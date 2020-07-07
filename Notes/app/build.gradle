@@ -1,0 +1,85 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    compileSdkVersion 29
+
+    defaultConfig {
+        applicationId "com.serhii.apps.notes"
+        minSdkVersion 26
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        // NDK settings
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+
+    }
+
+    buildTypes {
+
+        release {
+            minifyEnabled false // TODO Add and test app proguard settings
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+
+        debug {
+            debuggable true
+            jniDebuggable = true
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/cpp/build_ndk.mk')
+        }
+    }
+
+    flavorDimensions "environment"
+    productFlavors {
+
+        prodaction {
+            // App name
+            manifestPlaceholders = [appLabel: "Notes"]
+
+            dimension "environment"
+        }
+
+        dev {
+            // Indicates version for testing
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+
+            // App name
+            manifestPlaceholders = [appLabel: "DevNotes"]
+
+            dimension "environment"
+        }
+
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(":LibCore")
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.biometric:biometric:1.0.1'
+
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.2.0'
+}

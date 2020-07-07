@@ -1,0 +1,4 @@
+include ':app'
+
+include ':LibCore'
+project(':LibCore').projectDir = new File("../external-libs/core/")
