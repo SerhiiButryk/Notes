@@ -18,14 +18,11 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.core.common.log.Log;
 import com.example.notes.test.databinding.ActivityNoteEditorBinding;
 import com.example.notes.test.db.LocalDataBase;
 import com.example.notes.test.ui.data_model.NoteModel;
 import com.example.core.utils.GoodUtils;
 import com.example.notes.test.ui.utils.UserInactivityManager;
-
-import static com.example.notes.test.NotesViewActivity.EDITOR_ACTIVITY_INVALID_NOTE_ID;
 
 public class NoteEditorActivity extends AppCompatActivity {
 
@@ -34,6 +31,8 @@ public class NoteEditorActivity extends AppCompatActivity {
     public static final String UPDATE_NEEDED_EXTRA = "update needed extra";
     public static final String NOTE_TEMPLATE = "note template extra";
     public static final String NOTE_ID_EXTRA = "note key extra";
+    public static final int EDITOR_ACTIVITY_INVALID_NOTE_ID = -1;
+    public static final String EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED = "can not be deleted";
 
     private  EditText titleNote;
     private  EditText note;
@@ -48,6 +47,10 @@ public class NoteEditorActivity extends AppCompatActivity {
     private String checkNoteContent = "";
 
     private boolean isNoteOnBackPressedSaved;
+    private boolean isChangesShouldBeDiscarded;
+
+    // To overcome database issue
+    private boolean canNoteBeDeleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class NoteEditorActivity extends AppCompatActivity {
     protected void onDestroy() {
 
         // Save in case user updated a note
-        if (!isNoteOnBackPressedSaved) {
+        if (!isNoteOnBackPressedSaved && !isChangesShouldBeDiscarded) {
             saveUserNote(false);
         }
 
@@ -126,11 +129,27 @@ public class NoteEditorActivity extends AppCompatActivity {
                     return true;
                 }
 
+                if (canNoteBeDeleted) {
+                    Toast.makeText(this, R.string.toast_action_delete_error_first_note, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+
                 LocalDataBase.getInstance().deleteRecord(noteID);
 
                 sendResult(true, RESULT_OK);
 
                 Toast.makeText(this, R.string.toast_action_deleted_message, Toast.LENGTH_SHORT).show();
+                finish();
+
+            return true;
+
+            case R.id.discard_and_return:
+
+                isChangesShouldBeDiscarded = true;
+
+                sendResult(false, RESULT_OK);
+
+                Toast.makeText(this, R.string.toast_action_discard_changes_message, Toast.LENGTH_SHORT).show();
                 finish();
 
             return true;
@@ -180,6 +199,8 @@ public class NoteEditorActivity extends AppCompatActivity {
         if (intent.getAction() != null && intent.getAction().equals(ACTION_NOTE_OPENED)) {
 
             noteID = intent.getIntExtra(NOTE_ID_EXTRA, EDITOR_ACTIVITY_INVALID_NOTE_ID);
+            canNoteBeDeleted = intent.getBooleanExtra(EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED, false);
+
             boolean isTemplateNote = intent.getBooleanExtra(NOTE_TEMPLATE, false);
 
             /*

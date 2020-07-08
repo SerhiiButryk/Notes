@@ -24,6 +24,8 @@ public class LocalAppDatabase extends AppDataBaseImpl {
     private static final String TAG = "LocalAppDatabase";
 
     private static final int FLAG_GET_ALL_RECORDS = -11;
+    private static final String FLAG_SELECT = " = ?";
+    private static final String FLAG_ORDER = " ASC";
 
     private SQLiteDatabase databaseWrite;
     private SQLiteDatabase databaseRead;
@@ -93,9 +95,9 @@ public class LocalAppDatabase extends AppDataBaseImpl {
     public void deleteRecordImpl(int id) {
         super.deleteRecordImpl(id);
 
-        Log.info(TAG, " deleteRecordImpl( " + id + ")");
+        Log.info(TAG, " deleteRecordImpl(" + id + ")");
 
-        String selection = NotesEntry._ID + " = ?";
+        String selection = NotesEntry._ID + FLAG_SELECT;
         String[] selectionArgs = { String.valueOf(id + 1) }; // starts from 1
 
         int count = databaseWrite.delete(NotesEntry.TABLE_NAME, selection, selectionArgs);
@@ -107,7 +109,7 @@ public class LocalAppDatabase extends AppDataBaseImpl {
     public boolean updateRecordImpl(final int id, final NoteModel uiData) {
         super.updateRecordImpl(id, uiData);
 
-        Log.info(TAG, " updateRecordImpl( " + id + ")" + "New values "  + uiData.getNoteTitle() + " " + uiData.getNote() + "\n");
+        Log.info(TAG, " updateRecordImpl(" + id + ")" + "New values "  + uiData.getNoteTitle() + " " + uiData.getNote() + "\n");
 
         NoteModel noteModel = dbCypher.encrypt(uiData, id);
 
@@ -160,7 +162,7 @@ public class LocalAppDatabase extends AppDataBaseImpl {
 
         Log.info(TAG, "getRecordsImpl(" + id + ")");
 
-        String sortOrder = NotesEntry.COLUMN_TIMESTAMP + " ASC";
+        String sortOrder = NotesEntry.COLUMN_TIMESTAMP + FLAG_ORDER;
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -175,7 +177,7 @@ public class LocalAppDatabase extends AppDataBaseImpl {
         ArrayList<String> selectionArgs = new ArrayList<>();
 
         if (id != FLAG_GET_ALL_RECORDS) {
-            selection = NotesEntry._ID + " = ? ";
+            selection = NotesEntry._ID + FLAG_SELECT;
             selectionArgs.add(String.valueOf(id + 1)); // Start from 1 ID
         }
 

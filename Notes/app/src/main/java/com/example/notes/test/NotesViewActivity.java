@@ -30,6 +30,8 @@ import com.example.core.utils.GoodUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.notes.test.NoteEditorActivity.EDITOR_ACTIVITY_INVALID_NOTE_ID;
+import static com.example.notes.test.NoteEditorActivity.EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED;
 import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
 
 public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
@@ -38,8 +40,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
 
     // Intent extra values
     private static final int EDITOR_ACTIVITY_REQUEST_CODE = 199;
-
-    public static final int EDITOR_ACTIVITY_INVALID_NOTE_ID = -1;
 
     private FloatingActionButton actionButton;
     private RecyclerView notesRecyclerView;
@@ -68,7 +68,22 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
                 int noteID = position;
 
                 Intent intent = NoteEditorActivity.newIntent(NotesViewActivity.this,
-                        uiData.isTemplate(), uiData.isTemplate() ? EDITOR_ACTIVITY_INVALID_NOTE_ID : noteID);
+                        uiData.isTemplate(NotesViewActivity.this), uiData.isTemplate(NotesViewActivity.this)
+                                ? EDITOR_ACTIVITY_INVALID_NOTE_ID : noteID);
+
+                /**
+                 *   Database issue:
+                 *
+                 *   If there is at least 2 notes in the list and position = 0
+                 *   SQL database will return an error. To overcome this show a message to user
+                 *   to inform about this case and prevent a user from a deletion the first note.
+                 *
+                 *   User still can remove all notes one by one starting from the last note.
+                 *
+                 */
+                if (_uiData.size() >= 2 && position == 0) {
+                    intent.putExtra(EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED, true);
+                }
 
                 startActivityForResult(intent, EDITOR_ACTIVITY_REQUEST_CODE);
 
@@ -230,22 +245,21 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
     private void prepareLayout() {
         List<NoteModel> uiData = LocalDataBase.getInstance().getRecords();
 
+        _uiData.clear();
+
         if (uiData.isEmpty()) {
 
-            NoteModel note = NoteModel.createTemplateNote();
+            NoteModel note = NoteModel.createTemplateNote(this);
 
             // Add to the list
             _uiData.add(note);
 
-            adapter.setDataChanged(new ArrayList<>(_uiData));
-
         } else {
             // Add to the list
-            _uiData.clear();
             _uiData.addAll(uiData);
-
-            adapter.setDataChanged(_uiData);
         }
+
+        adapter.setDataChanged(_uiData);
 
     }
 

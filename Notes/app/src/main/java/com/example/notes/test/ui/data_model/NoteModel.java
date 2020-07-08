@@ -1,9 +1,10 @@
 package com.example.notes.test.ui.data_model;
 
-public class NoteModel {
+import android.content.Context;
 
-    private static final String TEMPLATE_TITLE_NOTE = "New title";
-    private static final String TEMPLATE_CONTENT_NOTE = "Here will be your short note's content shown";
+import com.example.notes.test.R;
+
+public class NoteModel {
 
     private String note;
     private String noteTitle;
@@ -34,16 +35,15 @@ public class NoteModel {
         this.noteTitle = noteTitle;
     }
 
-    public boolean isTemplate() {
-        return noteTitle.equals(TEMPLATE_TITLE_NOTE) & note.equals(TEMPLATE_CONTENT_NOTE);
+    public boolean isTemplate(Context context) {
+        return noteTitle.equals(context.getString(R.string.template_note_title))
+                && note.equals(context.getString(R.string.template_short_note));
     }
 
-    public static NoteModel createTemplateNote() {
+    public static NoteModel createTemplateNote(Context context) {
         NoteModel noteValues = new NoteModel();
-
-        noteValues.setNoteTitle(TEMPLATE_TITLE_NOTE);
-        noteValues.setNote(TEMPLATE_CONTENT_NOTE);
-
+        noteValues.setNoteTitle(context.getString(R.string.template_note_title));
+        noteValues.setNote(context.getString(R.string.template_short_note));
         return noteValues;
     }
 }

@@ -60,11 +60,14 @@
     <string name="title_toolbar">Note editor</string>
     <string name="toast_action_message">Note is saved</string>
     <string name="toast_action_deleted_message">Note is deleted</string>
+    <string name="toast_action_discard_changes_message">Changes are discarded</string>
     <string name="toast_action_delete_template_note">A template note cannot be deleted</string>
-    <string name="toast_action_delete_error_note">Can not deleted</string>
+    <string name="toast_action_delete_error_note">Can not delete an empty note</string>
+    <string name="toast_action_delete_error_first_note">Can not delete a note. This is not the last one.</string>
 
     // Menu
     <string name="delete_note_item">Delete note</string>
+    <string name="discard_and_return">Discard changes and return</string>
     <string name="settings_item">Settings</string>
 
     // PreferenceActivity
