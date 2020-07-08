@@ -50,7 +50,7 @@ public class NoteEditorActivity extends AppCompatActivity {
     private boolean isChangesShouldBeDiscarded;
 
     // To overcome database issue
-    private boolean canNoteBeDeleted;
+    private boolean cannotNoteBeDeleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +129,7 @@ public class NoteEditorActivity extends AppCompatActivity {
                     return true;
                 }
 
-                if (canNoteBeDeleted) {
+                if (cannotNoteBeDeleted) {
                     Toast.makeText(this, R.string.toast_action_delete_error_first_note, Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -199,7 +199,7 @@ public class NoteEditorActivity extends AppCompatActivity {
         if (intent.getAction() != null && intent.getAction().equals(ACTION_NOTE_OPENED)) {
 
             noteID = intent.getIntExtra(NOTE_ID_EXTRA, EDITOR_ACTIVITY_INVALID_NOTE_ID);
-            canNoteBeDeleted = intent.getBooleanExtra(EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED, false);
+            cannotNoteBeDeleted = intent.getBooleanExtra(EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED, false);
 
             boolean isTemplateNote = intent.getBooleanExtra(NOTE_TEMPLATE, false);
 
