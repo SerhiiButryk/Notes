@@ -25,16 +25,6 @@ bool APP::AuthUtils::isUserAccountExists(const std::string& user_name)
     return false;
 }
 
-bool APP::AuthUtils::isUserAuthorized()
-{
-    return is_user_authorized;;
-}
-
-void APP::AuthUtils::setUserAuthorized(bool isUserAuthorized)
-{
-    isUserAuthorized = isUserAuthorized;
-}
-
 bool APP::AuthUtils::verifyUserPassword(const std::string& user_name, const std::string& user_password)
 {
     SystemStorage ss;
@@ -114,5 +104,3 @@ void APP::AuthUtils::setIdleLockTimeOut()
 
     ss.addValues(kFileSystemData, value);
 }
-
-bool APP::AuthUtils::is_user_authorized = false;

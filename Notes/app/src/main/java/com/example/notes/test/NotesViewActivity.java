@@ -89,7 +89,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
         /**
          * Start authorization process
          */
-        authorizeUser();
+        authorizeUser(savedInstanceState);
 
         initNative(this);
 
@@ -249,9 +249,11 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
 
     }
 
-    private void authorizeUser() {
-
-        if (!nativeBridge.isUserAuthorized()) {
+    private void authorizeUser(Bundle bundle) {
+        /**
+         *  Activity is started by Android OS from launcher icon
+         */
+        if (bundle == null) {
             /*
                 Start authorization activity
             */

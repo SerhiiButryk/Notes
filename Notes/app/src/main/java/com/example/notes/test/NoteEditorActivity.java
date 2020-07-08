@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.core.common.log.Log;
 import com.example.notes.test.databinding.ActivityNoteEditorBinding;
 import com.example.notes.test.db.LocalDataBase;
 import com.example.notes.test.ui.data_model.NoteModel;
@@ -45,6 +46,8 @@ public class NoteEditorActivity extends AppCompatActivity {
 
     private String checkTitle = "";
     private String checkNoteContent = "";
+
+    private boolean isNoteOnBackPressedSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +81,9 @@ public class NoteEditorActivity extends AppCompatActivity {
     protected void onDestroy() {
 
         // Save in case user updated a note
-        saveUserNote(false);
+        if (!isNoteOnBackPressedSaved) {
+            saveUserNote(false);
+        }
 
         // Cancel alarm
         UserInactivityManager.getInstance().cancelAlarm();
@@ -164,6 +169,9 @@ public class NoteEditorActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         saveUserNote(true);
+
+        isNoteOnBackPressedSaved = true;
+
         finish();
     }
 
@@ -245,31 +253,11 @@ public class NoteEditorActivity extends AppCompatActivity {
      *
      */
     private boolean checkIfNoteChanged() {
-        boolean success = false;
-
-        if (isEmptyNote()) {
-            success = true;
-        }
 
         String title = GoodUtils.getText(titleNote);
         String note = GoodUtils.getText(this.note);
 
-        if (isTemplateNoteOpened) {
-            /*
-                Check if template note is edited
-            */
-            if (title.equals(getResources().getString(R.string.template_note_title))
-                    && note.equals(getResources().getString(R.string.template_short_note))) {
-                success = true;
-            }
-        }
-
-        if (checkTitle.equals(title) && checkNoteContent.equals(note)) {
-            success = true;
-        }
-
-        if (success) {
-
+        if (isEmptyNote() || (checkTitle.equals(title) && checkNoteContent.equals(note)) ) {
             sendResult(false, RESULT_OK);
             return true;
         }

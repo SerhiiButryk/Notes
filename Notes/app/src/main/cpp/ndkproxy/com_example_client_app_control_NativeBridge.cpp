@@ -45,12 +45,6 @@ JNIEXPORT jboolean JNICALL Java_com_example_notes_test_control_NativeBridge__1se
     return static_cast<jboolean>(ss.updateValue(kFileSystemData, key, passwordString));
 }
 
-JNIEXPORT jboolean JNICALL Java_com_example_notes_test_control_NativeBridge__1isUserAuthorized
-        (JNIEnv *, jobject)
-{
-    return static_cast<jboolean>(AuthUtils::isUserAuthorized());
-}
-
 JNIEXPORT void JNICALL Java_com_example_notes_test_control_NativeBridge__1clearAppData(JNIEnv *, jobject)
 {
     SystemStorage ss;

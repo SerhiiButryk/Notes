@@ -30,10 +30,6 @@ public class NativeBridge {
         return _setNewPassword(hash.hashMD5(password));
     }
 
-    public boolean isUserAuthorized() {
-        return _isUserAuthorized();
-    }
-
     public void setAttemptLimit(int newLimit) {
         _setAttemptLimit(newLimit);
     }
@@ -74,7 +70,6 @@ public class NativeBridge {
 
     private native boolean _verifyPassword(String userName, String password);
     private native boolean _setNewPassword(String password);
-    private native boolean _isUserAuthorized();
 
     private native void _clearAppData();
 

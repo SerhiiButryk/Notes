@@ -25,8 +25,6 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 
             if (p.second == event.getData(PASSWORD_KEY))
             {
-                AuthUtils::setUserAuthorized(true);
-
                 sendSystemEvent(EVENT_RESULT::AUTHORIZATION_DONE);
 
                 return;

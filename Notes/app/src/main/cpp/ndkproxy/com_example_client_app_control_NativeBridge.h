@@ -17,9 +17,6 @@ JNIEXPORT jboolean JNICALL Java_com_example_notes_test_control_NativeBridge__1ve
 JNIEXPORT jboolean JNICALL Java_com_example_notes_test_control_NativeBridge__1setNewPassword
         (JNIEnv *, jobject, jstring password);
 
-JNIEXPORT jboolean JNICALL Java_com_example_notes_test_control_NativeBridge__1isUserAuthorized
-        (JNIEnv *, jobject);
-
 JNIEXPORT void JNICALL Java_com_example_notes_test_control_NativeBridge__1clearAppData
         (JNIEnv *, jobject);
 
