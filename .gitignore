@@ -1,6 +1,5 @@
 # Ignore non project files
 
-sdk/3th_parties/*
 **/.gradle/*
 **/.idea/
 **/.settings/
