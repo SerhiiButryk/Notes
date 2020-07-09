@@ -11,7 +11,5 @@ namespace APP
 
             void handleEvent(const Event<SYSTEM_EVENT>& event) override;
 
-            static const std::string UNLOCK_KEY;
-
     };
 }

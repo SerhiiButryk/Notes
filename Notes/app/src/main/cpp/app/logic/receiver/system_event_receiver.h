@@ -13,7 +13,7 @@ namespace APP
     /**
      *  Class processes 'SYSTEM_EVENT' event types and forward them to
      *
-     *  corresponding handler (receiver).
+     *  corresponding event handler (receiver).
      */
     class SystemEventReceiver
     {

@@ -3,6 +3,7 @@
 #include "app_common/env_constants.h"
 #include "app/logic/event_dispatcher.h"
 #include "storage/system_storage.h"
+#include "app/logic/system/common_constants.h"
 
 using MYLIB::SystemStorage;
 
@@ -31,7 +32,5 @@ namespace APP
         }
 
     }
-
-    const std::string UnlockHandler::UNLOCK_KEY = "unlock_key";
 
 }

@@ -5,6 +5,7 @@
 #include "storage/system_storage.h"
 #include "app_common/env_constants.h"
 #include "app/core/utils/auth_utils.h"
+#include "app/logic/system/common_constants.h"
 
 using MYLIB::SystemStorage;
 
@@ -41,7 +42,3 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 
     sendSystemEvent(EVENT_RESULT::ACCOUNT_INVALID);
 }
-
-const std::string APP::AuthorizeHandler::USERNAME_KEY = "username key";
-
-const std::string APP::AuthorizeHandler::PASSWORD_KEY = "password key";

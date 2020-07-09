@@ -17,6 +17,7 @@ SDK_3TH_PARTIES := $(SDK_PATH)/3th_parties
                        ndkproxy/com_example_client_app_MainActivity.cpp \
                        ndkproxy/com_example_client_app_control_NativeBridge.cpp \
                        app/logic/receiver/system_event_receiver.cpp \
+                       app/logic/system/common_constants.cpp \
                        app/net/server_agent.cpp \
                        app/logic/event_dispatcher.cpp \
                        app/logic/event/authorize_event.cpp \

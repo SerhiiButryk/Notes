@@ -34,8 +34,8 @@ public class NoteEditorActivity extends AppCompatActivity {
     public static final int EDITOR_ACTIVITY_INVALID_NOTE_ID = -1;
     public static final String EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED = "can not be deleted";
 
-    private  EditText titleNote;
-    private  EditText note;
+    private  EditText titleNoteField;
+    private  EditText noteFiled;
 
     private  Toolbar toolbar;
 
@@ -101,8 +101,8 @@ public class NoteEditorActivity extends AppCompatActivity {
         ActivityNoteEditorBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_note_editor);
 
         // Set references
-        titleNote = binding.titleNote;
-        note = binding.bodyNote;
+        titleNoteField = binding.titleNote;
+        noteFiled = binding.bodyNote;
         toolbar = binding.toolbar;
     }
 
@@ -124,7 +124,7 @@ public class NoteEditorActivity extends AppCompatActivity {
                     return true;
                 }
 
-                if (TextUtils.isEmpty(titleNote.getText()) && TextUtils.isEmpty(note.getText())) {
+                if (TextUtils.isEmpty(titleNoteField.getText()) && TextUtils.isEmpty(noteFiled.getText())) {
                     Toast.makeText(this, R.string.toast_action_delete_error_note, Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -215,8 +215,8 @@ public class NoteEditorActivity extends AppCompatActivity {
                     checkTitle = note.getNoteTitle();
                     checkNoteContent = note.getNote();
 
-                    titleNote.setText(note.getNoteTitle());
-                    this.note.setText(note.getNote());
+                    titleNoteField.setText(checkTitle);
+                    noteFiled.setText(checkNoteContent);
                 }
 
                 isActionNoteOpened = true;
@@ -226,8 +226,8 @@ public class NoteEditorActivity extends AppCompatActivity {
                 If it's a request to open template note, then use default values
             */
             if (isTemplateNote) {
-                titleNote.setHint(getResources().getString(R.string.template_note_title));
-                note.setHint(getResources().getString(R.string.template_short_note));
+                titleNoteField.setHint(getResources().getString(R.string.template_note_title));
+                noteFiled.setHint(getResources().getString(R.string.template_short_note));
 
                 isTemplateNoteOpened = true;
             }
@@ -245,8 +245,8 @@ public class NoteEditorActivity extends AppCompatActivity {
             return;
         }
 
-        String title = GoodUtils.getText(titleNote);
-        String note = GoodUtils.getText(this.note);
+        String title = GoodUtils.getText(titleNoteField);
+        String note = GoodUtils.getText(noteFiled);
 
         /*
             If action is  ACTION_NOTE_OPENED then update current record
@@ -275,8 +275,8 @@ public class NoteEditorActivity extends AppCompatActivity {
      */
     private boolean checkIfNoteChanged() {
 
-        String title = GoodUtils.getText(titleNote);
-        String note = GoodUtils.getText(this.note);
+        String title = GoodUtils.getText(titleNoteField);
+        String note = GoodUtils.getText(noteFiled);
 
         if (isEmptyNote() || (checkTitle.equals(title) && checkNoteContent.equals(note)) ) {
             sendResult(false, RESULT_OK);
@@ -287,8 +287,8 @@ public class NoteEditorActivity extends AppCompatActivity {
     }
 
     private boolean isEmptyNote() {
-        return TextUtils.isEmpty(GoodUtils.getText(titleNote))
-                && TextUtils.isEmpty(GoodUtils.getText(note));
+        return TextUtils.isEmpty(GoodUtils.getText(titleNoteField))
+                && TextUtils.isEmpty(GoodUtils.getText(noteFiled));
     }
 
     private void sendResult(boolean needUpdate, int success) {

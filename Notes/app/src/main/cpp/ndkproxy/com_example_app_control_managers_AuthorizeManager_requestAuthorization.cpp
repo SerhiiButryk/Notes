@@ -3,11 +3,9 @@
 #include "utils/jstring.h"
 #include "app/logic/system/event.h"
 #include "app_common/types.h"
-#include "app/logic/handler/authorize_handler.h"
-#include "app/logic/handler/registration_handler.h"
 #include "app/logic/event_dispatcher.h"
-#include "app/logic/handler/unlock_handler.h"
 #include "app/logic/receiver/system_event_receiver.h"
+#include "app/logic/system/common_constants.h"
 
 using namespace APP;
 
@@ -24,8 +22,8 @@ extern "C" {
        JString usernameString(env, jusername);
 
        Event event(SYSTEM_EVENT::AUTHORIZE);
-       event.putData(AuthorizeHandler::PASSWORD_KEY, passwordString);
-       event.putData(AuthorizeHandler::USERNAME_KEY, usernameString);
+       event.putData(PASSWORD_KEY, passwordString);
+       event.putData(USERNAME_KEY, usernameString);
 
        SystemEventReceiver::getInstance()->forward(event);
   }
@@ -38,9 +36,9 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeMan
       JString confirmpasswordString(env, jconfirm_password);
 
       Event event(SYSTEM_EVENT::REGISTER_ACCOUNT);
-      event.putData(RegistrationHandler::USERNAME_KEY, usernameString);
-      event.putData(RegistrationHandler::PASSWORD_KEY, passwordString);
-      event.putData(RegistrationHandler::CONFIRM_PASSWORD_KEY, confirmpasswordString);
+      event.putData(USERNAME_KEY, usernameString);
+      event.putData(PASSWORD_KEY, passwordString);
+      event.putData(CONFIRM_PASSWORD_KEY, confirmpasswordString);
 
       SystemEventReceiver::getInstance()->forward(event);
   }
@@ -51,7 +49,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeMan
       JString unlockKey(env, junlockKey);
 
       Event event(SYSTEM_EVENT::UNLOCK);
-      event.putData(UnlockHandler::UNLOCK_KEY, unlockKey);
+      event.putData(UNLOCK_KEY, unlockKey);
 
       SystemEventReceiver::getInstance()->forward(event);
 }

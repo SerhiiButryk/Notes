@@ -14,9 +14,6 @@ namespace APP
             AuthorizeHandler();
 
             void handleEvent(const Event<SYSTEM_EVENT>& event) override;
-
-            static const std::string USERNAME_KEY;
-            static const std::string PASSWORD_KEY;
     };
 
 }

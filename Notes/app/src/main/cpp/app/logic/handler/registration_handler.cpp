@@ -8,6 +8,7 @@
 #include "app/logic/event_dispatcher.h"
 #include "utils/log.h"
 #include "app/core/utils/auth_utils.h"
+#include "app/logic/system/common_constants.h"
 
 using MYLIB::makeHashMD5;
 using MYLIB::CacheManager;
@@ -76,11 +77,5 @@ namespace APP
 
         sendSystemEvent(success);
     }
-
-    const std::string RegistrationHandler::PASSWORD_KEY = "password key";
-
-    const std::string RegistrationHandler::USERNAME_KEY = "username key";
-
-    const std::string RegistrationHandler::CONFIRM_PASSWORD_KEY = "confirm password key";
 
 }
