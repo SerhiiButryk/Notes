@@ -1,5 +1,4 @@
-#ifndef ANDROID_SAMPLES_CASHE_MANAGER_H
-#define ANDROID_SAMPLES_CASHE_MANAGER_H
+#pragma once
 
 #include <string>
 
@@ -17,6 +16,3 @@ namespace MYLIB
     };
 
 }
-
-
-#endif //ANDROID_SAMPLES_CASHE_MANAGER_H

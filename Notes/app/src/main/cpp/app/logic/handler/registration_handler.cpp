@@ -10,11 +10,7 @@
 #include "app/core/utils/auth_utils.h"
 #include "app/logic/system/common_constants.h"
 
-using MYLIB::makeHashMD5;
-using MYLIB::CacheManager;
-using MYLIB::SystemStorage;
-using MYLIB::FileSystem;
-using MYLIB::Log;
+using namespace MYLIB;
 
 const static std::string TAG = "RegistrationHandler";
 

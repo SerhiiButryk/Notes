@@ -28,4 +28,6 @@ namespace MYLIB
         _TAG_APP_ = tag;
     }
 
+    std::mutex Log::_mutex_log_guard;
+
 }

@@ -14,99 +14,96 @@ namespace MYLIB
     /**
      * Uses BOOST LIBRARY SUPPORT for logging
      */
-
-    namespace {
-        std::mutex _mutex_log_guard; // Protects android log resource
-    }
-
     class Log
     {
-    private:
+        private:
 
-        static std::string _TAG_APP_ ;
+            static std::string _TAG_APP_ ;
 
-        template<typename T, typename... Args>
-        static const T& getArg(boost::format& f, const T& arg, const Args&... args) {
-            f % arg;
-            return getArg(f, args...);
-        }
+            static std::mutex _mutex_log_guard; // Protects android log resource
 
-        template<typename T>
-        static const T& getArg(boost::format& f, const T& arg) {
-            return arg;
-        }
+            template<typename T, typename... Args>
+            static const T& getArg(boost::format& f, const T& arg, const Args&... args) {
+                f % arg;
+                return getArg(f, args...);
+            }
 
-        template<typename T, typename... Args>
-        static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {
+            template<typename T>
+            static const T& getArg(boost::format& f, const T& arg) {
+                return arg;
+            }
 
-            std::lock_guard guard(_mutex_log_guard);
+            template<typename T, typename... Args>
+            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {
 
-            using boost::format;
+                std::lock_guard guard(_mutex_log_guard);
 
-            format formatter(formattedMessage);
-            formatter % arg;
-            formatter % getArg(formatter, args...);
+                using boost::format;
 
-            __android_log_write(LOG_LEVEL, TAG.c_str(), formatter.str().c_str());
-        }
+                format formatter(formattedMessage);
+                formatter % arg;
+                formatter % getArg(formatter, args...);
 
-        template<typename T>
-        static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg) {
+                __android_log_write(LOG_LEVEL, TAG.c_str(), formatter.str().c_str());
+            }
 
-            std::lock_guard guard(_mutex_log_guard);
+            template<typename T>
+            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg) {
 
-            using boost::format;
+                std::lock_guard guard(_mutex_log_guard);
 
-            format formatter(formattedMessage);
-            formatter % arg;
+                using boost::format;
 
-            __android_log_write(LOG_LEVEL, TAG.c_str(), formatter.str().c_str());
-        }
+                format formatter(formattedMessage);
+                formatter % arg;
 
-        static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage);
+                __android_log_write(LOG_LEVEL, TAG.c_str(), formatter.str().c_str());
+            }
 
-    public:
+            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage);
 
-        /**
-         *  Set your TAG for logs
-         */
-        static void setTag(const std::string& tag);
+        public:
 
-        /**
-         *  Public error level functions
-         */
+            /**
+             *  Set your TAG for logs
+             */
+            static void setTag(const std::string& tag);
 
-        template<typename T, typename... Args>
-        static void Error(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
+            /**
+             *  Public error level functions
+             */
 
-            log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message, arg, args...);
-        }
+            template<typename T, typename... Args>
+            static void Error(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
 
-        template<typename T>
-        static void Error(const std::string& TAG, const std::string& message, const T& arg) {
+                log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message, arg, args...);
+            }
 
-            log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message, arg);
-        }
+            template<typename T>
+            static void Error(const std::string& TAG, const std::string& message, const T& arg) {
 
-        static void Error(const std::string& TAG, const std::string& message);
+                log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message, arg);
+            }
 
-        /**
-         *  Public info level functions
-         */
+            static void Error(const std::string& TAG, const std::string& message);
 
-        template<typename T, typename... Args>
-        static void Info(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
+            /**
+             *  Public info level functions
+             */
 
-            log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message, arg, args...);
-        }
+            template<typename T, typename... Args>
+            static void Info(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
 
-        template<typename T>
-        static void Info(const std::string& TAG, const std::string& message, const T& arg) {
+                log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message, arg, args...);
+            }
 
-            log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message, arg);
-        }
+            template<typename T>
+            static void Info(const std::string& TAG, const std::string& message, const T& arg) {
 
-        static void Info(const std::string& TAG, const std::string& message);
+                log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message, arg);
+            }
+
+            static void Info(const std::string& TAG, const std::string& message);
 
     };
 

@@ -7,10 +7,8 @@ namespace MYLIB
 
     class Algorithms
     {
-
-    public:
-
-        static bool containSpace(const std::string& str);
+        public:
+            static bool containSpace(const std::string& str);
     };
 
 }

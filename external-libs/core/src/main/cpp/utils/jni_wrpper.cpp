@@ -5,8 +5,10 @@
 
 #include "log.h"
 
-// For DEBUG
-const static std::string TAG = "JNIWrapper";
+namespace {
+    // For DEBUG
+    const std::string TAG = "JNIWrapper";
+}
 
 namespace MYLIB
 {
@@ -135,17 +137,6 @@ namespace MYLIB
 
         env->CallVoidMethod(obj, mId);
     }
-
-    Lock::Lock() : l(m, std::defer_lock)
-    {
-        l.lock();
-    }
-
-    Lock::~Lock()
-    {
-        l.unlock();
-    }
-
 
 }
 

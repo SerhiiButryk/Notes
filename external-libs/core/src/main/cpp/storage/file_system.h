@@ -1,5 +1,4 @@
-#ifndef ANDROID_SAMPLES_FILE_SYSTEM_H
-#define ANDROID_SAMPLES_FILE_SYSTEM_H
+#pragma once
 
 #include <string>
 #include <map>
@@ -49,5 +48,3 @@ namespace MYLIB
     };
 
 }
-
-#endif

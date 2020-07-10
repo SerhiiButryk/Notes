@@ -6,8 +6,7 @@
 #include "storage/system_storage.h"
 #include "utils/algorithms.h"
 
-using MYLIB::Algorithms;
-using MYLIB::SystemStorage;
+using namespace MYLIB;
 
 bool APP::AuthUtils::isUserAccountExists(const std::string& user_name)
 {

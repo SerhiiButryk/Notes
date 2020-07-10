@@ -5,7 +5,7 @@
 #include "storage/system_storage.h"
 #include "app/logic/system/common_constants.h"
 
-using MYLIB::SystemStorage;
+using namespace MYLIB;
 
 namespace APP
 {

@@ -55,6 +55,7 @@ SDK_3TH_PARTIES := $(SDK_PATH)/3th_parties
                        utils/jni_wrpper.cpp \
                        utils/log.cpp \
                        utils/jstring.cpp \
+                       utils/lock.cpp \
 
     LOCAL_CPP_FEATURES := rtti exceptions
 

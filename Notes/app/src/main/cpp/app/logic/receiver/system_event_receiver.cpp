@@ -36,6 +36,7 @@ namespace APP
         RegistrationHandler* registrationHandler = new RegistrationHandler();
         UnlockHandler* unlockHandler = new UnlockHandler();
 
+        // Register receivers
         addReceiver(authorizeHandler);
         addReceiver(registrationHandler);
         addReceiver(unlockHandler);

@@ -1,5 +1,4 @@
-#ifndef ANDROID_SAMPLES_ENV_CONSTANTS_H
-#define ANDROID_SAMPLES_ENV_CONSTANTS_H
+#pragma once
 
 #include <string>
 
@@ -24,5 +23,3 @@ namespace APP
     extern const std::string TRUE;
     extern const std::string FALSE;
 }
-
-#endif //ANDROID_SAMPLES_ENV_CONSTANTS_H

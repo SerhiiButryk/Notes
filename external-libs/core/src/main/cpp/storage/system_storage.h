@@ -1,5 +1,4 @@
-#ifndef ANDROID_SAMPLES_SYSTEM_STORAGE_H
-#define ANDROID_SAMPLES_SYSTEM_STORAGE_H
+#pragma once
 
 #include <string>
 #include <map>
@@ -40,6 +39,3 @@ namespace MYLIB
     };
 
 }
-
-
-#endif

@@ -7,7 +7,7 @@
 #include "app/core/utils/auth_utils.h"
 #include "app/logic/system/common_constants.h"
 
-using MYLIB::SystemStorage;
+using namespace MYLIB;
 
 APP::AuthorizeHandler::AuthorizeHandler() : EventHandlerBase(SYSTEM_EVENT::AUTHORIZE)
 {
