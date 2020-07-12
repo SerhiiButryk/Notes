@@ -15,10 +15,10 @@ It provides simple interface and pleasant design.
 
 # Implementation details
 
-- Separated UI logic in fragments
+- Separated UI logic to fragments
 - Separated presentation and bisness logic with MVVM pattern
-- Separeted reusable modules into library
-- Low level logic is written in native code -> improves code structure and flexibility
+- Separeted reusable modules into android/native libraries
+- Low level logic is written in native code -> improves code structure and code flexibility
 - Java and native calls are made from single place -> improves code maintainability
 - Applided decouple strategies to separate a receiver and handler of an event
 - Separated code into logical levels of abstraction
