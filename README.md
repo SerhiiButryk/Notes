@@ -33,7 +33,7 @@ It provides simple interface and pleasant design.
 
 - Languages: Java/JNI, C++17
 - Native libraryies: OpenSSL, Boost
-- Android framework feaches: androidX namespace, view's bindings, ui fragments, secure store, SQL database APIs   
+- Android framework features: androidX namespace, view's bindings, ui fragments, secure store, SQL database APIs   
 
 # Demo video
 
