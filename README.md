@@ -29,6 +29,12 @@ It provides simple interface and pleasant design.
 - sdk/ - reusable native interfaces
 - Notes/ - application root directory
 
+# Used technologies
+
+- Languages: Java/JNI, C++17
+- Native libraryies: OpenSSL, Boost
+- Android framework feaches: androidX namespace, view's bindings, ui fragments  
+
 # Demo video
 
 [![Watch the video](https://img.youtube.com/vi/C2zxFzp1pFk/0.jpg)](https://www.youtube.com/watch?v=C2zxFzp1pFk&feature=youtu.be)
