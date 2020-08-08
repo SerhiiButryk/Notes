@@ -2,7 +2,7 @@ package com.example.notes.test.db;
 
 import android.content.Context;
 
-import com.example.notes.test.db.impl.AppDataBaseImpl;
+import com.example.notes.test.db.impl.base.AppDataBaseImpl;
 import com.example.notes.test.db.impl.LocalAppDatabase;
 import com.example.notes.test.ui.data_model.NoteModel;
 
@@ -33,8 +33,8 @@ public class LocalDataBase implements DataBase {
     }
 
     @Override
-    public void addRecord(NoteModel uiData) {
-        impl.addRecordImpl(uiData);
+    public boolean addRecord(NoteModel uiData) {
+        return impl.addRecordImpl(uiData);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class LocalDataBase implements DataBase {
     }
 
     @Override
-    public void updateRecord(int id, NoteModel uiData) {
-        impl.updateRecordImpl(id, uiData);
+    public boolean updateRecord(int id, NoteModel uiData) {
+        return impl.updateRecordImpl(id, uiData);
     }
 
     @Override

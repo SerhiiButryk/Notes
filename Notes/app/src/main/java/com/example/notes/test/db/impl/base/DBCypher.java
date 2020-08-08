@@ -1,9 +1,11 @@
-package com.example.notes.test.db.impl;
+package com.example.notes.test.db.impl.base;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
+import com.example.core.security.impl.crypto.CryptoError;
+import com.example.notes.test.control.EventService;
 import com.example.notes.test.ui.data_model.NoteModel;
 import com.example.core.security.Cipher;
 import com.example.core.security.impl.crypto.Result;
@@ -13,7 +15,11 @@ public class DBCypher {
     private static final String FILE_PREFERENCES = "com.example.app.db.pref.local";
     private static final String KEY_IV_TITLE = "iv_title";
     private static final String KEY_IV_NOTE = "iv_note";
-    public static final long APPEND_MODE = -1;
+
+    /**
+     *  Indicates that this is not an update note request
+     */
+    public static final long ADD_MODE = -1;
 
     private byte[] ivTitle;
     private byte[] ivNote;
@@ -31,11 +37,24 @@ public class DBCypher {
         Result note = csk.encryptSymmetric(noteModel.getNote());
         Result title = csk.encryptSymmetric(noteModel.getNoteTitle());
 
+        if (!note.isResultAvailable() || !title.isResultAvailable()) {
+
+            if (note.getError() == CryptoError.USER_NOT_AUTHORIZED) {
+                // Need to request keystore unlock
+                EventService.getInstance().onUnlockKeystore();
+            }
+
+            return null;
+        }
+
         ivTitle = title.getIv();
         ivNote = note.getIv();
 
-        if (id != APPEND_MODE) {
-            cashInitializeVector(id);
+        /**
+         *  Save IV if a note was updated
+         */
+        if (id != ADD_MODE) {
+            saveInitializeVector(id);
         }
 
         return new NoteModel(note.toString(), title.toString());
@@ -46,13 +65,23 @@ public class DBCypher {
 
         retrieveInitializeVector(id);
 
-        String decodedNote = csk.decryptSymmetric(noteModel.getNote(), ivNote);
-        String decodedTitle = csk.decryptSymmetric(noteModel.getNoteTitle(), ivTitle);
+        Result decodedNote = csk.decryptSymmetric(noteModel.getNote(), ivNote);
+        Result decodedTitle = csk.decryptSymmetric(noteModel.getNoteTitle(), ivTitle);
 
-        return new NoteModel(decodedNote, decodedTitle);
+        if (!decodedNote.isResultAvailable() || !decodedTitle.isResultAvailable()) {
+
+            if (decodedNote.getError() == CryptoError.USER_NOT_AUTHORIZED) {
+                // Need to request keystore unlock
+                EventService.getInstance().onUnlockKeystore();
+            }
+
+            return null;
+        }
+
+        return new NoteModel(decodedNote.getMessage(), decodedTitle.getMessage());
     }
 
-    public void cashInitializeVector(long id) {
+    public void saveInitializeVector(long id) {
 
         String fileName = FILE_PREFERENCES + id;
 

@@ -23,7 +23,7 @@ public class SettingsActivity extends AppCompatActivity implements SetLoginLimit
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enable unsecure screen content settings
+        // Enable unsecured screen content settings
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         initBinding();
@@ -45,33 +45,16 @@ public class SettingsActivity extends AppCompatActivity implements SetLoginLimit
             getSupportActionBar().setTitle(getString(R.string.preference_title));
         }
 
-        UserInactivityManager.getInstance().initManager(this);
-    }
+        // Lifecycle aware component
+        UserInactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Start inactivity listener
-        UserInactivityManager.getInstance().scheduleAlarm();
     }
 
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
 
-        // Reschedule
-        UserInactivityManager.getInstance().cancelAlarm();
-        UserInactivityManager.getInstance().scheduleAlarm();
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        // Cancel alarm
-        UserInactivityManager.getInstance().cancelAlarm();
-
-        super.onDestroy();
+        UserInactivityManager.getInstance().onUserInteraction();
     }
 
     @Override

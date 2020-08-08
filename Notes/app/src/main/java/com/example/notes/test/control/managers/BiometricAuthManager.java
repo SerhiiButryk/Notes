@@ -1,6 +1,9 @@
 package com.example.notes.test.control.managers;
 
+import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
@@ -13,9 +16,13 @@ import com.example.core.common.log.Log;
 
 import java.util.concurrent.Executor;
 
+import static android.app.Activity.RESULT_OK;
+
 public class BiometricAuthManager {
 
     private final static String TAG = "BiometricAuthManager";
+
+    private static final int UNLOCK_KEYSTORE_REQUEST_CODE = 200;
 
     private Executor executor;
     private BiometricPrompt biometricPrompt;
@@ -61,11 +68,25 @@ public class BiometricAuthManager {
         });
 
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login for my app")
-                .setSubtitle("Log in using your biometric credential")
-                .setNegativeButtonText("Use account password")
+                .setTitle("Biometric login for my app") // TODO Move to xml
+                .setSubtitle("Log in using your biometric credential") // TODO Move to xml
+                .setDeviceCredentialAllowed(true)
                 .build();
 
+    }
+
+    public static void requestUnlockActivity(Activity activity) {
+        KeyguardManager keyguardManager = (KeyguardManager) activity.getSystemService(Context.KEYGUARD_SERVICE);
+
+        Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(null, null);
+
+        if (intent != null) {
+            activity.startActivityForResult(intent, UNLOCK_KEYSTORE_REQUEST_CODE);
+        }
+    }
+
+    public static boolean isUnlockActivityResult(int requestCode, int resultCode) {
+        return requestCode == UNLOCK_KEYSTORE_REQUEST_CODE && resultCode == RESULT_OK;
     }
 
     public void authenticate() {

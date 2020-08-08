@@ -12,7 +12,7 @@ namespace APP
     };
 
     // TODO: maybe create class instead ?
-    enum class EVENT_RESULT
+    enum class ACTION_TYPE
     {
         EMPTY_FIELD = -1,
         WRONG_PASSWORD = -2,
@@ -32,6 +32,8 @@ namespace APP
         UNLOCK_DONE = -9,
 
         UNLOCK_KEY_INVALID = -10,
+
+        UNLOCK_KEYSTORE = -11,
 
         NO_ERRORS = 1
     };

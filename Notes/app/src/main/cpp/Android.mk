@@ -14,15 +14,16 @@ SDK_3TH_PARTIES := $(SDK_PATH)/3th_parties
 
     LOCAL_SRC_FILES := ndkproxy/com_example_app_control_managers_AuthorizeManager_requestAuthorization.cpp \
                        ndkproxy/com_example_client_app_LoginActivity.cpp \
-                       ndkproxy/com_example_client_app_MainActivity.cpp \
+                       ndkproxy/com_example_client_app_NotesViewActivity.cpp \
                        ndkproxy/com_example_client_app_control_NativeBridge.cpp \
+                       ndkproxy/com_example_notes_test_NoteEditorActivity.cpp \
                        app/logic/receiver/system_event_receiver.cpp \
-                       app/logic/system/common_constants.cpp \
+                       app/logic/base/system_constants.cpp \
                        app/net/server_agent.cpp \
-                       app/logic/event_dispatcher.cpp \
+                       app/logic/action_dispatcher.cpp \
                        app/logic/event/authorize_event.cpp \
                        app/logic/event/registration_event.cpp \
-                       app/core/login_action_sender.cpp \
+                       app/core/app_action_sender.cpp \
                        app/core/utils/auth_utils.cpp \
                        app/logic/handler/authorize_handler.cpp \
                        app/logic/handler/registration_handler.cpp \

@@ -14,7 +14,7 @@ public class Cipher implements CryptoBase {
         CoreEngine.getInstance().configure(this);
     }
 
-    public void setCrypto(CryptoSymmetric impl) {
+    public void setSymmetricCrypto(CryptoSymmetric impl) {
         this.impl = impl;
     }
 
@@ -24,7 +24,7 @@ public class Cipher implements CryptoBase {
     }
 
     @Override
-    public String decryptSymmetric(String message, final byte[] inputIV) {
+    public Result decryptSymmetric(String message, final byte[] inputIV) {
         return impl.decryptSymmetric(message, inputIV);
     }
 }

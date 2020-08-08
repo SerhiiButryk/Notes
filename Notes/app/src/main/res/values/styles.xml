@@ -2,14 +2,14 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="colorPrimary">@color/dark_blue</item>
-        <item name="colorPrimaryDark">@color/light_blue</item>
+        <item name="colorPrimary">@color/blue_contrast</item>
+        <item name="colorPrimaryDark">@color/blue_contrast</item>
         <item name="colorAccent">@color/blue_accent</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/dark_blue</item>
-        <item name="colorPrimaryDark">@color/light_blue</item>
+        <item name="colorPrimary">@color/blue_contrast</item>
+        <item name="colorPrimaryDark">@color/blue_contrast</item>
         <item name="colorAccent">@color/blue_accent</item>
     </style>
 

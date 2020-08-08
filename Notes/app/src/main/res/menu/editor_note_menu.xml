@@ -6,7 +6,7 @@
         android:title="@string/delete_note_item"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/discard_and_return"
+    <item android:id="@+id/save_note"
         android:title="@string/discard_and_return"
         app:showAsAction="never"/>
 

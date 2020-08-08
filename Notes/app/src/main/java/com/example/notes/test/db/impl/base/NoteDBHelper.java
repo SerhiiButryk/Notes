@@ -1,11 +1,11 @@
-package com.example.notes.test.db.impl;
+package com.example.notes.test.db.impl.base;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
-import static com.example.notes.test.db.impl.model.DbNoteModel.*;
+import static com.example.notes.test.db.impl.model.DbNoteTableModel.*;
 
 public class NoteDBHelper extends SQLiteOpenHelper {
 

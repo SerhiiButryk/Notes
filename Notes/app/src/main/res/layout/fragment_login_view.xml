@@ -99,11 +99,11 @@
 
                 <ImageButton
                     android:id="@+id/btn_fingerprint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="80dp"
+                    android:layout_height="60dp"
                     android:layout_marginTop="24dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/icons_fingerprint"
+                    android:background="@drawable/fingerprint"
                     android:visibility="gone"/>
 
                 <TextView android:id="@+id/btn_register"
@@ -114,31 +114,6 @@
                     android:textSize="@dimen/bottom_text_message_size_text"
                     android:textColor="@color/white"
                     android:layout_marginTop="@dimen/margin_text_massage_label"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="#fff"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginEnd="10dp"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="#fff"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginStart="10dp"/>
-
-                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/google_signin_layout"

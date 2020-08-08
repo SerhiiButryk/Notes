@@ -1,11 +1,11 @@
 #include "authorize_handler.h"
 
 #include "app_common/types.h"
-#include "app/logic/event_dispatcher.h"
+#include "app/logic/action_dispatcher.h"
 #include "storage/system_storage.h"
 #include "app_common/env_constants.h"
 #include "app/core/utils/auth_utils.h"
-#include "app/logic/system/common_constants.h"
+#include "app/logic/base/system_constants.h"
 
 using namespace MYLIB;
 
@@ -26,13 +26,13 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 
             if (p.second == event.getData(PASSWORD_KEY))
             {
-                sendSystemEvent(EVENT_RESULT::AUTHORIZATION_DONE);
+                sendSystemAction(ACTION_TYPE::AUTHORIZATION_DONE);
 
                 return;
 
             } else {
 
-                sendSystemEvent(EVENT_RESULT::WRONG_PASSWORD);
+                sendSystemAction(ACTION_TYPE::WRONG_PASSWORD);
 
                 return;
             }
@@ -40,5 +40,5 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
         }
     }
 
-    sendSystemEvent(EVENT_RESULT::ACCOUNT_INVALID);
+    sendSystemAction(ACTION_TYPE::ACCOUNT_INVALID);
 }

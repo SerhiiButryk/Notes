@@ -1,18 +1,22 @@
 package com.example.notes.test.ui.utils;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.OnLifecycleEvent;
+
 import com.example.core.common.log.Log;
 import com.example.notes.test.control.NativeBridge;
 
-public class UserInactivityManager {
+public class UserInactivityManager implements LifecycleObserver {
 
     private static final String TAG = "UserInactivityManager";
-
-    private static int REQUEST_CODE = 1;
 
     private AlarmManager alarmManager;
     private PendingIntent inactivityIntent;
@@ -23,14 +27,13 @@ public class UserInactivityManager {
         if (instance == null) {
             instance = new UserInactivityManager();
         }
-
         return instance;
     }
 
     private UserInactivityManager() {
     }
 
-    public void initManager(Context context) {
+    private void initManager(Context context) {
 
         // Cancel and restart
         if (alarmManager != null) {
@@ -42,9 +45,10 @@ public class UserInactivityManager {
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, InactivityEventReceiver.class);
-        inactivityIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, 0);
+        inactivityIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void scheduleAlarm() {
 
         Log.info(TAG, "inactivity alarm is scheduled TIME: " + System.currentTimeMillis());
@@ -57,11 +61,23 @@ public class UserInactivityManager {
                 System.currentTimeMillis() + time, inactivityIntent);
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void cancelAlarm() {
 
         Log.info(TAG, "inactivity alarm is canceled ");
 
         alarmManager.cancel(inactivityIntent);
+    }
+
+    public void onUserInteraction() {
+        // Reschedule
+        UserInactivityManager.getInstance().cancelAlarm();
+        UserInactivityManager.getInstance().scheduleAlarm();
+    }
+
+    public void setLifecycle(Context context, Lifecycle lifecycle) {
+        initManager(context);
+        lifecycle.addObserver(this);
     }
 
 }

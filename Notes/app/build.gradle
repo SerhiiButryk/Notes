@@ -4,6 +4,15 @@ android {
 
     compileSdkVersion 29
 
+    signingConfigs {
+        release {
+            storeFile file("keystore")
+            storePassword 'passwotd'
+            keyAlias 'key0'
+            keyPassword 'password'
+        }
+    }
+
     defaultConfig {
         applicationId "com.serhii.apps.notes"
         minSdkVersion 26
@@ -23,7 +32,7 @@ android {
         release {
             minifyEnabled false // TODO Add and test app proguard settings
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
 
         debug {

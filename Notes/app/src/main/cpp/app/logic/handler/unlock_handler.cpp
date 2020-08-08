@@ -1,9 +1,9 @@
 #include "unlock_handler.h"
 
 #include "app_common/env_constants.h"
-#include "app/logic/event_dispatcher.h"
+#include "app/logic/action_dispatcher.h"
 #include "storage/system_storage.h"
-#include "app/logic/system/common_constants.h"
+#include "app/logic/base/system_constants.h"
 
 using namespace MYLIB;
 
@@ -21,14 +21,14 @@ namespace APP
 
         if (unlockKey != UNLOCK_ACCESSKEY_DEFAULT)
         {
-            sendSystemEvent(EVENT_RESULT::UNLOCK_KEY_INVALID);
+            sendSystemAction(ACTION_TYPE::UNLOCK_KEY_INVALID);
 
         } else {
 
             SystemStorage ss;
             ss.updateValue(kFileSystemData, kIsUserBlocked, FALSE);
 
-            sendSystemEvent(EVENT_RESULT::UNLOCK_DONE);
+            sendSystemAction(ACTION_TYPE::UNLOCK_DONE);
         }
 
     }

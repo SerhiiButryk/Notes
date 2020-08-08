@@ -5,7 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.notes.test.db.impl.model.DbNoteModel;
+import com.example.notes.test.db.impl.base.AppDataBaseImpl;
+import com.example.notes.test.db.impl.base.DBCypher;
+import com.example.notes.test.db.impl.base.NoteDBHelper;
+import com.example.notes.test.db.impl.model.DbNoteTableModel;
 import com.example.notes.test.ui.data_model.NoteModel;
 import com.example.core.common.log.Log;
 import com.example.core.utils.CollectionUtils;
@@ -13,7 +16,7 @@ import com.example.core.utils.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.notes.test.db.impl.model.DbNoteModel.*;
+import static com.example.notes.test.db.impl.model.DbNoteTableModel.*;
 
 /**
  *  Global access point for user's note records db
@@ -67,7 +70,10 @@ public class LocalAppDatabase extends AppDataBaseImpl {
 
         Log.info(TAG, " addRecordImpl( " + uiData.getNote() + "\n" + uiData.getNoteTitle() + ")\n");
 
-        NoteModel noteModel = dbCypher.encrypt(uiData, DBCypher.APPEND_MODE);
+        NoteModel noteModel = dbCypher.encrypt(uiData, DBCypher.ADD_MODE);
+
+        if (noteModel == null)
+            return false;
 
         ContentValues values = new ContentValues();
         values.put(NotesEntry.COLUMN_NAME_NOTE, noteModel.getNote());
@@ -83,7 +89,7 @@ public class LocalAppDatabase extends AppDataBaseImpl {
             Log.error(TAG, "failed to insert values to databaseWrite");
         } else {
 
-            dbCypher.cashInitializeVector(idRow - 1); // Start from 0
+            dbCypher.saveInitializeVector(idRow - 1); // Start from 0
 
             Log.error(TAG, "cashed iv");
         }
@@ -112,6 +118,9 @@ public class LocalAppDatabase extends AppDataBaseImpl {
         Log.info(TAG, " updateRecordImpl(" + id + ")" + "New values "  + uiData.getNoteTitle() + " " + uiData.getNote() + "\n");
 
         NoteModel noteModel = dbCypher.encrypt(uiData, id);
+
+        if (noteModel == null)
+            return false;
 
         ContentValues values = new ContentValues();
         values.put(NotesEntry.COLUMN_NAME_NOTE, noteModel.getNote());
@@ -181,7 +190,7 @@ public class LocalAppDatabase extends AppDataBaseImpl {
             selectionArgs.add(String.valueOf(id + 1)); // Start from 1 ID
         }
 
-        Cursor c = databaseRead.query(DbNoteModel.NotesEntry.TABLE_NAME,
+        Cursor c = databaseRead.query(DbNoteTableModel.NotesEntry.TABLE_NAME,
                 projection,
                 selection,
                 CollectionUtils.getConvertedArray(selectionArgs),
@@ -203,7 +212,9 @@ public class LocalAppDatabase extends AppDataBaseImpl {
 
             NoteModel note = getNoteModel(c, localId);
 
-            noteValuesList.add(note);
+            if (note != null) {
+                noteValuesList.add(note);
+            }
 
             // DEBUG ONLY
             // Log.info(TAG, "ROW : " + note.getNoteTitle() + " \t" + note.getNote());
@@ -220,11 +231,7 @@ public class LocalAppDatabase extends AppDataBaseImpl {
         String title = c.getString(c.getColumnIndex(NotesEntry.COLUMN_NAME_TITLE));
         String note = c.getString(c.getColumnIndex(NotesEntry.COLUMN_NAME_NOTE));
 
-        NoteModel noteModel = dbCypher.decrypt(new NoteModel(note, title), id);
-
-        Log.info(TAG, "getNoteModel() decrypted values successfully");
-
-        return noteModel;
+        return dbCypher.decrypt(new NoteModel(note, title), id);
     }
 
 }

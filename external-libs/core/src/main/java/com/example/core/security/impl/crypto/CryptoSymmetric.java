@@ -4,5 +4,5 @@ public interface CryptoSymmetric {
 
     Result encryptSymmetric(String message);
 
-    String decryptSymmetric(String message, final byte[] inputIV);
+    Result decryptSymmetric(String message, final byte[] inputIV);
 }

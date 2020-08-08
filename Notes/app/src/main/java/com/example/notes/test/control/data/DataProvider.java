@@ -6,23 +6,23 @@ import com.example.notes.test.ui.data_model.AuthModel;
  *  Global access point for app's data related to UIs
  */
 
-public class AppProvider {
+public class DataProvider {
 
-    private static AppProvider instance;
+    private static DataProvider instance;
 
     /**
         Application light data objects
 
-        Only used during application general life cycle
+        Only used during application lifecycle
     */
     private AuthModel authorizationModel;
 
-    private AppProvider() {
+    private DataProvider() {
     }
 
-    public static AppProvider getInstance() {
+    public static DataProvider getInstance() {
         if (instance == null) {
-            instance = new AppProvider();
+            instance = new DataProvider();
         }
         return instance;
     }

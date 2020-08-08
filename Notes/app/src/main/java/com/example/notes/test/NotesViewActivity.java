@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.Nullable;
 
+import com.example.notes.test.control.EventService;
+import com.example.notes.test.control.logic.IUnlockKeystore;
+import com.example.notes.test.control.managers.BiometricAuthManager;
 import com.example.notes.test.databinding.ActivityNotesBinding;
 import com.example.notes.test.ui.utils.UserInactivityManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,7 +37,7 @@ import static com.example.notes.test.NoteEditorActivity.EDITOR_ACTIVITY_INVALID_
 import static com.example.notes.test.NoteEditorActivity.EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED;
 import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
 
-public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
+public class NotesViewActivity extends AppCompatActivity implements IAuthorize, IUnlockKeystore {
 
     private static final String TAG = "NotesViewActivity";
 
@@ -75,10 +78,10 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
                  *   Database issue:
                  *
                  *   If there is at least 2 notes in the list and position = 0
-                 *   SQL database will return an error. To overcome this show a message to user
-                 *   to inform about this case and prevent a user from a deletion the first note.
+                 *   SQL database will return an error. Set a flag to inform about this case
+                 *   and prevent a user from a deletion of the first note.
                  *
-                 *   User still can remove all notes one by one starting from the last note.
+                 *   User still can remove all other notes.
                  *
                  */
                 if (_uiData.size() >= 2 && position == 0) {
@@ -98,7 +101,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enable unsecure screen content settings
+        // Enable unsecured screen content settings
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         /**
@@ -108,26 +111,32 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
 
         initNative(this);
 
-        UserInactivityManager.getInstance().initManager(this);
+        // Lifecycle aware components
+        getLifecycle().addObserver(EventService.getInstance());
+        UserInactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
         Log.info(TAG, "onCreate()");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Start inactivity listener
-        UserInactivityManager.getInstance().scheduleAlarm();
     }
 
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
 
-        // Reschedule
-        UserInactivityManager.getInstance().cancelAlarm();
-        UserInactivityManager.getInstance().scheduleAlarm();
+        UserInactivityManager.getInstance().onUserInteraction();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        notifyOnResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        notifyOnStop();
     }
 
     @Override
@@ -136,9 +145,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
 
         _uiData.clear();
         LocalDataBase.getInstance().close();
-
-        // Cancel alarm
-        UserInactivityManager.getInstance().cancelAlarm();
 
         super.onDestroy();
     }
@@ -182,14 +188,12 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.settings_item :
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -198,16 +202,19 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == EDITOR_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && NoteEditorActivity.isUpdateNotesNeeded(data)) {
 
-            if (resultCode == RESULT_OK) {
+                Log.info(TAG, "onActivityResult() - Need to update list");
 
-                if (NoteEditorActivity.isUpdateNotesNeeded(data)) {
-
-                    prepareLayout();
-                }
-
+                prepareLayout();
             }
         }
+
+        if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
+            // Reload data from database
+            prepareLayout();
+        }
+
     }
 
     /**
@@ -240,6 +247,16 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
         /**
          * not used
          */
+    }
+
+    @Override
+    public void onUnlockKeystore() {
+
+        Log.info(TAG, "onUnlockKeystore()");
+
+        BiometricAuthManager.requestUnlockActivity(this);
+
+        EventService.getInstance().notifyEventReceived();
     }
 
     private void prepareLayout() {
@@ -283,10 +300,13 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize {
      *
      */
     private void initNative(Context context) {
-        initFileSystem(GoodUtils.getFilePath(context));
+        initNativeConfigs(GoodUtils.getFilePath(context));
     }
 
-    private native void initFileSystem(String path);
+    private native void initNativeConfigs(String path);
+    private native void notifyOnStop();
+    private native void notifyOnResume();
+
 
     static {
         System.loadLibrary(RUNTIME_LIBRARY);

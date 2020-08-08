@@ -5,15 +5,15 @@
 #include <memory>
 
 #include "app_common/types.h"
-#include "app/logic/system/event.h"
-#include "app/logic/system/event_handler_base.h"
+#include "app/logic/base/event.h"
+#include "app/logic/base/event_handler_base.h"
 
 namespace APP
 {
     /**
-     *  Class processes 'SYSTEM_EVENT' event types and forward them to
+     *  This class knows about all event handlers.
      *
-     *  corresponding event handler (receiver).
+     *  Use it to deliver an event to corresponding event handler (receiver)
      */
     class SystemEventReceiver
     {

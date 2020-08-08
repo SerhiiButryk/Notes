@@ -13,10 +13,6 @@ public class Hash implements HashBase {
         CoreEngine.getInstance().configure(this);
     }
 
-    public Hash(HashGenerator generator) {
-        this.generator = generator;
-    }
-
     public void setGenerator(HashGenerator generator) {
         this.generator = generator;
     }

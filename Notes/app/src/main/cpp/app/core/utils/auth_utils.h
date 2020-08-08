@@ -13,8 +13,8 @@ namespace APP
 
             static bool verifyUserPassword(const std::string& user_name, const std::string& user_password);
 
-            static EVENT_RESULT checkRules(const std::string& password, const std::string& confirm_password,
-                                           const std::string& email, bool check_confirm = false);
+            static ACTION_TYPE checkRules(const std::string& password, const std::string& confirm_password,
+                                          const std::string& email, bool check_confirm = false);
 
             static void setLoginLimit();
             static void setIdleLockTimeOut();

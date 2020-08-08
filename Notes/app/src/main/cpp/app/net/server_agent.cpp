@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "app/logic/event_dispatcher.h"
+#include "app/logic/action_dispatcher.h"
 #include "storage/system_storage.h"
 #include "app_common/env_constants.h"
 

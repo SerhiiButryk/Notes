@@ -1,4 +1,4 @@
-package com.example.notes.test.db.impl;
+package com.example.notes.test.db.impl.base;
 
 import android.content.Context;
 

@@ -2,6 +2,8 @@ package com.example.notes.test.ui.fragments;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -188,6 +190,9 @@ public class LoginFragment extends Fragment {
 
         authModel.setPassword(hash.hashMD5(GoodUtils.getText(passwordField)));
         authModel.setEmail(GoodUtils.getText(emailField));
+
+        emailField.setText(null);
+        passwordField.setText(null);
 
         return authModel;
     }

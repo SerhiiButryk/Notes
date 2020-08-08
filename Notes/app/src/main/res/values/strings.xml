@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="app_name">DevNotes</string>
+    <string name="app_name">Notes</string>
+
+    // Authorization activity
+    <string name="toast_registration_done">Account is created</string>
 
     // Alter Dialog
     <string name="ms_no_user_account">This user account is not authorized. \nPlease, authorize your user.</string>
@@ -60,14 +63,15 @@
     <string name="title_toolbar">Note editor</string>
     <string name="toast_action_message">Note is saved</string>
     <string name="toast_action_deleted_message">Note is deleted</string>
-    <string name="toast_action_discard_changes_message">Changes are discarded</string>
     <string name="toast_action_delete_template_note">A template note cannot be deleted</string>
-    <string name="toast_action_delete_error_note">Can not delete an empty note</string>
+    <string name="toast_action_delete_error_note">Can\'t delete an empty note</string>
     <string name="toast_action_delete_error_first_note">Can not delete a note. This is not the last one.</string>
+    <string name="toast_action_error_note_is_not_changed">Nothing to save</string>
+    <string name="toast_action_error_note_is_empty">Empty note can\'t be saved</string>
 
     // Menu
     <string name="delete_note_item">Delete note</string>
-    <string name="discard_and_return">Discard changes and return</string>
+    <string name="discard_and_return">Save note</string>
     <string name="settings_item">Settings</string>
 
     // PreferenceActivity

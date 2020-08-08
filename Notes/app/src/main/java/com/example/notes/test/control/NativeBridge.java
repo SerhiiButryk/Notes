@@ -5,7 +5,7 @@ import com.example.core.security.Hash;
 import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
 
 /**
- *  Class which accesses underling C++ API's and methods
+ *  Class which accesses underling C++ APIs and methods
  */
 
 public class NativeBridge {

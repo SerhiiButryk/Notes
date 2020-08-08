@@ -5,10 +5,10 @@
 #include "storage/cashe_manager.h"
 #include "app_common/env_constants.h"
 #include "crypto/hash.h"
-#include "app/logic/event_dispatcher.h"
+#include "app/logic/action_dispatcher.h"
 #include "utils/log.h"
 #include "app/core/utils/auth_utils.h"
-#include "app/logic/system/common_constants.h"
+#include "app/logic/base/system_constants.h"
 
 using namespace MYLIB;
 
@@ -30,7 +30,7 @@ namespace APP
 
         auto success = AuthUtils::checkRules(password, confirmPassword, username, true);
 
-        if (success == EVENT_RESULT ::NO_ERRORS)
+        if (success == ACTION_TYPE ::NO_ERRORS)
         {
             std::map<std::string, std::string> data;
             data.insert(std::make_pair(username, makeHashMD5(password)));
@@ -42,7 +42,7 @@ namespace APP
             {
                 if (AuthUtils::isUserAccountExists(username))
                 {
-                    sendSystemEvent(EVENT_RESULT ::USER_NAME_EXISTS);
+                    sendSystemAction(ACTION_TYPE::USER_NAME_EXISTS);
 
                     return;
                 }
@@ -66,12 +66,12 @@ namespace APP
 
             Log::Info(TAG, "handleEvent() - REGISTRATION_DONE");
 
-            sendSystemEvent(EVENT_RESULT::REGISTRATION_DONE);
+            sendSystemAction(ACTION_TYPE::REGISTRATION_DONE);
 
             return;
         }
 
-        sendSystemEvent(success);
+        sendSystemAction(success);
     }
 
 }

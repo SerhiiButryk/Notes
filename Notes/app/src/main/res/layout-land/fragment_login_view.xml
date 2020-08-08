@@ -94,11 +94,11 @@
 
                 <ImageButton
                     android:id="@+id/btn_fingerprint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="80dp"
+                    android:layout_height="60dp"
                     android:layout_marginTop="24dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/icons_fingerprint"
+                    android:background="@drawable/fingerprint"
                     android:visibility="gone"/>
 
                 <TextView android:id="@+id/btn_register"

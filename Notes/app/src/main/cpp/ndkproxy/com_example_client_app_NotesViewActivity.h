@@ -7,13 +7,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * Class:     com_example_client_app_MainActivity
- * Method:    initFileSystem
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_initFileSystem
+
+JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_initNativeConfigs
   (JNIEnv *, jobject, jstring);
+
+JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnStop
+  (JNIEnv *, jobject);
+
+JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnResume
+        (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

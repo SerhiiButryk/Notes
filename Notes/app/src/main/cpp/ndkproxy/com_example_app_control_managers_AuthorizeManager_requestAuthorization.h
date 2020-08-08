@@ -20,6 +20,9 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeMan
 JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestBiometricLogin
         (JNIEnv *, jobject);
 
+JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestUnlockKeystore
+        (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

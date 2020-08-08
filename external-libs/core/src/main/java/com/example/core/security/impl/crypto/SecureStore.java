@@ -2,10 +2,10 @@ package com.example.core.security.impl.crypto;
 
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Base64;
 
 import com.example.core.common.log.Log;
-import com.example.core.security.impl.crypto.CryptoSymmetric;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -26,7 +25,9 @@ public class SecureStore implements CryptoSymmetric {
 
     private static final String TAG = "SecureStore";
 
-    private final String SECRET_KEY_ALIAS = "SK-729034-11_LK";
+    private static final String SECRET_KEY_ALIAS = "SK-729034";
+    private static final String SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding";
+
     private KeyStore keyStore;
 
     public SecureStore() {
@@ -39,64 +40,70 @@ public class SecureStore implements CryptoSymmetric {
 
             final SecretKey secretKey = (SecretKey) keyStore.getKey(SECRET_KEY_ALIAS, null);
 
-            Cipher encryptionCipher = Cipher.getInstance("AES/GCM/NoPadding");
+            Cipher encryptionCipher = Cipher.getInstance(SECRET_KEY_ALGORITHM);
             encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
             byte[] _iv = encryptionCipher.getIV();
             byte[] encryptedText = encryptionCipher.doFinal(message.getBytes("UTF-8"));
 
-            return new Result(new String(Base64.encode(encryptedText, Base64.DEFAULT)), _iv);
+            return new Result(new String(Base64.encode(encryptedText, Base64.DEFAULT)), _iv, CryptoError.OK);
+
+        } catch (UserNotAuthenticatedException e) {
+            Log.error(TAG, "user not authenticated exception: " + e);
+            e.printStackTrace();
+
+            return new Result("", null, CryptoError.USER_NOT_AUTHORIZED);
 
         } catch (Exception e) {
             Log.error(TAG, "exception during encryption: " + e.getMessage());
             e.printStackTrace();
         }
 
-        return null;
+        return new Result("", null, CryptoError.UNKNOWN);
     }
 
     @Override
-    public String decryptSymmetric(String message, final byte[] inputIV) {
+    public Result decryptSymmetric(String message, final byte[] inputIV) {
 
         try {
 
             final SecretKey secretKey = (SecretKey) keyStore.getKey(SECRET_KEY_ALIAS, null);
 
-            final Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            final Cipher cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM);
             final GCMParameterSpec spec = new GCMParameterSpec(128, inputIV);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
             byte[] textToDecrypt = message.getBytes();
 
-            final byte[] text = cipher.doFinal(Base64.decode(textToDecrypt, Base64.DEFAULT));
+            final byte[] text = cipher.doFinal(Base64.decode(textToDecrypt, Base64.NO_WRAP));
 
-            return new String(text);
+            return new Result(new String(text), null, CryptoError.OK);
+
+        } catch (UserNotAuthenticatedException e) {
+            Log.error(TAG, "user not authenticated exception: " + e);
+            e.printStackTrace();
+
+            return new Result("", null, CryptoError.USER_NOT_AUTHORIZED);
 
         } catch (Exception e) {
             Log.error(TAG, "exception during decryption: " + e.getMessage());
             e.printStackTrace();
         }
 
-        return "";
+        return new Result("", null, CryptoError.UNKNOWN);
 
     }
 
     private void init() {
         keyStore = initKeyStore(null);
 
-        boolean success = false;
-
         if (keyStore != null) {
-            success = load(keyStore);
-        }
+            boolean success = load(keyStore);
 
-        if (success) {
-
-            if (!isSecretKeyExists()) {
-                // gen a new secret key entity
+            if (success && !isSecretKeyExists()) {
+                // Gen a secret key entity
                 createKey();
             }
-
         }
 
     }
@@ -127,13 +134,18 @@ public class SecureStore implements CryptoSymmetric {
     }
 
     private void createKey() {
-        final KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(SECRET_KEY_ALIAS,
+        KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(SECRET_KEY_ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                // More info on GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                // GCM doesn't use padding
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                // User authentication is needed to user this key
+                .setUserAuthenticationRequired(true)
+                .setUserAuthenticationValidityDurationSeconds(300) // 5 minutes
                 .build();
 
-        KeyGenerator keyGenerator = getKeyGenerator(KeyProperties.KEY_ALGORITHM_AES, null);
+        KeyGenerator keyGenerator = getKeyGenerator(KeyProperties.KEY_ALGORITHM_AES);
 
         if (keyGenerator != null) {
             genSecretKey(keyGenerator, keyGenParameterSpec);
@@ -149,7 +161,7 @@ public class SecureStore implements CryptoSymmetric {
         return null;
     }
 
-    private KeyGenerator getKeyGenerator(String algorithm, String provider) {
+    private KeyGenerator getKeyGenerator(String algorithm) {
         try {
             return KeyGenerator.getInstance(algorithm, "AndroidKeyStore");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -159,15 +171,13 @@ public class SecureStore implements CryptoSymmetric {
         return null;
     }
 
-    private boolean genSecretKey(KeyGenerator keyGenerator, KeyGenParameterSpec keyGenParameterSpec) {
+    private void genSecretKey(KeyGenerator keyGenerator, KeyGenParameterSpec keyGenParameterSpec) {
         try {
             keyGenerator.init(keyGenParameterSpec);
             keyGenerator.generateKey();
-            return true;
         } catch (InvalidAlgorithmParameterException e) {
             Log.error(TAG, "exception: failed to gen Secret Key" + e.getMessage());
             e.printStackTrace();
         }
-        return false;
     }
 }

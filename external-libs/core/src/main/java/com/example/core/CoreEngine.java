@@ -29,7 +29,7 @@ public class CoreEngine implements Components {
 
     @Override
     public void configure(Cipher cipher) {
-        cipher.setCrypto(new SecureStore());
+        cipher.setSymmetricCrypto(new SecureStore());
     }
 
 }

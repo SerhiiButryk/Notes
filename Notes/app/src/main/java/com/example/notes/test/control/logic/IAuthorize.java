@@ -5,7 +5,7 @@ package com.example.notes.test.control.logic;
  *
  *   All interested parts which implements this interface and are registered to corresponding observer
  *
- *   will receive a user authorization event
+ *   will receive a such event
  */
 
 public interface IAuthorize {

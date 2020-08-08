@@ -2,9 +2,9 @@ package com.example.notes.test.db.impl.model;
 
 import android.provider.BaseColumns;
 
-public class DbNoteModel {
+public class DbNoteTableModel {
 
-    private DbNoteModel() {}
+    private DbNoteTableModel() {}
 
     /**
      *   Db table description for user notes
@@ -27,11 +27,11 @@ public class DbNoteModel {
     public static final int VERSION = 1;
 
     public static final String QUERY_CREATE_TABLE = "CREATE TABLE "
-            + DbNoteModel.NotesEntry.TABLE_NAME + " ("
-            + DbNoteModel.NotesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + DbNoteModel.NotesEntry.COLUMN_NAME_NOTE + " TEXT NOT NULL, "
-            + DbNoteModel.NotesEntry.COLUMN_NAME_TITLE + " TEXT NOT NULL, "
-            + DbNoteModel.NotesEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" + ");";
+            + DbNoteTableModel.NotesEntry.TABLE_NAME + " ("
+            + DbNoteTableModel.NotesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + DbNoteTableModel.NotesEntry.COLUMN_NAME_NOTE + " TEXT NOT NULL, "
+            + DbNoteTableModel.NotesEntry.COLUMN_NAME_TITLE + " TEXT NOT NULL, "
+            + DbNoteTableModel.NotesEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" + ");";
 
     public static final String QUERY_DROP_TABLE = "DROP TABLE IF EXISTS " + NotesEntry.TABLE_NAME;
 }

@@ -46,4 +46,8 @@ public class NoteModel {
         noteValues.setNote(context.getString(R.string.template_short_note));
         return noteValues;
     }
+
+    public static boolean isEmpty(NoteModel noteModel) {
+        return noteModel.note.isEmpty() && noteModel.noteTitle.isEmpty();
+    }
 }

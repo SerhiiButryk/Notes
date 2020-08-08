@@ -9,6 +9,7 @@
     <color name="black">#424242</color>
     <color name="blue">#0277BD</color>
     <color name="blue_dark">#00838F</color>
+    <color name="blue_contrast">#0288D1</color>
 
     <color name="light_grey">#ebebf0</color>
     <color name="background_color">@color/light_grey</color>

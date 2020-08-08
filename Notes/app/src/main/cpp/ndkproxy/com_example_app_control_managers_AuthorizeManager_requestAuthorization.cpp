@@ -1,11 +1,11 @@
 #include "com_example_app_control_managers_AuthorizeManager_requestAuthorization.h"
 
 #include "utils/jstring.h"
-#include "app/logic/system/event.h"
+#include "app/logic/base/event.h"
 #include "app_common/types.h"
-#include "app/logic/event_dispatcher.h"
+#include "app/logic/action_dispatcher.h"
 #include "app/logic/receiver/system_event_receiver.h"
-#include "app/logic/system/common_constants.h"
+#include "app/logic/base/system_constants.h"
 
 using namespace APP;
 
@@ -58,7 +58,14 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeMan
         (JNIEnv *, jobject)
 {
       // Authentication is done
-      sendSystemEvent(EVENT_RESULT::AUTHORIZATION_DONE);
+    sendSystemAction(ACTION_TYPE::AUTHORIZATION_DONE);
+}
+
+JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestUnlockKeystore
+        (JNIEnv *, jobject)
+{
+    // Trigger action
+    sendSystemAction(ACTION_TYPE::UNLOCK_KEYSTORE);
 }
 
 #ifdef __cplusplus

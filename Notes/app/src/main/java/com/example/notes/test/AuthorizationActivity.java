@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.example.notes.test.control.NativeBridge;
@@ -15,7 +16,7 @@ import com.example.notes.test.control.logic.AuthorizeType;
 import com.example.notes.test.control.logic.IAuthorize;
 import com.example.notes.test.control.logic.IAuthorizeSubject;
 import com.example.notes.test.control.EventService;
-import com.example.notes.test.control.data.AppProvider;
+import com.example.notes.test.control.data.DataProvider;
 import com.example.notes.test.ui.data_model.AuthModel;
 import com.example.notes.test.ui.dialogs.impl.AlertDialog;
 import com.example.notes.test.ui.fragments.BlockFragment;
@@ -40,6 +41,8 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
     private FragmentManager fragmentManager;
     private NativeBridge nativeBridge = new NativeBridge();
 
+    private Handler mainThreadHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +57,13 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
             @Override
             public void onChanged(@Nullable AuthModel authModel) {
                 // Save to local application data provider
-                AppProvider.getInstance().saveAuthorizeData(authModel);
+                DataProvider.getInstance().saveAuthorizeData(authModel);
             }
         });
 
+        // Observer
         subscribe(EventService.getInstance());
+
         initNative();
 
         Log.info(TAG, "onCreate() - fragments in the back stack " + fragmentManager.getBackStackEntryCount());
@@ -182,7 +187,7 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         LoginFragment loginFragment = (LoginFragment) fragmentManager.findFragmentByTag(LOGIN_FRAGMENT);
         loginFragment.onUserAccountCreated();
 
-        Toast.makeText(this, "Account created", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.toast_registration_done), Toast.LENGTH_SHORT).show();
     }
 
     /**

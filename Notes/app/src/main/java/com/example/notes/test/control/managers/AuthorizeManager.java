@@ -2,7 +2,7 @@ package com.example.notes.test.control.managers;
 
 import com.example.notes.test.control.logic.AuthorizeType;
 import com.example.notes.test.ui.data_model.AuthModel;
-import com.example.notes.test.control.logic.UserRequest;
+import com.example.notes.test.control.logic.RequestType;
 
 import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
 
@@ -16,26 +16,30 @@ public class AuthorizeManager {
     public AuthorizeManager() {
     }
 
-    public void handleRequest(UserRequest type, AuthModel requestData) {
+    public void handleRequest(RequestType type, AuthModel data) {
 
-        if (type == UserRequest.REQ_AUTHORIZE && requestData.getAuthType() == AuthorizeType.AUTH_UNLOCK) {
+        if (type == RequestType.REQ_AUTHORIZE && data.getAuthType() == AuthorizeType.AUTH_UNLOCK) {
 
-            requestUnlock(requestData.getPassword());
+            requestUnlock(data.getPassword());
 
-        } else if (type == UserRequest.REQ_AUTHORIZE) {
+        } else if (type == RequestType.REQ_AUTHORIZE) {
 
-            requestAuthorization(requestData.getPassword(), requestData.getEmail());
+            requestAuthorization(data.getPassword(), data.getEmail());
 
-        } else if (type == UserRequest.REQ_REGISTER) {
+        } else if (type == RequestType.REQ_REGISTER) {
             /*
                 Entered credentials will be checked on the native side
                 It will make a decision about the next step
             */
-            requestRegistration(requestData.getPassword(), requestData.getConfirmPassword(), requestData.getEmail());
+            requestRegistration(data.getPassword(), data.getConfirmPassword(), data.getEmail());
 
-        } else if (type == UserRequest.REQ_BIOMETRIC_LOGIN) {
+        } else if (type == RequestType.REQ_BIOMETRIC_LOGIN) {
 
             requestBiometricLogin();
+
+        } else if (type == RequestType.REQ_UNLOCK_KEYSTORE) {
+
+            requestUnlockKeystore();
         }
 
     }
@@ -44,6 +48,7 @@ public class AuthorizeManager {
     private native void requestRegistration(String password, String confirmPassword, String username);
     private native void requestUnlock(String unlockKey);
     private native void requestBiometricLogin();
+    private native void requestUnlockKeystore();
 
     static {
         System.loadLibrary(RUNTIME_LIBRARY);

@@ -41,12 +41,12 @@ bool APP::AuthUtils::verifyUserPassword(const std::string& user_name, const std:
     return false;
 }
 
-APP::EVENT_RESULT APP::AuthUtils::checkRules(const std::string &password, const std::string &confirm_password,
-                                             const std::string &email, bool check_confirm)
+APP::ACTION_TYPE APP::AuthUtils::checkRules(const std::string &password, const std::string &confirm_password,
+                                            const std::string &email, bool check_confirm)
 {
     if (password.empty() || email.empty())
     {
-        return EVENT_RESULT::EMPTY_FIELD;
+        return ACTION_TYPE::EMPTY_FIELD;
     }
 
     if (check_confirm)
@@ -54,25 +54,25 @@ APP::EVENT_RESULT APP::AuthUtils::checkRules(const std::string &password, const 
 
         if (confirm_password.empty())
         {
-            return EVENT_RESULT::EMPTY_FIELD;
+            return ACTION_TYPE::EMPTY_FIELD;
         }
 
         if (password != confirm_password)
         {
-            return EVENT_RESULT::PASSWORD_DIFFERS;
+            return ACTION_TYPE::PASSWORD_DIFFERS;
         }
 
         if (Algorithms::containSpace(password)
             || Algorithms::containSpace(confirm_password)
             || Algorithms::containSpace(email))
         {
-            return EVENT_RESULT::SPACE_CONTAIN;
+            return ACTION_TYPE::SPACE_CONTAIN;
         }
 
-        return EVENT_RESULT::NO_ERRORS;
+        return ACTION_TYPE::NO_ERRORS;
     }
 
-    return EVENT_RESULT::NO_ERRORS;
+    return ACTION_TYPE::NO_ERRORS;
 }
 
 void APP::AuthUtils::setLoginLimit()

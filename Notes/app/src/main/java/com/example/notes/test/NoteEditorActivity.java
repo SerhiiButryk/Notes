@@ -3,6 +3,7 @@ package com.example.notes.test;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -18,13 +19,19 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.core.common.log.Log;
+import com.example.notes.test.control.EventService;
+import com.example.notes.test.control.logic.IUnlockKeystore;
+import com.example.notes.test.control.managers.BiometricAuthManager;
 import com.example.notes.test.databinding.ActivityNoteEditorBinding;
 import com.example.notes.test.db.LocalDataBase;
 import com.example.notes.test.ui.data_model.NoteModel;
 import com.example.core.utils.GoodUtils;
 import com.example.notes.test.ui.utils.UserInactivityManager;
 
-public class NoteEditorActivity extends AppCompatActivity {
+public class NoteEditorActivity extends AppCompatActivity implements IUnlockKeystore {
+
+    private static final String TAG = NoteEditorActivity.class.getSimpleName();
 
     // Intent extra values
     public static final String ACTION_NOTE_OPENED = "action open note";
@@ -43,53 +50,42 @@ public class NoteEditorActivity extends AppCompatActivity {
     private boolean isTemplateNoteOpened;
     private int noteID;
 
-    private String checkTitle = "";
+    private String checkNoteTitleContent = "";
     private String checkNoteContent = "";
 
-    private boolean isNoteOnBackPressedSaved;
-    private boolean isChangesShouldBeDiscarded;
+    private boolean isPendingSave;
+    private boolean isUpdateNeeded;
 
     // To overcome database issue
     private boolean cannotNoteBeDeleted;
+
+    private Intent lastReceivedIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enable unsecure screen content settings
+        // Enable unsecured screen content settings
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         initBinding();
         initView();
 
-        final Intent intent = getIntent();
+        lastReceivedIntent = getIntent();
 
-        if (intent != null) {
-            handleIntent(intent);
-        }
+        handleIntent(lastReceivedIntent);
 
-        UserInactivityManager.getInstance().initManager(this);
+        // Lifecycle aware component
+        UserInactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
-    }
+        initNative();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Start inactivity listener
-        UserInactivityManager.getInstance().scheduleAlarm();
     }
 
     @Override
     protected void onDestroy() {
 
-        // Save in case user updated a note
-        if (!isNoteOnBackPressedSaved && !isChangesShouldBeDiscarded) {
-            saveUserNote(false);
-        }
-
-        // Cancel alarm
-        UserInactivityManager.getInstance().cancelAlarm();
+        notifyOnDestroy();
 
         super.onDestroy();
     }
@@ -136,21 +132,17 @@ public class NoteEditorActivity extends AppCompatActivity {
 
                 LocalDataBase.getInstance().deleteRecord(noteID);
 
-                sendResult(true, RESULT_OK);
+                setResult(true, RESULT_OK);
 
                 Toast.makeText(this, R.string.toast_action_deleted_message, Toast.LENGTH_SHORT).show();
+
                 finish();
 
             return true;
 
-            case R.id.discard_and_return:
+            case R.id.save_note:
 
-                isChangesShouldBeDiscarded = true;
-
-                sendResult(false, RESULT_OK);
-
-                Toast.makeText(this, R.string.toast_action_discard_changes_message, Toast.LENGTH_SHORT).show();
-                finish();
+                saveUserNote();
 
             return true;
         }
@@ -162,9 +154,31 @@ public class NoteEditorActivity extends AppCompatActivity {
     public void onUserInteraction() {
         super.onUserInteraction();
 
-        // Reschedule
-        UserInactivityManager.getInstance().cancelAlarm();
-        UserInactivityManager.getInstance().scheduleAlarm();
+        UserInactivityManager.getInstance().onUserInteraction();
+    }
+
+    @Override
+    public void onUnlockKeystore() {
+
+        Log.info(TAG, "onUnlockKeystore()");
+
+        BiometricAuthManager.requestUnlockActivity(this);
+
+        EventService.getInstance().notifyEventReceived();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
+            if (isPendingSave) {
+                saveUserNote();
+            } else {
+                handleIntent(lastReceivedIntent);
+            }
+        }
+
     }
 
     private void initView() {
@@ -187,14 +201,16 @@ public class NoteEditorActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        saveUserNote(true);
 
-        isNoteOnBackPressedSaved = true;
+        setResult(isUpdateNeeded, isUpdateNeeded ? RESULT_OK : RESULT_CANCELED);
 
         finish();
     }
 
     private void handleIntent(Intent intent) {
+
+        if (intent == null)
+            return;
 
         if (intent.getAction() != null && intent.getAction().equals(ACTION_NOTE_OPENED)) {
 
@@ -212,10 +228,10 @@ public class NoteEditorActivity extends AppCompatActivity {
                 final NoteModel note = LocalDataBase.getInstance().getRecord(noteID);
 
                 if (note != null) {
-                    checkTitle = note.getNoteTitle();
+                    checkNoteTitleContent = note.getNoteTitle();
                     checkNoteContent = note.getNote();
 
-                    titleNoteField.setText(checkTitle);
+                    titleNoteField.setText(checkNoteTitleContent);
                     noteFiled.setText(checkNoteContent);
                 }
 
@@ -236,35 +252,51 @@ public class NoteEditorActivity extends AppCompatActivity {
 
     }
 
-    private void saveUserNote(boolean showToastMessage) {
+    private void saveUserNote() {
+
+        String title = GoodUtils.getText(titleNoteField);
+        String note = GoodUtils.getText(noteFiled);
+
+        if (title.isEmpty() && note.isEmpty()) {
+
+            Toast.makeText(this, R.string.toast_action_error_note_is_empty, Toast.LENGTH_SHORT).show();
+
+            return;
+        }
 
         /*
             Checks if note needs update
         */
         if (checkIfNoteChanged()) {
+
+            Toast.makeText(this, R.string.toast_action_error_note_is_not_changed, Toast.LENGTH_SHORT).show();
+
             return;
         }
-
-        String title = GoodUtils.getText(titleNoteField);
-        String note = GoodUtils.getText(noteFiled);
 
         /*
             If action is  ACTION_NOTE_OPENED then update current record
             else create a new record in the app database
         */
-        if (isActionNoteOpened) {
-            LocalDataBase.getInstance().updateRecord(noteID, new NoteModel(note, title));
-        } else {
-            LocalDataBase.getInstance().addRecord(new NoteModel(note, title));
-        }
 
-        sendResult(true, RESULT_OK);
+        boolean result;
+
+        isPendingSave = true;
+
+        if (isActionNoteOpened) {
+            result = LocalDataBase.getInstance().updateRecord(noteID, new NoteModel(note, title));
+        } else {
+            result = LocalDataBase.getInstance().addRecord(new NoteModel(note, title));
+        }
 
         /*
             Display info toast message
         */
-        if (showToastMessage) {
+        if (result) {
             Toast.makeText(this, R.string.toast_action_message, Toast.LENGTH_SHORT).show();
+
+            isPendingSave = false;
+            isUpdateNeeded = true;
         }
 
     }
@@ -278,12 +310,7 @@ public class NoteEditorActivity extends AppCompatActivity {
         String title = GoodUtils.getText(titleNoteField);
         String note = GoodUtils.getText(noteFiled);
 
-        if (isEmptyNote() || (checkTitle.equals(title) && checkNoteContent.equals(note)) ) {
-            sendResult(false, RESULT_OK);
-            return true;
-        }
-
-        return false;
+        return  isEmptyNote() || (checkNoteTitleContent.equals(title) && checkNoteContent.equals(note));
     }
 
     private boolean isEmptyNote() {
@@ -291,7 +318,7 @@ public class NoteEditorActivity extends AppCompatActivity {
                 && TextUtils.isEmpty(GoodUtils.getText(noteFiled));
     }
 
-    private void sendResult(boolean needUpdate, int success) {
+    private void setResult(boolean needUpdate, int success) {
         Intent extraData = new Intent();
         extraData.putExtra(UPDATE_NEEDED_EXTRA, needUpdate);
 
@@ -331,4 +358,9 @@ public class NoteEditorActivity extends AppCompatActivity {
 
         return intent.getBooleanExtra(NoteEditorActivity.UPDATE_NEEDED_EXTRA, false);
     }
+
+    private void initNative() { initNativeConfigs(); }
+
+    private native void initNativeConfigs();
+    private native void notifyOnDestroy();
 }

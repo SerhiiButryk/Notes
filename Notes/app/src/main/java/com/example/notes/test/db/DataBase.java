@@ -12,11 +12,11 @@ public interface DataBase {
 
     void clearDatabase();
 
-    void addRecord(final NoteModel uiData);
+    boolean addRecord(final NoteModel uiData);
 
     void deleteRecord(int id);
 
-    void updateRecord(final int id, final NoteModel uiData);
+    boolean updateRecord(final int id, final NoteModel uiData);
 
     NoteModel getRecord(final int id);
 
