@@ -2,39 +2,42 @@
 
 # Overview
 
-The app is developed for keeping all your notes in one place (passwords, plannings, film list ets). Notes are saved encrypted in app database.
+The app is developed for keeping all your notes in one place (passwords, plannings, film lists ets). Notes are saved encrypted in app database.
 It provides simple interface and pleasant design.
 
 # Features
 
 - Password and biometric authentication
-- Basic editing features
-- Login password limit
+- Basic editing
+- Login password limitation
 - Idle Lock
-- Apllication Block
+- Apllication block 
 
 # Implementation details
 
 - Separated UI logic to fragments
 - Separated presentation and bisness logic with MVVM pattern
-- Separeted reusable modules into android/native libraries
+- Separeted code into android/native libraries and modules
 - Low level logic is written in native code -> improves code structure and code flexibility
-- Java and native calls are made from single place -> improves code maintainability
-- Applided decouple strategies to separate a receiver and handler of an event
+- Java and native calls are made from a single place -> improves code maintainability
+- Applided decouple strategies to separate a receiver and handler of an event/request
 - Separated code into logical levels of abstraction
 
 # Repo directory structure
 
 - external-libs/ - reusable components
-- sdk/ - reusable native interfaces
 - Notes/ - application root directory
 
 # Used technologies
 
 - Languages: Java/JNI, C++17
-- Native libraryies: OpenSSL, Boost
-- Android framework features: androidX namespace, view's bindings, ui fragments, secure store, SQL database APIs   
+- External native libraryies: OpenSSL, Boost
+- Android framework features: androidX, view's bindings, fragments, key store, SQL database, biomatric API  
 
-# Demo video
+# Screenshots
 
-[![Watch the video](https://img.youtube.com/vi/C2zxFzp1pFk/0.jpg)](https://www.youtube.com/watch?v=C2zxFzp1pFk&feature=youtu.be)
+<img src="images/screenshot_1.png" height="400">
+<img src="images/screenshot_2.png" height="400">
+<img src="images/screenshot_3.png" height="400">
+<img src="images/screenshot_4.png" height="400">
+<img src="images/screenshot_5.png" height="400">
