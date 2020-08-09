@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
 <LinearLayout
     android:orientation="vertical" android:layout_width="match_parent"
@@ -97,14 +96,8 @@
                     android:background="@drawable/button_background"
                     android:padding="12dp"/>
 
-                <ImageButton
-                    android:id="@+id/btn_fingerprint"
-                    android:layout_width="80dp"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/fingerprint"
-                    android:visibility="gone"/>
+                <include layout="@layout/fingerprint_layout"
+                    android:id="@+id/fingerprint_layout"/>
 
                 <TextView android:id="@+id/btn_register"
                     android:layout_width="match_parent"

@@ -142,7 +142,7 @@ public class SecureStore implements CryptoSymmetric {
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 // User authentication is needed to user this key
                 .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(300) // 5 minutes
+                .setUserAuthenticationValidityDurationSeconds(500)
                 .build();
 
         KeyGenerator keyGenerator = getKeyGenerator(KeyProperties.KEY_ALGORITHM_AES);

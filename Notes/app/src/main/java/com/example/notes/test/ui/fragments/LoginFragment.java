@@ -162,7 +162,7 @@ public class LoginFragment extends Fragment {
         loginButton = binding.btnLogin;
         registerAccountBtn = binding.btnRegister;
         titleLabel = binding.title;
-        fingerprintBtn = binding.btnFingerprint;
+        fingerprintBtn = binding.fingerprintLayout.btnFingerprint;
 
         return binding.getRoot();
     }

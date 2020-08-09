@@ -66,7 +66,7 @@ public class NoteEditorActivity extends AppCompatActivity implements IUnlockKeys
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         initBinding();
         initView();

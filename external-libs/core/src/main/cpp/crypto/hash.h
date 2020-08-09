@@ -1,5 +1,4 @@
-#ifndef _HASH_H_
-#define _HASH_H_
+#pragma once
 
 #include <string>
 
@@ -9,5 +8,3 @@ namespace MYLIB
 
     std::string convertToHex(unsigned char const* bytes_to_encode, unsigned int in_len);
 }
-
-#endif

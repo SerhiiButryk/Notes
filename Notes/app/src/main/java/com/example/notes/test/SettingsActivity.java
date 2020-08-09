@@ -24,7 +24,7 @@ public class SettingsActivity extends AppCompatActivity implements SetLoginLimit
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         initBinding();
 

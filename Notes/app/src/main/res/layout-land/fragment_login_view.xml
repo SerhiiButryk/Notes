@@ -92,14 +92,8 @@
                     android:layout_marginEnd="40dp"
                     android:layout_marginStart="40dp" />
 
-                <ImageButton
-                    android:id="@+id/btn_fingerprint"
-                    android:layout_width="80dp"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/fingerprint"
-                    android:visibility="gone"/>
+                <include layout="@layout/fingerprint_layout"
+                    android:id="@+id/fingerprint_layout"/>
 
                 <TextView android:id="@+id/btn_register"
                     android:layout_width="match_parent"

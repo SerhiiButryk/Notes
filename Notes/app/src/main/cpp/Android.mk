@@ -1,9 +1,5 @@
 LOCAL_PATH:= $(call my-dir)
 
-# Update if necessary
-SDK_PATH := ../../../../../sdk
-SDK_3TH_PARTIES := $(SDK_PATH)/3th_parties
-
 # Local module
 
     include $(CLEAR_VARS)
@@ -30,7 +26,6 @@ SDK_3TH_PARTIES := $(SDK_PATH)/3th_parties
                        app/logic/handler/unlock_handler.cpp \
                        app_common/env_constants.cpp \
 
-    LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDK_PATH)
     LOCAL_C_INCLUDES += $(LOCAL_PATH)
 
     # Include system libraries
@@ -39,7 +34,7 @@ SDK_3TH_PARTIES := $(SDK_PATH)/3th_parties
 
     # Include local build libraries
 
-    LOCAL_SHARED_LIBRARIES := libc++_shared socket core
+    LOCAL_SHARED_LIBRARIES := libc++_shared core
 
     include $(BUILD_SHARED_LIBRARY)
 

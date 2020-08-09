@@ -102,7 +102,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize, 
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         /**
          * Start authorization process

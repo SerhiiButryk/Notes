@@ -40,7 +40,7 @@
     <string name="usr_new_psw">Enter your password</string>
     <string name="usr_approve_new_psw">Repeat your password</string>
     <string name="usr_new_email">Enter your user email</string>
-    <string name="title_login">Login</string>
+    <string name="title_login">Greetings !</string>
     <string name="title_reg">Registration</string>
     <string name="title_login_google">Login with google</string>
 
