@@ -36,8 +36,6 @@ It provides simple interface and pleasant design.
 
 # Screenshots
 
-<img src="images/screenshot_1.png" height="400">
-<img src="images/screenshot_2.png" height="400">
-<img src="images/screenshot_3.png" height="400">
-<img src="images/screenshot_4.png" height="400">
+<img src="images/screenshot_1.png" height="400"> <img src="images/screenshot_2.png" height="400">
+<img src="images/screenshot_3.png" height="400"> <img src="images/screenshot_4.png" height="400"> 
 <img src="images/screenshot_5.png" height="400">
