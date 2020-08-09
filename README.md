@@ -11,7 +11,8 @@ It provides simple interface and pleasant design.
 - Basic editing
 - Login password limitation
 - Idle Lock
-- Apllication block 
+- Apllication bloc
+- User authentication enforcement for key use
 
 # Implementation details
 
