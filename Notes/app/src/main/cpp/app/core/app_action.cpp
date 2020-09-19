@@ -1,4 +1,4 @@
-#include "app_action_sender.h"
+#include "app_action.h"
 
 #include "app/logic/action_dispatcher.h"
 #include "utils/log.h"
@@ -10,13 +10,13 @@ namespace {
 namespace APP
 {
 
-    AppActionSender* AppActionSender::getInstance()
+    AppAction* AppAction::getInstance()
     {
-        static AppActionSender event;
+        static AppAction event;
         return &event;
     }
 
-    AppActionSender::AppActionSender()
+    AppAction::AppAction()
     {
         // Register this handler to corresponding actions
         ActionDispatcher::getInstance()->addAuthorizeActionObserver(this);
@@ -25,7 +25,7 @@ namespace APP
         ActionDispatcher::getInstance()->addUnlockKeystoreActionObserver(this);
     }
 
-    void AppActionSender::onAuthorized()
+    void AppAction::onAuthorized()
     {
         for (auto&& f : authorizeObservers)
         {
@@ -33,7 +33,7 @@ namespace APP
         }
     }
 
-    void AppActionSender::onRegistered()
+    void AppAction::onRegistered()
     {
         if (registerObserver)
         {
@@ -41,7 +41,7 @@ namespace APP
         }
     }
 
-    void AppActionSender::onShowDialog(int type)
+    void AppAction::onShowDialog(int type)
     {
         if (showDialogObserver)
         {
@@ -49,7 +49,7 @@ namespace APP
         }
     }
 
-    void AppActionSender::onUnlockKeystore()
+    void AppAction::onUnlockKeystore()
     {
         if (unlockKeystoreObserverNoteViewActivity)
         {
@@ -66,37 +66,37 @@ namespace APP
         }
     }
 
-    void AppActionSender::addAuthorizeCallback(JNIWrapper authorize_callback)
+    void AppAction::addAuthorizeCallback(JNIWrapper authorize_callback)
     {
         authorizeObservers.push_back(std::move(authorize_callback));
     }
 
-    void AppActionSender::setShowDialogCallback(JNIWrapper* showdialog_callback)
+    void AppAction::setShowDialogCallback(JNIWrapper* showdialog_callback)
     {
         showDialogObserver.reset(showdialog_callback);
     }
 
-    void AppActionSender::setRegistrationCallback(JNIWrapper* registration_callback)
+    void AppAction::setRegistrationCallback(JNIWrapper* registration_callback)
     {
         registerObserver.reset(registration_callback);
     }
 
-    void AppActionSender::setUnlockKeystoreNoteViewCallback(JNIWrapper* unlock_keystore_callback)
+    void AppAction::setUnlockKeystoreNoteViewCallback(JNIWrapper* unlock_keystore_callback)
     {
         unlockKeystoreObserverNoteViewActivity.reset(unlock_keystore_callback);
     }
 
-    void AppActionSender::setUnlockKeystoreEditorViewCallback(JNIWrapper* unlock_keystore_callback)
+    void AppAction::setUnlockKeystoreEditorViewCallback(JNIWrapper* unlock_keystore_callback)
     {
         unlockKeystoreObserverNoteEditorActivity.reset(unlock_keystore_callback);
     }
 
-    void AppActionSender::removeUnlockKeystoreNoteViewCallback()
+    void AppAction::removeUnlockKeystoreNoteViewCallback()
     {
         unlockKeystoreObserverNoteViewActivity.reset(nullptr);
     }
 
-    void AppActionSender::removeUnlockKeystoreEditorViewCallback()
+    void AppAction::removeUnlockKeystoreEditorViewCallback()
     {
         unlockKeystoreObserverNoteEditorActivity.reset(nullptr);
     }

@@ -3,7 +3,7 @@
 #include "app/logic/action_dispatcher.h"
 #include "app/net/server_agent.h"
 #include "utils/log.h"
-#include "app/core/app_action_sender.h"
+#include "app/core/app_action.h"
 #include "app_common/env_constants.h"
 
 #include <utility>
@@ -37,9 +37,9 @@ extern "C" {
         JNIWrapper* callback_dialog = new JNIWrapper(javaVm, jobj, _Login_Activity_showAlertDialog);
         JNIWrapper* callback_registred = new JNIWrapper(javaVm, jobj, _Login_Activity_onRegisterdUser);
 
-        AppActionSender::getInstance()->addAuthorizeCallback(std::move(callback_data));
-        AppActionSender::getInstance()->setRegistrationCallback(callback_registred);
-        AppActionSender::getInstance()->setShowDialogCallback(callback_dialog);
+        AppAction::getInstance()->addAuthorizeCallback(std::move(callback_data));
+        AppAction::getInstance()->setRegistrationCallback(callback_registred);
+        AppAction::getInstance()->setShowDialogCallback(callback_dialog);
   }
 
 #ifdef __cplusplus

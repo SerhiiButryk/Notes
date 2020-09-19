@@ -4,7 +4,7 @@ import com.example.notes.test.control.logic.AuthorizeType;
 import com.example.notes.test.ui.data_model.AuthModel;
 import com.example.notes.test.control.logic.RequestType;
 
-import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
+import static com.example.notes.test.common.AppContants.RUNTIME_LIBRARY;
 
 /**
  *  Performs user authorization request processing

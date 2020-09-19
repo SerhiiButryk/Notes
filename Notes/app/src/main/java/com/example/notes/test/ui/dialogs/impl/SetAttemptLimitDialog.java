@@ -6,7 +6,7 @@ import com.example.notes.test.ui.SetLoginLimitDialogUI;
 
 public class SetAttemptLimitDialog {
 
-    private static final String DIALOG_TAG =  "enter number dialog";
+    private static final String DIALOG_TAG =  "Attempt limit dialog";
 
     public static void showDialog(FragmentActivity activity) {
         SetLoginLimitDialogUI dialog = new SetLoginLimitDialogUI();

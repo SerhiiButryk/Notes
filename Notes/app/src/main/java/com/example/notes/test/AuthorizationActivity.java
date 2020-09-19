@@ -22,26 +22,24 @@ import com.example.notes.test.ui.dialogs.impl.AlertDialog;
 import com.example.notes.test.ui.fragments.BlockFragment;
 import com.example.notes.test.ui.fragments.LoginFragment;
 import com.example.notes.test.ui.fragments.RegisterFragment;
+import com.example.notes.test.ui.utils.AuthorizeObserver;
 import com.example.notes.test.ui.view_model.AuthViewModel;
 import com.example.core.common.log.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
+import static com.example.notes.test.common.AppContants.RUNTIME_LIBRARY;
 
-public class AuthorizationActivity extends AppCompatActivity implements LoginFragment.LoginListener,
-        IAuthorizeSubject, RegisterFragment.OnRegisterListener {
+public class AuthorizationActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
     private static final String LOGIN_FRAGMENT = "LoginFragment";
 
     private AuthViewModel authViewModel;
-    private List<IAuthorize> observers = new ArrayList<>();
     private FragmentManager fragmentManager;
     private NativeBridge nativeBridge = new NativeBridge();
-
-    private Handler mainThreadHandler = new Handler();
+    private AuthorizeObserver observer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +60,19 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         });
 
         // Observer
-        subscribe(EventService.getInstance());
+        observer = new AuthorizeObserver(new AuthorizeObserver.RegisterNewAccountListener() {
+            @Override
+            public void onRegisterNewAccountClicked() {
+                addRegisterFragment();
+            }
+        });
 
         initNative();
 
         Log.info(TAG, "onCreate() - fragments in the back stack " + fragmentManager.getBackStackEntryCount());
     }
+
+    public AuthorizeObserver getObserver() { return observer;  }
 
     @Override
     protected void onResume() {
@@ -79,7 +84,7 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
     @Override
     protected void onDestroy() {
 
-        observers.clear();
+        observer.clear();
 
         super.onDestroy();
     }
@@ -96,22 +101,10 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         }
     }
 
-    @Override
-    public void onRegister() {
+    public void addRegisterFragment() {
         // Open the Registration fragment view
         addFragment(new RegisterFragment(), null);
     }
-
-    @Override
-    public void onLoginRequested() { notifyObservers(AuthorizeType.AUTH_LOGIN_BASIC); }
-
-    @Override
-    public void onRegisterRequested() {
-        notifyObservers(AuthorizeType.AUTH_REGISTRATION);
-    }
-
-    @Override
-    public void onFingerPrintLoginRequested() { notifyObservers(AuthorizeType.AUTH_BIOMETRIC_LOGIN); }
 
     private void showLoginFragment() {
         if (fragmentManager.getBackStackEntryCount() == 0) {
@@ -136,36 +129,6 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         fragmentManager.beginTransaction().replace(R.id.main_layout, fragment, tag)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    @Override
-    public void subscribe(IAuthorize observer) {
-        observers.add(observer);
-    }
-
-    @Override
-    public void unsubscribe(IAuthorize observer) {
-        observers.remove(observer);
-    }
-
-    @Override
-    public void notifyObservers(AuthorizeType type) {
-        for (IAuthorize observer : observers) {
-
-            if (type == AuthorizeType.AUTH_REGISTRATION) {
-
-                observer.onRegistration();
-
-            } else if (type == AuthorizeType.AUTH_LOGIN_BASIC) {
-
-                observer.onAuthorization();
-
-            } else if (type == AuthorizeType.AUTH_BIOMETRIC_LOGIN) {
-
-                observer.onBiometricLogin();
-            }
-
-        }
     }
 
     /**

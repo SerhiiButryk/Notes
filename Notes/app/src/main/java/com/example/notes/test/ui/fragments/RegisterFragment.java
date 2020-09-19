@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.notes.test.AuthorizationActivity;
 import com.example.notes.test.R;
 import com.example.notes.test.databinding.FragmentRegistrationViewBinding;
 import com.example.notes.test.ui.data_model.AuthModel;
@@ -40,7 +41,7 @@ public class RegisterFragment extends Fragment {
                 // Set data
                 authViewModel.changeValue(getData());
 
-                registerListener.onRegisterRequested();
+                registerListener.onRegisterClicked();
                 return true;
             }
             return false;
@@ -48,15 +49,14 @@ public class RegisterFragment extends Fragment {
     };
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        try {
-            registerListener = (OnRegisterListener) context;
-        } catch (ClassCastException exception) {
-            throw new ClassCastException(context.toString() + " must implement OnRegisterListener interface");
-        }
+        // Retrieve an instance on ViewModel
+        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
 
+        AuthorizationActivity activity = (AuthorizationActivity) getActivity();
+        registerListener = activity.getObserver();
     }
 
     @Nullable
@@ -73,7 +73,7 @@ public class RegisterFragment extends Fragment {
                 // Set data
                 authViewModel.changeValue(getData());
 
-                registerListener.onRegisterRequested();
+                registerListener.onRegisterClicked();
             }
         });
 
@@ -96,21 +96,6 @@ public class RegisterFragment extends Fragment {
         return binding.getRoot();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        // Retrieve an instance on ViewModel
-        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        registerListener = null;
-    }
-
     private AuthModel getData() {
         AuthModel authModel = new AuthModel();
         authModel.setPassword(GoodUtils.getText(passwordField));
@@ -125,7 +110,7 @@ public class RegisterFragment extends Fragment {
      */
     public interface OnRegisterListener {
 
-        void onRegisterRequested();
+        void onRegisterClicked();
     }
 
 }

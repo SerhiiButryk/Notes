@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include "app/core/app_action_sender.h"
+#include "app/core/app_action.h"
 #include "storage/file_system.h"
 #include "utils/jstring.h"
 #include "utils/log.h"
@@ -35,7 +35,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_initNativeC
 
     JNIWrapper callback(javaVm, obj, id);
 
-    AppActionSender::getInstance()->addAuthorizeCallback(std::move(callback));
+    AppAction::getInstance()->addAuthorizeCallback(std::move(callback));
 }
 
 JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnStop
@@ -43,7 +43,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnSto
 {
     Log::Info(TAG, "Java_com_example_notes_test_NotesViewActivity_notifyOnStop \n");
 
-    AppActionSender::getInstance()->removeUnlockKeystoreNoteViewCallback();
+    AppAction::getInstance()->removeUnlockKeystoreNoteViewCallback();
 }
 
 JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnResume
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnRes
 
     JNIWrapper* unlockKeystoreCallback = new JNIWrapper(javaVm, obj, idKeystore);
 
-    AppActionSender::getInstance()->setUnlockKeystoreNoteViewCallback(unlockKeystoreCallback);
+    AppAction::getInstance()->setUnlockKeystoreNoteViewCallback(unlockKeystoreCallback);
 }
 
 #ifdef __cplusplus

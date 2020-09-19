@@ -37,4 +37,11 @@ public class GoodUtils {
         return textView.getText().toString().trim();
     }
 
+    /**
+     *  Replace a place holder symbol with int value
+     */
+    public static String formatString(String message, int placeValue) {
+        return message.replace('%', String.valueOf(placeValue).charAt(0));
+    }
+
 }

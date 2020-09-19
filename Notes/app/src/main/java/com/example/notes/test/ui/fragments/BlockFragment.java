@@ -1,6 +1,5 @@
 package com.example.notes.test.ui.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -19,6 +18,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.core.security.Hash;
 import com.example.core.utils.GoodUtils;
+import com.example.notes.test.AuthorizationActivity;
 import com.example.notes.test.R;
 import com.example.notes.test.control.logic.AuthorizeType;
 import com.example.notes.test.databinding.FragmentBlockViewBinding;
@@ -31,7 +31,7 @@ public class BlockFragment extends Fragment {
     private EditText accessKeyField;
     private Button ok;
 
-    private LoginFragment.LoginListener loginListener;
+    private UnlockApplicationListener unlockApplicationListener;
 
     private AuthViewModel authViewModel;
 
@@ -47,30 +47,14 @@ public class BlockFragment extends Fragment {
     };
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-            loginListener = (LoginFragment.LoginListener) context;
-        } catch (ClassCastException exception) {
-            throw new ClassCastException(context.toString() + " must implement LoginListener interface");
-        }
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        loginListener = null;
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance of ViewModel
         authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
+
+        AuthorizationActivity activity = (AuthorizationActivity) getActivity();
+        unlockApplicationListener = activity.getObserver();
     }
 
     @Nullable
@@ -117,7 +101,11 @@ public class BlockFragment extends Fragment {
         authViewModel.changeValue(authModel);
 
         // Proceed with unlock
-        loginListener.onLoginRequested();
+        unlockApplicationListener.onApplicationUnlock();
+    }
+
+    public interface UnlockApplicationListener {
+        void onApplicationUnlock();
     }
 
 }

@@ -18,11 +18,11 @@ LOCAL_PATH:= $(call my-dir)
                        app/net/server_agent.cpp \
                        app/logic/action_dispatcher.cpp \
                        app/logic/event/authorize_event.cpp \
-                       app/logic/event/registration_event.cpp \
-                       app/core/app_action_sender.cpp \
+                       app/logic/event/register_event.cpp \
+                       app/core/app_action.cpp \
                        app/core/utils/auth_utils.cpp \
                        app/logic/handler/authorize_handler.cpp \
-                       app/logic/handler/registration_handler.cpp \
+                       app/logic/handler/register_handler.cpp \
                        app/logic/handler/unlock_handler.cpp \
                        app_common/env_constants.cpp \
 

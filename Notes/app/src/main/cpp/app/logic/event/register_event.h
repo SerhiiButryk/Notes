@@ -6,10 +6,10 @@
 namespace APP
 {
 
-    class RegistrationEvent : public Event<SYSTEM_EVENT>
+    class RegisterEvent : public Event<SYSTEM_EVENT>
     {
         public:
-            RegistrationEvent();
+            RegisterEvent();
 
     };
 

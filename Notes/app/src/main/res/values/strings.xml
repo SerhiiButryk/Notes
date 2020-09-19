@@ -71,7 +71,8 @@
 
     // Menu
     <string name="delete_note_item">Delete note</string>
-    <string name="discard_and_return">Save note</string>
+    <string name="save_note_item">Save note</string>
+    <string name="clear_note_item">Clear note</string>
     <string name="settings_item">Settings</string>
 
     // PreferenceActivity

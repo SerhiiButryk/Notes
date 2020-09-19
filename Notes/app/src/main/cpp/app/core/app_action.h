@@ -20,7 +20,7 @@ namespace APP
      *  Note: This class is an observer of the events in ActionDispatcher class.
      */
 
-    class AppActionSender : public SystemActions
+    class AppAction : public SystemActions
     {
         private:
 
@@ -34,7 +34,7 @@ namespace APP
 
         public:
 
-            static AppActionSender* getInstance();
+            static AppAction* getInstance();
 
             void addAuthorizeCallback(JNIWrapper authorize_callback);
             void setShowDialogCallback(JNIWrapper* showdialog_callback);
@@ -54,7 +54,7 @@ namespace APP
             void onUnlockKeystore() override;
 
         private:
-            AppActionSender();
+            AppAction();
     };
 
 }

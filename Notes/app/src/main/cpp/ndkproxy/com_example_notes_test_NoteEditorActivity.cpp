@@ -1,6 +1,6 @@
 #include "com_example_notes_test_NoteEditorActivity.h"
 
-#include "app/core/app_action_sender.h"
+#include "app/core/app_action.h"
 #include "utils/jstring.h"
 #include "utils/log.h"
 
@@ -23,7 +23,7 @@ extern "C" {
 
   JNIWrapper* unlockKeystoreCallback = new JNIWrapper(javaVm, obj, idKeystore);
 
-  AppActionSender::getInstance()->setUnlockKeystoreEditorViewCallback(unlockKeystoreCallback);
+  AppAction::getInstance()->setUnlockKeystoreEditorViewCallback(unlockKeystoreCallback);
 }
 
 JNIEXPORT void JNICALL Java_com_example_notes_test_NoteEditorActivity_notifyOnDestroy
@@ -31,7 +31,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_NoteEditorActivity_notifyOnDe
 {
     Log::Info("JNI", " Java_com_example_notes_test_NoteEditorActivity_notifyOnDestroy \n");
 
-  AppActionSender::getInstance()->removeUnlockKeystoreEditorViewCallback();
+  AppAction::getInstance()->removeUnlockKeystoreEditorViewCallback();
 }
 
 #ifdef __cplusplus

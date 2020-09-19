@@ -3,7 +3,6 @@ package com.example.notes.test.ui.fragments;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -21,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.core.security.Hash;
+import com.example.notes.test.AuthorizationActivity;
 import com.example.notes.test.R;
 import com.example.notes.test.control.NativeBridge;
 import com.example.notes.test.control.managers.BiometricAuthManager;
@@ -58,7 +58,7 @@ public class LoginFragment extends Fragment {
                 authViewModel.changeValue(getData());
 
                 // Send event
-                loginListener.onLoginRequested();
+                loginListener.onLoginClicked();
                 return true;
             }
             return false;
@@ -69,18 +69,23 @@ public class LoginFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        try {
-            loginListener = (LoginListener) context;
-        } catch (ClassCastException exception) {
-            throw new ClassCastException(context.toString() + " must implement OnCreateAccountListener interface");
-        }
-
         if (biometricAuthManager.canAuthenticate(context) && biometricAuthManager.hasFingerPrint(context))
         {
             biometricAuthManager.initBiometricSettings(context, this);
             isFingerprintAvailable = true;
         }
 
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Retrieve an instance of ViewModel
+        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
+
+        AuthorizationActivity activity = (AuthorizationActivity) getActivity();
+        loginListener = activity.getObserver();
     }
 
     @Nullable
@@ -114,7 +119,7 @@ public class LoginFragment extends Fragment {
         biometricAuthManager.setOnAuthenticateListener(new BiometricAuthManager.OnAuthenticateListener() {
             @Override
             public void onSuccess() {
-                loginListener.onFingerPrintLoginRequested();
+                loginListener.onFingerPrintLoginClicked();
             }
         });
 
@@ -123,7 +128,7 @@ public class LoginFragment extends Fragment {
         registerAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginListener.onRegister();
+                loginListener.onRegisterNewAccountClicked();
             }
         });
 
@@ -134,7 +139,7 @@ public class LoginFragment extends Fragment {
                 authViewModel.changeValue(getData());
 
                 // Send event
-                loginListener.onLoginRequested();
+                loginListener.onLoginClicked();
             }
         });
 
@@ -167,21 +172,6 @@ public class LoginFragment extends Fragment {
         return binding.getRoot();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        // Retrieve an instance of ViewModel
-        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        loginListener = null;
-    }
-
     private AuthModel getData() {
 
         Hash hash = new Hash();
@@ -202,10 +192,10 @@ public class LoginFragment extends Fragment {
      */
     public interface LoginListener {
 
-        void onRegister();
+        void onRegisterNewAccountClicked();
 
-        void onLoginRequested();
+        void onLoginClicked();
 
-        void onFingerPrintLoginRequested();
+        void onFingerPrintLoginClicked();
     }
 }

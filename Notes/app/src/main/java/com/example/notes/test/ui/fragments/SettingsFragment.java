@@ -7,8 +7,9 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.core.common.log.Log;
+import com.example.core.utils.GoodUtils;
 import com.example.notes.test.R;
-import com.example.notes.test.common.AppUtils;
+import com.example.notes.test.common.AppContants;
 import com.example.notes.test.control.NativeBridge;
 import com.example.notes.test.ui.dialogs.impl.ChangePasswordDialog;
 import com.example.notes.test.ui.dialogs.impl.SetAttemptLimitDialog;
@@ -22,6 +23,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private Preference version;
     private ListPreference idleLockTimeOut;
 
+    private final NativeBridge nativeBridge = new NativeBridge();
+
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         setPreferencesFromResource(R.xml.preferences, s);
@@ -30,11 +33,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     public void updatePreferences() {
-
-        NativeBridge nativeBridge = new NativeBridge();
         int limitAttempts = nativeBridge.getAttemptLimit();
 
-        loginAttempts.setSummary(AppUtils.formatString(getString(R.string.preference_login_limit_summary), limitAttempts));
+        loginAttempts.setSummary(GoodUtils.formatString(getString(R.string.preference_login_limit_summary), limitAttempts));
     }
 
     private void initBasicSettings() {
@@ -50,9 +51,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         loginAttempts = findPreference(getString(R.string.preference_login_limit_key));
 
-        final NativeBridge nativeBridge = new NativeBridge();
-
-        loginAttempts.setSummary(AppUtils.formatString(getString(R.string.preference_login_limit_summary),
+        loginAttempts.setSummary(GoodUtils.formatString(getString(R.string.preference_login_limit_summary),
                 nativeBridge.getAttemptLimit()));
 
         loginAttempts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -64,7 +63,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         version = findPreference(getString(R.string.preference_about_version_key));
-        version.setSummary(AppUtils.VERSION_LIBRARY);
+        version.setSummary(AppContants.VERSION_LIBRARY);
 
         idleLockTimeOut = findPreference(getString(R.string.preference_idle_lock_timeout_key));
 

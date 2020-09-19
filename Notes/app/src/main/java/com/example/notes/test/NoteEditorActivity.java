@@ -66,7 +66,7 @@ public class NoteEditorActivity extends AppCompatActivity implements IUnlockKeys
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         initBinding();
         initView();
@@ -138,13 +138,19 @@ public class NoteEditorActivity extends AppCompatActivity implements IUnlockKeys
 
                 finish();
 
-            return true;
+                return true;
 
             case R.id.save_note:
 
                 saveUserNote();
 
-            return true;
+                return true;
+
+            case R.id.clear_note:
+
+                noteFiled.setText("");
+
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

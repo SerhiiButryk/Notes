@@ -8,10 +8,10 @@ namespace APP
      *  Class which handles SYSTEM_EVENT::REGISTER_ACCOUNT
      */
 
-    class RegistrationHandler : public EventHandlerBase<SYSTEM_EVENT>
+    class RegisterHandler : public EventHandlerBase<SYSTEM_EVENT>
     {
         public:
-            RegistrationHandler();
+            RegisterHandler();
 
             void handleEvent(const Event<SYSTEM_EVENT>& event) override;
 

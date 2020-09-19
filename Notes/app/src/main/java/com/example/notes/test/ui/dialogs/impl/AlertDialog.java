@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.core.utils.GoodUtils;
 import com.example.notes.test.R;
-import com.example.notes.test.common.AppUtils;
 import com.example.notes.test.control.NativeBridge;
 import com.example.notes.test.control.logic.AuthResult;
 import com.example.notes.test.ui.AlertDialogUI;
@@ -51,7 +51,7 @@ public class AlertDialog implements BaseDialog {
             int limitLeft = nativeBridge.getLimitLeft();
 
             title = context.getString(R.string.title_wrong_password);
-            message = AppUtils.formatString(context.getString(R.string.ms_wrong_password), limitLeft);
+            message = GoodUtils.formatString(context.getString(R.string.ms_wrong_password), limitLeft);
 
         } else if (type == AuthResult.EMPTY_FIELD.getTypeId()) {
 
@@ -89,11 +89,6 @@ public class AlertDialog implements BaseDialog {
     @Override
     public String getMessage() {
         return message;
-    }
-
-    @Override
-    public boolean hasCustomLayout() {
-        return false;
     }
 
 }

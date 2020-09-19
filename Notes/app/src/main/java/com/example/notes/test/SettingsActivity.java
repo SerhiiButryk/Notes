@@ -15,7 +15,7 @@ import com.example.notes.test.ui.utils.UserInactivityManager;
 
 public class SettingsActivity extends AppCompatActivity implements SetLoginLimitDialogUI.OnNewValueSet {
 
-    private static final String SETTINGS_FRAGMENT_TAG = "settings fragment";
+    private static final String SETTINGS_FRAGMENT_TAG = "main settings";
 
     private Toolbar toolbar;
 
@@ -24,21 +24,15 @@ public class SettingsActivity extends AppCompatActivity implements SetLoginLimit
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         initBinding();
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new SettingsFragment(), SETTINGS_FRAGMENT_TAG).commit();
+                .replace(R.id.container, new SettingsFragment(), SETTINGS_FRAGMENT_TAG)
+                .commit();
 
         setSupportActionBar(toolbar);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -68,6 +62,13 @@ public class SettingsActivity extends AppCompatActivity implements SetLoginLimit
 
         // Set references
         toolbar = binding.toolbar;
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
 

@@ -2,7 +2,7 @@ package com.example.notes.test.control;
 
 import com.example.core.security.Hash;
 
-import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
+import static com.example.notes.test.common.AppContants.RUNTIME_LIBRARY;
 
 /**
  *  Class which accesses underling C++ APIs and methods

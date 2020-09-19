@@ -35,7 +35,7 @@ import java.util.List;
 
 import static com.example.notes.test.NoteEditorActivity.EDITOR_ACTIVITY_INVALID_NOTE_ID;
 import static com.example.notes.test.NoteEditorActivity.EDITOR_ACTIVITY_NOTE_CANNOT_BE_DELETED;
-import static com.example.notes.test.common.AppUtils.RUNTIME_LIBRARY;
+import static com.example.notes.test.common.AppContants.RUNTIME_LIBRARY;
 
 public class NotesViewActivity extends AppCompatActivity implements IAuthorize, IUnlockKeystore {
 
@@ -102,7 +102,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize, 
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         /**
          * Start authorization process
@@ -306,7 +306,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorize, 
     private native void initNativeConfigs(String path);
     private native void notifyOnStop();
     private native void notifyOnResume();
-
 
     static {
         System.loadLibrary(RUNTIME_LIBRARY);

@@ -1,4 +1,4 @@
-#include "registration_handler.h"
+#include "register_handler.h"
 
 #include "storage/system_storage.h"
 #include "storage/file_system.h"
@@ -17,12 +17,12 @@ const static std::string TAG = "RegistrationHandler";
 namespace APP
 {
 
-    RegistrationHandler::RegistrationHandler() : EventHandlerBase(SYSTEM_EVENT::REGISTER_ACCOUNT)
+    RegisterHandler::RegisterHandler() : EventHandlerBase(SYSTEM_EVENT::REGISTER_ACCOUNT)
     {
 
     }
 
-    void RegistrationHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
+    void RegisterHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
     {
         std::string username = event.getData(USERNAME_KEY);
         std::string password = event.getData(PASSWORD_KEY);

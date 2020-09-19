@@ -1,7 +1,7 @@
 #include "system_event_receiver.h"
 
 #include "app/logic/handler/authorize_handler.h"
-#include "app/logic/handler/registration_handler.h"
+#include "app/logic/handler/register_handler.h"
 #include "app/logic/handler/unlock_handler.h"
 
 namespace APP
@@ -33,7 +33,7 @@ namespace APP
     SystemEventReceiver::SystemEventReceiver()
     {
         AuthorizeHandler* authorizeHandler = new AuthorizeHandler();
-        RegistrationHandler* registrationHandler = new RegistrationHandler();
+        RegisterHandler* registrationHandler = new RegisterHandler();
         UnlockHandler* unlockHandler = new UnlockHandler();
 
         // Register receivers
