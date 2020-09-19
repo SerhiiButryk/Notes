@@ -33,7 +33,7 @@ It provides simple interface and pleasant design.
 
 - Languages: Java/JNI, C++17
 - External native libraryies: OpenSSL, Boost
-- Android framework features: androidX, view's bindings, fragments, secure key store, SQL database, biomatric APIs  
+- Android framework features: androidX, view's bindings, fragments, secure key store, SQL database, biometric APIs  
 
 # Screenshots
 
