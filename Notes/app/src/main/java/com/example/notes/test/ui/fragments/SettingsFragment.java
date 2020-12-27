@@ -6,13 +6,12 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.core.common.log.Log;
+import com.example.core.log.Log;
 import com.example.core.utils.GoodUtils;
 import com.example.notes.test.R;
-import com.example.notes.test.common.AppContants;
+import com.example.notes.test.common.AppConstants;
 import com.example.notes.test.control.NativeBridge;
-import com.example.notes.test.ui.dialogs.impl.ChangePasswordDialog;
-import com.example.notes.test.ui.dialogs.impl.SetAttemptLimitDialog;
+import com.example.notes.test.ui.dialogs.DialogHelper;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -28,13 +27,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         setPreferencesFromResource(R.xml.preferences, s);
-
         initBasicSettings();
     }
 
     public void updatePreferences() {
         int limitAttempts = nativeBridge.getAttemptLimit();
-
         loginAttempts.setSummary(GoodUtils.formatString(getString(R.string.preference_login_limit_summary), limitAttempts));
     }
 
@@ -44,7 +41,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         changePassword.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                ChangePasswordDialog.showDialog(SettingsFragment.this.getActivity());
+                DialogHelper.showChangePasswordDialog(getActivity());
                 return true;
             }
         });
@@ -57,13 +54,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         loginAttempts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                SetAttemptLimitDialog.showDialog(getActivity());
+                DialogHelper.showSetAttemptDialog(getActivity());
                 return true;
             }
         });
 
         version = findPreference(getString(R.string.preference_about_version_key));
-        version.setSummary(AppContants.VERSION_LIBRARY);
+        version.setSummary(AppConstants.VERSION_LIBRARY);
 
         idleLockTimeOut = findPreference(getString(R.string.preference_idle_lock_timeout_key));
 

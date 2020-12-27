@@ -1,8 +1,6 @@
 package com.example.notes.test.ui.data_model;
 
-import androidx.annotation.NonNull;
-
-import com.example.notes.test.control.logic.AuthorizeType;
+import com.example.notes.test.control.types.AuthorizeType;
 
 public class AuthModel {
 
@@ -46,9 +44,10 @@ public class AuthModel {
 
     public AuthorizeType getAuthType() { return authType; }
 
-    @NonNull
-    @Override
-    public String toString() {
-        return "{" + email + ":" + password + ":" + confirmPassword + "}";
-    }
+    // DEBUG ONLY
+    //    @NonNull
+    //    @Override
+    //    public String toString() {
+    //        return "{" + email + ":" + password + ":" + confirmPassword + "}";
+    //    }
 }

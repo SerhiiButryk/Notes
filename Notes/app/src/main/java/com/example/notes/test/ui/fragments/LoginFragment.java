@@ -1,7 +1,7 @@
 package com.example.notes.test.ui.fragments;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,21 +20,22 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.core.security.Hash;
-import com.example.notes.test.AuthorizationActivity;
 import com.example.notes.test.R;
 import com.example.notes.test.control.NativeBridge;
+import com.example.notes.test.control.types.AuthorizeType;
 import com.example.notes.test.control.managers.BiometricAuthManager;
 import com.example.notes.test.databinding.FragmentLoginViewBinding;
 import com.example.notes.test.ui.data_model.AuthModel;
-import com.example.notes.test.ui.view_model.AuthViewModel;
+import com.example.notes.test.ui.fragments.base.IViewBindings;
+import com.example.notes.test.ui.view_model.AuthorizationViewModel;
 import com.example.core.utils.GoodUtils;
 
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements IViewBindings {
 
     private static String TAG = LoginFragment.class.getSimpleName();
+    public static final String FRAGMENT_TAG = "LoginFragment";
 
-    private LoginListener loginListener;
-    private AuthViewModel authViewModel;
+    private AuthorizationViewModel authorizationViewModel;
 
     private EditText emailField;
     private EditText passwordField;
@@ -45,6 +46,9 @@ public class LoginFragment extends Fragment {
 
     private BiometricAuthManager biometricAuthManager = new BiometricAuthManager();
     private boolean isFingerprintAvailable;
+    private final NativeBridge nativeBridge = new NativeBridge();
+
+    private ShowRegistrationUIListener showRegistrationUIListener;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
@@ -55,10 +59,7 @@ public class LoginFragment extends Fragment {
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 // Set data
-                authViewModel.changeValue(getData());
-
-                // Send event
-                loginListener.onLoginClicked();
+                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_BASIC_LOGIN));
                 return true;
             }
             return false;
@@ -82,10 +83,9 @@ public class LoginFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance of ViewModel
-        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
+        authorizationViewModel = new ViewModelProvider(getActivity()).get(AuthorizationViewModel.class);
 
-        AuthorizationActivity activity = (AuthorizationActivity) getActivity();
-        loginListener = activity.getObserver();
+        showRegistrationUIListener = (ShowRegistrationUIListener) getActivity();
     }
 
     @Nullable
@@ -94,7 +94,6 @@ public class LoginFragment extends Fragment {
 
         View view = initBinding(inflater, container);
 
-        final NativeBridge nativeBridge = new NativeBridge();
         String userName = nativeBridge.getUserName();
 
         if (!userName.isEmpty()) {
@@ -116,10 +115,11 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        biometricAuthManager.setOnAuthenticateListener(new BiometricAuthManager.OnAuthenticateListener() {
+        biometricAuthManager.setOnAuthenticateSuccess(new BiometricAuthManager.OnAuthenticateListener() {
             @Override
             public void onSuccess() {
-                loginListener.onFingerPrintLoginClicked();
+                // Set data
+                authorizationViewModel.setAuthValue(createEmptyModel(AuthorizeType.AUTH_BIOMETRIC_LOGIN));
             }
         });
 
@@ -128,7 +128,7 @@ public class LoginFragment extends Fragment {
         registerAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginListener.onRegisterNewAccountClicked();
+                showRegistrationUIListener.onShowRegistrationUI();
             }
         });
 
@@ -136,10 +136,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Set data
-                authViewModel.changeValue(getData());
-
-                // Send event
-                loginListener.onLoginClicked();
+                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_BASIC_LOGIN));
             }
         });
 
@@ -150,15 +147,12 @@ public class LoginFragment extends Fragment {
 
     public void onUserAccountCreated() {
         registerAccountBtn.setVisibility(View.GONE);
-
-        NativeBridge nativeBridge = new NativeBridge();
-        String userName = nativeBridge.getUserName();
-
-        emailField.setText(userName);
+        emailField.setText(nativeBridge.getUserName());
         passwordField.requestFocus();
     }
 
-    private View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
+    @Override
+    public View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
         FragmentLoginViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login_view, viewGroup, false);
 
         // Set references
@@ -172,7 +166,7 @@ public class LoginFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private AuthModel getData() {
+    private AuthModel createModel(AuthorizeType type) {
 
         Hash hash = new Hash();
 
@@ -180,22 +174,19 @@ public class LoginFragment extends Fragment {
 
         authModel.setPassword(hash.hashMD5(GoodUtils.getText(passwordField)));
         authModel.setEmail(GoodUtils.getText(emailField));
-
-        emailField.setText(null);
-        passwordField.setText(null);
+        authModel.setAuthType(type);
 
         return authModel;
     }
 
-    /**
-     *  Callback interface to the activity
-     */
-    public interface LoginListener {
-
-        void onRegisterNewAccountClicked();
-
-        void onLoginClicked();
-
-        void onFingerPrintLoginClicked();
+    private AuthModel createEmptyModel(AuthorizeType type) {
+        AuthModel authModel = new AuthModel();
+        authModel.setAuthType(type);
+        return authModel;
     }
+
+    public interface ShowRegistrationUIListener {
+        void onShowRegistrationUI();
+    }
+
 }

@@ -12,7 +12,7 @@ extern "C" {
  * Method:    initNative
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_example_notes_test_AuthorizationActivity_initNative
+JNIEXPORT void JNICALL Java_com_example_notes_test_activities_AuthorizationActivity_initNative
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus

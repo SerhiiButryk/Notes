@@ -6,27 +6,32 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:allowBackup="true"
+        android:name=".Notes"
+        android:allowBackup="false"
         android:icon="@drawable/app_icon"
         android:label="${appLabel}"
         android:roundIcon="@drawable/app_icon"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".SettingsActivity"
-            android:theme="@style/AppThemeNoActionBar"/>
+        <activity
+            android:name=".activities.PlansViewActivity"
+            android:theme="@style/AppThemeNoActionBar"
+            android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".NoteEditorActivity"
-            android:theme="@style/AppThemeNoActionBar" />
+            android:name=".activities.SettingsActivity"
+            android:theme="@style/ThemeSettings" />
 
         <activity
-            android:name=".AuthorizationActivity"
+            android:name=".activities.AuthorizationActivity"
             android:theme="@style/AppLoginTheme"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".NotesViewActivity">
+        <activity android:name=".activities.NotesViewActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".ui.utils.InactivityEventReceiver"/>
+        <receiver android:name=".control.broadcast.InactivityEventReceiver" />
 
     </application>
 

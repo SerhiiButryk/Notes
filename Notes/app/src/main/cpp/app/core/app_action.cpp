@@ -30,6 +30,8 @@ namespace APP
         for (auto&& f : authorizeObservers)
         {
             callVoid(f);
+
+            Log::Info(TAG, "onAuthorized - called observer \n");
         }
     }
 
@@ -38,6 +40,10 @@ namespace APP
         if (registerObserver)
         {
             callVoid(*registerObserver);
+
+            Log::Info(TAG, "onRegistered - called observer \n");
+        } else {
+            Log::Error(TAG, "onRegistered - no observer \n");
         }
     }
 
@@ -46,6 +52,10 @@ namespace APP
         if (showDialogObserver)
         {
             callVoid(*showDialogObserver, type);
+
+            Log::Info(TAG, "onShowDialog - called observer \n");
+        } else {
+            Log::Error(TAG, "onShowDialog - no observer \n");
         }
     }
 

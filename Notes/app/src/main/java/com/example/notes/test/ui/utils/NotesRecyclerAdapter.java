@@ -1,8 +1,9 @@
 package com.example.notes.test.ui.utils;
 
-import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +12,16 @@ import android.widget.TextView;
 import com.example.notes.test.R;
 import com.example.notes.test.ui.data_model.NoteModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.NoteViewHolder> {
 
-    private List<NoteModel> notes;
-    private Context context;
-    private ClickListener clickListener;
+    private List<NoteModel> notes = new ArrayList<>();
+    private NoteViewHolder.ClickListener clickListener;
 
-    public void setClickListener(ClickListener clickListener) {
+    public NotesRecyclerAdapter(NoteViewHolder.ClickListener clickListener) {
         this.clickListener = clickListener;
-    }
-
-    public NotesRecyclerAdapter(List<NoteModel> notes, Context context) {
-        this.notes = notes;
-        this.context = context;
     }
 
     @NonNull
@@ -34,12 +30,19 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_item_view, parent, false);
 
-        return new NoteViewHolder(view, clickListener);
+        return new NoteViewHolder(view, new ClickListener() {
+            @Override
+            public void onClick(int position) {
+                if (clickListener != null) {
+                    clickListener.onClick(notes.get(position));
+                }
+            }
+        });
     }
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i) {
-        noteViewHolder.setTitle(notes.get(i).getNoteTitle());
+        noteViewHolder.setTitle(notes.get(i).getTitle());
         noteViewHolder.setDescription(notes.get(i).getNote());
     }
 
@@ -59,7 +62,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         private TextView title;
         private TextView description;
 
-        public NoteViewHolder(@NonNull View itemView, final ClickListener clickListener) {
+        public NoteViewHolder(@NonNull View itemView, final NotesRecyclerAdapter.ClickListener clickListener) {
             super(itemView);
 
             title = itemView.findViewById(R.id.tv_note_title);
@@ -86,10 +89,15 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         public void setDescription(String description) {
             this.description.setText(description);
         }
+
+        public interface ClickListener {
+            void onClick(NoteModel noteModel);
+        }
+
     }
 
-    public interface ClickListener {
-
+    interface ClickListener {
         void onClick(int position);
     }
+
 }

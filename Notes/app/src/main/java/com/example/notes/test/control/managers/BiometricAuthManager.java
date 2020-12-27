@@ -12,7 +12,8 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.core.common.log.Log;
+import com.example.core.log.Log;
+import com.example.notes.test.R;
 
 import java.util.concurrent.Executor;
 
@@ -20,23 +21,22 @@ import static android.app.Activity.RESULT_OK;
 
 public class BiometricAuthManager {
 
-    private final static String TAG = "BiometricAuthManager";
+    private final static String TAG = BiometricAuthManager.class.getSimpleName();
 
     private static final int UNLOCK_KEYSTORE_REQUEST_CODE = 200;
 
-    private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
 
     private OnAuthenticateListener listener;
 
-    public void setOnAuthenticateListener(OnAuthenticateListener listener) {
+    public void setOnAuthenticateSuccess(OnAuthenticateListener listener) {
         this.listener = listener;
     }
 
     public void initBiometricSettings(Context context, Fragment fragment) {
 
-        executor = ContextCompat.getMainExecutor(context);
+        Executor executor = ContextCompat.getMainExecutor(context);
 
         biometricPrompt = new BiometricPrompt(fragment,
                 executor, new BiometricPrompt.AuthenticationCallback() {
@@ -68,8 +68,8 @@ public class BiometricAuthManager {
         });
 
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login for my app") // TODO Move to xml
-                .setSubtitle("Log in using your biometric credential") // TODO Move to xml
+                .setTitle(context.getString(R.string.biometric_prompt_title))
+                .setSubtitle(context.getString(R.string.biometric_prompt_subtitle))
                 .setDeviceCredentialAllowed(true)
                 .build();
 

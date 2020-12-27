@@ -24,6 +24,8 @@ namespace APP
 
     void RegisterHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
     {
+        Log::Info(TAG, "handleEvent() : got event");
+
         std::string username = event.getData(USERNAME_KEY);
         std::string password = event.getData(PASSWORD_KEY);
         std::string confirmPassword = event.getData(CONFIRM_PASSWORD_KEY);

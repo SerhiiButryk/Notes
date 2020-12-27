@@ -19,7 +19,7 @@ namespace {
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_initNativeConfigs
+JNIEXPORT void JNICALL Java_com_example_notes_test_activities_NotesViewActivity_initNativeConfigs
   (JNIEnv* env, jobject obj, jstring jstr)
 {
     JString filePath(env, jstr);
@@ -31,14 +31,14 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_initNativeC
     JavaVM* javaVm;
     env->GetJavaVM(&javaVm);
 
-    jmethodID id = env->GetMethodID(clz, "onAuthorization", "()V");
+    jmethodID id = env->GetMethodID(clz, "onUserAuthorized", "()V");
 
     JNIWrapper callback(javaVm, obj, id);
 
     AppAction::getInstance()->addAuthorizeCallback(std::move(callback));
 }
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnStop
+JNIEXPORT void JNICALL Java_com_example_notes_test_activities_NotesViewActivity_notifyOnStop
    (JNIEnv *, jobject)
 {
     Log::Info(TAG, "Java_com_example_notes_test_NotesViewActivity_notifyOnStop \n");
@@ -46,7 +46,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnSto
     AppAction::getInstance()->removeUnlockKeystoreNoteViewCallback();
 }
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_NotesViewActivity_notifyOnResume
+JNIEXPORT void JNICALL Java_com_example_notes_test_activities_NotesViewActivity_notifyOnResume
         (JNIEnv* env, jobject obj)
 {
     Log::Info(TAG, "Java_com_example_notes_test_NotesViewActivity_notifyOnResume \n");

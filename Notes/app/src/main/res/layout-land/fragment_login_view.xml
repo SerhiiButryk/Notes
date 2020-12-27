@@ -9,7 +9,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/login_background"
         android:padding="@dimen/margin_middle">
 
         <LinearLayout
@@ -30,6 +29,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textSize="@dimen/title_size_text"
+                    android:textStyle="bold"
                     android:textColor="@color/authorize_title_color_text"
                     android:layout_marginBottom="@dimen/margin_bottom_small"
                     android:layout_marginTop="@dimen/margin_top_small"/>
@@ -92,7 +92,7 @@
                     android:layout_marginEnd="40dp"
                     android:layout_marginStart="40dp" />
 
-                <include layout="@layout/fingerprint_layout"
+                <include layout="@layout/fingerprint_view"
                     android:id="@+id/fingerprint_layout"/>
 
                 <TextView android:id="@+id/btn_register"

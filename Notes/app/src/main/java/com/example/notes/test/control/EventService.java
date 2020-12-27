@@ -7,22 +7,19 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import com.example.core.common.log.Log;
-import com.example.notes.test.control.data.DataProvider;
-import com.example.notes.test.control.logic.IAuthorize;
-import com.example.notes.test.control.logic.IUnlockKeystore;
-import com.example.notes.test.control.managers.AuthorizeManager;
-import com.example.notes.test.control.logic.RequestType;
+import com.example.core.log.Log;
+import com.example.notes.test.control.base.IAuthorizeService;
+import com.example.notes.test.control.base.IUnlockKeystore;
+import com.example.notes.test.control.managers.AppAuthManager;
+import com.example.notes.test.control.types.RequestType;
 import com.example.notes.test.ui.data_model.AuthModel;
 
 /**
- *  Class which receives the events from the system and delivers it to corresponding manager
- *
- *  Could receive update commands from any subscribed subjects
+ *  Class which receives the events from the system and delivers them to corresponding manager
  *
  *  See interface definition
  */
-public class EventService implements IAuthorize, IUnlockKeystore, LifecycleObserver {
+public class EventService implements IAuthorizeService, IUnlockKeystore, LifecycleObserver {
 
     private static String TAG = EventService.class.getSimpleName();
 
@@ -49,45 +46,45 @@ public class EventService implements IAuthorize, IUnlockKeystore, LifecycleObser
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void releaseResources() {
-        serviceThread.quit();
-        serviceThread = null;
+        if (serviceThread != null) {
+            serviceThread.quit();
+            serviceThread = null;
+        }
     }
 
     /**
      *  Handle authorize event
      */
     @Override
-    public void onAuthorization() {
-        // Retrieve authorization data model
-        AuthModel authModel = DataProvider.getInstance().getAuthorizeData();
-
-        AuthorizeManager authorizeManager = new AuthorizeManager();
-
+    public void onBasicLogin(AuthModel model) {
+        AppAuthManager appAuthManager = new AppAuthManager();
         // Initiate authorize request
-        authorizeManager.handleRequest(RequestType.REQ_AUTHORIZE, authModel);
+        appAuthManager.handleRequest(RequestType.REQ_AUTHORIZE, model);
     }
 
     /**
      *  Handle registration event
      */
     @Override
-    public void onRegistration() {
-        // Retrieve authorization data model
-        AuthModel authModel = DataProvider.getInstance().getAuthorizeData();
-
-        AuthorizeManager authorizeManager = new AuthorizeManager();
-
+    public void onRegistration(AuthModel model) {
+        AppAuthManager appAuthManager = new AppAuthManager();
         // Initiate authorize request
-        authorizeManager.handleRequest(RequestType.REQ_REGISTER, authModel);
+        appAuthManager.handleRequest(RequestType.REQ_REGISTER, model);
     }
 
+    /**
+     *  Handle finger print login event
+     */
     @Override
     public void onBiometricLogin() {
-        AuthorizeManager authorizeManager = new AuthorizeManager();
-
-        authorizeManager.handleRequest(RequestType.REQ_BIOMETRIC_LOGIN, null);
+        AppAuthManager appAuthManager = new AppAuthManager();
+        // Initiate authorize request
+        appAuthManager.handleRequest(RequestType.REQ_BIOMETRIC_LOGIN, null);
     }
 
+    /**
+     *  Handle keystore unlock event
+     */
     @Override
     public void onUnlockKeystore() {
 
@@ -101,10 +98,8 @@ public class EventService implements IAuthorize, IUnlockKeystore, LifecycleObser
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
-                    AuthorizeManager authorizeManager = new AuthorizeManager();
-
-                    authorizeManager.handleRequest(RequestType.REQ_UNLOCK_KEYSTORE, null);
+                    AppAuthManager appAuthManager = new AppAuthManager();
+                    appAuthManager.handleRequest(RequestType.REQ_UNLOCK_KEYSTORE, null);
                 }
             }, 1000);
 
@@ -112,7 +107,7 @@ public class EventService implements IAuthorize, IUnlockKeystore, LifecycleObser
 
     }
 
-    public void notifyEventReceived() {
+    public void notifyUnlockEventReceived() {
         // Indicates that Unlock Dialog has shown
         isUnlockKeystoreEventHandled = true;
     }

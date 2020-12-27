@@ -40,7 +40,7 @@
     <string name="usr_new_psw">Enter your password</string>
     <string name="usr_approve_new_psw">Repeat your password</string>
     <string name="usr_new_email">Enter your user email</string>
-    <string name="title_login">Greetings !</string>
+    <string name="title_login">Welcome !</string>
     <string name="title_reg">Registration</string>
     <string name="title_login_google">Login with google</string>
 
@@ -65,7 +65,7 @@
     <string name="toast_action_deleted_message">Note is deleted</string>
     <string name="toast_action_delete_template_note">A template note cannot be deleted</string>
     <string name="toast_action_delete_error_note">Can\'t delete an empty note</string>
-    <string name="toast_action_delete_error_first_note">Can not delete a note. This is not the last one.</string>
+    <string name="toast_action_delete_error_first_note">Can not delete a note.</string>
     <string name="toast_action_error_note_is_not_changed">Nothing to save</string>
     <string name="toast_action_error_note_is_empty">Empty note can\'t be saved</string>
 
@@ -74,6 +74,7 @@
     <string name="save_note_item">Save note</string>
     <string name="clear_note_item">Clear note</string>
     <string name="settings_item">Settings</string>
+    <string name="plans_item">Plans</string>
 
     // PreferenceActivity
     <string name="preference_title">Preferences</string>
@@ -136,5 +137,15 @@
     <string name="block_title">Application is blocked</string>
     <string name="block_message">Enter access key to unlock your application. Find it in the email which is sent to you.</string>
     <string name="block_hint">Access key</string>
+
+    // Biometric prompt
+    <string name="biometric_prompt_title">Biometric login</string>
+    <string name="biometric_prompt_subtitle">Login using your biometric credential</string>
+
+    // Confirm dialog
+    <string name="confirm_dialog_delete_note_title">Confirm your delete action</string>
+    <string name="confirm_dialog_delete_note_message">Are you sure you want to delete this note ?</string>
+    <string name="confirm_dialog_save_note_title">Confirm your save action</string>
+    <string name="confirm_dialog_save_note_message">Are you sure you want to save this note ?</string>
 
 </resources>

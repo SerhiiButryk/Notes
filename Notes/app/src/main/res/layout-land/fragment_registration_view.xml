@@ -2,11 +2,10 @@
 
 <layout>
 
-<ScrollView android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_background"
-    android:padding="@dimen/margin_middle"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:padding="@dimen/margin_middle">
 
     <LinearLayout
         android:id="@+id/authorization_activity_main_layout"
@@ -27,6 +26,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="@dimen/title_size_text"
+                android:textStyle="bold"
                 android:textColor="@color/authorize_title_color_text"
                 android:layout_marginBottom="@dimen/margin_bottom_small"
                 android:layout_marginTop="@dimen/margin_top_small"/>

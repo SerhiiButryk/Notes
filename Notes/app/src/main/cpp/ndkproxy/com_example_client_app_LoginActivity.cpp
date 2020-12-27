@@ -16,9 +16,11 @@ const static std::string TAG = "JNI";
 extern "C" {
 #endif
 
-  JNIEXPORT void JNICALL Java_com_example_notes_test_AuthorizationActivity_initNative
+  JNIEXPORT void JNICALL Java_com_example_notes_test_activities_AuthorizationActivity_initNative
   (JNIEnv* env, jobject jobj)
   {
+        Log::Info(TAG, "JNI Java_com_example_notes_test_AuthorizationActivity_initNative()");
+
         jclass cls = env->GetObjectClass(jobj);
 
         jmethodID _Login_Activity_onAuthorizedUser = env->GetMethodID(cls, "onAuthorizationFinished", "()V");

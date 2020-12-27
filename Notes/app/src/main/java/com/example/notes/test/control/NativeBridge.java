@@ -2,15 +2,13 @@ package com.example.notes.test.control;
 
 import com.example.core.security.Hash;
 
-import static com.example.notes.test.common.AppContants.RUNTIME_LIBRARY;
+import static com.example.notes.test.common.AppConstants.RUNTIME_LIBRARY;
 
 /**
- *  Class which accesses underling C++ APIs and methods
+ *  Class accessor for underling C++ APIs
  */
 
 public class NativeBridge {
-
-    public NativeBridge() { }
 
     public String getUserName() {
         return _getUserName();
@@ -36,6 +34,10 @@ public class NativeBridge {
 
     public int getAttemptLimit() {
         return _getAttemptLimit();
+    }
+
+    public void updateLoginLimit() {
+        setLimitLeft(getAttemptLimit());
     }
 
     public int getLimitLeft() {

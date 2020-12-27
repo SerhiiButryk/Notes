@@ -13,12 +13,12 @@ namespace MYLIB
 
     void Log::Error(const std::string& TAG, const std::string& message) {
 
-        log(ANDROID_LOG_ERROR, TAG, message);
+        log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message);
     }
 
     void Log::Info(const std::string& TAG, const std::string& message) {
 
-        log(ANDROID_LOG_INFO, TAG, message);
+        log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message);
     }
 
     std::string Log::_TAG_APP_ = "";

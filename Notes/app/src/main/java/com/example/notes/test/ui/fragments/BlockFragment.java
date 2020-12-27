@@ -14,26 +14,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.core.security.Hash;
 import com.example.core.utils.GoodUtils;
-import com.example.notes.test.AuthorizationActivity;
 import com.example.notes.test.R;
-import com.example.notes.test.control.logic.AuthorizeType;
+import com.example.notes.test.control.types.AuthorizeType;
 import com.example.notes.test.databinding.FragmentBlockViewBinding;
 import com.example.notes.test.ui.data_model.AuthModel;
+import com.example.notes.test.ui.fragments.base.IViewBindings;
 import com.example.notes.test.ui.utils.TextChecker;
-import com.example.notes.test.ui.view_model.AuthViewModel;
+import com.example.notes.test.ui.view_model.AuthorizationViewModel;
 
-public class BlockFragment extends Fragment {
+public class BlockFragment extends Fragment implements IViewBindings {
 
     private EditText accessKeyField;
     private Button ok;
 
-    private UnlockApplicationListener unlockApplicationListener;
-
-    private AuthViewModel authViewModel;
+    private AuthorizationViewModel authorizationViewModel;
 
     private EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
         @Override
@@ -51,22 +49,18 @@ public class BlockFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance of ViewModel
-        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
-
-        AuthorizationActivity activity = (AuthorizationActivity) getActivity();
-        unlockApplicationListener = activity.getObserver();
+        authorizationViewModel = new ViewModelProvider(getActivity()).get(AuthorizationViewModel.class);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = initBinding(inflater, container);
-
-        return view;
+        return initBinding(inflater, container);
     }
 
-    private View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
+    @Override
+    public View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
 
         FragmentBlockViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_block_view, viewGroup, false);
 
@@ -98,14 +92,8 @@ public class BlockFragment extends Fragment {
         authModel.setAuthType(AuthorizeType.AUTH_UNLOCK);
         authModel.setPassword(hash.hashMD5(enteredKey));
 
-        authViewModel.changeValue(authModel);
-
-        // Proceed with unlock
-        unlockApplicationListener.onApplicationUnlock();
-    }
-
-    public interface UnlockApplicationListener {
-        void onApplicationUnlock();
+        // Set data
+        authorizationViewModel.setAuthValue(authModel);
     }
 
 }

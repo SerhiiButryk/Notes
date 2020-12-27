@@ -5,9 +5,10 @@ import android.security.keystore.KeyProperties;
 import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Base64;
 
-import com.example.core.common.log.Log;
+import com.example.core.log.Log;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -44,9 +45,9 @@ public class SecureStore implements CryptoSymmetric {
             encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
             byte[] _iv = encryptionCipher.getIV();
-            byte[] encryptedText = encryptionCipher.doFinal(message.getBytes("UTF-8"));
+            byte[] encryptedText = encryptionCipher.doFinal(message.getBytes(StandardCharsets.UTF_8));
 
-            return new Result(new String(Base64.encode(encryptedText, Base64.DEFAULT)), _iv, CryptoError.OK);
+            return new Result(new String(Base64.encode(encryptedText, Base64.NO_WRAP)), _iv, CryptoError.OK);
 
         } catch (UserNotAuthenticatedException e) {
             Log.error(TAG, "user not authenticated exception: " + e);
@@ -95,7 +96,7 @@ public class SecureStore implements CryptoSymmetric {
     }
 
     private void init() {
-        keyStore = initKeyStore(null);
+        keyStore = initKeyStore();
 
         if (keyStore != null) {
             boolean success = load(keyStore);
@@ -152,7 +153,7 @@ public class SecureStore implements CryptoSymmetric {
         }
     }
 
-    private KeyStore initKeyStore(String provider) {
+    private KeyStore initKeyStore() {
         try {
             return KeyStore.getInstance("AndroidKeyStore");
         } catch (KeyStoreException e) {

@@ -1,8 +1,8 @@
 package com.example.notes.test.ui.fragments;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
-import android.content.Context;
+import androidx.lifecycle.ViewModelProvider;
+
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,14 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.notes.test.AuthorizationActivity;
 import com.example.notes.test.R;
+import com.example.notes.test.control.types.AuthorizeType;
 import com.example.notes.test.databinding.FragmentRegistrationViewBinding;
 import com.example.notes.test.ui.data_model.AuthModel;
-import com.example.notes.test.ui.view_model.AuthViewModel;
+import com.example.notes.test.ui.fragments.base.IViewBindings;
+import com.example.notes.test.ui.view_model.AuthorizationViewModel;
 import com.example.core.utils.GoodUtils;
 
-public class RegisterFragment extends Fragment {
+public class RegisterFragment extends Fragment implements IViewBindings {
 
     private  EditText emailField;
     private  TextView titleLabel;
@@ -31,17 +32,14 @@ public class RegisterFragment extends Fragment {
     private  EditText confirmPasswordField;
     private  Button registerButton;
 
-    private OnRegisterListener registerListener;
-    private AuthViewModel authViewModel;
+    private AuthorizationViewModel authorizationViewModel;
 
     private EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 // Set data
-                authViewModel.changeValue(getData());
-
-                registerListener.onRegisterClicked();
+                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION));
                 return true;
             }
             return false;
@@ -53,10 +51,7 @@ public class RegisterFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance on ViewModel
-        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
-
-        AuthorizationActivity activity = (AuthorizationActivity) getActivity();
-        registerListener = activity.getObserver();
+        authorizationViewModel = new ViewModelProvider(getActivity()).get(AuthorizationViewModel.class);
     }
 
     @Nullable
@@ -71,9 +66,7 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Set data
-                authViewModel.changeValue(getData());
-
-                registerListener.onRegisterClicked();
+                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION));
             }
         });
 
@@ -83,7 +76,8 @@ public class RegisterFragment extends Fragment {
         return view;
     }
 
-    private View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
+    @Override
+    public View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
         FragmentRegistrationViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_registration_view, viewGroup, false);
 
         // Set references
@@ -96,21 +90,13 @@ public class RegisterFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private AuthModel getData() {
+    private AuthModel createModel(AuthorizeType type) {
         AuthModel authModel = new AuthModel();
         authModel.setPassword(GoodUtils.getText(passwordField));
         authModel.setEmail(GoodUtils.getText(emailField));
         authModel.setConfirmPassword(GoodUtils.getText(confirmPasswordField));
-
+        authModel.setAuthType(type);
         return authModel;
-    }
-
-    /**
-     *  Callback interface to the activity
-     */
-    public interface OnRegisterListener {
-
-        void onRegisterClicked();
     }
 
 }

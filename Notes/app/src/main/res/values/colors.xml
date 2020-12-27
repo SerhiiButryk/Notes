@@ -8,15 +8,20 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#424242</color>
     <color name="blue">#0277BD</color>
+    <color name="blue_light">#81D4FA</color>
     <color name="blue_dark">#00838F</color>
     <color name="blue_contrast">#0288D1</color>
+    <color name="birch">#03dac6</color>
+    <color name="yellow">#FFC107</color>
+    <color name="red">#FF5722</color>
+    <color name="dark">#f2f1f6</color>
 
     <color name="light_grey">#ebebf0</color>
     <color name="background_color">@color/light_grey</color>
     <color name="span_color">@color/light_grey</color>
     <color name="authorize_title_color_text">@color/white</color>
 
-    <color name="dark_blue">#0277BD</color>
+    <color name="dark_blue">#03A9F4</color>
     <color name="light_blue">#3F51B5</color>
     <color name="blue_accent">#00B8D4</color>
     <color name="grey_background">#BDBDBD</color>
@@ -26,5 +31,16 @@
     <color name="login_medium">#66ffffff</color>
 
     <color name="semitransparent_white">#77ffffff</color>
+
+    <array name="plan_item_colors">
+        <item>@color/birch</item>
+        <item>@color/yellow</item>
+        <item>@color/blue_contrast</item>
+        <item>@color/red</item>
+    </array>
+
+    <color name="background_main_color">#424242</color>
+
+    <color name="dark_grey">#616161</color>
 
 </resources>

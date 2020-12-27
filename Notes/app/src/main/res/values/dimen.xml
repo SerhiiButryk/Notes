@@ -58,4 +58,19 @@
     // BlockView
     <dimen name="message_size_text">20sp</dimen>
 
+    // PlansFragment
+    <dimen name="column_number">2</dimen>
+
+    // PlanItem
+    <dimen name="item_margin">16dp</dimen>
+    <dimen name="item_text_sz">24sp</dimen>
+    <dimen name="item_radius_sz">16dp</dimen>
+    <dimen name="item_elevation_sz">10dp</dimen>
+    <dimen name="item_padding">10dp</dimen>
+    <dimen name="item_time_margin_top">20dp</dimen>
+    <dimen name="grid_margin_sz">10dp</dimen>
+
+    // Dialogs
+    <dimen name="padding_edittext_dialog">18dp</dimen>
+
 </resources>

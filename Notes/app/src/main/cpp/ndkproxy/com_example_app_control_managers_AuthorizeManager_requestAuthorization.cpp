@@ -15,7 +15,7 @@ using MYLIB::JString;
 extern "C" {
 #endif
 
-  JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestAuthorization
+  JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AppAuthManager_requestAuthorization
   (JNIEnv* env, jobject, jstring jpassword, jstring jusername)
   {
        JString passwordString(env, jpassword);
@@ -28,7 +28,7 @@ extern "C" {
        SystemEventReceiver::getInstance()->forward(event);
   }
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestRegistration
+JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AppAuthManager_requestRegistration
   (JNIEnv* env, jobject, jstring jpassword, jstring jconfirm_password, jstring jusername)
   {
       JString passwordString(env, jpassword);
@@ -43,7 +43,7 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeMan
       SystemEventReceiver::getInstance()->forward(event);
   }
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestUnlock
+JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AppAuthManager_requestUnlock
         (JNIEnv* env, jobject, jstring junlockKey)
 {
       JString unlockKey(env, junlockKey);
@@ -54,14 +54,14 @@ JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeMan
       SystemEventReceiver::getInstance()->forward(event);
 }
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestBiometricLogin
+JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AppAuthManager_requestBiometricLogin
         (JNIEnv *, jobject)
 {
       // Authentication is done
     sendSystemAction(ACTION_TYPE::AUTHORIZATION_DONE);
 }
 
-JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AuthorizeManager_requestUnlockKeystore
+JNIEXPORT void JNICALL Java_com_example_notes_test_control_managers_AppAuthManager_requestUnlockKeystore
         (JNIEnv *, jobject)
 {
     // Trigger action

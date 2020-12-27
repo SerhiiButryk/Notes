@@ -1,6 +1,6 @@
 package com.example.core;
 
-import com.example.core.common.components.Components;
+import com.example.core.base.Components;
 import com.example.core.security.Cipher;
 import com.example.core.security.Hash;
 import com.example.core.security.impl.hash.HashAlgorithms;

@@ -24,24 +24,29 @@ namespace MYLIB
         setJObj(object);
     }
 
-    JNIWrapper::JNIWrapper(JNIWrapper&& from) noexcept : javaVm(std::exchange(from.javaVm, nullptr)),
-        jobj(std::exchange(from.jobj, nullptr)), mID(std::exchange(from.mID, nullptr)),
+    JNIWrapper::JNIWrapper(JNIWrapper&& from) noexcept : javaVm(from.javaVm), jobj(from.jobj), mID(from.mID),
         isThreadAttached(std::exchange(from.isThreadAttached, false)), jniEnv(nullptr)
     {
         from.jniEnv = nullptr;
+        from.javaVm = nullptr;
+        from.mID = nullptr;
+        from.jobj = nullptr;
     }
 
     JNIWrapper& JNIWrapper::operator=(JNIWrapper&& from) noexcept
     {
         if (this != &from)
         {
-            javaVm = std::exchange(from.javaVm, nullptr);
-            jobj = std::exchange(from.jobj, nullptr);
-            mID = std::exchange(from.mID, nullptr);
-            isThreadAttached = std::exchange(from.isThreadAttached, nullptr);
+            javaVm = from.javaVm;
+            jobj = from.jobj;
+            mID = from.mID;
+            isThreadAttached = from.isThreadAttached;
             jniEnv = nullptr;
 
             from.jniEnv = nullptr;
+            from.javaVm = nullptr;
+            from.mID = nullptr;
+            from.jobj = nullptr;
         }
 
         return *this;
@@ -136,6 +141,8 @@ namespace MYLIB
         jmethodID mId = callback.getMethodID();
 
         env->CallVoidMethod(obj, mId);
+
+        Log::Info(TAG, "callVoid(): Called callback ");
     }
 
 }
