@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.notes.test">
+    package="com.serhii.apps.notes">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".Notes"
+        android:name="com.serhii.apps.notes.Notes"
         android:allowBackup="false"
         android:icon="@drawable/app_icon"
         android:label="${appLabel}"
@@ -16,20 +16,20 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name=".activities.PlansViewActivity"
+            android:name="com.serhii.apps.notes.activities.PlansViewActivity"
             android:theme="@style/AppThemeNoActionBar"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name="com.serhii.apps.notes.activities.SettingsActivity"
             android:theme="@style/ThemeSettings" />
 
         <activity
-            android:name=".activities.AuthorizationActivity"
+            android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
             android:theme="@style/AppLoginTheme"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".activities.NotesViewActivity"
+        <activity android:name="com.serhii.apps.notes.activities.NotesViewActivity"
             android:windowSoftInputMode="adjustPan"
             android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".control.broadcast.InactivityEventReceiver" />
+        <receiver android:name="com.serhii.apps.notes.control.broadcast.InactivityEventReceiver" />
 
     </application>
 

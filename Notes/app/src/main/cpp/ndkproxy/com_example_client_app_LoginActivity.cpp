@@ -1,7 +1,6 @@
 #include "com_example_client_app_LoginActivity.h"
 
 #include "app/logic/action_dispatcher.h"
-#include "app/net/server_agent.h"
 #include "utils/log.h"
 #include "app/core/app_action.h"
 #include "app_common/env_constants.h"
@@ -16,10 +15,10 @@ const static std::string TAG = "JNI";
 extern "C" {
 #endif
 
-  JNIEXPORT void JNICALL Java_com_example_notes_test_activities_AuthorizationActivity_initNative
+  JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_AuthorizationActivity_initNative
   (JNIEnv* env, jobject jobj)
   {
-        Log::Info(TAG, "JNI Java_com_example_notes_test_AuthorizationActivity_initNative()");
+        Log::Info(TAG, "JNI Java_com_serhii_apps_notes_activities_AuthorizationActivity_initNative()");
 
         jclass cls = env->GetObjectClass(jobj);
 
@@ -39,7 +38,7 @@ extern "C" {
         JNIWrapper* callback_dialog = new JNIWrapper(javaVm, jobj, _Login_Activity_showAlertDialog);
         JNIWrapper* callback_registred = new JNIWrapper(javaVm, jobj, _Login_Activity_onRegisterdUser);
 
-        AppAction::getInstance()->addAuthorizeCallback(std::move(callback_data));
+      AppAction::getInstance()->setAuthorizeCallback(std::move(callback_data));
         AppAction::getInstance()->setRegistrationCallback(callback_registred);
         AppAction::getInstance()->setShowDialogCallback(callback_dialog);
   }

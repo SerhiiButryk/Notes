@@ -12,10 +12,8 @@ LOCAL_PATH:= $(call my-dir)
                        ndkproxy/com_example_client_app_LoginActivity.cpp \
                        ndkproxy/com_example_client_app_NotesViewActivity.cpp \
                        ndkproxy/com_example_client_app_control_NativeBridge.cpp \
-                       ndkproxy/com_example_notes_test_NoteEditorActivity.cpp \
                        app/logic/receiver/system_event_receiver.cpp \
                        app/logic/base/system_constants.cpp \
-                       app/net/server_agent.cpp \
                        app/logic/action_dispatcher.cpp \
                        app/logic/event/authorize_event.cpp \
                        app/logic/event/register_event.cpp \

@@ -36,18 +36,16 @@ namespace APP
 
             static AppAction* getInstance();
 
-            void addAuthorizeCallback(JNIWrapper authorize_callback);
+            void setAuthorizeCallback(JNIWrapper authorize_callback);
             void setShowDialogCallback(JNIWrapper* showdialog_callback);
             void setRegistrationCallback(JNIWrapper* registration_callback);
 
             void setUnlockKeystoreNoteViewCallback(JNIWrapper* unlock_keystore_callback);
-            void setUnlockKeystoreEditorViewCallback(JNIWrapper* unlock_keystore_callback);
             void removeUnlockKeystoreNoteViewCallback();
+
+            void setUnlockKeystoreEditorViewCallback(JNIWrapper* unlock_keystore_callback);
             void removeUnlockKeystoreEditorViewCallback();
 
-            /**
-             * Called by ActionDispatcher
-             */
             void onAuthorized() override;
             void onRegistered() override;
             void onShowDialog(int type) override;

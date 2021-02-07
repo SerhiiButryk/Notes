@@ -10,14 +10,14 @@ namespace APP
 {
 
     /**
-     *  This class dispatches the action in response to processed events to registered observers.
+     *  This class controls an app actions corresponding to system events.
      *
-     *  It knows about all action.
+     *  It processes the result of event handling and dispatches an action if it's needed.
      *
-     *  All requests of any actions should go through this class.
+     *  All system messages should go through this class.
      */
 
-    class ActionDispatcher : private SystemActions
+    class ActionDispatcher
     {
         private:
             std::vector<SystemActions*> authorization_observers;
@@ -25,10 +25,13 @@ namespace APP
             std::vector<SystemActions*> showdialog_observers;
             std::vector<SystemActions*> unlockkeystore_observers;
 
-    public:
+        public:
             static ActionDispatcher* getInstance();
 
-            void sendAction(ACTION_TYPE action);
+           /**
+            * Main entry point for scheduling an app action
+            */
+            void sendMessage(SYSTEM_MESSAGE message);
 
             void addAuthorizeActionObserver(SystemActions* observer);
             void removeAuthorizeObserver(SystemActions* observer);
@@ -43,18 +46,11 @@ namespace APP
             void removeUnlockKeystoreObserver(SystemActions* observer);
 
         private:
-            /**
-             * Native callbacks
-             */
-            void onAuthorized() override;
-            void onRegistered() override;
-            void onShowDialog(int type) override;
-            void onUnlockKeystore() override;
-    };
 
-    /**
-     * Helper functions
-     */
-    void sendSystemAction(ACTION_TYPE action);
+            void notifyOnAuthorized();
+            void notifyOnRegistered();
+            void notifyOnShowDialog(int type);
+            void notifyOnUnlockKeystore();
+    };
 
 }

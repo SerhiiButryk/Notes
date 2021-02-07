@@ -32,7 +32,7 @@ namespace APP
 
         auto success = AuthUtils::checkRules(password, confirmPassword, username, true);
 
-        if (success == ACTION_TYPE ::NO_ERRORS)
+        if (success == SYSTEM_MESSAGE ::NO_ERRORS)
         {
             std::map<std::string, std::string> data;
             data.insert(std::make_pair(username, makeHashMD5(password)));
@@ -44,7 +44,7 @@ namespace APP
             {
                 if (AuthUtils::isUserAccountExists(username))
                 {
-                    sendSystemAction(ACTION_TYPE::USER_NAME_EXISTS);
+                    ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::USER_NAME_EXISTS);
 
                     return;
                 }
@@ -68,12 +68,12 @@ namespace APP
 
             Log::Info(TAG, "handleEvent() - REGISTRATION_DONE");
 
-            sendSystemAction(ACTION_TYPE::REGISTRATION_DONE);
+            ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::REGISTRATION_DONE);
 
             return;
         }
 
-        sendSystemAction(success);
+        ActionDispatcher::getInstance()->sendMessage(success);
     }
 
 }

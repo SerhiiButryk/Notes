@@ -31,7 +31,7 @@ namespace APP
         {
             callVoid(f);
 
-            Log::Info(TAG, "onAuthorized - called observer \n");
+            Log::Info(TAG, "notifyOnAuthorized - called observer \n");
         }
     }
 
@@ -41,9 +41,9 @@ namespace APP
         {
             callVoid(*registerObserver);
 
-            Log::Info(TAG, "onRegistered - called observer \n");
+            Log::Info(TAG, "notifyOnRegistered - called observer \n");
         } else {
-            Log::Error(TAG, "onRegistered - no observer \n");
+            Log::Error(TAG, "notifyOnRegistered - no observer \n");
         }
     }
 
@@ -53,9 +53,9 @@ namespace APP
         {
             callVoid(*showDialogObserver, type);
 
-            Log::Info(TAG, "onShowDialog - called observer \n");
+            Log::Info(TAG, "notifyOnShowDialog - called observer \n");
         } else {
-            Log::Error(TAG, "onShowDialog - no observer \n");
+            Log::Error(TAG, "notifyOnShowDialog - no observer \n");
         }
     }
 
@@ -63,20 +63,20 @@ namespace APP
     {
         if (unlockKeystoreObserverNoteViewActivity)
         {
-            Log::Info(TAG, "onUnlockKeystore - unlockKeystoreObserverNoteViewActivity \n");
+            Log::Info(TAG, "notifyOnUnlockKeystore - unlockKeystoreObserverNoteViewActivity \n");
 
             callVoid(*unlockKeystoreObserverNoteViewActivity);
         }
 
         if (unlockKeystoreObserverNoteEditorActivity)
         {
-            Log::Info(TAG, "onUnlockKeystore - unlockKeystoreObserverNoteEditorActivity \n");
+            Log::Info(TAG, "notifyOnUnlockKeystore - unlockKeystoreObserverNoteEditorActivity \n");
 
             callVoid(*unlockKeystoreObserverNoteEditorActivity);
         }
     }
 
-    void AppAction::addAuthorizeCallback(JNIWrapper authorize_callback)
+    void AppAction::setAuthorizeCallback(JNIWrapper authorize_callback)
     {
         authorizeObservers.push_back(std::move(authorize_callback));
     }

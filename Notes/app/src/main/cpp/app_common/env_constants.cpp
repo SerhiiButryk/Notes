@@ -4,9 +4,9 @@ namespace APP
 {
     const std::string kFileSystemData = "startup_data_file.txt";
 
-    const std::string kFileCashSystemData = "cash_data.txt";
+    const std::string kFileCashSystemData = "cache_data.txt";
 
-    const std::string kUserName = "k_cahsed_user";
+    const std::string kUserName = "k_cached_user";
 
     const std::string kUserLoginAttempts = "k_login_attempts";
 

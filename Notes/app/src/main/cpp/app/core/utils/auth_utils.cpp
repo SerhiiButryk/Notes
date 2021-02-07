@@ -41,12 +41,12 @@ bool APP::AuthUtils::verifyUserPassword(const std::string& user_name, const std:
     return false;
 }
 
-APP::ACTION_TYPE APP::AuthUtils::checkRules(const std::string &password, const std::string &confirm_password,
-                                            const std::string &email, bool check_confirm)
+APP::SYSTEM_MESSAGE APP::AuthUtils::checkRules(const std::string &password, const std::string &confirm_password,
+                                               const std::string &email, bool check_confirm)
 {
     if (password.empty() || email.empty())
     {
-        return ACTION_TYPE::EMPTY_FIELD;
+        return SYSTEM_MESSAGE::EMPTY_FIELD;
     }
 
     if (check_confirm)
@@ -54,25 +54,25 @@ APP::ACTION_TYPE APP::AuthUtils::checkRules(const std::string &password, const s
 
         if (confirm_password.empty())
         {
-            return ACTION_TYPE::EMPTY_FIELD;
+            return SYSTEM_MESSAGE::EMPTY_FIELD;
         }
 
         if (password != confirm_password)
         {
-            return ACTION_TYPE::PASSWORD_DIFFERS;
+            return SYSTEM_MESSAGE::PASSWORD_DIFFERS;
         }
 
         if (Algorithms::containSpace(password)
             || Algorithms::containSpace(confirm_password)
             || Algorithms::containSpace(email))
         {
-            return ACTION_TYPE::SPACE_CONTAIN;
+            return SYSTEM_MESSAGE::SPACE_CONTAIN;
         }
 
-        return ACTION_TYPE::NO_ERRORS;
+        return SYSTEM_MESSAGE::NO_ERRORS;
     }
 
-    return ACTION_TYPE::NO_ERRORS;
+    return SYSTEM_MESSAGE::NO_ERRORS;
 }
 
 void APP::AuthUtils::setLoginLimit()
@@ -86,20 +86,6 @@ void APP::AuthUtils::setLoginLimit()
     std::map<std::string, std::string> value;
     value.insert(std::make_pair(kUserLoginAttempts, std::to_string(USER_LOGIN_ATTEMPTS_DEFAULT)));
     value.insert(std::make_pair(kUserLoginAttemptsLeft, std::to_string(USER_LOGIN_ATTEMPTS_DEFAULT)));
-
-    ss.addValues(kFileSystemData, value);
-}
-
-void APP::AuthUtils::setIdleLockTimeOut()
-{
-    SystemStorage ss;
-
-    if (ss.doesKeyExist(kFileSystemData, kIdleLockTimeOut)) {
-        return;
-    }
-
-    std::map<std::string, std::string> value;
-    value.insert(std::pair(kIdleLockTimeOut, std::to_string(IDLE_LOCK_TIMEOUT_DEFAULT)));
 
     ss.addValues(kFileSystemData, value);
 }

@@ -21,14 +21,14 @@ namespace APP
 
         if (unlockKey != UNLOCK_ACCESSKEY_DEFAULT)
         {
-            sendSystemAction(ACTION_TYPE::UNLOCK_KEY_INVALID);
+            ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::UNLOCK_KEY_INVALID);
 
         } else {
 
             SystemStorage ss;
             ss.updateValue(kFileSystemData, kIsUserBlocked, FALSE);
 
-            sendSystemAction(ACTION_TYPE::UNLOCK_DONE);
+            ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::UNLOCK_DONE);
         }
 
     }

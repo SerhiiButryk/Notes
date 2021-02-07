@@ -44,8 +44,8 @@ LIB_PATH := ../../../libs
 
     # Core library source files
 
-    LOCAL_SRC_FILES := ndkproxy/com_example_core_security_impl_HashAlgorithms.cpp \
-                       ndkproxy/com_example_core_log_LogImpl.cpp \
+    LOCAL_SRC_FILES := ndkproxy/com_serhii_core_security_impl_HashAlgorithms.cpp \
+                       ndkproxy/com_serhii_core_log_LogImpl.cpp \
                        crypto/hash.cpp \
                        storage/file_system.cpp \
                        storage/system_storage.cpp \

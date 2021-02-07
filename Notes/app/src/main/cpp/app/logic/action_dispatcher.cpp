@@ -16,43 +16,40 @@ namespace APP
         return &eventDispatcher;
     }
 
-    /**
-     *  Handle System Event
-     */
-    void ActionDispatcher::sendAction(ACTION_TYPE action)
+    void ActionDispatcher::sendMessage(SYSTEM_MESSAGE message)
     {
-        if (action == ACTION_TYPE::AUTHORIZATION_DONE || action == ACTION_TYPE::UNLOCK_DONE)
+        if (message == SYSTEM_MESSAGE::AUTHORIZATION_DONE || message == SYSTEM_MESSAGE::UNLOCK_DONE)
         {
             Log::Info("ActionDispatcher", "sendEvent() - ACTION::AUTHORIZATION_DONE \n");
 
-            onAuthorized();
+            notifyOnAuthorized();
         }
 
-        if (action == ACTION_TYPE::REGISTRATION_DONE)
+        if (message == SYSTEM_MESSAGE::REGISTRATION_DONE)
         {
             Log::Info("ActionDispatcher", "sendEvent() - ACTION::REGISTRATION_DONE \n");
 
-            onRegistered();
+            notifyOnRegistered();
         }
 
-        if (action == ACTION_TYPE ::ACCOUNT_INVALID ||
-            action == ACTION_TYPE ::WRONG_PASSWORD ||
-            action == ACTION_TYPE ::EMPTY_FIELD ||
-            action == ACTION_TYPE ::USER_NAME_EXISTS ||
-            action == ACTION_TYPE ::PASSWORD_DIFFERS ||
-            action == ACTION_TYPE ::SPACE_CONTAIN ||
-            action == ACTION_TYPE::UNLOCK_KEY_INVALID)
+        if (message == SYSTEM_MESSAGE ::ACCOUNT_INVALID ||
+            message == SYSTEM_MESSAGE ::WRONG_PASSWORD ||
+            message == SYSTEM_MESSAGE ::EMPTY_FIELD ||
+            message == SYSTEM_MESSAGE ::USER_NAME_EXISTS ||
+            message == SYSTEM_MESSAGE ::PASSWORD_DIFFERS ||
+            message == SYSTEM_MESSAGE ::SPACE_CONTAIN ||
+            message == SYSTEM_MESSAGE::UNLOCK_KEY_INVALID)
         {
-            Log::Info("ActionDispatcher", "sendEvent() - ACTION onShowDialog \n");
+            Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnShowDialog \n");
 
-            onShowDialog(static_cast<int>(action));
+            notifyOnShowDialog(static_cast<int>(message));
         }
 
-        if (action == ACTION_TYPE::UNLOCK_KEYSTORE)
+        if (message == SYSTEM_MESSAGE::UNLOCK_KEYSTORE)
         {
-            Log::Info("ActionDispatcher", "sendEvent() - ACTION onUnlockKeystore \n");
+            Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnUnlockKeystore \n");
 
-            onUnlockKeystore();
+            notifyOnUnlockKeystore();
         }
 
     }
@@ -60,7 +57,7 @@ namespace APP
     /**
      * Notify observers
      */
-    void ActionDispatcher::onAuthorized()
+    void ActionDispatcher::notifyOnAuthorized()
     {
         for (const auto& v : authorization_observers) {
             v->onAuthorized();
@@ -70,7 +67,7 @@ namespace APP
     /**
      * Notify observers
      */
-    void ActionDispatcher::onRegistered()
+    void ActionDispatcher::notifyOnRegistered()
     {
         for (const auto& v : registration_observers) {
             v->onRegistered();
@@ -80,7 +77,7 @@ namespace APP
     /**
      * Notify observers
      */
-    void ActionDispatcher::onShowDialog(int type)
+    void ActionDispatcher::notifyOnShowDialog(int type)
     {
         for (const auto& v : showdialog_observers) {
             v->onShowDialog(type);
@@ -90,7 +87,7 @@ namespace APP
     /**
      * Notify observers
      */
-    void ActionDispatcher::onUnlockKeystore()
+    void ActionDispatcher::notifyOnUnlockKeystore()
     {
         for (const auto& v : unlockkeystore_observers) {
             v->onUnlockKeystore();
@@ -142,14 +139,6 @@ namespace APP
     {
         auto iterator = std::remove(unlockkeystore_observers.begin(), unlockkeystore_observers.end(), observer);
         unlockkeystore_observers.erase(iterator);
-    }
-
-    /**
-     * Send event
-     */
-    void sendSystemAction(ACTION_TYPE action)
-    {
-        ActionDispatcher::getInstance()->sendAction(action);
     }
 
 }

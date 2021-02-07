@@ -3,7 +3,6 @@
 namespace APP
 {
 
-    // TODO: maybe create class instead ?
     enum class SYSTEM_EVENT
     {
         AUTHORIZE = 101,
@@ -11,8 +10,7 @@ namespace APP
         UNLOCK
     };
 
-    // TODO: maybe create class instead ?
-    enum class ACTION_TYPE
+    enum class SYSTEM_MESSAGE
     {
         EMPTY_FIELD = -1,
         WRONG_PASSWORD = -2,

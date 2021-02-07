@@ -26,13 +26,13 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 
             if (p.second == event.getData(PASSWORD_KEY))
             {
-                sendSystemAction(ACTION_TYPE::AUTHORIZATION_DONE);
+                ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::AUTHORIZATION_DONE);
 
                 return;
 
             } else {
 
-                sendSystemAction(ACTION_TYPE::WRONG_PASSWORD);
+                ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::WRONG_PASSWORD);
 
                 return;
             }
@@ -40,5 +40,5 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
         }
     }
 
-    sendSystemAction(ACTION_TYPE::ACCOUNT_INVALID);
+    ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::ACCOUNT_INVALID);
 }

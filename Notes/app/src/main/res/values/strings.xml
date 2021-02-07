@@ -119,6 +119,8 @@
         <item>600000</item> <!--IN millis-->
     </string-array>
 
+    <string name="preference_idle_lock_time_default">180000</string>
+
     // Change password dialog
     <string name="hint_new_password">Enter a new password</string>
     <string name="hint_old_password">Enter an old password</string>
