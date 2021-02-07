@@ -2,8 +2,8 @@
 
 #include "app/logic/action_dispatcher.h"
 #include "utils/log.h"
-#include "app/core/app_action.h"
-#include "app_common/env_constants.h"
+#include "app/logic/app_action.h"
+#include "app/logic/base/env_constants.h"
 
 #include <utility>
 

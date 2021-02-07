@@ -2,7 +2,7 @@
 
 #include "utils/jstring.h"
 #include "app/logic/base/event.h"
-#include "app_common/types.h"
+#include "app/logic/base/types.h"
 #include "app/logic/action_dispatcher.h"
 #include "app/logic/receiver/system_event_receiver.h"
 #include "app/logic/base/system_constants.h"

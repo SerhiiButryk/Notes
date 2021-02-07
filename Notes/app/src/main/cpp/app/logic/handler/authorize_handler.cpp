@@ -1,10 +1,10 @@
 #include "authorize_handler.h"
 
-#include "app_common/types.h"
+#include "app/logic/base/types.h"
 #include "app/logic/action_dispatcher.h"
 #include "storage/system_storage.h"
-#include "app_common/env_constants.h"
-#include "app/core/utils/auth_utils.h"
+#include "app/logic/base/env_constants.h"
+#include "app/logic/utils/auth_utils.h"
 #include "app/logic/base/system_constants.h"
 
 using namespace MYLIB;

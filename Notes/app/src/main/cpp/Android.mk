@@ -17,12 +17,12 @@ LOCAL_PATH:= $(call my-dir)
                        app/logic/action_dispatcher.cpp \
                        app/logic/event/authorize_event.cpp \
                        app/logic/event/register_event.cpp \
-                       app/core/app_action.cpp \
-                       app/core/utils/auth_utils.cpp \
+                       app/logic/app_action.cpp \
+                       app/logic/utils/auth_utils.cpp \
                        app/logic/handler/authorize_handler.cpp \
                        app/logic/handler/register_handler.cpp \
                        app/logic/handler/unlock_handler.cpp \
-                       app_common/env_constants.cpp \
+                       app/logic/base/env_constants.cpp \
 
     LOCAL_C_INCLUDES += $(LOCAL_PATH)
 

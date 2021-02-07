@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "app_common/types.h"
+#include "app/logic/base/types.h"
 
 namespace APP
 {

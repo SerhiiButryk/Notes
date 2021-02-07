@@ -2,7 +2,6 @@
 
 namespace APP
 {
-
     enum class SYSTEM_EVENT
     {
         AUTHORIZE = 101,

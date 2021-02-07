@@ -3,11 +3,11 @@
 #include "storage/system_storage.h"
 #include "storage/file_system.h"
 #include "storage/cashe_manager.h"
-#include "app_common/env_constants.h"
+#include "app/logic/base/env_constants.h"
 #include "crypto/hash.h"
 #include "app/logic/action_dispatcher.h"
 #include "utils/log.h"
-#include "app/core/utils/auth_utils.h"
+#include "app/logic/utils/auth_utils.h"
 #include "app/logic/base/system_constants.h"
 
 using namespace MYLIB;

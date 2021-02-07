@@ -1,7 +1,7 @@
 #include "action_dispatcher.h"
 
 #include <algorithm>
-#include <app/core/app_action.h>
+#include <app/logic/app_action.h>
 
 #include "utils/log.h"
 

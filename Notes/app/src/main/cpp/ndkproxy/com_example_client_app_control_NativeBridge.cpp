@@ -1,10 +1,10 @@
 #include "com_example_client_app_control_NativeBridge.h"
 
-#include "app_common/env_constants.h"
+#include "app/logic/base/env_constants.h"
 #include "storage/cashe_manager.h"
 #include "storage/system_storage.h"
 #include "utils/jstring.h"
-#include "app/core/utils/auth_utils.h"
+#include "app/logic/utils/auth_utils.h"
 
 using namespace APP;
 using namespace MYLIB;

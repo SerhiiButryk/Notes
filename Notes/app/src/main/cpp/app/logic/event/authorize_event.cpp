@@ -1,6 +1,6 @@
 #include "authorize_event.h"
 
-#include "app_common/types.h"
+#include "app/logic/base/types.h"
 
 namespace APP
 {
