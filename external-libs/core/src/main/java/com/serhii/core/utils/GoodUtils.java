@@ -48,7 +48,11 @@ public class GoodUtils {
      *  Replace a place holder symbol with int value
      */
     public static String formatString(String message, int placeValue) {
-        return message.replace('%', String.valueOf(placeValue).charAt(0));
+        return message.replace("%", String.valueOf(placeValue));
+    }
+
+    public static String formatString(String message, String placeValue) {
+        return message.replace("%", placeValue);
     }
 
     /**

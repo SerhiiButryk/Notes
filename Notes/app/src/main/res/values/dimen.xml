@@ -13,6 +13,13 @@
     <dimen name="margin_top_header">40dp</dimen>
     <dimen name="margin_top_large_layout">70dp</dimen>
 
+    <dimen name="small_margin">10dp</dimen>
+    <dimen name="middle_margin">20dp</dimen>
+
+    <dimen name="padding_small">20dp</dimen>
+    <dimen name="padding_middle">30dp</dimen>
+    <dimen name="padding">10dp</dimen>
+
     <dimen name="text_size_small">16sp</dimen>
     <dimen name="text_size_middle">18sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
@@ -34,13 +41,6 @@
     <dimen name="text_labels_layout">40dp</dimen>
 
     <dimen name="margin_text_massage_label">20dp</dimen>
-
-    <dimen name="padding_small">20dp</dimen>
-    <dimen name="padding_middle">30dp</dimen>
-    <dimen name="padding">10dp</dimen>
-
-    <dimen name="margin">10dp</dimen>
-    <dimen name="margin_middle">20dp</dimen>
 
     <dimen name="title_size_text">26sp</dimen>
     <dimen name="bottom_text_message_size_text">20sp</dimen>

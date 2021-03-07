@@ -60,11 +60,9 @@ namespace APP
 
             }
 
-            // User is registered, cash user name
+            // User is registered, cache user name
             CacheManager cacheManager;
-            cacheManager.cash(kFileCashSystemData, kUserName, username);
-
-            AuthUtils::setLoginLimit();
+            cacheManager.cache(kFileCashSystemData, kUserName, username);
 
             Log::Info(TAG, "handleEvent() - REGISTRATION_DONE");
 

@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -81,7 +82,7 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
 
         // Set references
         titleNoteField = binding.titleNote;
-        noteFiled = binding.bodyNote;
+        noteFiled = binding.noteText;
         toolbar = binding.toolbar;
         noteTimeFiled = binding.dateTimeView;
 
@@ -98,6 +99,10 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
             @Override
             public void onClick(View v) {
                 if (interaction != null) {
+                    // Hide keyboard if it's open
+                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+
                     interaction.onBackPressedClicked();
                 }
             }

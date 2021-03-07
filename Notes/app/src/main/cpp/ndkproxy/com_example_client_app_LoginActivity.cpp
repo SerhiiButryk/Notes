@@ -24,7 +24,7 @@ extern "C" {
 
         jmethodID _Login_Activity_onAuthorizedUser = env->GetMethodID(cls, "onAuthorizationFinished", "()V");
         jmethodID _Login_Activity_showAlertDialog = env->GetMethodID(cls, "showAlertDialog", "(I)V");
-        jmethodID _Login_Activity_onRegisterdUser = env->GetMethodID(cls, "showRegistrationUI", "()V");
+        jmethodID _Login_Activity_onRegisterdUser = env->GetMethodID(cls, "userRegistered", "()V");
 
         JavaVM* javaVm;
         int result = env->GetJavaVM(&javaVm);
@@ -38,7 +38,7 @@ extern "C" {
         JNIWrapper* callback_dialog = new JNIWrapper(javaVm, jobj, _Login_Activity_showAlertDialog);
         JNIWrapper* callback_registred = new JNIWrapper(javaVm, jobj, _Login_Activity_onRegisterdUser);
 
-      AppAction::getInstance()->setAuthorizeCallback(std::move(callback_data));
+        AppAction::getInstance()->setAuthorizeCallback(std::move(callback_data));
         AppAction::getInstance()->setRegistrationCallback(callback_registred);
         AppAction::getInstance()->setShowDialogCallback(callback_dialog);
   }

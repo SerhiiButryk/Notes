@@ -60,7 +60,7 @@ public class PlansRecyclerAdapter extends RecyclerView.Adapter<PlansRecyclerAdap
             super(itemView);
 
             title = itemView.findViewById(R.id.title);
-            dateTime = itemView.findViewById(R.id.dateTimeView);
+            dateTime = itemView.findViewById(R.id.date_time_view);
             indicator = itemView.findViewById(R.id.indicator);
 
             indicator.setBackgroundColor(color);

@@ -23,7 +23,7 @@ namespace MYLIB
         return "";
     }
 
-    void CacheManager::cash(const std::string& file_name, const std::string& key, const std::string& value)
+    void CacheManager::cache(const std::string& file_name, const std::string& key, const std::string& value)
     {
         SystemStorage ss;
 

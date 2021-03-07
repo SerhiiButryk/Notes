@@ -7,18 +7,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.serhii.apps.notes.ui.ChangePasswordDialogUI;
-import com.serhii.apps.notes.ui.SetLoginLimitDialogUI;
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper;
 
 public class DialogHelper {
 
-    private static final String SAD_DIALOG_TAG =  "Set attempt dialog";
     private static final String CPD_DIALOG_TAG =  "Change password dialog";
-
-    public static void showSetAttemptDialog(FragmentActivity activity) {
-        SetLoginLimitDialogUI dialog = new SetLoginLimitDialogUI();
-        dialog.show(activity.getSupportFragmentManager(), SAD_DIALOG_TAG);
-    }
 
     public static void showChangePasswordDialog(FragmentActivity activity) {
         ChangePasswordDialogUI dialog = new ChangePasswordDialogUI();

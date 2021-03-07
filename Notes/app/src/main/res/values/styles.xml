@@ -40,4 +40,23 @@
         <item name="colorAccent">@color/blue_accent</item>
     </style>
 
+    <style name="noteTextStyle">
+        <item name="android:background">@drawable/text_background</item>
+        <item name="android:fontFamily">@font/crete_round</item>
+        <item name="android:inputType">textMultiLine</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+
+    <style name="textStyle">
+        <item name="android:fontFamily">@font/crete_round</item>
+        <item name="android:inputType">text</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:imeOptions">actionNext</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 </resources>

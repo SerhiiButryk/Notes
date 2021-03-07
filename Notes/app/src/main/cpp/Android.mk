@@ -15,8 +15,6 @@ LOCAL_PATH:= $(call my-dir)
                        app/logic/receiver/system_event_receiver.cpp \
                        app/logic/base/system_constants.cpp \
                        app/logic/action_dispatcher.cpp \
-                       app/logic/event/authorize_event.cpp \
-                       app/logic/event/register_event.cpp \
                        app/logic/app_action.cpp \
                        app/logic/utils/auth_utils.cpp \
                        app/logic/handler/authorize_handler.cpp \
@@ -27,11 +25,9 @@ LOCAL_PATH:= $(call my-dir)
     LOCAL_C_INCLUDES += $(LOCAL_PATH)
 
     # Include system libraries
-
     LOCAL_LDLIBS := -llog
 
-    # Include local build libraries
-
+    # Include local libraries
     LOCAL_SHARED_LIBRARIES := libc++_shared core
 
     include $(BUILD_SHARED_LIBRARY)

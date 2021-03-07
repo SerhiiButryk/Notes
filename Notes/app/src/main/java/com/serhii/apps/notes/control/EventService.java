@@ -1,5 +1,6 @@
 package com.serhii.apps.notes.control;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 
@@ -7,12 +8,14 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 
+import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.core.log.Log;
 import com.serhii.apps.notes.control.base.IAuthorizeService;
 import com.serhii.apps.notes.control.base.IUnlockKeystore;
 import com.serhii.apps.notes.control.managers.AppAuthManager;
 import com.serhii.apps.notes.control.types.RequestType;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
+import com.serhii.core.security.Cipher;
 
 /**
  *  Class which receives the events from the system and delivers them to corresponding manager
@@ -110,6 +113,18 @@ public class EventService implements IAuthorizeService, IUnlockKeystore, Lifecyc
     public void notifyUnlockEventReceived() {
         // Indicates that Unlock Dialog has shown
         isUnlockKeystoreEventHandled = true;
+    }
+
+    public void onUserRegistered(Context context) {
+        Log.info(TAG, "onUserRegistered()");
+
+        // Create protection keys
+        Cipher cipher = new Cipher();
+        cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, 1000, true);
+        cipher.createKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS, false);
+
+        // Set login password limit
+        new NativeBridge().setLoginLimitFromDefault(context);
     }
 
 }

@@ -1,29 +1,39 @@
 package com.serhii.core.security;
 
 import com.serhii.core.CoreEngine;
-import com.serhii.core.security.impl.crypto.CryptoBase;
-import com.serhii.core.security.impl.crypto.CryptoSymmetric;
+import com.serhii.core.security.impl.crypto.CryptoProvider;
 import com.serhii.core.security.impl.crypto.Result;
 
-public class Cipher implements CryptoBase {
+public class Cipher {
 
-    private CryptoSymmetric impl;
+    private CryptoProvider provider;
 
     public Cipher() {
         CoreEngine.getInstance().configure(this);
     }
 
-    public void setSymmetricCrypto(CryptoSymmetric impl) {
-        this.impl = impl;
+    public void setSymmetricCrypto(CryptoProvider impl) {
+        this.provider = impl;
     }
 
-    @Override
     public Result encryptSymmetric(String message) {
-        return impl.encryptSymmetric(message);
+        return provider.encryptSymmetric(message);
     }
 
-    @Override
     public Result decryptSymmetric(String message, final byte[] inputIV) {
-        return impl.decryptSymmetric(message, inputIV);
+        return provider.decryptSymmetric(message, inputIV);
     }
+
+    public void selectKey(String key) {
+        provider.selectKey(key);
+    }
+
+    public void createKey(String key, int timeOutSeconds, boolean authRequired) {
+        provider.createKey(key, timeOutSeconds, authRequired);
+    }
+
+    public void createKey(String key, boolean authRequired) {
+        provider.createKey(key, 0, authRequired);
+    }
+
 }

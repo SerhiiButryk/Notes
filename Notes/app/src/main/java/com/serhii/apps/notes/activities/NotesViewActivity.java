@@ -113,8 +113,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     public void onUserAuthorized() {
         Log.info(TAG, "onAuthorize() - User is authorized");
 
-        // Update login limit
-        nativeBridge.updateLoginLimit();
+        nativeBridge.resetLoginLimitLeft(this);
 
         notesViewModel = new ViewModelProvider(this, new NotesViewModelFactory(getApplication())).get(NotesViewModel.class);
     }

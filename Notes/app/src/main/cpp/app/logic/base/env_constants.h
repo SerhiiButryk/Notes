@@ -10,7 +10,6 @@ namespace APP
 
     // Key value names
     extern const std::string kUserName;
-    extern const std::string kUserLoginAttempts;
     extern const std::string kUserLoginAttemptsLeft;
     extern const std::string kIsUserBlocked;
 

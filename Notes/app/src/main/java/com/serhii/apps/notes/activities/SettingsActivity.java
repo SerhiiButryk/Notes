@@ -13,10 +13,9 @@ import android.view.WindowManager;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
-import com.serhii.apps.notes.ui.SetLoginLimitDialogUI;
 import com.serhii.apps.notes.ui.fragments.SettingsFragment;
 
-public class SettingsActivity extends AppCompatActivity implements SetLoginLimitDialogUI.OnNewValueSet {
+public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
@@ -55,12 +54,6 @@ public class SettingsActivity extends AppCompatActivity implements SetLoginLimit
         super.onUserInteraction();
 
         InactivityManager.getInstance().onUserInteraction();
-    }
-
-    @Override
-    public void onNewValueSet() {
-        SettingsFragment settingsFragment = (SettingsFragment) getSupportFragmentManager().findFragmentByTag(SETTINGS_FRAGMENT_TAG);
-        settingsFragment.updatePreferences();
     }
 
     private void initBinding() {

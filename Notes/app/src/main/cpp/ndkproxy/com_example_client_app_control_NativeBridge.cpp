@@ -53,36 +53,33 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1clearAp
     ss.clearFileData(kFileSystemData);
 }
 
-JNIEXPORT jint JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getAttemptLimit
-        (JNIEnv *, jobject)
-{
-    SystemStorage ss;
-    std::string attempts = ss.getValueByKey(kFileSystemData, kUserLoginAttempts);
-
-    return static_cast<jint>(std::stoi(attempts));
-}
-
-JNIEXPORT jint JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getLimitLeft
-        (JNIEnv *, jobject)
+JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getLimitLeft
+        (JNIEnv* env, jobject)
 {
     SystemStorage ss;
     std::string attempts = ss.getValueByKey(kFileSystemData, kUserLoginAttemptsLeft);
 
-    return static_cast<jint>(std::stoi(attempts));
-}
-
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setAttemptLimit
-        (JNIEnv *, jobject, jint new_value)
-{
-    SystemStorage ss;
-    ss.updateValue(kFileSystemData, kUserLoginAttempts, std::to_string(new_value));
+    return env->NewStringUTF(attempts.c_str());
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setLimitLeft
-        (JNIEnv *, jobject, jint new_value)
+        (JNIEnv* env, jobject, jstring new_value)
 {
+    JString passwordString(env, new_value);
+
     SystemStorage ss;
-    ss.updateValue(kFileSystemData, kUserLoginAttemptsLeft, std::to_string(new_value));
+
+    if (!ss.doesKeyExist(kFileSystemData, kUserLoginAttemptsLeft))
+    {
+        std::map<std::string, std::string> value;
+        value.insert(std::make_pair(kUserLoginAttemptsLeft, static_cast<std::string>(passwordString)));
+
+        ss.addValues(kFileSystemData, value);
+
+        return;
+    }
+
+    ss.updateValue(kFileSystemData, kUserLoginAttemptsLeft, passwordString);
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1executeBlockApp

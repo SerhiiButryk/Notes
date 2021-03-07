@@ -19,17 +19,11 @@ JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1set
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1clearAppData
         (JNIEnv *, jobject);
 
-JNIEXPORT jint JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getAttemptLimit
+JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getLimitLeft
         (JNIEnv *, jobject);
-
-JNIEXPORT jint JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getLimitLeft
-        (JNIEnv *, jobject);
-
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setAttemptLimit
-        (JNIEnv *, jobject, jint);
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setLimitLeft
-        (JNIEnv *, jobject, jint);
+        (JNIEnv *, jobject, jstring);
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1executeBlockApp
         (JNIEnv *, jobject);

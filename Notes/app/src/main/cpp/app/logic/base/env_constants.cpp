@@ -8,8 +8,6 @@ namespace APP
 
     const std::string kUserName = "k_cached_user";
 
-    const std::string kUserLoginAttempts = "k_login_attempts";
-
     const std::string kUserLoginAttemptsLeft = "k_login_attempts_left";
 
     const std::string kIsUserBlocked = "k_is_user_blocked";

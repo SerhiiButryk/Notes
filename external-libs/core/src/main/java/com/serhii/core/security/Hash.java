@@ -1,10 +1,9 @@
 package com.serhii.core.security;
 
 import com.serhii.core.CoreEngine;
-import com.serhii.core.security.impl.hash.HashBase;
 import com.serhii.core.security.impl.hash.HashGenerator;
 
-public class Hash implements HashBase {
+public class Hash {
 
     private HashGenerator generator;
 
@@ -16,7 +15,6 @@ public class Hash implements HashBase {
         this.generator = generator;
     }
 
-    @Override
     public String hashMD5(String message) {
         return generator.makeHashMD5(message);
     }

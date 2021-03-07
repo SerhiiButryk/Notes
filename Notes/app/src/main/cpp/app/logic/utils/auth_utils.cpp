@@ -74,18 +74,3 @@ APP::SYSTEM_MESSAGE APP::AuthUtils::checkRules(const std::string &password, cons
 
     return SYSTEM_MESSAGE::NO_ERRORS;
 }
-
-void APP::AuthUtils::setLoginLimit()
-{
-    SystemStorage ss;
-
-    if (ss.doesKeyExist(kFileSystemData, kUserLoginAttempts)) {
-        return;
-    }
-
-    std::map<std::string, std::string> value;
-    value.insert(std::make_pair(kUserLoginAttempts, std::to_string(USER_LOGIN_ATTEMPTS_DEFAULT)));
-    value.insert(std::make_pair(kUserLoginAttemptsLeft, std::to_string(USER_LOGIN_ATTEMPTS_DEFAULT)));
-
-    ss.addValues(kFileSystemData, value);
-}

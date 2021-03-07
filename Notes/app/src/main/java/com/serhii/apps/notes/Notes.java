@@ -11,10 +11,10 @@ public class Notes extends Application {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         // Initialize here application configuration
         Log.setTag(AppConstants.APP_LOG_TAG);
-
-        super.onCreate();
 
         Log.info(TAG, "application is created");
     }

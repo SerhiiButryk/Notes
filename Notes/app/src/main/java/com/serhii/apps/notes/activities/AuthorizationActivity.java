@@ -140,13 +140,15 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
     /**
      * Called from native
      */
-    public void showRegistrationUI() {
-        Log.info(TAG, "showRegistrationUI()");
+    public void userRegistered() {
+        Log.info(TAG, "userRegistered()");
 
         onBackPressed();
 
         LoginFragment loginFragment = (LoginFragment) fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG);
         loginFragment.onUserAccountCreated();
+
+        EventService.getInstance().onUserRegistered(this);
 
         Toast.makeText(this, getString(R.string.toast_registration_done), Toast.LENGTH_SHORT).show();
     }

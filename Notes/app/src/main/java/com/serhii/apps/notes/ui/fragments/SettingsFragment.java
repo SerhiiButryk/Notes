@@ -6,12 +6,12 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.serhii.core.log.Log;
-import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
+import com.serhii.core.log.Log;
+import com.serhii.core.utils.GoodUtils;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -30,11 +30,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         initBasicSettings();
     }
 
-    public void updatePreferences() {
-        int limitAttempts = nativeBridge.getAttemptLimit();
-        loginAttempts.setSummary(GoodUtils.formatString(getString(R.string.preference_login_limit_summary), limitAttempts));
-    }
-
     private void initBasicSettings() {
         changePassword = findPreference(getString(R.string.preference_change_password_key));
 
@@ -47,14 +42,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         loginAttempts = findPreference(getString(R.string.preference_login_limit_key));
-
         loginAttempts.setSummary(GoodUtils.formatString(getString(R.string.preference_login_limit_summary),
-                nativeBridge.getAttemptLimit()));
+                nativeBridge.getLockLimit(getContext())));
 
-        loginAttempts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        loginAttempts.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference) {
-                DialogHelper.showSetAttemptDialog(getActivity());
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                int selectedValue = Integer.parseInt(newValue.toString());
+                Log.info(TAG, "onPreferenceChange(), selected new login limit: " + selectedValue);
+
+                loginAttempts.setSummary(GoodUtils.formatString(getString(R.string.preference_login_limit_summary), selectedValue));
+
+                nativeBridge.setLimitLeft(selectedValue);
+
                 return true;
             }
         });

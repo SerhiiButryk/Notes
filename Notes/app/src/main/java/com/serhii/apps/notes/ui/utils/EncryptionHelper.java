@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
+import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.core.log.Log;
 import com.serhii.core.security.impl.crypto.CryptoError;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
@@ -39,6 +40,7 @@ public class EncryptionHelper {
         Log.info(TAG, "encrypt()");
 
         Cipher csk = new Cipher();
+        csk.selectKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS);
 
         Result note = csk.encryptSymmetric(noteModel.getNote());
         Result title = csk.encryptSymmetric(noteModel.getTitle());
@@ -143,6 +145,7 @@ public class EncryptionHelper {
 
     private NoteModel decryptInternal(final NoteModel encData) {
         Cipher csk = new Cipher();
+        csk.selectKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS);
 
         Result decodedNote = csk.decryptSymmetric(encData.getNote(), ivNote);
         Result decodedTitle = csk.decryptSymmetric(encData.getTitle(), ivTitle);

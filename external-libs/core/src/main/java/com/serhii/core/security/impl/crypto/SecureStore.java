@@ -22,30 +22,51 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-public class SecureStore implements CryptoSymmetric {
+public class SecureStore implements CryptoProvider {
 
     private static final String TAG = "SecureStore";
 
-    private static final String SECRET_KEY_ALIAS = "SK-729034";
     private static final String SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding";
 
     private KeyStore keyStore;
 
+    private String selectedKey;
+
     public SecureStore() {
-        init();
+        keyStore = initKeyStore();
+        if (keyStore != null) {
+            boolean success = load(keyStore);
+            Log.detail(TAG, "SecureStore(): is key store loaded " + success);
+        }
+    }
+
+    @Override
+    public void selectKey(String key) {
+        Log.detail(TAG, "selectKey(): " + key);
+
+        if (!isSecretKeyExists(key)) {
+            throw new IllegalArgumentException("No key with this alias is created");
+        }
+
+        selectedKey = key;
+    }
+
+    @Override
+    public void createKey(String key, int timeOutSeconds, boolean authRequired) {
+        Log.detail(TAG, "createKey()");
+        init(key, timeOutSeconds, authRequired);
     }
 
     @Override
     public Result encryptSymmetric(String message) {
+
+        if (selectedKey == null) {
+            throw new IllegalStateException("No secret key is selected for cryptographic operation");
+        }
+
         try {
 
-            if (!isSecretKeyExists() && !tryRegenSecretKey()) {
-                Log.error(TAG, "encryptSymmetric() failed to regen keys");
-                // Should request authorization
-                return new Result("", null, CryptoError.USER_NOT_AUTHORIZED);
-            }
-
-            final SecretKey secretKey = (SecretKey) keyStore.getKey(SECRET_KEY_ALIAS, null);
+            final SecretKey secretKey = (SecretKey) keyStore.getKey(selectedKey, null);
 
             Cipher encryptionCipher = Cipher.getInstance(SECRET_KEY_ALGORITHM);
             encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -72,15 +93,13 @@ public class SecureStore implements CryptoSymmetric {
     @Override
     public Result decryptSymmetric(String message, final byte[] inputIV) {
 
+        if (selectedKey == null) {
+            throw new IllegalStateException("No secret key is selected for cryptographic operation");
+        }
+
         try {
 
-            if (!isSecretKeyExists() && !tryRegenSecretKey()) {
-                Log.error(TAG, "decryptSymmetric() failed to regen keys");
-                // Should request authorization
-                return new Result("", null, CryptoError.USER_NOT_AUTHORIZED);
-            }
-
-            final SecretKey secretKey = (SecretKey) keyStore.getKey(SECRET_KEY_ALIAS, null);
+            final SecretKey secretKey = (SecretKey) keyStore.getKey(selectedKey, null);
 
             final Cipher cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM);
             final GCMParameterSpec spec = new GCMParameterSpec(128, inputIV);
@@ -107,18 +126,11 @@ public class SecureStore implements CryptoSymmetric {
 
     }
 
-    private void init() {
-        keyStore = initKeyStore();
-
-        if (keyStore != null) {
-            boolean success = load(keyStore);
-
-            if (success && !isSecretKeyExists()) {
-                // Gen a secret key entity
-                createKey();
-            }
+    private void init(String key, int timeOutSeconds, boolean authRequired) {
+        if (!isSecretKeyExists(key)) {
+            // Gen a secret key entity
+            _createKey(key, timeOutSeconds, authRequired);
         }
-
     }
 
     private boolean load(KeyStore keyStore) {
@@ -132,10 +144,10 @@ public class SecureStore implements CryptoSymmetric {
         return false;
     }
 
-    private boolean isSecretKeyExists() {
+    private boolean isSecretKeyExists(String key) {
         try {
 
-            KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) keyStore.getEntry(SECRET_KEY_ALIAS, null);
+            KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) keyStore.getEntry(key, null);
 
             return secretKeyEntry != null;
 
@@ -146,22 +158,29 @@ public class SecureStore implements CryptoSymmetric {
         return false;
     }
 
-    private boolean createKey() {
-        KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(SECRET_KEY_ALIAS,
+    private boolean _createKey(String key, int timeOutSeconds, boolean authRequired) {
+
+        Log.detail(TAG, "_createKey(): " + key + " " + timeOutSeconds);
+
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(key,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 // More info on GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 // GCM doesn't use padding
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE);
                 // User authentication is needed to user this key
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(500)
-                .build();
+                if (authRequired) {
+                    builder.setUserAuthenticationRequired(true);
+                }
+                // Additional security
+                if (timeOutSeconds != 0) {
+                    builder.setUserAuthenticationValidityDurationSeconds(timeOutSeconds);
+                }
 
         KeyGenerator keyGenerator = getKeyGenerator(KeyProperties.KEY_ALGORITHM_AES);
 
         if (keyGenerator != null) {
-            return genSecretKey(keyGenerator, keyGenParameterSpec);
+            return genSecretKey(keyGenerator, builder.build());
         }
 
         return false;
@@ -196,10 +215,6 @@ public class SecureStore implements CryptoSymmetric {
             return false;
         }
         return true;
-    }
-
-    private boolean tryRegenSecretKey() {
-        return createKey();
     }
 
 }
