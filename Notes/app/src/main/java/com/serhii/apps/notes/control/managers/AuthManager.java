@@ -9,9 +9,9 @@ import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 /**
  *  Performs user authorization request processing
  */
-public class AppAuthManager {
+public class AuthManager {
 
-    public static final String TAG = AppAuthManager.class.getSimpleName();
+    public static final String TAG = AuthManager.class.getSimpleName();
 
     public void handleRequest(RequestType type, AuthModel data) {
 

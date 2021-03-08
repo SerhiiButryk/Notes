@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.serhii.core.security.Hash;
 import com.serhii.apps.notes.R;
@@ -135,6 +136,11 @@ public class LoginFragment extends Fragment implements IViewBindings {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (GoodUtils.getText(passwordField).isEmpty() || GoodUtils.getText(emailField).isEmpty()) {
+                    Toast.makeText(getContext(), getString(R.string.empty_login), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 // Set data
                 authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_BASIC_LOGIN));
             }

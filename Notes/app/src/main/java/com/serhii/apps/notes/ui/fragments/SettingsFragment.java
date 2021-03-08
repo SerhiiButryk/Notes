@@ -9,6 +9,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.apps.notes.control.NativeBridge;
+import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
@@ -21,8 +22,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private Preference loginAttempts;
     private Preference version;
     private ListPreference idleLockTimeOut;
+    private Preference backup;
 
     private final NativeBridge nativeBridge = new NativeBridge();
+    private final BackupManager backupManager = new BackupManager();
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -69,6 +72,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 int selectedTime = Integer.parseInt(newValue.toString());
                 Log.info(TAG, "onPreferenceChange(), selected idle lock time " + selectedTime);
+                return true;
+            }
+        });
+
+        backup = findPreference(getString(R.string.preference_backup_key));
+
+        backup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                backupManager.openDirectoryChooser(getActivity());
                 return true;
             }
         });

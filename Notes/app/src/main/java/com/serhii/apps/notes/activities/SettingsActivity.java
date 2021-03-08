@@ -1,7 +1,11 @@
 package com.serhii.apps.notes.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -11,9 +15,16 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.serhii.apps.notes.R;
+import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
 import com.serhii.apps.notes.ui.fragments.SettingsFragment;
+import com.serhii.core.log.Log;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -79,4 +90,28 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (BackupManager.REQUEST_CODE == requestCode && resultCode == RESULT_OK) {
+
+            Log.info(TAG, "onActivityResult() got result uri");
+
+            OutputStream outputStream = null;
+            try {
+                outputStream = getContentResolver().openOutputStream(data.getData());
+            } catch (FileNotFoundException e) {
+                Log.error(TAG, "onActivityResult() error: " + e);
+                e.printStackTrace();
+                return;
+            }
+
+            BackupManager backupManager = new BackupManager();
+            backupManager.backupData(outputStream, this);
+        }
+
+    }
+
 }

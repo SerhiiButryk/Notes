@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.serhii.apps.notes">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:name="com.serhii.apps.notes.Notes"
         android:allowBackup="false"
@@ -30,7 +28,7 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity android:name="com.serhii.apps.notes.activities.NotesViewActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

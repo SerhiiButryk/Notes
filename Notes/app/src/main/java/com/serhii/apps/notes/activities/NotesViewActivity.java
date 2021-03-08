@@ -8,15 +8,16 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.serhii.core.log.Log;
+import com.serhii.core.security.impl.crypto.CryptoError;
 import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.EventService;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeUser;
-import com.serhii.apps.notes.control.base.IUnlockKeystore;
 import com.serhii.apps.notes.control.managers.BiometricAuthManager;
 import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
@@ -28,7 +29,7 @@ import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory;
 import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 
 public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUser,
-        IUnlockKeystore, NoteViewFragment.NoteInteraction, NoteEditorFragment.EditorNoteInteraction {
+        NoteViewFragment.NoteInteraction, NoteEditorFragment.EditorNoteInteraction {
 
     private static final String TAG = NotesViewActivity.class.getSimpleName();
 
@@ -78,15 +79,13 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     @Override
     protected void onResume() {
         super.onResume();
-
-        notifyOnResume();
+        Log.info(TAG, "onResume()");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        notifyOnStop();
+        Log.info(TAG, "onStop()");
     }
 
     @Override
@@ -101,7 +100,8 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
 
         if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
             Log.info(TAG, "onActivityResult() - Need to reload data");
-            notesViewModel.retrieveData();
+            notesViewModel.resetErrorState();
+            notesViewModel.updateData();
         }
 
     }
@@ -116,15 +116,19 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         nativeBridge.resetLoginLimitLeft(this);
 
         notesViewModel = new ViewModelProvider(this, new NotesViewModelFactory(getApplication())).get(NotesViewModel.class);
-    }
+        notesViewModel.getErrorStateData().observe(this, new Observer<CryptoError>() {
+            @Override
+            public void onChanged(CryptoError cryptoError) {
+                if (cryptoError == CryptoError.USER_NOT_AUTHORIZED) {
+                    // Request KeyStore Unlock
+                    Log.info(TAG, "onChanged() request keystore unlock");
 
-    @Override
-    public void onUnlockKeystore() {
-        Log.info(TAG, "notifyOnUnlockKeystore()");
+                    BiometricAuthManager.requestUnlockActivity(NotesViewActivity.this);
+                }
+            }
+        });
 
-        BiometricAuthManager.requestUnlockActivity(this);
-
-        EventService.getInstance().notifyUnlockEventReceived();
+        notesViewModel.updateData();
     }
 
     @Override
@@ -191,8 +195,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     }
 
     private native void initNativeConfigs(String path);
-    private native void notifyOnStop();
-    private native void notifyOnResume();
 
     static {
         System.loadLibrary(RUNTIME_LIBRARY);

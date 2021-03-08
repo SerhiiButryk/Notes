@@ -27,6 +27,9 @@
     <string name="ms_unlock_key_invalid">Entered key is incorrect. \nPlease try again.</string>
     <string name="title_unlock_key_invalid">Authorize error</string>
 
+    <string name="ms_backup">No data to backup.</string>
+    <string name="title_backup">Backup error</string>
+
     // Common buttons
     <string name="kbtn_ok">Ok</string>
     <string name="kbtn_cancel">Cancel</string>
@@ -96,6 +99,7 @@
 
     <string name="preference_category_title">Security</string>
     <string name="preference_category_title_about">About</string>
+    <string name="preference_category_title_backup">Backup</string>
 
     <string name="preference_login_limit_key">login_limit</string>
     <string name="preference_login_limit_title">Set login limit attempts </string>
@@ -135,6 +139,10 @@
 
     <string name="preference_idle_lock_time_default">180000</string>
 
+    <string name="preference_backup_key">backup_key</string>
+    <string name="preference_backup_title">Create backup file</string>
+    <string name="preference_backup_desc">Backup file allows you to save your note and restore your data from it.</string>
+
     // Change password dialog
     <string name="hint_new_password">Enter a new password</string>
     <string name="hint_old_password">Enter an old password</string>
@@ -143,11 +151,6 @@
     <string name="change_password_toast_not_correct_password">Entered password is not correct</string>
     <string name="change_password_toast_password_set">Password is set</string>
     <string name="change_password_toast_password_error">Error occurred</string>
-
-    // Set limit dialog
-    <string name="set_limit_Title">Enter new value</string>
-    <string name="set_limit_hint">Enter number</string>
-    <string name="set_limit_error">Allowed values are from 1 to 10</string>
 
     // BlockView
     <string name="block_title">Application is blocked</string>
@@ -163,5 +166,10 @@
     <string name="confirm_dialog_delete_note_message">Are you sure you want to delete this note ?</string>
     <string name="confirm_dialog_save_note_title">Confirm your save action</string>
     <string name="confirm_dialog_save_note_message">Are you sure you want to save this note ?</string>
+
+    // Errors / Info
+    <string name="backup_file_success">Success. Data is backed up</string>
+    <string name="backup_file_fail">Fail to back up data</string>
+    <string name="empty_login">Empty username or password</string>
 
 </resources>

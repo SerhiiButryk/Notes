@@ -38,31 +38,6 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_i
     AppAction::getInstance()->setAuthorizeCallback(std::move(callback));
 }
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_notifyOnStop
-   (JNIEnv *, jobject)
-{
-    Log::Info(TAG, "Java_com_serhii_apps_notes_NotesViewActivity_notifyOnStop \n");
-
-    AppAction::getInstance()->removeUnlockKeystoreNoteViewCallback();
-}
-
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_notifyOnResume
-        (JNIEnv* env, jobject obj)
-{
-    Log::Info(TAG, "Java_com_serhii_apps_notes_NotesViewActivity_notifyOnResume \n");
-
-    jclass clz = env->GetObjectClass(obj);
-
-    JavaVM* javaVm;
-    env->GetJavaVM(&javaVm);
-
-    jmethodID idKeystore = env->GetMethodID(clz, "onUnlockKeystore", "()V");
-
-    JNIWrapper* unlockKeystoreCallback = new JNIWrapper(javaVm, obj, idKeystore);
-
-    AppAction::getInstance()->setUnlockKeystoreNoteViewCallback(unlockKeystoreCallback);
-}
-
 #ifdef __cplusplus
 }
 #endif

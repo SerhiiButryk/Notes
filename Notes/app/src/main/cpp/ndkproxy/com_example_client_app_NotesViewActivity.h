@@ -10,12 +10,6 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_initNativeConfigs
   (JNIEnv *, jobject, jstring);
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_notifyOnStop
-  (JNIEnv *, jobject);
-
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_notifyOnResume
-        (JNIEnv *, jobject);
-
 #ifdef __cplusplus
 }
 #endif

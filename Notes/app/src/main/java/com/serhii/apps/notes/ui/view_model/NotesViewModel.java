@@ -6,13 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.serhii.core.log.Log;
-import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.control.EventService;
-import com.serhii.apps.notes.database.NotesDatabase;
+import com.serhii.apps.notes.database.NotesDataProvider;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
-import com.serhii.apps.notes.ui.utils.EncryptionHelper;
+import com.serhii.core.log.Log;
+import com.serhii.core.security.impl.crypto.CryptoError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotesViewModel extends ViewModel {
@@ -20,14 +20,16 @@ public class NotesViewModel extends ViewModel {
     private static final String TAG = NotesViewModel.class.getSimpleName();
 
     private MutableLiveData<List<NoteModel>> notes = new MutableLiveData<>();
-    private EncryptionHelper encryptionHelper;
+    private MutableLiveData<CryptoError> errorState = new MutableLiveData<>();
+    private NotesDataProvider notesDataProvider;
 
     public NotesViewModel(Context applicationContext) {
-        encryptionHelper = new EncryptionHelper(applicationContext);
+        notesDataProvider = new NotesDataProvider(applicationContext);
+        notesDataProvider.init(applicationContext);
 
-        NotesDatabase.getInstance().init(applicationContext);
+        errorState.setValue(CryptoError.OK);
+        notes.setValue(new ArrayList<NoteModel>());
 
-        retrieveData();
         Log.info(TAG, "NotesViewModel(), created");
     }
 
@@ -35,7 +37,7 @@ public class NotesViewModel extends ViewModel {
     protected void onCleared() {
         super.onCleared();
 
-        NotesDatabase.getInstance().close();
+        notesDataProvider.close();
 
         Log.info(TAG, "onCleared()");
     }
@@ -47,20 +49,14 @@ public class NotesViewModel extends ViewModel {
     public boolean deleteNote(String index) {
         Log.info(TAG, "deleteNote()");
 
-        boolean success = false;
+        boolean success = notesDataProvider.deleteRecord(index);
 
-        NoteModel noteModel = NotesDatabase.getInstance().getRecord(index);
+        if (handleError()) {
+            return false;
+        }
 
-        if (noteModel != null) {
-
-            success = NotesDatabase.getInstance().deleteRecord(index);
-
-            if (success) {
-                encryptionHelper.removeMetaData(Integer.parseInt(index));
-
-                retrieveData();
-            }
-
+        if (success) {
+            updateData();
         }
 
         return success;
@@ -69,25 +65,14 @@ public class NotesViewModel extends ViewModel {
     public boolean addNote(NoteModel noteModel) {
         Log.info(TAG, "addNote()");
 
-        // Update time
-        noteModel.setTime(GoodUtils.currentTimeToString());
+        int result = notesDataProvider.addRecord(noteModel);
 
-        NoteModel noteEnc = encryptionHelper.encrypt(noteModel);
-
-        if (noteEnc == null) {
-            Log.error(TAG, "addNote(), dec failed");
-            // Need to request keystore unlock
-            EventService.getInstance().onUnlockKeystore();
+        if (handleError()) {
             return false;
         }
 
-        int index = NotesDatabase.getInstance().addRecord(noteEnc);
-
-        if (index != -1) {
-            encryptionHelper.saveMetaData(index);
-
-            retrieveData();
-
+        if (result != -1 && result != 0) {
+            updateData();
             return true;
         }
 
@@ -97,58 +82,54 @@ public class NotesViewModel extends ViewModel {
     public boolean updateNote(String index, NoteModel noteModel) {
         Log.info(TAG, "updateNote()");
 
-        // Update time
-        noteModel.setTime(GoodUtils.currentTimeToString());
+        boolean result = notesDataProvider.updateRecord(index, noteModel);
 
-        NoteModel noteEnc = encryptionHelper.encrypt(noteModel);
-
-        if (noteEnc == null) {
-            Log.error(TAG, "updateNote(), dec failed");
-            // Need to request keystore unlock
-            EventService.getInstance().onUnlockKeystore();
+        if (handleError()) {
             return false;
         }
 
-        if (NotesDatabase.getInstance().updateRecord(index, noteEnc)) {
-            encryptionHelper.saveMetaData(Integer.parseInt(index));
-
-            retrieveData();
-
-            return true;
+        if (result) {
+            updateData();
         }
 
-        return false;
+        return result;
     }
 
     public NoteModel getNote(String index) {
-        NoteModel data = NotesDatabase.getInstance().getRecord(index);
-        NoteModel decData = null;
 
-        if (data != null) {
-            decData = encryptionHelper.decrypt(data, Integer.parseInt(index));
-            if (decData == null) {
-                Log.error(TAG, "getNote(), dec failed");
-                // Need to request keystore unlock
-                EventService.getInstance().onUnlockKeystore();
-            }
+        NoteModel data = notesDataProvider.getRecord(index);
+
+        if (handleError()) {
+            return null;
         }
 
-        return decData;
+        return data;
     }
 
-    public void retrieveData() {
-        Log.info(TAG, "loadData(), load and decrypt");
+    public void updateData() {
+        Log.info(TAG, "retrieveData(), load data");
 
-        List<NoteModel> data = NotesDatabase.getInstance().getRecords();
-        List<NoteModel> decData = encryptionHelper.decodeData(data);
+        List<NoteModel> data = notesDataProvider.getRecords();
 
-        if (!data.isEmpty() && decData.isEmpty()) {
-            Log.error(TAG, "loadData(), dec failed");
-            // Need to request keystore unlock
-            EventService.getInstance().onUnlockKeystore();
+        if (!handleError() && data != null) {
+            Log.info(TAG, "updateData(), data is updated");
+            notes.setValue(data);
         }
 
-        notes.setValue(decData);
+    }
+
+    public LiveData<CryptoError> getErrorStateData() { return errorState; }
+
+    public void resetErrorState() { notesDataProvider.resetErrors(); }
+
+    private boolean handleError() {
+        if (notesDataProvider.getLastError() == CryptoError.USER_NOT_AUTHORIZED) {
+            Log.error(TAG, "handleError(), auth error");
+            // Need to request keystore unlock
+            errorState.setValue(CryptoError.USER_NOT_AUTHORIZED);
+            return true;
+        }
+        return false;
     }
 
 

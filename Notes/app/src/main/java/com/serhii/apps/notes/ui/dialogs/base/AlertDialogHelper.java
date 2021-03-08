@@ -2,6 +2,7 @@ package com.serhii.apps.notes.ui.dialogs.base;
 
 import android.content.Context;
 
+import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
@@ -62,6 +63,10 @@ public class AlertDialogHelper {
 
             title = context.getString(R.string.title_unlock_key_invalid);
             message = context.getString(R.string.ms_unlock_key_invalid);
+        } else if (type == BackupManager.ALERT_DIALOG_TYPE) {
+
+            title = context.getString(R.string.ms_backup);
+            message = context.getString(R.string.title_backup);
         }
 
     }

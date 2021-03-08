@@ -1,4 +1,4 @@
-package com.serhii.apps.notes.ui.utils;
+package com.serhii.apps.notes.database;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,7 +14,7 @@ import com.serhii.core.security.impl.crypto.Result;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EncryptionHelper {
+class EncryptionHelper {
 
     private static final String TAG = EncryptionHelper.class.getSimpleName();
 
@@ -31,6 +31,8 @@ public class EncryptionHelper {
     // Application context
     private final Context context;
 
+    private CryptoError lastError = CryptoError.OK;
+
     public EncryptionHelper(Context context) {
         this.context = context;
     }
@@ -38,6 +40,8 @@ public class EncryptionHelper {
     public NoteModel encrypt(final NoteModel noteModel) {
 
         Log.info(TAG, "encrypt()");
+
+        resetErrors();
 
         Cipher csk = new Cipher();
         csk.selectKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS);
@@ -49,6 +53,7 @@ public class EncryptionHelper {
         if (!note.isResultAvailable() || !title.isResultAvailable()) {
             if (note.getError() == CryptoError.USER_NOT_AUTHORIZED) {
                 Log.info(TAG, "encrypt() error: USER_NOT_AUTHORIZED");
+                lastError = CryptoError.USER_NOT_AUTHORIZED;
                 return null;
             }
         }
@@ -68,6 +73,8 @@ public class EncryptionHelper {
 
     public NoteModel decrypt(final NoteModel noteModel, int index) {
         Log.info(TAG, "decrypt() with index = " + index);
+
+        resetErrors();
 
         retrieveMetaData(index);
 
@@ -127,7 +134,10 @@ public class EncryptionHelper {
 
     }
 
-    public List<NoteModel> decodeData(List<NoteModel> data) {
+    public List<NoteModel> decryptData(List<NoteModel> data) {
+
+        resetErrors();
+
         List<NoteModel> noteDec = new ArrayList<>();
 
         for (NoteModel n : data) {
@@ -143,6 +153,10 @@ public class EncryptionHelper {
         return noteDec;
     }
 
+    public CryptoError getLastError() { return lastError; }
+
+    public void resetErrors() { lastError = CryptoError.OK; }
+
     private NoteModel decryptInternal(final NoteModel encData) {
         Cipher csk = new Cipher();
         csk.selectKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS);
@@ -154,6 +168,7 @@ public class EncryptionHelper {
         if (!decodedNote.isResultAvailable() || !decodedTitle.isResultAvailable() || !decodedTime.isResultAvailable()) {
             if (decodedNote.getError() == CryptoError.USER_NOT_AUTHORIZED) {
                 Log.info(TAG, "decrypt(): error: USER_NOT_AUTHORIZED");
+                lastError = CryptoError.USER_NOT_AUTHORIZED;
                 return null;
             }
         }

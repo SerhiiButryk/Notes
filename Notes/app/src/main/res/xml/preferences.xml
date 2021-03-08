@@ -26,6 +26,13 @@
         android:entryValues="@array/preference_idle_lock_list_values"
         android:defaultValue="180000"/>
 
+    <PreferenceCategory android:title="@string/preference_category_title_backup"/>
+
+    <Preference
+        android:key="@string/preference_backup_key"
+        app:title="@string/preference_backup_title"
+        android:summary="@string/preference_backup_desc"/>
+
     <PreferenceCategory android:title="@string/preference_category_title_about"/>
 
     <Preference
