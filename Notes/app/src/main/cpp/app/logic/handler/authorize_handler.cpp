@@ -18,7 +18,7 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 {
     SystemStorage ss;
 
-    std::map<std::string, std::string> data = ss.getValues(kFileSystemData);
+    std::map<std::string, std::string> data = ss.readData(kFileSystemData);
 
     for (const auto& p : data)
     {

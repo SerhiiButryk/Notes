@@ -4,7 +4,7 @@ import android.content.Context;
 
 import java.util.List;
 
-public interface Database<T> {
+interface Database<T> {
 
     void init(Context context);
 

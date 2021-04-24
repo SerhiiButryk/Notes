@@ -27,8 +27,8 @@
     <string name="ms_unlock_key_invalid">Entered key is incorrect. \nPlease try again.</string>
     <string name="title_unlock_key_invalid">Authorize error</string>
 
-    <string name="ms_backup">No data to backup.</string>
-    <string name="title_backup">Backup error</string>
+    <string name="ms_extract_data">No data to save.</string>
+    <string name="title_extract_data">Error</string>
 
     // Common buttons
     <string name="kbtn_ok">Ok</string>
@@ -139,13 +139,17 @@
 
     <string name="preference_idle_lock_time_default">180000</string>
 
+    <string name="preference_extract_key">extract_key</string>
+    <string name="preference_extract_title">Save your notes</string>
+    <string name="preference_extract_desc">Save your notes as plain text to external/internal storage.</string>
+
     <string name="preference_backup_key">backup_key</string>
     <string name="preference_backup_title">Create backup file</string>
-    <string name="preference_backup_desc">Backup file allows you to save your note and restore your data from it.</string>
+    <string name="preference_backup_desc">Backup file allows you to restore your notes on other device. You need to remember the key (password) which is used to create this file.</string>
 
     // Change password dialog
-    <string name="hint_new_password">Enter a new password</string>
-    <string name="hint_old_password">Enter an old password</string>
+    <string name="hint_new_password">Enter new password</string>
+    <string name="hint_old_password">Enter old password</string>
     <string name="change_password_title_dialog">Change your password</string>
 
     <string name="change_password_toast_not_correct_password">Entered password is not correct</string>

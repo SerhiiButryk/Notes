@@ -9,6 +9,7 @@
 #include "utils/log.h"
 #include "app/logic/utils/auth_utils.h"
 #include "app/logic/base/system_constants.h"
+#include "crypto/hash.h""
 
 using namespace MYLIB;
 
@@ -35,7 +36,7 @@ namespace APP
         if (success == SYSTEM_MESSAGE ::NO_ERRORS)
         {
             std::map<std::string, std::string> data;
-            data.insert(std::make_pair(username, makeHashMD5(password)));
+            data.insert(std::make_pair(username, Hash::makeHashMD5(password)));
 
             SystemStorage ss;
 
@@ -49,13 +50,13 @@ namespace APP
                     return;
                 }
 
-                ss.addValues(kFileSystemData, data);
+                ss.addData(kFileSystemData, data);
 
             } else {
 
                 if (ss.createFile(kFileSystemData))
                 {
-                    ss.addValues(kFileSystemData, data);
+                    ss.addData(kFileSystemData, data);
                 }
 
             }

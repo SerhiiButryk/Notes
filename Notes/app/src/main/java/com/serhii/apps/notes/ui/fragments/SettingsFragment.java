@@ -22,7 +22,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private Preference loginAttempts;
     private Preference version;
     private ListPreference idleLockTimeOut;
-    private Preference backup;
+    private Preference extractNotes;
+    private Preference backupNotes;
 
     private final NativeBridge nativeBridge = new NativeBridge();
     private final BackupManager backupManager = new BackupManager();
@@ -76,15 +77,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        backup = findPreference(getString(R.string.preference_backup_key));
+        extractNotes = findPreference(getString(R.string.preference_extract_key));
 
-        backup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        extractNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 backupManager.openDirectoryChooser(getActivity());
                 return true;
             }
         });
+
+        backupNotes = findPreference(getString(R.string.preference_backup_key));
+
+        backupNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                return false;
+            }
+        });
+
     }
 
 }

@@ -12,7 +12,7 @@ bool APP::AuthUtils::isUserAccountExists(const std::string& user_name)
 {
     SystemStorage ss;
 
-    std::map<std::string, std::string> data = ss.getValues(kFileSystemData);
+    std::map<std::string, std::string> data = ss.readData(kFileSystemData);
 
     for (const auto& p : data)
     {
@@ -28,7 +28,7 @@ bool APP::AuthUtils::verifyUserPassword(const std::string& user_name, const std:
 {
     SystemStorage ss;
 
-    std::map<std::string, std::string> data = ss.getValues(kFileSystemData);
+    std::map<std::string, std::string> data = ss.readData(kFileSystemData);
 
     for (auto& p : data)
     {

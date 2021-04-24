@@ -7,7 +7,7 @@ import com.serhii.apps.notes.common.AppConstants;
 
 public class Notes extends Application {
 
-    public static final String TAG = Notes.class.getSimpleName();
+    private static final String TAG = Notes.class.getSimpleName();
 
     @Override
     public void onCreate() {
@@ -16,6 +16,6 @@ public class Notes extends Application {
         // Initialize here application configuration
         Log.setTag(AppConstants.APP_LOG_TAG);
 
-        Log.info(TAG, "application is created");
+        Log.info(TAG, "onCreate(), application is created");
     }
 }

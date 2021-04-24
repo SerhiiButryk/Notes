@@ -21,6 +21,7 @@ public class NotesViewModel extends ViewModel {
 
     private MutableLiveData<List<NoteModel>> notes = new MutableLiveData<>();
     private MutableLiveData<CryptoError> errorState = new MutableLiveData<>();
+
     private NotesDataProvider notesDataProvider;
 
     public NotesViewModel(Context applicationContext) {
@@ -30,7 +31,7 @@ public class NotesViewModel extends ViewModel {
         errorState.setValue(CryptoError.OK);
         notes.setValue(new ArrayList<NoteModel>());
 
-        Log.info(TAG, "NotesViewModel(), created");
+        Log.info(TAG, "NotesViewModel(), instance is created");
     }
 
     @Override
@@ -80,7 +81,7 @@ public class NotesViewModel extends ViewModel {
     }
 
     public boolean updateNote(String index, NoteModel noteModel) {
-        Log.info(TAG, "updateNote()");
+        Log.info(TAG, "updateNote(), index = " + index);
 
         boolean result = notesDataProvider.updateRecord(index, noteModel);
 
@@ -96,6 +97,7 @@ public class NotesViewModel extends ViewModel {
     }
 
     public NoteModel getNote(String index) {
+        Log.info(TAG, "getNote(), index = " + index);
 
         NoteModel data = notesDataProvider.getRecord(index);
 

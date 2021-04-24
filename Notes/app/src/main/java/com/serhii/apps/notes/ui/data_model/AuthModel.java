@@ -44,10 +44,4 @@ public class AuthModel {
 
     public AuthorizeType getAuthType() { return authType; }
 
-    // DEBUG ONLY
-    //    @NonNull
-    //    @Override
-    //    public String toString() {
-    //        return "{" + email + ":" + password + ":" + confirmPassword + "}";
-    //    }
 }

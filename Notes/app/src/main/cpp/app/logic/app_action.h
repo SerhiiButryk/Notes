@@ -13,7 +13,7 @@ namespace APP
 {
 
     /**
-     *  This class is specific action handler
+     *  This class is a concrete action handler
      *
      *  It performs notification calls to Java side.
      *
@@ -25,12 +25,8 @@ namespace APP
         private:
 
             std::vector<JNIWrapper> authorizeObservers;
-
             std::unique_ptr<JNIWrapper> showDialogObserver;
             std::unique_ptr<JNIWrapper> registerObserver;
-
-            std::unique_ptr<JNIWrapper> unlockKeystoreObserverNoteViewActivity;
-            std::unique_ptr<JNIWrapper> unlockKeystoreObserverNoteEditorActivity;
 
         public:
 
@@ -40,16 +36,9 @@ namespace APP
             void setShowDialogCallback(JNIWrapper* showdialog_callback);
             void setRegistrationCallback(JNIWrapper* registration_callback);
 
-            void setUnlockKeystoreNoteViewCallback(JNIWrapper* unlock_keystore_callback);
-            void removeUnlockKeystoreNoteViewCallback();
-
-            void setUnlockKeystoreEditorViewCallback(JNIWrapper* unlock_keystore_callback);
-            void removeUnlockKeystoreEditorViewCallback();
-
             void onAuthorized() override;
             void onRegistered() override;
             void onShowDialog(int type) override;
-            void onUnlockKeystore() override;
 
         private:
             AppAction();

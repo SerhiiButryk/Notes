@@ -18,7 +18,7 @@ extern "C" {
   JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_AuthorizationActivity_initNative
   (JNIEnv* env, jobject jobj)
   {
-        Log::Info(TAG, "JNI Java_com_serhii_apps_notes_activities_AuthorizationActivity_initNative()");
+        Log::Info("JNI", " %s IN", __FUNCTION__ );
 
         jclass cls = env->GetObjectClass(jobj);
 
@@ -41,6 +41,8 @@ extern "C" {
         AppAction::getInstance()->setAuthorizeCallback(std::move(callback_data));
         AppAction::getInstance()->setRegistrationCallback(callback_registred);
         AppAction::getInstance()->setShowDialogCallback(callback_dialog);
+
+      Log::Info("JNI", " %s OUT", __FUNCTION__ );
   }
 
 #ifdef __cplusplus

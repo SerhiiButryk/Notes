@@ -14,7 +14,7 @@ public class InactivityEventReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.info(TAG, "Received inactivity event, TIME: " + System.currentTimeMillis());
+        Log.detail(TAG, "Received inactivity event, TIME: " + System.currentTimeMillis());
 
         // Start login activity
         Intent startActivityIntent = new Intent(context, AuthorizationActivity.class);

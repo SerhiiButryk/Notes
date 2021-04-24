@@ -2,8 +2,6 @@ package com.serhii.apps.notes.control;
 
 import android.content.Context;
 
-import androidx.lifecycle.LifecycleObserver;
-
 import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.apps.notes.control.base.IAuthorizeService;
 import com.serhii.apps.notes.control.managers.AuthManager;
@@ -17,7 +15,7 @@ import com.serhii.core.security.Cipher;
  *
  *  See interface definition
  */
-public class EventService implements IAuthorizeService, LifecycleObserver {
+public class EventService implements IAuthorizeService {
 
     private static String TAG = EventService.class.getSimpleName();
 
@@ -25,7 +23,11 @@ public class EventService implements IAuthorizeService, LifecycleObserver {
 
     public static EventService getInstance() {
         if (instance == null) {
-            instance = new EventService();
+            synchronized (EventService.class) {
+                if (instance == null) {
+                    instance = new EventService();
+                }
+            }
         }
         return instance;
     }
@@ -34,7 +36,7 @@ public class EventService implements IAuthorizeService, LifecycleObserver {
      *  Handle authorize event
      */
     @Override
-    public void onBasicLogin(AuthModel model) {
+    public void onPasswordLogin(AuthModel model) {
         AuthManager authManager = new AuthManager();
         // Initiate authorize request
         authManager.handleRequest(RequestType.REQ_AUTHORIZE, model);
@@ -65,7 +67,7 @@ public class EventService implements IAuthorizeService, LifecycleObserver {
 
         // Create protection keys
         Cipher cipher = new Cipher();
-        cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, 1000, true);
+        cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, true);
         cipher.createKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS, false);
 
         // Set login password limit

@@ -60,7 +60,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 // Set data
-                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_BASIC_LOGIN));
+                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
                 return true;
             }
             return false;
@@ -142,7 +142,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
                 }
 
                 // Set data
-                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_BASIC_LOGIN));
+                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
             }
         });
 

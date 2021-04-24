@@ -34,9 +34,6 @@ public class AuthManager {
 
             requestBiometricLogin();
 
-        } else if (type == RequestType.REQ_UNLOCK_KEYSTORE) {
-
-            requestUnlockKeystore();
         }
 
     }
@@ -45,7 +42,6 @@ public class AuthManager {
     private native void requestRegistration(String password, String confirmPassword, String username);
     private native void requestUnlock(String unlockKey);
     private native void requestBiometricLogin();
-    private native void requestUnlockKeystore();
 
     static {
         System.loadLibrary(RUNTIME_LIBRARY);

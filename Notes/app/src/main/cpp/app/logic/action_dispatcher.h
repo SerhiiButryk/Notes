@@ -10,7 +10,7 @@ namespace APP
 {
 
     /**
-     *  This class controls an app actions corresponding to system events.
+     *  This class controls app actions corresponding to system events.
      *
      *  It processes the result of event handling and dispatches an action if it's needed.
      *
@@ -23,7 +23,6 @@ namespace APP
             std::vector<SystemActions*> authorization_observers;
             std::vector<SystemActions*> registration_observers;
             std::vector<SystemActions*> showdialog_observers;
-            std::vector<SystemActions*> unlockkeystore_observers;
 
         public:
             static ActionDispatcher* getInstance();
@@ -42,15 +41,11 @@ namespace APP
             void addShowDialogActionObserver(SystemActions* observer);
             void removeShowDialogObserver(SystemActions* observer);
 
-            void addUnlockKeystoreActionObserver(SystemActions* observer);
-            void removeUnlockKeystoreObserver(SystemActions* observer);
-
         private:
 
             void notifyOnAuthorized();
             void notifyOnRegistered();
             void notifyOnShowDialog(int type);
-            void notifyOnUnlockKeystore();
     };
 
 }

@@ -8,7 +8,7 @@ import com.serhii.apps.notes.ui.data_model.AuthModel;
 
 public interface IAuthorizeService {
 
-    void onBasicLogin(AuthModel model);
+    void onPasswordLogin(AuthModel model);
 
     void onRegistration(AuthModel model);
 

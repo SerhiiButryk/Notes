@@ -3,17 +3,14 @@ package com.serhii.apps.notes.control.managers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.database.NotesDataProvider;
-import com.serhii.apps.notes.database.NotesDatabase;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.log.Log;
+import com.serhii.core.utils.GoodUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -29,8 +26,12 @@ public class BackupManager {
 
     public void openDirectoryChooser(Activity activity) {
 
+        Log.info(TAG, "openDirectoryChooser()");
+
+        NotesDataProvider notesDataProvider = new NotesDataProvider(activity);
+
         // Check if there is data to backup
-        if (NotesDatabase.getInstance().getRecordsCount() == 0) {
+        if (notesDataProvider.getRecordsCount() == 0) {
             DialogHelper.showAlertDialog(ALERT_DIALOG_TYPE, activity);
             return;
         }
@@ -46,7 +47,7 @@ public class BackupManager {
 
     public void backupData(final OutputStream outputStream, Context context) {
 
-        // TODO: Check keystore unauthorize error !!!
+        Log.info(TAG, "backupData()");
 
         try {
 
@@ -72,21 +73,24 @@ public class BackupManager {
                     outputStream.flush();
                     outputStream.close();
 
-                    Toast.makeText(context, context.getString(R.string.backup_file_success), Toast.LENGTH_LONG).show();
+                    GoodUtils.showToast(context, R.string.backup_file_success);
+
+                    Log.info(TAG, "backupData() backup is finished");
+
                     return;
                 }
 
+            } else {
+                Log.info(TAG, "backupData() database is empty");
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            Log.error(TAG, "backupData() exception: " + e);
             e.printStackTrace();
         }
 
-        Toast.makeText(context, context.getString(R.string.backup_file_fail), Toast.LENGTH_LONG).show();
+        GoodUtils.showToast(context, R.string.backup_file_fail);
 
-        Log.info(TAG, "backupData() DONE");
     }
 
 }

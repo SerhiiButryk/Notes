@@ -5,6 +5,7 @@
 #include "storage/system_storage.h"
 #include "utils/jstring.h"
 #include "app/logic/utils/auth_utils.h"
+#include "utils/log.h"
 
 using namespace APP;
 using namespace MYLIB;
@@ -16,9 +17,13 @@ extern "C" {
 JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getUserName
         (JNIEnv* env, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     CacheManager cacheManager;
 
-    std::string user_name = cacheManager.getCachedValue(kUserName, kFileCashSystemData);
+    std::string user_name = cacheManager.getCachedData(kUserName, kFileCashSystemData);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(user_name.c_str());
 }
@@ -26,8 +31,12 @@ JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getU
 JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1verifyPassword
         (JNIEnv* env, jobject, jstring username, jstring password)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     JString passwordString(env, password);
     JString usernameString(env, username);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
     return static_cast<jboolean>(AuthUtils::verifyUserPassword(usernameString, passwordString));
 }
@@ -35,29 +44,41 @@ JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1ver
 JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setNewPassword
         (JNIEnv* env, jobject, jstring password)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     JString passwordString(env, password);
 
     SystemStorage ss;
     CacheManager cacheManager;
 
-    std::string key = cacheManager.getCachedValue(kUserName, kFileCashSystemData);
+    std::string key = cacheManager.getCachedData(kUserName, kFileCashSystemData);
 
-    return static_cast<jboolean>(ss.updateValue(kFileSystemData, key, passwordString));
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+
+    return static_cast<jboolean>(ss.updateData(kFileSystemData, key, passwordString));
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1clearAppData(JNIEnv *, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     SystemStorage ss;
 
-    ss.clearFileData(kFileCashSystemData);
-    ss.clearFileData(kFileSystemData);
+    ss.clearData(kFileCashSystemData);
+    ss.clearData(kFileSystemData);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getLimitLeft
         (JNIEnv* env, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     SystemStorage ss;
-    std::string attempts = ss.getValueByKey(kFileSystemData, kUserLoginAttemptsLeft);
+    std::string attempts = ss.getDataByKey(kFileSystemData, kUserLoginAttemptsLeft);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(attempts.c_str());
 }
@@ -65,6 +86,8 @@ JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getL
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setLimitLeft
         (JNIEnv* env, jobject, jstring new_value)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     JString passwordString(env, new_value);
 
     SystemStorage ss;
@@ -74,37 +97,50 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setLimi
         std::map<std::string, std::string> value;
         value.insert(std::make_pair(kUserLoginAttemptsLeft, static_cast<std::string>(passwordString)));
 
-        ss.addValues(kFileSystemData, value);
+        ss.addData(kFileSystemData, value);
+
+        Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
         return;
     }
 
-    ss.updateValue(kFileSystemData, kUserLoginAttemptsLeft, passwordString);
+    ss.updateData(kFileSystemData, kUserLoginAttemptsLeft, passwordString);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1executeBlockApp
         (JNIEnv *, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     SystemStorage ss;
 
     if (ss.doesKeyExist(kFileSystemData, kIsUserBlocked))
     {
-        ss.updateValue(kFileSystemData, kIsUserBlocked, TRUE);
+        ss.updateData(kFileSystemData, kIsUserBlocked, TRUE);
     } else {
 
         std::map<std::string, std::string> value;
         value.insert(std::make_pair(kIsUserBlocked, TRUE));
 
-        ss.addValues(kFileSystemData, value);
+        ss.addData(kFileSystemData, value);
     }
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
 }
 
 JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1isAppBlocked
         (JNIEnv *, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     SystemStorage ss;
-    std::string result =  ss.getValueByKey(kFileSystemData, kIsUserBlocked);
+    std::string result = ss.getDataByKey(kFileSystemData, kIsUserBlocked);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
     return static_cast<jboolean>( !(result.empty() || result == FALSE) );
 }
@@ -112,6 +148,8 @@ JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1isA
 JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getUnlockKey
         (JNIEnv* env, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     return env->NewStringUTF(UNLOCK_ACCESSKEY_DEFAULT.c_str());
 }
 

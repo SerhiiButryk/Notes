@@ -45,13 +45,6 @@ namespace APP
             notifyOnShowDialog(static_cast<int>(message));
         }
 
-        if (message == SYSTEM_MESSAGE::UNLOCK_KEYSTORE)
-        {
-            Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnUnlockKeystore \n");
-
-            notifyOnUnlockKeystore();
-        }
-
     }
 
     /**
@@ -81,16 +74,6 @@ namespace APP
     {
         for (const auto& v : showdialog_observers) {
             v->onShowDialog(type);
-        }
-    }
-
-    /**
-     * Notify observers
-     */
-    void ActionDispatcher::notifyOnUnlockKeystore()
-    {
-        for (const auto& v : unlockkeystore_observers) {
-            v->onUnlockKeystore();
         }
     }
 
@@ -128,17 +111,6 @@ namespace APP
     {
         auto iterator = std::remove(showdialog_observers.begin(), showdialog_observers.end(), observer);
         showdialog_observers.erase(iterator);
-    }
-
-    void ActionDispatcher::addUnlockKeystoreActionObserver(SystemActions* observer)
-    {
-        unlockkeystore_observers.push_back(observer);
-    }
-
-    void ActionDispatcher::removeUnlockKeystoreObserver(SystemActions* observer)
-    {
-        auto iterator = std::remove(unlockkeystore_observers.begin(), unlockkeystore_observers.end(), observer);
-        unlockkeystore_observers.erase(iterator);
     }
 
 }

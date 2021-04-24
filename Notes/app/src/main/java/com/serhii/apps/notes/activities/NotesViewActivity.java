@@ -50,7 +50,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         initNative(this);
 
         // Initialize lifecycle aware components
-        getLifecycle().addObserver(EventService.getInstance());
         InactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
         if (savedInstanceState == null) {

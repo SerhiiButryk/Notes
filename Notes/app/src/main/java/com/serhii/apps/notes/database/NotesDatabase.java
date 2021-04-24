@@ -12,7 +12,7 @@ import java.util.List;
  * Thread safe singleton implementation
  */
 
-public class NotesDatabase implements Database<NoteModel> {
+class NotesDatabase implements Database<NoteModel> {
 
     private volatile static NotesDatabase INSTANCE;
 

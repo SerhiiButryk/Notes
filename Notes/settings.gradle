@@ -1,4 +1,4 @@
 include ':app'
 
-include ':LibCore'
-project(':LibCore').projectDir = new File("../external-libs/core/")
+include ':LibCoreAndroid'
+project(':LibCoreAndroid').projectDir = new File("../external-libs/android-core/")

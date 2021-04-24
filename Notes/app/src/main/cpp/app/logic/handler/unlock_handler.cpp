@@ -26,7 +26,7 @@ namespace APP
         } else {
 
             SystemStorage ss;
-            ss.updateValue(kFileSystemData, kIsUserBlocked, FALSE);
+            ss.updateData(kFileSystemData, kIsUserBlocked, FALSE);
 
             ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::UNLOCK_DONE);
         }

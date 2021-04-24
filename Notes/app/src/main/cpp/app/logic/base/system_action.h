@@ -19,8 +19,6 @@ namespace APP
             virtual void onShowDialog(int type) = 0;
 
             virtual void onRegistered() = 0;
-
-            virtual void onUnlockKeystore() = 0;
     };
 
 }

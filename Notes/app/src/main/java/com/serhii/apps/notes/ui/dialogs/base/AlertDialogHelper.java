@@ -65,8 +65,8 @@ public class AlertDialogHelper {
             message = context.getString(R.string.ms_unlock_key_invalid);
         } else if (type == BackupManager.ALERT_DIALOG_TYPE) {
 
-            title = context.getString(R.string.ms_backup);
-            message = context.getString(R.string.title_backup);
+            title = context.getString(R.string.ms_extract_data);
+            message = context.getString(R.string.title_extract_data);
         }
 
     }

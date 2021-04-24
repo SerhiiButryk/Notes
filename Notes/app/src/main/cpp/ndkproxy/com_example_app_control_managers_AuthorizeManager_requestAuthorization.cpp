@@ -6,10 +6,10 @@
 #include "app/logic/action_dispatcher.h"
 #include "app/logic/receiver/system_event_receiver.h"
 #include "app/logic/base/system_constants.h"
+#include "utils/log.h"
 
 using namespace APP;
-
-using MYLIB::JString;
+using namespace MYLIB;
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +18,8 @@ extern "C" {
   JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestAuthorization
   (JNIEnv* env, jobject, jstring jpassword, jstring jusername)
   {
+       Log::Info("JNI", " %s IN", __FUNCTION__ );
+
        JString passwordString(env, jpassword);
        JString usernameString(env, jusername);
 
@@ -26,11 +28,15 @@ extern "C" {
        event.putData(USERNAME_KEY, usernameString);
 
        SystemEventReceiver::getInstance()->forward(event);
+
+      Log::Info("JNI", " %s OUT", __FUNCTION__ );
   }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestRegistration
   (JNIEnv* env, jobject, jstring jpassword, jstring jconfirm_password, jstring jusername)
   {
+      Log::Info("JNI", " %s IN", __FUNCTION__ );
+
       JString passwordString(env, jpassword);
       JString usernameString(env, jusername);
       JString confirmpasswordString(env, jconfirm_password);
@@ -41,31 +47,34 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_r
       event.putData(CONFIRM_PASSWORD_KEY, confirmpasswordString);
 
       SystemEventReceiver::getInstance()->forward(event);
+
+      Log::Info("JNI", " %s OUT", __FUNCTION__ );
   }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestUnlock
         (JNIEnv* env, jobject, jstring junlockKey)
 {
+      Log::Info("JNI", " %s IN", __FUNCTION__ );
+
       JString unlockKey(env, junlockKey);
 
       Event event(SYSTEM_EVENT::UNLOCK);
       event.putData(UNLOCK_KEY, unlockKey);
 
       SystemEventReceiver::getInstance()->forward(event);
+
+      Log::Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestBiometricLogin
         (JNIEnv *, jobject)
 {
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
     // Authentication is done
     ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::AUTHORIZATION_DONE);
-}
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestUnlockKeystore
-        (JNIEnv *, jobject)
-{
-    // Trigger action
-    ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::UNLOCK_KEYSTORE);
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
 #ifdef __cplusplus

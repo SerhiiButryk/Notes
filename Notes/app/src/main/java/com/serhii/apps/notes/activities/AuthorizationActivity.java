@@ -106,8 +106,8 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
                 AuthorizeType type = authModel.getAuthType();
                 switch (type) {
                     case AUTH_UNLOCK:
-                    case AUTH_BASIC_LOGIN:
-                        EventService.getInstance().onBasicLogin(authModel);
+                    case AUTH_PASSWORD_LOGIN:
+                        EventService.getInstance().onPasswordLogin(authModel);
                         break;
                     case AUTH_REGISTRATION:
                         EventService.getInstance().onRegistration(authModel);
