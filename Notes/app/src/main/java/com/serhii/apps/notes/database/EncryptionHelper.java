@@ -62,7 +62,7 @@ class EncryptionHelper {
         ivNote = note.getIv();
         ivTime = time.getIv();
 
-        return new NoteModel(note.toString(), title.toString(), time.toString());
+        return new NoteModel(note.getMessage(), title.getMessage(), time.getMessage());
     }
 
     public NoteModel decrypt(final NoteModel noteModel) {

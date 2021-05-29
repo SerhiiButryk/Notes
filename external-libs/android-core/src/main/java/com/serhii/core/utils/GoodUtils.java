@@ -2,6 +2,7 @@ package com.serhii.core.utils;
 
 import android.content.Context;
 import android.os.Message;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,10 +39,10 @@ public class GoodUtils {
     }
 
     /**
-     *  Retrieve a text from a TextView widget
+     *  Retrieve a text from a EditText widget
      */
-    public static String getText(TextView textView) {
-        return textView.getText().toString().trim();
+    public static String getText(EditText editText) {
+        return editText.getText().toString().trim();
     }
 
     /**

@@ -11,9 +11,9 @@ public abstract class DatabaseImpl<T> {
     public static final String FLAG_SELECT = "=?";
     public static final String FLAG_ORDER = " ASC";
 
-    protected boolean initialized;
+    protected static boolean initialized;
 
-    public void initDbImpl(Context context) { checkIfInitialized(); }
+    public void initDbImpl(Context context) { }
 
     public void clearDatabaseImpl() { checkIfInitialized(); }
 

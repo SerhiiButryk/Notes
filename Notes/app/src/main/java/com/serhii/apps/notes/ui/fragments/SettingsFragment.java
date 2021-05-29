@@ -10,20 +10,19 @@ import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.managers.BackupManager;
+import com.serhii.apps.notes.database.NotesDatabaseProvider;
+import com.serhii.apps.notes.ui.SetPasswordDialogUI;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
+
+import static com.serhii.apps.notes.control.managers.BackupManager.ALERT_DIALOG_TYPE;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private static String TAG = LoginFragment.class.getSimpleName();
 
-    private Preference changePassword;
     private Preference loginAttempts;
-    private Preference version;
-    private ListPreference idleLockTimeOut;
-    private Preference extractNotes;
-    private Preference backupNotes;
 
     private final NativeBridge nativeBridge = new NativeBridge();
     private final BackupManager backupManager = new BackupManager();
@@ -31,11 +30,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         setPreferencesFromResource(R.xml.preferences, s);
-        initBasicSettings();
+        initLayout();
     }
 
-    private void initBasicSettings() {
-        changePassword = findPreference(getString(R.string.preference_change_password_key));
+    private void initLayout() {
+        Preference changePassword = findPreference(getString(R.string.preference_change_password_key));
 
         changePassword.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -63,10 +62,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        version = findPreference(getString(R.string.preference_about_version_key));
+        Preference version = findPreference(getString(R.string.preference_about_version_key));
         version.setSummary(AppConstants.VERSION_LIBRARY);
 
-        idleLockTimeOut = findPreference(getString(R.string.preference_idle_lock_timeout_key));
+        Preference idleLockTimeOut = findPreference(getString(R.string.preference_idle_lock_timeout_key));
 
         idleLockTimeOut.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -77,26 +76,78 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        extractNotes = findPreference(getString(R.string.preference_extract_key));
+        Preference extractNotes = findPreference(getString(R.string.preference_extract_key));
 
         extractNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                backupManager.openDirectoryChooser(getActivity());
+
+                Log.info(TAG, "onPreferenceClick()");
+
+                if (!isDataAvailable()) {
+                    return true;
+                }
+
+                backupManager.openDirectoryChooserForExtractData(getActivity());
                 return true;
             }
         });
 
-        backupNotes = findPreference(getString(R.string.preference_backup_key));
+        Preference backupNotes = findPreference(getString(R.string.preference_backup_key));
 
         backupNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+// TODO: Uncomment when this is tested
+//                DialogHelper.showSetPasswordDialog(getActivity(), new SetPasswordDialogUI.OnPasswordSetListener() {
+//                    @Override
+//                    public void onPasswordSet(String password) {
+//
+//                        Log.info(TAG, "onPasswordSet()");
+//
+//                        if (!isDataAvailable()) {
+//                            return;
+//                        }
+//
+//                        // TODO: Find better way to save password
+//                        backupManager.setPassword(password);
+//
+//                        backupManager.openDirectoryChooserForBackup(getActivity());
+//                    }
+//                });
+
+                backupManager.openDirectoryChooserForBackup(getActivity());
 
                 return false;
             }
         });
 
+        Preference unlockNote = findPreference(getString(R.string.preference_unlock_note_key));
+        unlockNote.setSummary(getString(R.string.preference_unlock_note_decs) + nativeBridge.getUnlockKey());
+
+        Preference restoreNotes = findPreference(getString(R.string.preference_restore_note_key));
+        restoreNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                BackupManager backupManager = new BackupManager();
+                backupManager.openBackUpFile(getActivity());
+                return true;
+            }
+        });
+
+    }
+
+    private boolean isDataAvailable() {
+        NotesDatabaseProvider notesDatabaseProvider = new NotesDatabaseProvider(getActivity());
+
+        // Check if there is data to extract
+        if (notesDatabaseProvider.getRecordsCount() == 0) {
+            DialogHelper.showAlertDialog(ALERT_DIALOG_TYPE, getActivity());
+            Log.error(TAG, "isDataAvailable() no data available");
+            return false;
+        }
+
+        return true;
     }
 
 }

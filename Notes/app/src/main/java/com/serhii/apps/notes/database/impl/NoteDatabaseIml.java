@@ -147,6 +147,8 @@ public class NoteDatabaseIml extends DatabaseImpl<NoteModel> {
 
         databaseRead = null;
         databaseWrite = null;
+
+        initialized = false;
     }
 
     @Override

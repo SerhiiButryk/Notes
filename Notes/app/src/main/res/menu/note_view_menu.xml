@@ -6,7 +6,7 @@
         android:title="@string/settings_item"
         app:showAsAction="never"/>
 
-    <!--No implemented yet-->
+    <!--TODO: No implemented yet-->
     <!--    <item android:id="@+id/plans_item"-->
     <!--        android:title="@string/plans_item"-->
     <!--        app:showAsAction="never"/>-->

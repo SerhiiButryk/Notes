@@ -16,6 +16,11 @@ public class Notes extends Application {
         // Initialize here application configuration
         Log.setTag(AppConstants.APP_LOG_TAG);
 
+        // Enable detailed logs
+        if (BuildConfig.DEBUG) {
+            Log.setDetailedLogs(true);
+        }
+
         Log.info(TAG, "onCreate(), application is created");
     }
 }

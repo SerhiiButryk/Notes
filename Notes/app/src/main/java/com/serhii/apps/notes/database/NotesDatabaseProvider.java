@@ -15,13 +15,13 @@ import java.util.List;
  *  It is a decorator around NotesDatabase class
  */
 
-public class NotesDataProvider implements Database<NoteModel> {
+public class NotesDatabaseProvider implements Database<NoteModel> {
 
-    public static final String TAG = NotesDataProvider.class.getSimpleName();
+    public static final String TAG = NotesDatabaseProvider.class.getSimpleName();
 
     private final EncryptionHelper encryptionHelper;
 
-    public NotesDataProvider(Context context) {
+    public NotesDatabaseProvider(Context context) {
         encryptionHelper = new EncryptionHelper(context);
     }
 

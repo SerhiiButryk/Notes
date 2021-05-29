@@ -59,6 +59,11 @@ public class LoginFragment extends Fragment implements IViewBindings {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (GoodUtils.getText(passwordField).isEmpty() || GoodUtils.getText(emailField).isEmpty()) {
+                    Toast.makeText(getContext(), getString(R.string.empty_login), Toast.LENGTH_LONG).show();
+                    return true;
+                }
+
                 // Set data
                 authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
                 return true;

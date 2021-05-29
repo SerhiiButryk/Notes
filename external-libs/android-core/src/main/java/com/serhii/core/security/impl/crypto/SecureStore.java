@@ -45,7 +45,7 @@ public class SecureStore implements CryptoProvider {
         Log.detail(TAG, "selectKey(): " + key);
 
         if (!isSecretKeyExists(key)) {
-            throw new IllegalArgumentException("No key with this alias is created");
+            throw new IllegalArgumentException("No key with this alias (" + key + ") is created");
         }
 
         selectedKey = key;
@@ -194,6 +194,8 @@ public class SecureStore implements CryptoProvider {
         if (keyGenerator != null) {
             return genSecretKey(keyGenerator, builder.build());
         }
+
+        Log.error(TAG, "_createKey(): failed to gen key");
 
         return false;
     }

@@ -133,7 +133,15 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     @Override
     public void onOpenNote(NoteModel noteModel) {
 
+        Log.info(TAG, "onOpenNote()");
+
         FragmentManager fm = getSupportFragmentManager();
+
+        if (fm.findFragmentByTag(NoteEditorFragment.FRAGMENT_TAG) != null) {
+            Log.info(TAG, "onOpenNote() fragment is already opened, return");
+            return;
+        }
+
         Bundle args = new Bundle();
 
         if (noteModel == null) {
@@ -151,7 +159,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
             args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_OPEN);
         }
 
-        fm.beginTransaction().add(R.id.main_layout, NoteEditorFragment.class, args, null)
+        fm.beginTransaction().add(R.id.main_layout, NoteEditorFragment.class, args, NoteEditorFragment.FRAGMENT_TAG)
                 .setReorderingAllowed(true) // Needed for optimization
                 .addToBackStack(null)
                 .commit();

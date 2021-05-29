@@ -67,7 +67,7 @@ public class EventService implements IAuthorizeService {
 
         // Create protection keys
         Cipher cipher = new Cipher();
-        cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, true);
+        cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, false);
         cipher.createKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS, false);
 
         // Set login password limit

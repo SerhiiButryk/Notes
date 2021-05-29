@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
 
@@ -53,14 +54,14 @@ android {
         }
     }
 
-    flavorDimensions "environment"
+    flavorDimensions "product"
     productFlavors {
 
-        prodaction {
+        prod {
             // App name
             manifestPlaceholders = [appLabel: "Notes"]
 
-            dimension "environment"
+            dimension "product"
         }
 
         dev {
@@ -71,7 +72,7 @@ android {
             // App name
             manifestPlaceholders = [appLabel: "DevNotes"]
 
-            dimension "environment"
+            dimension "product"
         }
 
     }
@@ -93,6 +94,13 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.navigation:navigation-fragment:2.1.0'
     implementation 'androidx.navigation:navigation-ui:2.1.0'
+
+    // JSON library - https://github.com/square/moshi
+    implementation("com.squareup.moshi:moshi:1.12.0")
+
+    // Tests use Kotlin
+    testImplementation "androidx.core:core-ktx:+"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

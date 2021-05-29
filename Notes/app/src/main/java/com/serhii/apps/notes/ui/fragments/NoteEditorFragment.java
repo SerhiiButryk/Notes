@@ -35,6 +35,8 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
 
     private static final String TAG = NoteEditorFragment.class.getSimpleName();
 
+    public static final String FRAGMENT_TAG = "NoteEditorFragmentTAG";
+
     public static final String ACTION_NOTE_OPEN = "action open note";
     public static final String ACTION_NOTE_CREATE = "action create note";
 

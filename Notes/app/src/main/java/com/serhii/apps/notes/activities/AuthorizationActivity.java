@@ -24,6 +24,7 @@ import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
 import com.serhii.core.log.Log;
 
 import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
+import static com.serhii.apps.notes.ui.fragments.RegisterFragment.FRAGMENT_TAG;
 
 public class AuthorizationActivity extends AppCompatActivity implements LoginFragment.ShowRegistrationUIListener {
 
@@ -73,7 +74,7 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
 
     @Override
     public void onShowRegistrationUI() {
-        addFragment(new RegisterFragment(), null);
+        addFragment(new RegisterFragment(), FRAGMENT_TAG);
     }
 
     private void showLoginFragment(Bundle savedInstanceState) {
@@ -121,6 +122,12 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
     }
 
     private void addFragment(Fragment fragment, String tag) {
+
+        if (tag != null && fragmentManager.findFragmentByTag(tag) != null) {
+            Log.info(TAG, "addFragment() - fragment is already opened");
+            return;
+        }
+
         fragmentManager.beginTransaction().replace(R.id.main_layout, fragment, tag)
                 .setReorderingAllowed(true) // Needed for optimization
                 .addToBackStack(null)

@@ -26,6 +26,8 @@ import com.serhii.core.utils.GoodUtils;
 
 public class RegisterFragment extends Fragment implements IViewBindings {
 
+    public static final String FRAGMENT_TAG = "RegisterFragmentTag";
+
     private  EditText emailField;
     private  TextView titleLabel;
     private  EditText passwordField;

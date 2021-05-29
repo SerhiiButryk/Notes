@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -20,11 +19,15 @@ import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
 import com.serhii.apps.notes.ui.fragments.SettingsFragment;
 import com.serhii.core.log.Log;
+import com.serhii.core.utils.GoodUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_BACKUP_NOTES;
+import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -95,23 +98,95 @@ public class SettingsActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (BackupManager.REQUEST_CODE == requestCode && resultCode == RESULT_OK) {
+            if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
 
-            Log.info(TAG, "onActivityResult() got result uri");
+                Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES");
 
-            OutputStream outputStream = null;
-            try {
-                outputStream = getContentResolver().openOutputStream(data.getData());
-            } catch (FileNotFoundException e) {
-                Log.error(TAG, "onActivityResult() error: " + e);
-                e.printStackTrace();
-                return;
+                OutputStream outputStream = null;
+                try {
+                    outputStream = getContentResolver().openOutputStream(data.getData());
+                } catch (FileNotFoundException e) {
+                    Log.error(TAG, "onActivityResult() error: " + e);
+                    e.printStackTrace();
+                    return;
+                }
+
+                BackupManager backupManager = new BackupManager();
+                boolean result = backupManager.saveDataAsPlainText(outputStream, this);
+                if (result) {
+                    GoodUtils.showToast(this, R.string.result_success);
+                } else {
+                    GoodUtils.showToast(this, R.string.result_failed);
+                }
+
+            } else if (requestCode == REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
+
+                Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES");
+
+                OutputStream outputStream = null;
+                try {
+                    outputStream = getContentResolver().openOutputStream(data.getData());
+                } catch (FileNotFoundException e) {
+                    Log.error(TAG, "onActivityResult() error: " + e);
+                    e.printStackTrace();
+                    return;
+                }
+
+                BackupManager backupManager = new BackupManager();
+                boolean result = backupManager.backupDataAsEncryptedText(outputStream, this);
+                if (result) {
+                    GoodUtils.showToast(this, R.string.result_success);
+                } else {
+                    GoodUtils.showToast(this, R.string.result_failed);
+                }
+
+                backupManager.setPassword(null);
+
+            } else if (requestCode == REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
+
+                Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE");
+
+                InputStream inputStream = null;
+                try {
+                    inputStream = getContentResolver().openInputStream(data.getData());
+                } catch (FileNotFoundException e) {
+                    Log.error(TAG, "onActivityResult() error: " + e);
+                    e.printStackTrace();
+                    return;
+                }
+
+                StringBuilder content = new StringBuilder();
+
+                try {
+
+                    byte[] buffer = new byte[inputStream.available()];
+
+                    while (inputStream.read(buffer) != -1) {
+                        content.append(new String(buffer));
+                    }
+
+                } catch (Exception e) {
+                    Log.error(TAG, "onActivityResult() exception while reading the file: " + e);
+                    e.printStackTrace();
+                    return;
+                } finally {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                BackupManager backupManager = new BackupManager();
+                boolean result = backupManager.restoreData(content.toString(), this);
+                if (result) {
+                    GoodUtils.showToast(this, R.string.result_success);
+                } else {
+                    GoodUtils.showToast(this, R.string.result_failed);
+                }
+
             }
 
-            BackupManager backupManager = new BackupManager();
-            backupManager.backupData(outputStream, this);
         }
-
-    }
 
 }

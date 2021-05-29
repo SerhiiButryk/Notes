@@ -48,7 +48,7 @@ public class ChangePasswordDialogUI extends DialogFragment {
         TextView title = dialogView.findViewById(R.id.title_dialog);
         title.setText(inflater.getContext().getString(R.string.change_password_title_dialog));
 
-        oldPassword = dialogView.findViewById(R.id.old_password_field);
+        oldPassword = dialogView.findViewById(R.id.edit_text_field);
         oldPassword.requestFocus();
 
         newPassword = dialogView.findViewById(R.id.new_password_field);
