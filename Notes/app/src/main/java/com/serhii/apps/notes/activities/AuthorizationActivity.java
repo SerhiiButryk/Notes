@@ -1,5 +1,6 @@
 package com.serhii.apps.notes.activities;
 
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.Nullable;
@@ -11,8 +12,8 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.EventService;
 import com.serhii.apps.notes.control.NativeBridge;
+import com.serhii.apps.notes.control.base.IAuthorizeService;
 import com.serhii.apps.notes.control.types.AuthResult;
 import com.serhii.apps.notes.control.types.AuthorizeType;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
@@ -32,10 +33,13 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
 
     private AuthorizationViewModel authorizationViewModel;
     private FragmentManager fragmentManager;
-    private NativeBridge nativeBridge = new NativeBridge();
+    private final NativeBridge nativeBridge = new NativeBridge();
+    private IAuthorizeService authorizeService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.info(TAG, "onCreate() IN");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
 
@@ -47,34 +51,38 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         showLoginFragment(savedInstanceState);
 
         authorizationViewModel = new ViewModelProvider(this).get(AuthorizationViewModel.class);
+        authorizeService = authorizationViewModel.getAuthorizeService();
 
         setupObservers();
         initNative();
 
-        Log.info(TAG, "onCreate() - fragments in the back stack " + fragmentManager.getBackStackEntryCount());
+        Log.info(TAG, "onCreate() OUT");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        Log.info(TAG, "onResume() - fragments in the back stack " + fragmentManager.getBackStackEntryCount());
+        Log.info(TAG, "onResume()");
     }
 
     @Override
     public void onBackPressed() {
-        Log.info(TAG, "onBackPressed() - fragments in the back stack " + fragmentManager.getBackStackEntryCount());
+        Log.info(TAG, "onBackPressed()");
 
+        // Allow user to go back to the Login UI
+        // If there is one fragment in the stack then Registration UI is displayed
         if (fragmentManager.getBackStackEntryCount() == 1) {
-            moveTaskToBack(true);
-        } else {
             super.onBackPressed();
+        } else {
+            moveTaskToBack(true);
         }
+
     }
 
     @Override
     public void onShowRegistrationUI() {
-        addFragment(new RegisterFragment(), FRAGMENT_TAG);
+        addFragment(new RegisterFragment(), FRAGMENT_TAG, true);
     }
 
     private void showLoginFragment(Bundle savedInstanceState) {
@@ -88,13 +96,13 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
 
                 BlockFragment blockFragment = new BlockFragment();
 
-                addFragment(blockFragment, null);
+                addFragment(blockFragment, null, false);
 
             } else {
 
                 LoginFragment loginFragment = LoginFragment.newInstance();
 
-                addFragment(loginFragment, LoginFragment.FRAGMENT_TAG);
+                addFragment(loginFragment, LoginFragment.FRAGMENT_TAG, false);
             }
 
         }
@@ -108,30 +116,36 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
                 switch (type) {
                     case AUTH_UNLOCK:
                     case AUTH_PASSWORD_LOGIN:
-                        EventService.getInstance().onPasswordLogin(authModel);
+                        authorizeService.onPasswordLogin(authModel);
                         break;
                     case AUTH_REGISTRATION:
-                        EventService.getInstance().onRegistration(authModel);
+                        authorizeService.onRegistration(authModel);
                         break;
                     case AUTH_BIOMETRIC_LOGIN:
-                        EventService.getInstance().onBiometricLogin();
+                        authorizeService.onBiometricLogin();
                         break;
                 }
             }
         });
     }
 
-    private void addFragment(Fragment fragment, String tag) {
+    private void addFragment(Fragment fragment, String tag, boolean shouldSave) {
 
         if (tag != null && fragmentManager.findFragmentByTag(tag) != null) {
             Log.info(TAG, "addFragment() - fragment is already opened");
             return;
         }
 
-        fragmentManager.beginTransaction().replace(R.id.main_layout, fragment, tag)
-                .setReorderingAllowed(true) // Needed for optimization
-                .addToBackStack(null)
-                .commit();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.replace(R.id.main_layout, fragment, tag);
+        transaction.setReorderingAllowed(true); // Needed for optimization
+
+        if (shouldSave) {
+            transaction.addToBackStack(null);
+        }
+
+        transaction.commit();
     }
 
     /**
@@ -155,7 +169,7 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         LoginFragment loginFragment = (LoginFragment) fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG);
         loginFragment.onUserAccountCreated();
 
-        EventService.getInstance().onUserRegistered(this);
+        authorizeService.onUserRegistered(this);
 
         Toast.makeText(this, getString(R.string.toast_registration_done), Toast.LENGTH_SHORT).show();
     }
@@ -191,7 +205,7 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
 
             clearFragmentStack();
 
-            addFragment(new BlockFragment(), null);
+            addFragment(new BlockFragment(), null, false);
 
         } else {
 

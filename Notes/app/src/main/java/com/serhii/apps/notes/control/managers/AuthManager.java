@@ -1,8 +1,10 @@
 package com.serhii.apps.notes.control.managers;
 
+import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.types.AuthorizeType;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.control.types.RequestType;
+import com.serhii.core.security.Hash;
 
 import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 
@@ -17,7 +19,9 @@ public class AuthManager {
 
         if (type == RequestType.REQ_AUTHORIZE && data.getAuthType() == AuthorizeType.AUTH_UNLOCK) {
 
-            requestUnlock(data.getPassword());
+            Hash hash = new Hash();
+
+            requestUnlock(data.getPassword(), hash.hashMD5(new NativeBridge().getUnlockKey()));
 
         } else if (type == RequestType.REQ_AUTHORIZE) {
 
@@ -40,7 +44,7 @@ public class AuthManager {
 
     private native void requestAuthorization(String password, String username);
     private native void requestRegistration(String password, String confirmPassword, String username);
-    private native void requestUnlock(String unlockKey);
+    private native void requestUnlock(String unlockKey, String currentKey);
     private native void requestBiometricLogin();
 
     static {

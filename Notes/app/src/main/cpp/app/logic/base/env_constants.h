@@ -12,11 +12,7 @@ namespace APP
     extern const std::string kUserName;
     extern const std::string kUserLoginAttemptsLeft;
     extern const std::string kIsUserBlocked;
-
-    // Defaults constants
-    extern const int USER_LOGIN_ATTEMPTS_DEFAULT;
-    extern const int IDLE_LOCK_TIMEOUT_DEFAULT;
-    extern const std::string UNLOCK_ACCESSKEY_DEFAULT; // TODO: Temporary, replace this hard-codded value
+    extern const std::string kUnlockKey;
 
     extern const std::string TRUE;
     extern const std::string FALSE;

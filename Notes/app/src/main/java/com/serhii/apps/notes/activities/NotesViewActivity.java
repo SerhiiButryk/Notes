@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.core.log.Log;
 import com.serhii.core.security.impl.crypto.CryptoError;
 import com.serhii.core.utils.GoodUtils;
@@ -44,6 +45,10 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         // Enable unsecured screen content settings
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
+        if (savedInstanceState == null) {
+            addFragment();
+        }
+
         // Start authorization process
         authorizeUser(savedInstanceState);
 
@@ -51,10 +56,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
 
         // Initialize lifecycle aware components
         InactivityManager.getInstance().setLifecycle(this, getLifecycle());
-
-        if (savedInstanceState == null) {
-            addFragment();
-        }
 
         Log.info(TAG, "onCreate()");
     }
@@ -91,6 +92,8 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     protected void onDestroy() {
         Log.info(TAG, "onDestroy()");
         super.onDestroy();
+
+        BackupManager.getInstance().clearNotesViewModelWeakReference();
     }
 
     @Override
@@ -128,6 +131,8 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         });
 
         notesViewModel.updateData();
+
+        BackupManager.getInstance().setNotesViewModelWeakReference(notesViewModel);
     }
 
     @Override
@@ -149,7 +154,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
             args.putString(NoteEditorFragment.ARG_NOTE_ID, NoteEditorFragment.ARG_NOTE_TEMPLATE);
             args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_CREATE);
         } else {
-
+            // Handle open note button click
             if (noteModel.isTemplate(this)) {
                 args.putString(NoteEditorFragment.ARG_NOTE_ID, NoteEditorFragment.ARG_NOTE_TEMPLATE);
             } else {
@@ -167,13 +172,13 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     }
 
     @Override
-    public void onNoteDeleted() {
+    public void onDeleteNote() {
         FragmentManager fm = getSupportFragmentManager();
         fm.popBackStack();
     }
 
     @Override
-    public void onBackPressedClicked() {
+    public void onBackNavigation() {
         FragmentManager fm = getSupportFragmentManager();
         fm.popBackStack();
     }

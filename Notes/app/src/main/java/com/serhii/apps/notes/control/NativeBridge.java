@@ -12,6 +12,8 @@ import com.serhii.core.security.Cipher;
 import com.serhii.core.security.Hash;
 import com.serhii.core.security.impl.crypto.Result;
 
+import java.util.UUID;
+
 import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 
 /**
@@ -20,7 +22,8 @@ import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 
 public class NativeBridge {
 
-    private static final String LOG_LIMIT_MARKER = "LIMIT";
+    private static final String LOG_LIMIT_MARKER = "SSDD"; // Random value
+    private static final String LOG_UNLOCK_KEY_MARKER = "AALL"; // Random value
 
     public String getUserName() {
         return _getUserName();
@@ -46,10 +49,6 @@ public class NativeBridge {
 
     public boolean isAppBlocked() {
         return _isAppBlocked();
-    }
-
-    public String getUnlockKey() {
-        return _getUnlockKey();
     }
 
     public void setLoginLimitFromDefault(Context context) {
@@ -94,6 +93,7 @@ public class NativeBridge {
         cipher.selectKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS);
         Result result = cipher.decryptSymmetric(encLimit, iv);
 
+        // Return result
         return Integer.parseInt(result.getMessage());
     }
 
@@ -103,6 +103,52 @@ public class NativeBridge {
         String logLimitDefault = context.getString(R.string.preference_login_limit_default);
 
         return sharedPreferences.getString(context.getString(R.string.preference_login_limit_key), logLimitDefault);
+    }
+
+    public void createUnlockKey() {
+        String unlockKey = UUID.randomUUID().toString();
+
+        // Take the first 8 characters
+        unlockKey = unlockKey.substring(0, unlockKey.indexOf('-'));
+
+        // Encrypt value
+        Cipher cipher = new Cipher();
+        cipher.selectKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS);
+        Result result = cipher.encryptSymmetric(unlockKey);
+
+        String iv = new String(Base64.encode(result.getIv(), Base64.NO_WRAP));
+
+        String encMessage = result.getMessage() + LOG_UNLOCK_KEY_MARKER + iv;
+
+        _setUnlockKey(encMessage);
+    }
+
+    public String getUnlockKey() {
+
+        String unlockKey = _getUnlockKey();
+
+        // Decrypt value
+        String encLimit = unlockKey.split(LOG_UNLOCK_KEY_MARKER)[0];
+        String encIv = unlockKey.split(LOG_UNLOCK_KEY_MARKER)[1];
+
+        byte[] iv = Base64.decode(encIv.getBytes(), Base64.NO_WRAP);
+
+        Cipher cipher = new Cipher();
+        cipher.selectKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS);
+        Result result = cipher.decryptSymmetric(encLimit, iv);
+
+        // Return result
+        return result.getMessage();
+    }
+
+    public boolean checkPasswordRequirements(String password) {
+
+        if (password == null || password.isEmpty())
+            return false;
+
+        // TODO: Check password strength
+
+        return true;
     }
 
     private native String _getUserName();
@@ -119,6 +165,7 @@ public class NativeBridge {
     private native boolean _isAppBlocked();
 
     private native String _getUnlockKey();
+    private native void _setUnlockKey(String unlockKey);
 
     static {
         System.loadLibrary(RUNTIME_LIBRARY);

@@ -14,7 +14,7 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_r
         (JNIEnv *, jobject, jstring, jstring, jstring);
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestUnlock
-        (JNIEnv *, jobject, jstring);
+        (JNIEnv *, jobject, jstring, jstring);
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestBiometricLogin
         (JNIEnv *, jobject);

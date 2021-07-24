@@ -52,14 +52,16 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_r
   }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestUnlock
-        (JNIEnv* env, jobject, jstring junlockKey)
+        (JNIEnv* env, jobject, jstring junlockKey, jstring jcurrentKey)
 {
       Log::Info("JNI", " %s IN", __FUNCTION__ );
 
       JString unlockKey(env, junlockKey);
+      JString currentKey(env, jcurrentKey);
 
       Event event(SYSTEM_EVENT::UNLOCK);
       event.putData(UNLOCK_KEY, unlockKey);
+      event.putData(CURRENT_UNLOCK_KEY, currentKey);
 
       SystemEventReceiver::getInstance()->forward(event);
 

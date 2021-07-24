@@ -7,12 +7,12 @@ import com.serhii.core.security.impl.crypto.CryptoOpenssl;
 import com.serhii.core.security.impl.hash.HashAlgorithms;
 import com.serhii.core.security.impl.crypto.SecureStore;
 
+import static com.serhii.core.security.Cipher.CRYPTO_PROVIDER_ANDROID;
+import static com.serhii.core.security.Cipher.CRYPTO_PROVIDER_OPENSSL;
+
 public class CoreEngine implements Components {
 
     private static String RUNTIME_LIBRARY = "core";
-
-    public static final String CRYPTO_PROVIDER_OPENSSL = "openssl";
-    public static final String CRYPTO_PROVIDER_ANDROID = "android";
 
     private static CoreEngine instance;
 

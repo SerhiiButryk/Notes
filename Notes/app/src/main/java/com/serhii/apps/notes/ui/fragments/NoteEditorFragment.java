@@ -105,7 +105,7 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
                     InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
 
-                    interaction.onBackPressedClicked();
+                    interaction.onBackNavigation();
                 }
             }
         });
@@ -285,7 +285,7 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
         if (notesViewModel.deleteNote(noteId)) {
             GoodUtils.showToast(getActivity(), R.string.toast_action_deleted_message);
             if (interaction != null) {
-                interaction.onNoteDeleted();
+                interaction.onDeleteNote();
             }
         }
 
@@ -306,8 +306,8 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
     }
 
     public interface EditorNoteInteraction {
-        void onBackPressedClicked();
-        void onNoteDeleted();
+        void onBackNavigation();
+        void onDeleteNote();
     }
 
 }

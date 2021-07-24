@@ -56,7 +56,6 @@ namespace APP
 
         }
 
-        // TODO: throw exception ?
         return std::string();
     }
 }

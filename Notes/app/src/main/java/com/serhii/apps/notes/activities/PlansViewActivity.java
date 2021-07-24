@@ -18,6 +18,13 @@ public class PlansViewActivity extends AppCompatActivity {
         // Enable unsecured screen content settings
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
+        if (savedInstanceState == null) {
+            addFragment();
+        }
+
+    }
+
+    private void addFragment() {
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true) // Needed for optimization
                 .add(R.id.plans_container_layout, new PlansFragment())

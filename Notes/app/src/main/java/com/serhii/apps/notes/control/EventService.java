@@ -62,6 +62,12 @@ public class EventService implements IAuthorizeService {
         authManager.handleRequest(RequestType.REQ_BIOMETRIC_LOGIN, null);
     }
 
+    /**
+     *  Handle user registered event
+     *
+     *  User account is created, do one time application setup
+     */
+    @Override
     public void onUserRegistered(Context context) {
         Log.info(TAG, "onUserRegistered()");
 
@@ -69,6 +75,8 @@ public class EventService implements IAuthorizeService {
         Cipher cipher = new Cipher();
         cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, false);
         cipher.createKey(AppConstants.SECRET_KEY_PASSWORD_ENC_ALIAS, false);
+
+        new NativeBridge().createUnlockKey();
 
         // Set login password limit
         new NativeBridge().setLoginLimitFromDefault(context);

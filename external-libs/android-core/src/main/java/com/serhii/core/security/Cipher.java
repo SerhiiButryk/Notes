@@ -7,11 +7,14 @@ import com.serhii.core.security.impl.crypto.Result;
 /**
  *  Class provides symmetric encryption functionality.
  *
- *  Note: You can use OpenSSL or Android implementation for symmetric encryption.
+ *  Note: You choose between OpenSSL or Android implementation.
  */
 public class Cipher {
 
     private CryptoProvider provider;
+
+    public static final String CRYPTO_PROVIDER_OPENSSL = "openssl";
+    public static final String CRYPTO_PROVIDER_ANDROID = "android";
 
     public Cipher() {
         CoreEngine.getInstance().configure(this);

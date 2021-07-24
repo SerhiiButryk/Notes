@@ -13,8 +13,8 @@ namespace {
 
 namespace MYLIB {
 
-    int CryptoUtils::encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-                unsigned char *iv, unsigned char *ciphertext)
+    int CryptoUtils::encryptSymmetric(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+                                      unsigned char *iv, unsigned char *ciphertext)
     {
         EVP_CIPHER_CTX *ctx;
 
@@ -75,8 +75,8 @@ namespace MYLIB {
         return ciphertext_len;
     }
 
-    int CryptoUtils::decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-                unsigned char *iv, unsigned char *plaintext)
+    int CryptoUtils::decryptSymmetric(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+                                      unsigned char *iv, unsigned char *plaintext)
     {
         EVP_CIPHER_CTX *ctx;
 

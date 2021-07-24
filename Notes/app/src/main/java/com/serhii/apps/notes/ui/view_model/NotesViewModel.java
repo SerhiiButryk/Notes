@@ -14,6 +14,10 @@ import com.serhii.core.security.impl.crypto.CryptoError;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  View model for NotesViewActivity, NoteEditorFragment and NoteViewFragment
+ */
+
 public class NotesViewModel extends ViewModel {
 
     private static final String TAG = NotesViewModel.class.getSimpleName();

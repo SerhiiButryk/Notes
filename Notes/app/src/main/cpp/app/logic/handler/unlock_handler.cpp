@@ -18,8 +18,9 @@ namespace APP
     void UnlockHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
     {
         std::string unlockKey = event.getData(UNLOCK_KEY);
+        std::string currentUnlockKey = event.getData(CURRENT_UNLOCK_KEY);
 
-        if (unlockKey != UNLOCK_ACCESSKEY_DEFAULT)
+        if (unlockKey != currentUnlockKey)
         {
             ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::UNLOCK_KEY_INVALID);
 

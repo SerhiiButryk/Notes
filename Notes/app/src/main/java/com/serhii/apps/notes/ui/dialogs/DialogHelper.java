@@ -1,6 +1,7 @@
 package com.serhii.apps.notes.ui.dialogs;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,6 +16,9 @@ public class DialogHelper {
 
     private static final String CPD_DIALOG_TAG =  "Change password dialog";
     private static final String SPD_DIALOG_TAG =  "Set password dialog";
+
+    public static final int ALERT_DIALOG_TYPE_BACKUP_ERROR = 101;
+    public static final int ALERT_DIALOG_TYPE_PASSWORD_IS_WEAK = 102;
 
     public static void showChangePasswordDialog(FragmentActivity activity) {
         ChangePasswordDialogUI dialog = new ChangePasswordDialogUI();
@@ -54,13 +58,13 @@ public class DialogHelper {
         builder.create().show();
     }
 
-    public static void showAlertDialog(int type, Activity activity) {
+    public static void showAlertDialog(int type, Context context) {
 
-        AlertDialogHelper dialog = new AlertDialogHelper(type, activity);
+        AlertDialogHelper dialog = new AlertDialogHelper(type, context);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setPositiveButton(activity.getResources().getString(R.string.kbtn_ok), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(context.getResources().getString(R.string.kbtn_ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 // no-op

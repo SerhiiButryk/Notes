@@ -9,11 +9,11 @@ namespace MYLIB
 {
 
     /**
-     *  Class handles low level read/write operations to file system
+     *  Class handles low level read/write operations to file system.
      *
      *  Note: Read/Write from/to file as key-value pair data.
      *
-     *  Also note that system root directory path should be set before accessing the file storage
+     *  Also note that system root directory path should be set before accessing the file storage.
      */
     class FileSystem
     {

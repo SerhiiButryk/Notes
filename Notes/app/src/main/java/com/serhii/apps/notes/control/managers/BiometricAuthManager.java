@@ -70,6 +70,7 @@ public class BiometricAuthManager {
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle(context.getString(R.string.biometric_prompt_title))
                 .setSubtitle(context.getString(R.string.biometric_prompt_subtitle))
+                // User can authenticate with device PIN/Password
                 .setDeviceCredentialAllowed(true)
                 .build();
 
@@ -104,7 +105,6 @@ public class BiometricAuthManager {
     }
 
     public interface OnAuthenticateListener {
-
         void onSuccess();
     }
 

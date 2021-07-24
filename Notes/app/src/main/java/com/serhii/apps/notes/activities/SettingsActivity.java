@@ -1,17 +1,16 @@
 package com.serhii.apps.notes.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
-import androidx.databinding.DataBindingUtil;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.managers.BackupManager;
@@ -46,21 +45,30 @@ public class SettingsActivity extends AppCompatActivity {
 
         initBinding();
 
-        getSupportFragmentManager().beginTransaction()
-                .setReorderingAllowed(true) // Needed for optimization
-                .replace(R.id.container, new SettingsFragment(), SETTINGS_FRAGMENT_TAG)
-                .commit();
-
-        setSupportActionBar(toolbar);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(getString(R.string.preference_title));
+        if (savedInstanceState == null) {
+            addFragment();
         }
+
+        setActionBar();
 
         // Lifecycle aware component
         InactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
+    }
+
+    private void addFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true) // Needed for optimization
+                .replace(R.id.container, new SettingsFragment(), SETTINGS_FRAGMENT_TAG)
+                .commit();
+    }
+
+    private void setActionBar() {
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(getString(R.string.preference_title));
+        }
     }
 
     @Override
@@ -102,91 +110,99 @@ public class SettingsActivity extends AppCompatActivity {
 
                 Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES");
 
-                OutputStream outputStream = null;
-                try {
-                    outputStream = getContentResolver().openOutputStream(data.getData());
-                } catch (FileNotFoundException e) {
-                    Log.error(TAG, "onActivityResult() error: " + e);
-                    e.printStackTrace();
-                    return;
-                }
-
-                BackupManager backupManager = new BackupManager();
-                boolean result = backupManager.saveDataAsPlainText(outputStream, this);
-                if (result) {
-                    GoodUtils.showToast(this, R.string.result_success);
-                } else {
-                    GoodUtils.showToast(this, R.string.result_failed);
-                }
+                extractNotes(data);
 
             } else if (requestCode == REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
 
                 Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES");
 
-                OutputStream outputStream = null;
-                try {
-                    outputStream = getContentResolver().openOutputStream(data.getData());
-                } catch (FileNotFoundException e) {
-                    Log.error(TAG, "onActivityResult() error: " + e);
-                    e.printStackTrace();
-                    return;
-                }
-
-                BackupManager backupManager = new BackupManager();
-                boolean result = backupManager.backupDataAsEncryptedText(outputStream, this);
-                if (result) {
-                    GoodUtils.showToast(this, R.string.result_success);
-                } else {
-                    GoodUtils.showToast(this, R.string.result_failed);
-                }
-
-                backupManager.setPassword(null);
+                backupNotes(data);
 
             } else if (requestCode == REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
 
                 Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE");
 
-                InputStream inputStream = null;
-                try {
-                    inputStream = getContentResolver().openInputStream(data.getData());
-                } catch (FileNotFoundException e) {
-                    Log.error(TAG, "onActivityResult() error: " + e);
-                    e.printStackTrace();
-                    return;
-                }
-
-                StringBuilder content = new StringBuilder();
-
-                try {
-
-                    byte[] buffer = new byte[inputStream.available()];
-
-                    while (inputStream.read(buffer) != -1) {
-                        content.append(new String(buffer));
-                    }
-
-                } catch (Exception e) {
-                    Log.error(TAG, "onActivityResult() exception while reading the file: " + e);
-                    e.printStackTrace();
-                    return;
-                } finally {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                BackupManager backupManager = new BackupManager();
-                boolean result = backupManager.restoreData(content.toString(), this);
-                if (result) {
-                    GoodUtils.showToast(this, R.string.result_success);
-                } else {
-                    GoodUtils.showToast(this, R.string.result_failed);
-                }
+                restoreNotes(data);
 
             }
 
+        }
+
+        private void extractNotes(Intent data) {
+            OutputStream outputStream = null;
+            try {
+                outputStream = getContentResolver().openOutputStream(data.getData());
+            } catch (FileNotFoundException e) {
+                Log.error(TAG, "extractNotes() error: " + e);
+                e.printStackTrace();
+                return;
+            }
+
+            boolean result = BackupManager.getInstance().saveDataAsPlainText(outputStream, this);
+            if (result) {
+                GoodUtils.showToast(this, R.string.result_success);
+            } else {
+                GoodUtils.showToast(this, R.string.result_failed);
+            }
+        }
+
+        private void backupNotes(Intent data) {
+            OutputStream outputStream = null;
+            try {
+                outputStream = getContentResolver().openOutputStream(data.getData());
+            } catch (FileNotFoundException e) {
+                Log.error(TAG, "backupNotes() error: " + e);
+                e.printStackTrace();
+                return;
+            }
+
+            boolean result = BackupManager.getInstance().backupData(outputStream, this);
+            if (result) {
+                GoodUtils.showToast(this, R.string.result_success);
+            } else {
+                GoodUtils.showToast(this, R.string.result_failed);
+            }
+
+        }
+
+        private void restoreNotes(Intent data) {
+            InputStream inputStream = null;
+            try {
+                inputStream = getContentResolver().openInputStream(data.getData());
+            } catch (FileNotFoundException e) {
+                Log.error(TAG, "restoreNotes() error: " + e);
+                e.printStackTrace();
+                return;
+            }
+
+            StringBuilder content = new StringBuilder();
+
+            try {
+
+                byte[] buffer = new byte[inputStream.available()];
+
+                while (inputStream.read(buffer) != -1) {
+                    content.append(new String(buffer));
+                }
+
+            } catch (Exception e) {
+                Log.error(TAG, "restoreNotes() exception while reading the file: " + e);
+                e.printStackTrace();
+                return;
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            boolean result = BackupManager.getInstance().restoreData(content.toString(), this);
+            if (result) {
+                GoodUtils.showToast(this, R.string.result_success);
+            } else {
+                GoodUtils.showToast(this, R.string.result_failed);
+            }
         }
 
 }

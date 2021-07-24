@@ -2,8 +2,8 @@ package com.serhii.apps.notes;
 
 import android.app.Application;
 
-import com.serhii.core.log.Log;
 import com.serhii.apps.notes.common.AppConstants;
+import com.serhii.core.log.Log;
 
 public class Notes extends Application {
 

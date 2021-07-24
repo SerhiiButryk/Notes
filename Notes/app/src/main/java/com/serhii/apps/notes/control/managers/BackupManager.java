@@ -6,14 +6,20 @@ import android.content.Intent;
 
 import com.serhii.apps.notes.database.NotesDatabaseProvider;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
+import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.core.log.Log;
+import com.serhii.core.security.Cipher;
+import com.serhii.core.security.impl.crypto.Result;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.serhii.core.security.Cipher.CRYPTO_PROVIDER_OPENSSL;
 
 public class BackupManager {
 
@@ -23,28 +29,43 @@ public class BackupManager {
     public static final int REQUEST_CODE_BACKUP_NOTES = 2;
     public static final int REQUEST_CODE_OPEN_BACKUP_FILE = 3;
 
-    public static final int ALERT_DIALOG_TYPE = 101;
-
     private static final String TEXT_FILE_TYPE = "text/plain";
     private static final String FILE_NAME_EXTRACT_DATA = "NotesExtracted.txt";
     private static final String FILE_NAME_BACKUP = "NotesBackup.txt";
 
-    // TODO: find better way to save it
-    // Password which is used to encrypt / decrypt notes for backup
-    private static String userPassword;
+    private WeakReference<NotesViewModel> notesViewModelWeakReference;
+
+    private static BackupManager instance;
+
+    private BackupManager() {}
+
+    public static BackupManager getInstance() {
+        if (instance == null) {
+            instance = new BackupManager();
+        }
+        return instance;
+    }
+
+    public void setNotesViewModelWeakReference(NotesViewModel notesViewModel) {
+        notesViewModelWeakReference = new WeakReference<>(notesViewModel);
+    }
+
+    public void clearNotesViewModelWeakReference() {
+        notesViewModelWeakReference.clear();
+    }
 
     public void openDirectoryChooserForExtractData(Activity activity) {
 
         Log.info(TAG, "openDirectoryChooser()");
 
-        activity.startActivityForResult(createIntent(), REQUEST_CODE_EXTRACT_NOTES);
+        activity.startActivityForResult(createIntent(FILE_NAME_EXTRACT_DATA), REQUEST_CODE_EXTRACT_NOTES);
     }
 
     public void openDirectoryChooserForBackup(Activity activity) {
 
         Log.info(TAG, "openDirectoryChooserForBackup()");
 
-        activity.startActivityForResult(createIntent(), REQUEST_CODE_BACKUP_NOTES);
+        activity.startActivityForResult(createIntent(FILE_NAME_BACKUP), REQUEST_CODE_BACKUP_NOTES);
     }
 
     public void openBackUpFile(Activity activity) {
@@ -71,11 +92,12 @@ public class BackupManager {
                 StringBuilder builder = new StringBuilder();
 
                 for (NoteModel note : notes) {
-                    builder.append("***********")
+                    builder.append("*********** ")
                             .append(note.getTitle().trim())
-                            .append('\n')
+                            .append(" ***********")
+                            .append("\n")
                             .append(note.getNote().trim())
-                            .append("***********");
+                            .append("\n");
                 }
 
                 String data = builder.toString();
@@ -102,14 +124,7 @@ public class BackupManager {
         return false;
     }
 
-    // TODO: Add encryption
-    public boolean backupDataAsEncryptedText(final OutputStream outputStream, Context context) {
-
-// TODO: Uncomment when this is tested
-//        if (userPassword == null || userPassword.isEmpty()) {
-//            Log.error(TAG, "backupDataAsEncryptedText() password is empty, return");
-//            return false;
-//        }
+    public boolean backupData(final OutputStream outputStream, Context context) {
 
         NotesDatabaseProvider notesDatabaseProvider = new NotesDatabaseProvider(context);
 
@@ -173,19 +188,19 @@ public class BackupManager {
             notesDatabaseProvider.addRecord(new NoteModel(note.note, note.title));
         }
 
+        if (notesViewModelWeakReference != null && notesViewModelWeakReference.get() != null) {
+            notesViewModelWeakReference.get().updateData();
+        }
+
         return true;
     }
 
-    public void setPassword(String password) {
-        userPassword = password;
-    }
-
-    private Intent createIntent() {
+    private Intent createIntent(final String fileName) {
         // Show directory chooser
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(TEXT_FILE_TYPE);
-        intent.putExtra(Intent.EXTRA_TITLE, FILE_NAME_EXTRACT_DATA);
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
         return intent;
     }
 

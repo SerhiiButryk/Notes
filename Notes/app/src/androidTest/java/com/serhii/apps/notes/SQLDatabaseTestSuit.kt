@@ -7,13 +7,12 @@ import com.serhii.apps.notes.database.NotesDatabaseProvider
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.Cipher
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class SQLDatabaseTestSuit {
 
     @Before

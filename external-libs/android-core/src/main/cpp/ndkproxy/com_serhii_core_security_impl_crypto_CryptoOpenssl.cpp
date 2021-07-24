@@ -28,7 +28,8 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     std::unique_ptr<unsigned char> ciphertext(new unsigned char[plaintext.getSize()]{ 0 } );
 
     /* Encrypt the plaintext */
-    size_t ciphertext_len = CryptoUtils::encrypt(plaintext, plaintext.getSize(), key, iv, ciphertext.get());
+    size_t ciphertext_len = CryptoUtils::encryptSymmetric(plaintext, plaintext.getSize(), key, iv,
+                                                          ciphertext.get());
 
     std::string res = Base64::encode(ciphertext.get(), ciphertext_len);
 
@@ -59,7 +60,8 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     int decryptedtext_len;
 
     /* Decrypt the ciphertext */
-    decryptedtext_len = CryptoUtils::decrypt((unsigned char*) rez.c_str(), rez.length(), key, iv, decryptedtext.get());
+    decryptedtext_len = CryptoUtils::decryptSymmetric((unsigned char *) rez.c_str(), rez.length(),
+                                                      key, iv, decryptedtext.get());
 
     /* Add a NULL terminator. We are expecting printable text */
     decryptedtext.get()[decryptedtext_len] = '\0';

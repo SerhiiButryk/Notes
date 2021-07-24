@@ -2,7 +2,6 @@ package com.serhii.apps.notes.ui.fragments;
 
 import android.os.Bundle;
 
-import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -11,12 +10,9 @@ import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.database.NotesDatabaseProvider;
-import com.serhii.apps.notes.ui.SetPasswordDialogUI;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
-
-import static com.serhii.apps.notes.control.managers.BackupManager.ALERT_DIALOG_TYPE;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -25,7 +21,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private Preference loginAttempts;
 
     private final NativeBridge nativeBridge = new NativeBridge();
-    private final BackupManager backupManager = new BackupManager();
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -88,7 +83,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     return true;
                 }
 
-                backupManager.openDirectoryChooserForExtractData(getActivity());
+                BackupManager.getInstance().openDirectoryChooserForExtractData(getActivity());
                 return true;
             }
         });
@@ -98,39 +93,25 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         backupNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-// TODO: Uncomment when this is tested
-//                DialogHelper.showSetPasswordDialog(getActivity(), new SetPasswordDialogUI.OnPasswordSetListener() {
-//                    @Override
-//                    public void onPasswordSet(String password) {
-//
-//                        Log.info(TAG, "onPasswordSet()");
-//
-//                        if (!isDataAvailable()) {
-//                            return;
-//                        }
-//
-//                        // TODO: Find better way to save password
-//                        backupManager.setPassword(password);
-//
-//                        backupManager.openDirectoryChooserForBackup(getActivity());
-//                    }
-//                });
 
-                backupManager.openDirectoryChooserForBackup(getActivity());
+                if (!isDataAvailable()) {
+                    return true;
+                }
+
+                BackupManager.getInstance().openDirectoryChooserForBackup(getActivity());
 
                 return false;
             }
         });
 
         Preference unlockNote = findPreference(getString(R.string.preference_unlock_note_key));
-        unlockNote.setSummary(getString(R.string.preference_unlock_note_decs) + nativeBridge.getUnlockKey());
+        unlockNote.setSummary(nativeBridge.getUnlockKey());
 
         Preference restoreNotes = findPreference(getString(R.string.preference_restore_note_key));
         restoreNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                BackupManager backupManager = new BackupManager();
-                backupManager.openBackUpFile(getActivity());
+                BackupManager.getInstance().openBackUpFile(getActivity());
                 return true;
             }
         });
@@ -142,7 +123,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         // Check if there is data to extract
         if (notesDatabaseProvider.getRecordsCount() == 0) {
-            DialogHelper.showAlertDialog(ALERT_DIALOG_TYPE, getActivity());
+            DialogHelper.showAlertDialog(DialogHelper.ALERT_DIALOG_TYPE_BACKUP_ERROR, getActivity());
             Log.error(TAG, "isDataAvailable() no data available");
             return false;
         }

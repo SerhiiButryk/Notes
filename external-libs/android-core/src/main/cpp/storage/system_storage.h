@@ -7,7 +7,7 @@ namespace MYLIB
 {
 
     /**
-     *  Class provides functionality to save and retrieve data from a file
+     *  Class provides functionality to save and retrieve data from a file.
      */
     class SystemStorage
     {

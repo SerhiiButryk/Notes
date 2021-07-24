@@ -3,15 +3,19 @@ package com.serhii.core
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.serhii.core.log.Log
 import com.serhii.core.security.Cipher
+import com.serhii.core.security.Cipher.CRYPTO_PROVIDER_OPENSSL
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import com.serhii.core.security.impl.crypto.Result
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
 
 @RunWith(AndroidJUnit4::class)
-class CryptoTestSuit {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+class CryptoTestSuite {
 
     @Before
     fun setup() {
@@ -26,15 +30,18 @@ class CryptoTestSuit {
 
         Log.info(TAG, "test01_SimpleEncryptDecrypt() IN")
 
-        val cipher = Cipher(CoreEngine.CRYPTO_PROVIDER_OPENSSL)
+        var cipher: Cipher? = Cipher(CRYPTO_PROVIDER_OPENSSL)
         val message = "The quick brown fox jumps over the lazy dog"
         val key = "01234567890123456789012345678901"
         val iv = "0123456789012345"
 
         // Encrypt message
-        var result = cipher.encryptSymmetricWithKey(message, key, iv.toByteArray())
+        var result = cipher!!.encryptSymmetricWithKey(message, key, iv.toByteArray())
 
         Assert.assertFalse("Failed to encrypt", result.message.isEmpty())
+
+        // Using new object
+        cipher = Cipher(CRYPTO_PROVIDER_OPENSSL)
 
         // Decrypt message
         result = cipher.decryptSymmetricWithKey(result.message, key, iv.toByteArray())
@@ -80,10 +87,10 @@ class CryptoTestSuit {
     }
 
     companion object {
-        val TAG = CryptoTestSuit::class.java.simpleName
+        val TAG: String = CryptoTestSuite::class.java.simpleName
 
-        val SECRET_KET_TEST_A = "Key1"
-        val SECRET_KET_TEST_B = "Key2"
+        const val SECRET_KET_TEST_A = "Key1"
+        const val SECRET_KET_TEST_B = "Key2"
     }
 
 }

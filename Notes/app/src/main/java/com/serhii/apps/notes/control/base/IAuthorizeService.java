@@ -1,5 +1,7 @@
 package com.serhii.apps.notes.control.base;
 
+import android.content.Context;
+
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 
 /**
@@ -13,5 +15,7 @@ public interface IAuthorizeService {
     void onRegistration(AuthModel model);
 
     void onBiometricLogin();
+
+    void onUserRegistered(Context context);
 
 }
