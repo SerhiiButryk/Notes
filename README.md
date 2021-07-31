@@ -34,9 +34,3 @@ The interface is simple and easy.
 <img src="images/screenshot_3.png" height="400"> <img src="images/screenshot_4.png" height="400"> 
 <img src="images/screenshot_5.png" height="400"> <img src="images/screenshot_6.png" height="400">
 <img src="images/screenshot_7.png" height="400">
-
-# UML class diagram
-
-Skeleton of sender/received mechanism of event handling model between Java and native code layer
-
-<img src="images/diagram.png" height="400">
