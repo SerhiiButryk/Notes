@@ -1,4 +1,4 @@
-# Notes
+# Notes application for Android
 
 # Overview
 
