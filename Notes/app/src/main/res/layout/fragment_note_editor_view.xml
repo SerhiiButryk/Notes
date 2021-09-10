@@ -62,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/title_note"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="@+id/note_text"
                 app:layout_constraintStart_toStartOf="@+id/note_text"
                 app:layout_constraintTop_toBottomOf="@id/indicator"
@@ -87,7 +87,7 @@
                 android:importantForAutofill="no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title_note" />
+                app:layout_constraintTop_toBottomOf="@+id/date_time_view" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
