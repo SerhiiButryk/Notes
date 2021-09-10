@@ -51,7 +51,9 @@ public class BackupManager {
     }
 
     public void clearNotesViewModelWeakReference() {
-        notesViewModelWeakReference.clear();
+        if (notesViewModelWeakReference != null) {
+            notesViewModelWeakReference.clear();
+        }
     }
 
     public void openDirectoryChooserForExtractData(Activity activity) {

@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:fontFamily="@font/crete_round"
-        android:maxLines="1"
+        android:maxLines="2"
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_middle"
         tools:text="Title" />
@@ -28,7 +28,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/crete_round"
-        android:maxLines="1"
+        android:maxLines="2"
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_small"
         tools:text="Content" />

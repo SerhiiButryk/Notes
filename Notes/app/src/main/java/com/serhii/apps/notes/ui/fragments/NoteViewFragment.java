@@ -18,6 +18,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +39,8 @@ import java.util.List;
 public class NoteViewFragment extends Fragment implements IViewBindings {
 
     private static final String TAG = NoteViewFragment.class.getSimpleName();
+
+    private static final int NOTES_COLUMN_COUNT = 2;
 
     private FloatingActionButton actionButton;
     private RecyclerView notesRecyclerView;
@@ -88,7 +91,7 @@ public class NoteViewFragment extends Fragment implements IViewBindings {
         });
 
         notesRecyclerView.setAdapter(adapter);
-        notesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        notesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), NOTES_COLUMN_COUNT));
 
         return v;
     }

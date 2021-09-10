@@ -38,7 +38,7 @@
     <string name="kbtn_cancel">Cancel</string>
 
     // Login Activity
-    <string name="title_description">No account yet ? Create one !</string>
+    <string name="title_description">Create your user !</string>
     <string name="login_btn">Login</string>
     <string name="create_account_bnt">Create account</string>
     <string name="usr_psw">Your user password</string>
@@ -48,6 +48,7 @@
     <string name="usr_new_email">Enter your user email</string>
     <string name="title_login">Welcome !</string>
     <string name="title_reg">Registration</string>
+    <string name="login_with_biometric">Login with biometric</string>
 
     // NoteEditor
     <string name="title_note">Enter your note title</string>
@@ -55,8 +56,8 @@
 
     // Default values
     <string name="empty_note_text">Empty</string>
-    <string name="template_note_title">New title</string>
-    <string name="template_short_note">Here will be your short notes</string>
+    <string name="template_note_title">Add your note title</string>
+    <string name="template_short_note">No notes yet</string>
     <string name="empty_string"> </string>
 
     // NoteEditorActivity
@@ -68,6 +69,7 @@
     <string name="toast_action_delete_error_first_note">Can\'t delete a note.</string>
     <string name="toast_action_error_note_is_not_changed">Nothing to save</string>
     <string name="toast_action_error_note_is_empty">Empty note can\'t be saved</string>
+    <string name="toast_action_error_note_nothing_to_clear">Nothing to clear</string>
 
     // Menu
     <string name="delete_note_item">Delete note</string>
@@ -155,8 +157,8 @@
 
     // BlockView
     <string name="block_title">Application is blocked</string>
-    <string name="block_message">Enter access key to unlock your application.</string>
-    <string name="block_hint">Access key</string>
+    <string name="block_message">Enter unlock key to unlock your application.</string>
+    <string name="block_hint">Unlock key</string>
 
     // Biometric prompt
     <string name="biometric_prompt_title">Biometric login</string>
@@ -164,9 +166,11 @@
 
     // Confirm dialog
     <string name="confirm_dialog_delete_note_title">Delete note</string>
-    <string name="confirm_dialog_delete_note_message">Are you sure you want to delete this note ?</string>
+    <string name="confirm_dialog_delete_note_message">Are you sure you want to deletFe this note ?</string>
     <string name="confirm_dialog_save_note_title">Save note</string>
     <string name="confirm_dialog_save_note_message">Are you sure you want to save this note ?</string>
+    <string name="confirm_dialog_clear_note_title">Clear note</string>
+    <string name="confirm_dialog_clear_note_message">Are you sure you want to clear entered note ?</string>
 
     // Errors / Info
     <string name="result_success">Success</string>

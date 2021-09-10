@@ -1,10 +1,11 @@
 package com.serhii.apps.notes.activities;
 
 import android.os.Bundle;
-import android.view.WindowManager;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.ui.fragments.PlansFragment;
+import com.serhii.core.log.Log;
+import com.serhii.core.utils.GoodUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,7 +17,7 @@ public class PlansViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_plans_view);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        Log.info("PlansViewActivity", "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
 
         if (savedInstanceState == null) {
             addFragment();

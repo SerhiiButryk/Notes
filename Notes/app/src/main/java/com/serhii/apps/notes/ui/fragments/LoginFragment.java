@@ -1,14 +1,7 @@
 package com.serhii.apps.notes.ui.fragments;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,19 +9,25 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.serhii.core.security.Hash;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
-import com.serhii.apps.notes.control.types.AuthorizeType;
 import com.serhii.apps.notes.control.managers.BiometricAuthManager;
+import com.serhii.apps.notes.control.types.AuthorizeType;
 import com.serhii.apps.notes.databinding.FragmentLoginViewBinding;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
 import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
+import com.serhii.core.log.Log;
+import com.serhii.core.security.Hash;
 import com.serhii.core.utils.GoodUtils;
 
 public class LoginFragment extends Fragment implements IViewBindings {
@@ -43,7 +42,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
     private Button loginButton;
     private TextView registerAccountBtn;
     private TextView titleLabel;
-    private ImageButton fingerprintBtn;
+    private Button fingerprintBtn;
 
     private BiometricAuthManager biometricAuthManager = new BiometricAuthManager();
     private boolean isFingerprintAvailable;
@@ -98,11 +97,15 @@ public class LoginFragment extends Fragment implements IViewBindings {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        Log.info(TAG, "onCreateView()");
+
         View view = initBinding(inflater, container);
 
         String userName = nativeBridge.getUserName();
 
         if (!userName.isEmpty()) {
+
+            Log.info(TAG, "onCreateView() user exists");
 
             emailField.setText(userName);
             registerAccountBtn.setVisibility(View.GONE);
@@ -112,6 +115,10 @@ public class LoginFragment extends Fragment implements IViewBindings {
                 fingerprintBtn.setVisibility(View.VISIBLE);
             }
 
+        } else {
+            Log.info(TAG, "onCreateView() user doesn't exist");
+
+            fingerprintBtn.setVisibility(View.INVISIBLE);
         }
 
         fingerprintBtn.setOnClickListener(new View.OnClickListener() {
@@ -172,7 +179,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
         loginButton = binding.btnLogin;
         registerAccountBtn = binding.btnRegister;
         titleLabel = binding.title;
-        fingerprintBtn = binding.fingerprintLayout.btnFingerprint;
+        fingerprintBtn = binding.btnLoginBiometric;
 
         return binding.getRoot();
     }

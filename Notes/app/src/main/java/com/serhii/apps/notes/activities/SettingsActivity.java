@@ -41,7 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        Log.info(TAG, "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
 
         initBinding();
 

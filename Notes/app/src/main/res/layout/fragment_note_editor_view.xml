@@ -35,10 +35,14 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/middle_margin">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <EditText
                 android:id="@+id/title_note"
@@ -48,6 +52,7 @@
                 android:hint="@string/title_note"
                 android:importantForAutofill="no"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,8 +63,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/title_note"
                 android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/note_text_scrollview"
-                app:layout_constraintStart_toStartOf="@+id/note_text_scrollview"
+                app:layout_constraintEnd_toEndOf="@+id/note_text"
+                app:layout_constraintStart_toStartOf="@+id/note_text"
                 app:layout_constraintTop_toBottomOf="@id/indicator"
                 tools:text="Last edited: Saturday, 13 June 2020 21:22 PM" />
 
@@ -72,26 +77,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/title_note" />
 
-            <ScrollView
-                android:id="@+id/note_text_scrollview"
+            <EditText
+                android:id="@+id/note_text"
+                style="@style/noteTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/middle_margin"
+                android:layout_marginTop="16dp"
+                android:hint="@string/body_note"
+                android:importantForAutofill="no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/date_time_view">
-
-                <EditText
-                    android:id="@+id/note_text"
-                    style="@style/noteTextStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/body_note"
-                    android:importantForAutofill="no" />
-
-            </ScrollView>
+                app:layout_constraintTop_toBottomOf="@+id/title_note" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
     </LinearLayout>
 
 </layout>

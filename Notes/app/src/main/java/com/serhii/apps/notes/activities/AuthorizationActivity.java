@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.serhii.apps.notes.BuildConfig;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeService;
@@ -23,6 +24,7 @@ import com.serhii.apps.notes.ui.fragments.LoginFragment;
 import com.serhii.apps.notes.ui.fragments.RegisterFragment;
 import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
 import com.serhii.core.log.Log;
+import com.serhii.core.utils.GoodUtils;
 
 import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 import static com.serhii.apps.notes.ui.fragments.RegisterFragment.FRAGMENT_TAG;
@@ -44,7 +46,7 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         setContentView(R.layout.activity_authorization);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        Log.info(TAG, "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
 
         fragmentManager = getSupportFragmentManager();
 

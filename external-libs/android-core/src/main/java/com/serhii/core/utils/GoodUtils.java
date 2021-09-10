@@ -1,10 +1,14 @@
 package com.serhii.core.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Message;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.serhii.core.BuildConfig;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -69,6 +73,17 @@ public class GoodUtils {
      */
     public static void showToast(Context context, int stringId) {
         Toast.makeText(context, context.getString(stringId), Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Enable unsecured screen content settings if it's Release build
+     */
+    public static boolean enableUnsecureScreenProtection(Activity activity) {
+        if (!BuildConfig.DEBUG) {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            return true;
+        }
+        return false;
     }
 
 }

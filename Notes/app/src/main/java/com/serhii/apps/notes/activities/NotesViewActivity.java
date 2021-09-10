@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.serhii.apps.notes.BuildConfig;
 import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.core.log.Log;
 import com.serhii.core.security.impl.crypto.CryptoError;
@@ -43,7 +44,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         setContentView(R.layout.activity_note_view);
 
         // Enable unsecured screen content settings
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        Log.info(TAG, "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
 
         if (savedInstanceState == null) {
             addFragment();

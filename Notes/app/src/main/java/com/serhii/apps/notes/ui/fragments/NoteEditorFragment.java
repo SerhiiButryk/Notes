@@ -209,7 +209,24 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
 
             case R.id.clear_note:
 
-                noteFiled.setText("");
+                /**
+                 * Clears EditTextView
+                 */
+                DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
+                    @Override
+                    public void onOkClicked() {
+                        if (GoodUtils.getText(noteFiled).isEmpty()) {
+                            GoodUtils.showToast(getActivity(), R.string.toast_action_error_note_nothing_to_clear);
+                            return;
+                        }
+                        noteFiled.setText("");
+                    }
+
+                    @Override
+                    public void onCancelClicked() {
+                        // no-op
+                    }
+                }, R.string.confirm_dialog_clear_note_title, R.string.confirm_dialog_clear_note_message);
 
                 return true;
         }

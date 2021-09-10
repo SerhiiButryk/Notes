@@ -45,6 +45,8 @@
     <dimen name="title_size_text">26sp</dimen>
     <dimen name="bottom_text_message_size_text">20sp</dimen>
 
+    <dimen name="biomertric_button_top_margin">6dp</dimen>
+
     // Note editor screen
     <dimen name="padding_layout">16dp</dimen>
     <dimen name="toolbar_height">80dp</dimen>
