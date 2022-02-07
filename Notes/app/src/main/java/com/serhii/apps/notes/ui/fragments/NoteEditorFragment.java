@@ -1,8 +1,15 @@
 package com.serhii.apps.notes.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -151,7 +158,17 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
 
                 String timeDate = note.getTime();
                 if (!timeDate.isEmpty()) {
-                    noteTimeFiled.setText(timeDate);
+                    // TODO: Create helper class for such formatting and move this code away
+                    String startText = getString(R.string.time_date_label);
+                    String label = startText + " " + timeDate;
+
+                    final StyleSpan boldSpan = new StyleSpan(android.graphics.Typeface.BOLD);
+                    Spannable finalText = new SpannableStringBuilder(label);
+                    finalText.setSpan(boldSpan, 0, startText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+                    Spannable buffer = new SpannableString(finalText);
+                    noteTimeFiled.setText(buffer);
+
                     noteTimeFiled.setVisibility(View.VISIBLE);
                 }
 
@@ -171,6 +188,7 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
         inflater.inflate(R.menu.editor_note_menu, menu);
     }
 
+    @SuppressLint("all") // Suppress "Checks use of resource IDs in places requiring constants." warnning
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 

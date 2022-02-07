@@ -1,5 +1,4 @@
 # Ignore non project files
-
 **/.gradle/*
 **/.idea/
 **/.settings/
@@ -9,3 +8,4 @@
 **/build/
 **/gradle/
 **/.vscode/
+**/local.properties

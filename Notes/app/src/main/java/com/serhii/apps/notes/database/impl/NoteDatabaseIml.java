@@ -1,5 +1,6 @@
 package com.serhii.apps.notes.database.impl;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -205,6 +206,7 @@ public class NoteDatabaseIml extends DatabaseImpl<NoteModel> {
         return note;
     }
 
+    @SuppressLint("Range")
     private NoteModel getNote(Cursor c) {
         Log.info(TAG, "getNoteModel()");
         String id = c.getString(c.getColumnIndex(NotesEntry._ID));

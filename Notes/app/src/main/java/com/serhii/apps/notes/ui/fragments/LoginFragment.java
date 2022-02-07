@@ -40,7 +40,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
     private EditText emailField;
     private EditText passwordField;
     private Button loginButton;
-    private TextView registerAccountBtn;
+    private Button registerAccountBtn;
     private TextView titleLabel;
     private Button fingerprintBtn;
 
@@ -103,6 +103,8 @@ public class LoginFragment extends Fragment implements IViewBindings {
 
         String userName = nativeBridge.getUserName();
 
+        // If user name is not empty then user is already registered.
+        // Otherwise, we should ask for registration.
         if (!userName.isEmpty()) {
 
             Log.info(TAG, "onCreateView() user exists");
@@ -113,12 +115,14 @@ public class LoginFragment extends Fragment implements IViewBindings {
 
             if (isFingerprintAvailable) {
                 fingerprintBtn.setVisibility(View.VISIBLE);
+            } else {
+                fingerprintBtn.setVisibility(View.GONE);
             }
 
         } else {
             Log.info(TAG, "onCreateView() user doesn't exist");
 
-            fingerprintBtn.setVisibility(View.INVISIBLE);
+            registerAccountBtn.setVisibility(View.VISIBLE);
         }
 
         fingerprintBtn.setOnClickListener(new View.OnClickListener() {

@@ -16,20 +16,19 @@
 
         <activity
             android:name="com.serhii.apps.notes.activities.PlansViewActivity"
-            android:theme="@style/AppThemeNoActionBar"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/NotesNoActionBarTheme" />
 
         <activity
             android:name="com.serhii.apps.notes.activities.SettingsActivity"
-            android:theme="@style/ThemeSettings" />
+            android:theme="@style/SettingsTheme" />
 
         <activity
             android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
-            android:theme="@style/AppLoginTheme"
+            android:theme="@style/LoginTheme"
             android:windowSoftInputMode="adjustPan" />
 
         <activity android:name="com.serhii.apps.notes.activities.NotesViewActivity"
-            android:theme="@style/AppThemeNoActionBar">
+            android:theme="@style/NotesNoActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

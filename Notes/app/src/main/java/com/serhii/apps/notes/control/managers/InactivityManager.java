@@ -24,7 +24,7 @@ public class InactivityManager implements LifecycleObserver {
 
     private AlarmManager alarmManager;
     private PendingIntent inactivityIntent;
-    private Context context;
+    private int timeoutTimeMillis;
 
     private static InactivityManager instance;
 
@@ -40,8 +40,9 @@ public class InactivityManager implements LifecycleObserver {
 
     private void initManager(Context context) {
 
-        if (this.context == null) {
-            this.context = context;
+        if (context == null) {
+            Log.error(TAG, "initManager(), passed context is null");
+            throw new NullPointerException("initManager(), passed context is null");
         }
 
         // Cancel and restart
@@ -49,12 +50,25 @@ public class InactivityManager implements LifecycleObserver {
             cancelAlarm();
         }
 
-        Log.detail(TAG, "alarm is initialized with " + context);
+        Log.info(TAG, "initManager(), alarm is initialized with " + context);
 
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, InactivityEventReceiver.class);
         inactivityIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, 0);
+
+        updateTimeout(context);
+    }
+
+    public void updateTimeout(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String timeDefault = context.getString(R.string.preference_idle_lock_time_default);
+        String time = sharedPreferences.getString(context.getString(R.string.preference_idle_lock_timeout_key), timeDefault);
+
+        Log.detail(TAG, "updateTimeout(), retrieved time: " + time);
+
+        timeoutTimeMillis = Integer.parseInt(time);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -62,10 +76,8 @@ public class InactivityManager implements LifecycleObserver {
 
         Log.detail(TAG, "inactivity alarm is scheduled TIME: " + System.currentTimeMillis());
 
-        int time = getIdleLockTime();
-
         alarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + time, inactivityIntent);
+                System.currentTimeMillis() + timeoutTimeMillis, inactivityIntent);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -85,18 +97,6 @@ public class InactivityManager implements LifecycleObserver {
     public void setLifecycle(Context context, Lifecycle lifecycle) {
         initManager(context);
         lifecycle.addObserver(this);
-    }
-
-    private int getIdleLockTime() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String timeDefault = context.getString(R.string.preference_idle_lock_time_default);
-
-        String time = sharedPreferences.getString(context.getString(R.string.preference_idle_lock_timeout_key), timeDefault);
-
-        Log.detail(TAG, "getIdleLockTime(), retrieved time " + time);
-
-        return Integer.parseInt(time);
     }
 
 }

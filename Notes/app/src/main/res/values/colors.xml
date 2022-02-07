@@ -19,7 +19,7 @@
     <color name="light_grey">#ebebf0</color>
     <color name="background_color">@color/light_grey</color>
     <color name="span_color">@color/light_grey</color>
-    <color name="authorize_title_color_text">@color/white</color>
+    <color name="authorize_screen_text_color">@color/black</color>
 
     <color name="dark_blue">#03A9F4</color>
     <color name="light_blue">#3F51B5</color>
@@ -40,6 +40,7 @@
     </array>
 
     <color name="background_main_color">#424242</color>
+    <color name="background_login_screen_color">#4FC3F7</color>
 
     <color name="dark_grey">#616161</color>
 

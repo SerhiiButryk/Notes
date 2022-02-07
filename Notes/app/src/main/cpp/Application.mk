@@ -6,5 +6,5 @@ APP_ABI := armeabi-v7a arm64-v8a
 
 APP_STL := c++_static
 
-# CPP Flags
+# C++ global settings
 APP_CPPFLAGS := -std=c++17 -frtti -fexceptions

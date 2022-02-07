@@ -44,8 +44,9 @@ android {
         }
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
+        dataBinding true
     }
 
     externalNativeBuild {
@@ -53,6 +54,8 @@ android {
             path file('src/main/cpp/build_ndk.mk')
         }
     }
+    // Fix for Android Bumblebee which requires definition of NDK version
+    ndkVersion '21.1.6352462'
 
     flavorDimensions "product"
     productFlavors {

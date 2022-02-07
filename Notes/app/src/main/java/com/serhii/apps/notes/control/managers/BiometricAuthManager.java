@@ -101,7 +101,13 @@ public class BiometricAuthManager {
 
     public boolean canAuthenticate(Context context) {
         BiometricManager biometricManager = BiometricManager.from(context);
-        return (biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS);
+        boolean result = (biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS);
+        if (result) {
+            Log.info(TAG, "Biometric are available");
+        } else {
+            Log.info(TAG, "Biometric are NOT available (NOT enrolled or device doesn't support it)");
+        }
+        return result;
     }
 
     public interface OnAuthenticateListener {

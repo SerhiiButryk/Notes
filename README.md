@@ -2,19 +2,19 @@
 
 # Overview
 
-This application is developed for keeping and accessing all your information in a device securily. 
-The app saves notes as encrypted data. So, it couldn't be extracted and read easily. The app protects data with authorization. 
-The interface is simple and easy to use.
+This application is developed for keeping and accessing all your notes on a device securely. 
+The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication. 
+The interface is simple to use.
 
 # Features
 
 - Password and biometric authentication
-- Text editing
-- User login limitation
+- Basic text editing
+- Limitation of User login attempts
 - Application inactivity lock
-- Apllication block feature after login limit is exceeded
+- Apllication block (after login attempts are exceeded)
 - Secure information storage
-- Backup/Restore support
+- Backup/restore support
 
 # Repository structure
 
@@ -26,7 +26,7 @@ The interface is simple and easy to use.
 - Languages: Java/JNI, C++17
 - Libraries: OpenSSL, Boost
 - Build tools: NDK, Gradle
-- Android conponents: fragments, view model, view binding, SQL database.
+- Android conponents / libraries: fragments, view model, view binding, SQL database.
 
 # Screenshots
 

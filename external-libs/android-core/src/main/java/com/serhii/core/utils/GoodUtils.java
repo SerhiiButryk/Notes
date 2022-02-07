@@ -50,10 +50,10 @@ public class GoodUtils {
     }
 
     /**
-     *  Replace a place holder symbol with int value
+     *  Fills string with passed variables
      */
-    public static String formatString(String message, int placeValue) {
-        return message.replace("%", String.valueOf(placeValue));
+    public static <T> String formatString(String message, T... placeValues) {
+        return String.format(message, placeValues);
     }
 
     public static String formatString(String message, String placeValue) {

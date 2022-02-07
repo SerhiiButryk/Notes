@@ -14,7 +14,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:theme="@style/NotesThemeDark">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar_layout"
@@ -30,7 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+                    app:popupTheme="@style/NotesThemeLight" />
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -46,7 +46,7 @@
 
             <EditText
                 android:id="@+id/title_note"
-                style="@style/textStyle"
+                style="@style/TextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/title_note"
@@ -58,7 +58,7 @@
 
             <TextView
                 android:id="@+id/date_time_view"
-                style="@style/textStyle"
+                style="@style/TextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/title_note"
@@ -79,7 +79,7 @@
 
             <EditText
                 android:id="@+id/note_text"
-                style="@style/noteTextStyle"
+                style="@style/NoteTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

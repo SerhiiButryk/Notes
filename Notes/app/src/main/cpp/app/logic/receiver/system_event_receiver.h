@@ -11,9 +11,9 @@
 namespace APP
 {
     /**
-     *  This class knows about all event handlers.
+     *  Class to manage event processing in the cpp code.
      *
-     *  Use it to deliver an event to corresponding event handler (receiver)
+     *  This class sends events to corresponding event handler.
      */
     class SystemEventReceiver
     {

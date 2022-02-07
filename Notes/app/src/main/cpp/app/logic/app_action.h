@@ -13,9 +13,9 @@ namespace APP
 {
 
     /**
-     *  This class is a concrete action handler
+     *  This class is a concrete action handler.
      *
-     *  It performs notification calls to Java side.
+     *  It performs calls into Java side.
      *
      *  Note: This class is an observer of the events in ActionDispatcher class.
      */

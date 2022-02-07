@@ -1,6 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 
-# Local module
+# START app build settings
 
     include $(CLEAR_VARS)
 
@@ -22,12 +22,13 @@ LOCAL_PATH:= $(call my-dir)
                        app/logic/handler/unlock_handler.cpp \
                        app/logic/base/env_constants.cpp \
 
+    # Headers are included
     LOCAL_C_INCLUDES += $(LOCAL_PATH)
 
-    # Include system libraries
+    # System libraries are included
     LOCAL_LDLIBS := -llog
 
-    # Include local libraries
+    # Local libraries are included
     LOCAL_SHARED_LIBRARIES := libc++_shared core
 
     include $(BUILD_SHARED_LIBRARY)

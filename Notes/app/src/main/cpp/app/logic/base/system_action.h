@@ -3,9 +3,13 @@
 namespace APP
 {
     /**
-     *  Interface class of system actions
+     *  Interface which describes the system actions.
      *
-     *  Extends it to add a new action
+     *  Implement it to receive a notification about the next action:
+     *
+     *  1. User authorized event.
+     *  2. Dialog displaying event.
+     *  3. User registered event.
      *
      */
 

@@ -15,7 +15,7 @@
             android:layout_marginBottom="@dimen/margin_top_small"
             android:gravity="center"
             android:text="@string/block_title"
-            android:textColor="@color/authorize_title_color_text"
+            android:textColor="@color/authorize_screen_text_color"
             android:textSize="@dimen/title_size_text"
             android:textStyle="bold" />
 
@@ -31,7 +31,7 @@
             android:paddingStart="@dimen/padding_small"
             android:paddingEnd="@dimen/padding_small"
             android:text="@string/block_message"
-            android:textColor="@color/authorize_title_color_text"
+            android:textColor="@color/authorize_screen_text_color"
             android:textSize="@dimen/message_size_text" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -45,7 +45,7 @@
             android:layout_marginBottom="8dp"
             android:paddingStart="@dimen/padding_small"
             android:paddingEnd="@dimen/padding_small"
-            android:textColorHint="@color/authorize_title_color_text">
+            android:textColorHint="@color/authorize_screen_text_color">
 
             <EditText
                 android:id="@+id/access_key"
@@ -55,7 +55,7 @@
                 android:focusable="true"
                 android:hint="@string/block_hint"
                 android:inputType="textPassword"
-                android:textColor="@color/authorize_title_color_text"
+                android:textColor="@color/authorize_screen_text_color"
                 android:textSize="18sp" />
 
         </com.google.android.material.textfield.TextInputLayout>

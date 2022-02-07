@@ -1,9 +1,9 @@
 LOCAL_PATH:= $(call my-dir)
 
-# Update if necessary
+# Update if paths are changed
 LIB_PATH := ../../../libs
 
-# Module for OpenSSL library
+# Settings for OpenSSL library
 
     include $(CLEAR_VARS)
     LOCAL_MODULE := ssl_static
@@ -17,7 +17,7 @@ LIB_PATH := ../../../libs
 
 # END
 
-# Module for core library
+# Settings for Core library
 
     include $(CLEAR_VARS)
 

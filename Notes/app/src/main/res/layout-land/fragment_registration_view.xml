@@ -27,7 +27,7 @@
                     android:layout_marginTop="@dimen/margin_top_small"
                     android:layout_marginBottom="@dimen/margin_bottom_small"
                     android:gravity="center"
-                    android:textColor="@color/authorize_title_color_text"
+                    android:textColor="@color/authorize_screen_text_color"
                     android:textSize="@dimen/title_size_text"
                     android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="40dp"
                     android:layout_marginBottom="8dp"
-                    android:textColorHint="@color/authorize_title_color_text">
+                    android:textColorHint="@color/authorize_screen_text_color">
 
                     <EditText
                         android:id="@+id/usr_email"
@@ -49,7 +49,7 @@
                         android:focusable="true"
                         android:hint="@string/usr_new_email"
                         android:inputType="textEmailAddress"
-                        android:textColor="@color/authorize_title_color_text"
+                        android:textColor="@color/authorize_screen_text_color"
                         android:textSize="18sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -62,7 +62,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="40dp"
                     android:layout_marginBottom="8dp"
-                    android:textColorHint="@color/authorize_title_color_text">
+                    android:textColorHint="@color/authorize_screen_text_color">
 
                     <EditText
                         android:id="@+id/usr_password"
@@ -72,7 +72,7 @@
                         android:focusable="true"
                         android:hint="@string/usr_new_psw"
                         android:inputType="textPassword"
-                        android:textColor="@color/authorize_title_color_text"
+                        android:textColor="@color/authorize_screen_text_color"
                         android:textSize="18sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -85,7 +85,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="40dp"
                     android:layout_marginBottom="8dp"
-                    android:textColorHint="@color/authorize_title_color_text">
+                    android:textColorHint="@color/authorize_screen_text_color">
 
                     <EditText
                         android:id="@+id/confirm_password"
@@ -95,7 +95,7 @@
                         android:focusable="true"
                         android:hint="@string/usr_approve_new_psw"
                         android:inputType="textPassword"
-                        android:textColor="@color/authorize_title_color_text"
+                        android:textColor="@color/authorize_screen_text_color"
                         android:textSize="18sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>

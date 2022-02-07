@@ -1,5 +1,6 @@
 package com.serhii.apps.notes.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -48,6 +49,7 @@ public class SetPasswordDialogUI extends DialogFragment {
         return builder.create();
     }
 
+    @SuppressLint("InflateParams")
     private ViewGroup initView(LayoutInflater inflater) {
         ViewGroup dialogView = (ViewGroup) inflater.inflate(R.layout.set_password_dialog, null);
 
