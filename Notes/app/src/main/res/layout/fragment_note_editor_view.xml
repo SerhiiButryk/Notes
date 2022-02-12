@@ -46,11 +46,11 @@
 
             <EditText
                 android:id="@+id/title_note"
-                style="@style/TextStyle"
+                style="@style/NoteEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:hint="@string/title_note"
-                android:importantForAutofill="no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -58,11 +58,10 @@
 
             <TextView
                 android:id="@+id/date_time_view"
-                style="@style/TextStyle"
+                style="@style/NoteTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/title_note"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@+id/note_text"
                 app:layout_constraintStart_toStartOf="@+id/note_text"
                 app:layout_constraintTop_toBottomOf="@id/indicator"
@@ -79,12 +78,11 @@
 
             <EditText
                 android:id="@+id/note_text"
-                style="@style/NoteTextStyle"
+                style="@style/NoteEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/body_note"
-                android:importantForAutofill="no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/date_time_view" />

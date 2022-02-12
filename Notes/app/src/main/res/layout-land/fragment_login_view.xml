@@ -4,17 +4,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <ScrollView
+        android:layout_marginBottom="@dimen/margin_bottom_login_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/parentLandscapeLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/title"
             style="@style/LoginTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="@dimen/margin_top_login_screen"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -33,11 +38,10 @@
             <EditText
                 android:id="@+id/input_email"
                 style="@style/LoginEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:hint="@string/usr_email"
-                android:inputType="textEmailAddress"
-                android:importantForAutofill="no" />
+                android:inputType="textEmailAddress" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,17 +58,16 @@
             <EditText
                 android:id="@+id/input_password"
                 style="@style/LoginEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:hint="@string/usr_psw"
-                android:inputType="textPassword"
-                android:importantForAutofill="no" />
+                android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/btn_login"
-            style="@style/LoginButtonStyle"
+            style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -75,7 +78,7 @@
 
         <Button
             android:id="@+id/btn_login_biometric"
-            style="@style/LoginButtonStyle"
+            style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
@@ -86,7 +89,7 @@
 
         <Button
             android:id="@+id/btn_register"
-            style="@style/LoginButtonStyle"
+            style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -96,5 +99,7 @@
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
 </layout>

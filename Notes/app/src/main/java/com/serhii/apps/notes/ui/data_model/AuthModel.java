@@ -16,6 +16,10 @@ public class AuthModel {
         this.confirmPassword = "";
     }
 
+    public AuthModel(AuthorizeType authType) {
+        this.authType = authType;
+    }
+
     public String getEmail() {
         return email;
     }

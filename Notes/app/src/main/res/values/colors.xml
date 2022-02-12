@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">@color/blue_contrast</color>
+    <color name="colorPrimaryDark">@color/blue</color>
+    <color name="colorAccent">@color/blue_accent</color>
 
     <color name="grey">#E0E0E0</color>
+    <color name="dark_grey">#616161</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#424242</color>
     <color name="blue">#0277BD</color>
@@ -19,11 +20,11 @@
     <color name="light_grey">#ebebf0</color>
     <color name="background_color">@color/light_grey</color>
     <color name="span_color">@color/light_grey</color>
-    <color name="authorize_screen_text_color">@color/black</color>
+    <color name="text_color">@color/black</color>
 
     <color name="dark_blue">#03A9F4</color>
     <color name="light_blue">#3F51B5</color>
-    <color name="blue_accent">#00B8D4</color>
+    <color name="blue_accent">#4FC3F7</color>
     <color name="grey_background">#BDBDBD</color>
 
     <color name="login_primary">#ccffffff</color>
@@ -38,10 +39,5 @@
         <item>@color/blue_contrast</item>
         <item>@color/red</item>
     </array>
-
-    <color name="background_main_color">#424242</color>
-    <color name="background_login_screen_color">#4FC3F7</color>
-
-    <color name="dark_grey">#616161</color>
 
 </resources>

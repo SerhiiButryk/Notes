@@ -18,7 +18,7 @@ public class InactivityEventReceiver extends BroadcastReceiver {
 
         // Start login activity
         Intent startActivityIntent = new Intent(context, AuthorizationActivity.class);
-        startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         context.startActivity(startActivityIntent);
     }

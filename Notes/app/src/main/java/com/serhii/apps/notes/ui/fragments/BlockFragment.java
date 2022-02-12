@@ -24,14 +24,14 @@ import com.serhii.apps.notes.databinding.FragmentBlockViewBinding;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
 import com.serhii.apps.notes.ui.utils.TextChecker;
-import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
+import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 
 public class BlockFragment extends Fragment implements IViewBindings {
 
     private EditText accessKeyField;
     private Button ok;
 
-    private AuthorizationViewModel authorizationViewModel;
+    private LoginViewModel loginViewModel;
 
     private EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
         @Override
@@ -49,7 +49,7 @@ public class BlockFragment extends Fragment implements IViewBindings {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance of ViewModel
-        authorizationViewModel = new ViewModelProvider(getActivity()).get(AuthorizationViewModel.class);
+        loginViewModel = new ViewModelProvider(getActivity()).get(LoginViewModel.class);
     }
 
     @Nullable
@@ -79,6 +79,9 @@ public class BlockFragment extends Fragment implements IViewBindings {
             }
         });
 
+        ok.setVisibility(View.VISIBLE);
+        binding.emailLayout.setVisibility(View.VISIBLE);
+
         return binding.getRoot();
     }
 
@@ -93,7 +96,7 @@ public class BlockFragment extends Fragment implements IViewBindings {
         authModel.setPassword(hash.hashMD5(enteredKey));
 
         // Set data
-        authorizationViewModel.setAuthValue(authModel);
+        loginViewModel.setAuthValue(authModel);
     }
 
 }

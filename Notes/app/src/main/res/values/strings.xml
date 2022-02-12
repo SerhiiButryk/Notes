@@ -2,9 +2,6 @@
 <resources>
     <string name="app_name">Notes</string>
 
-    // Login activity
-    <string name="toast_registration_done">Account is created</string>
-
     // Alter Dialog
     <string name="ms_no_user_account">This user account is not authorized. \nPlease, authorize your user.</string>
     <string name="title_no_user_account">Authorize error</string>
@@ -40,7 +37,7 @@
     // Login Activity
     <string name="title_description">Create user</string>
     <string name="login_btn">Login</string>
-    <string name="create_account_bnt">Create account</string>
+    <string name="create_account_bnt">Done</string>
     <string name="usr_psw">Your user password</string>
     <string name="usr_email">Your user email</string>
     <string name="usr_new_psw">Enter your password</string>
@@ -52,14 +49,14 @@
 
     // Default values
     <string name="empty_note_text">Empty</string>
-    <string name="template_note_title">Add your note title</string>
-    <string name="template_short_note">No notes yet</string>
+    <string name="template_note_title">Add your title</string>
+    <string name="template_short_note">Add your note</string>
     <string name="empty_string"> </string>
 
     // NoteEditor
     <string name="title_note">Enter your note title</string>
     <string name="body_note">Start typing your note</string>
-    <string name="time_date_label">Last edited time </string>
+    <string name="time_date_label">Time: </string>
     <string name="title_toolbar">Note editor</string>
     <string name="toast_action_message">Note is saved</string>
     <string name="toast_action_deleted_message">Note is deleted</string>
@@ -155,8 +152,8 @@
     <string name="set_password_dialog_hint">Enter a password</string>
 
     // BlockView
-    <string name="block_title">Application is blocked</string>
-    <string name="block_message">Enter unlock key to unlock your application.</string>
+    <string name="block_title">Access is restricted</string>
+    <string name="block_message">You need unlock key to restore your application</string>
     <string name="block_hint">Unlock key</string>
 
     // Biometric prompt

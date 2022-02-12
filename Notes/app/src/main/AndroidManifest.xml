@@ -15,20 +15,19 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name="com.serhii.apps.notes.activities.PlansViewActivity"
-            android:theme="@style/NotesNoActionBarTheme" />
-
-        <activity
             android:name="com.serhii.apps.notes.activities.SettingsActivity"
-            android:theme="@style/SettingsTheme" />
+            android:exported="false"
+            android:theme="@style/AppThemeNoActionbarTheme" />
 
         <activity
             android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
-            android:theme="@style/LoginTheme"
+            android:exported="false"
+            android:theme="@style/AppThemeNoActionbarTheme"
             android:windowSoftInputMode="adjustPan" />
 
         <activity android:name="com.serhii.apps.notes.activities.NotesViewActivity"
-            android:theme="@style/NotesNoActionBarTheme">
+            android:theme="@style/AppThemeNoActionbarTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +35,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.serhii.apps.notes.control.broadcast.InactivityEventReceiver" />
+        <receiver android:name="com.serhii.apps.notes.control.broadcast.InactivityEventReceiver"
+            android:exported="false"/>
 
     </application>
 

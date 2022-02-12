@@ -2,27 +2,15 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/dark_grey</item>
-        <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/black</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="NotesNoActionBarTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/dark_grey</item>
-        <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/black</item>
-    </style>
-
-    <style name="SettingsTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/dark_grey</item>
-        <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/black</item>
-    </style>
-
-    <style name="LoginTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/blue_contrast</item>
-        <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/blue_accent</item>
+    <style name="AppThemeNoActionbarTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="NotesThemeDark" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -40,17 +28,18 @@
         <item name="colorAccent">@color/blue_accent</item>
     </style>
 
-    <style name="NoteTextStyle">
+    <style name="NoteEditText">
         <item name="android:background">@drawable/text_background</item>
-        <item name="android:fontFamily">@font/crete_round</item>
-        <item name="android:inputType">textMultiLine</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:inputType">textMultiLine|textNoSuggestions</item>
         <item name="android:padding">10dp</item>
         <item name="android:textSize">20sp</item>
         <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:importantForAutofill">no</item>
     </style>
 
-    <style name="TextStyle">
-        <item name="android:fontFamily">@font/crete_round</item>
+    <style name="NoteTextView">
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:inputType">text</item>
         <item name="android:maxLines">1</item>
         <item name="android:padding">10dp</item>
@@ -59,9 +48,9 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-    <style name="LoginButtonStyle">
+    <style name="LoginButton">
         <item name="android:background">@drawable/button_background</item>
-        <item name="android:textColor">@color/authorize_screen_text_color</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:gravity">center</item>
         <item name="android:visibility">gone</item>
         <item name="android:padding">12dp</item>
@@ -73,7 +62,7 @@
 
     <style name="LoginTextView">
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/authorize_screen_text_color</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">@dimen/title_size_text</item>
         <item name="android:fontFamily">@font/roboto_thin</item>
         <item name="android:layout_marginStart">@dimen/margin_edges_textview</item>
@@ -84,19 +73,21 @@
 
     <style name="LoginInputTextView" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/authorize_screen_text_color</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:visibility">gone</item>
-        <item name="android:textColorHint">@color/authorize_screen_text_color</item>
-        <item name="android:layout_marginStart">@dimen/margin_edges_input_textview</item>
-        <item name="android:layout_marginLeft">@dimen/margin_edges_input_textview</item>
-        <item name="android:layout_marginEnd">@dimen/margin_edges_input_textview</item>
-        <item name="android:layout_marginRight">@dimen/margin_edges_input_textview</item>
+        <item name="android:textColorHint">@color/white</item>
+        <item name="android:layout_marginStart">@dimen/margin_edges</item>
+        <item name="android:layout_marginLeft">@dimen/margin_edges</item>
+        <item name="android:layout_marginEnd">@dimen/margin_edges</item>
+        <item name="android:layout_marginRight">@dimen/margin_edges</item>
     </style>
 
     <style name="LoginEditText">
         <item name="android:background">@drawable/edit_text_background</item>
-        <item name="android:textColor">@color/authorize_screen_text_color</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">18sp</item>
+        <item name="android:imeOptions">flagNoExtractUi</item>
+        <item name="android:importantForAutofill">no</item>
     </style>
 
 </resources>

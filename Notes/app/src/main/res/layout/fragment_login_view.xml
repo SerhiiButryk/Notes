@@ -33,8 +33,8 @@
             <EditText
                 android:id="@+id/input_email"
                 style="@style/LoginEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:hint="@string/usr_email"
                 android:imeOptions="actionNext"
                 android:inputType="textEmailAddress" />
@@ -54,8 +54,8 @@
             <EditText
                 android:id="@+id/input_password"
                 style="@style/LoginEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:hint="@string/usr_psw"
                 android:imeOptions="actionDone"
                 android:inputType="textPassword" />
@@ -64,7 +64,7 @@
 
         <Button
             android:id="@+id/btn_login"
-            style="@style/LoginButtonStyle"
+            style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -75,7 +75,7 @@
 
         <Button
             android:id="@+id/btn_login_biometric"
-            style="@style/LoginButtonStyle"
+            style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
@@ -86,7 +86,7 @@
 
         <Button
             android:id="@+id/btn_register"
-            style="@style/LoginButtonStyle"
+            style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"

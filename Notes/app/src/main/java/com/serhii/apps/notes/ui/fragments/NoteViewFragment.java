@@ -147,10 +147,6 @@ public class NoteViewFragment extends Fragment implements IViewBindings {
             case R.id.settings_item :
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
-            // TODO: uncomment when implemented
-            //            case R.id.plans_item :
-            //                startActivity(new Intent(this, PlansViewActivity.class));
-            //                return true;
         }
         return false;
     }

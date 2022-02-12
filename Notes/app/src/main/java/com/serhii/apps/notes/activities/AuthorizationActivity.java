@@ -8,10 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import com.serhii.apps.notes.BuildConfig;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeService;
@@ -22,43 +19,40 @@ import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.fragments.BlockFragment;
 import com.serhii.apps.notes.ui.fragments.LoginFragment;
 import com.serhii.apps.notes.ui.fragments.RegisterFragment;
-import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
+import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
 
 import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 import static com.serhii.apps.notes.ui.fragments.RegisterFragment.FRAGMENT_TAG;
 
-public class AuthorizationActivity extends AppCompatActivity implements LoginFragment.ShowRegistrationUIListener {
+public class AuthorizationActivity extends AppCompatActivity {
 
     private static final String TAG = AuthorizationActivity.class.getSimpleName();
 
-    private AuthorizationViewModel authorizationViewModel;
+    private LoginViewModel loginViewModel;
     private FragmentManager fragmentManager;
     private final NativeBridge nativeBridge = new NativeBridge();
-    private IAuthorizeService authorizeService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.info(TAG, "onCreate() IN");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
 
         // Enable unsecured screen content settings
-        Log.info(TAG, "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
+        boolean isUnsecureScreenEnabled = GoodUtils.enableUnsecureScreenProtection(this);
+        Log.info(TAG, "onCreate() SS: " + isUnsecureScreenEnabled);
 
         fragmentManager = getSupportFragmentManager();
 
         showLoginFragment(savedInstanceState);
 
-        authorizationViewModel = new ViewModelProvider(this).get(AuthorizationViewModel.class);
-        authorizeService = authorizationViewModel.getAuthorizeService();
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         setupObservers();
         initNative();
 
-        Log.info(TAG, "onCreate() OUT");
+        Log.info(TAG, "onCreate() activity created");
     }
 
     @Override
@@ -80,11 +74,6 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
             moveTaskToBack(true);
         }
 
-    }
-
-    @Override
-    public void onShowRegistrationUI() {
-        addFragment(new RegisterFragment(), FRAGMENT_TAG, true);
     }
 
     private void showLoginFragment(Bundle savedInstanceState) {
@@ -111,21 +100,36 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
     }
 
     private void setupObservers() {
-        authorizationViewModel.getAuthValue().observe(this, new Observer<AuthModel>() {
+        loginViewModel.getAuthModelSetFlag().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(@Nullable AuthModel authModel) {
-                AuthorizeType type = authModel.getAuthType();
-                switch (type) {
-                    case AUTH_UNLOCK:
-                    case AUTH_PASSWORD_LOGIN:
-                        authorizeService.onPasswordLogin(authModel);
-                        break;
-                    case AUTH_REGISTRATION:
-                        authorizeService.onRegistration(authModel);
-                        break;
-                    case AUTH_BIOMETRIC_LOGIN:
-                        authorizeService.onBiometricLogin();
-                        break;
+            public void onChanged(@Nullable Boolean value) {
+                AuthModel authModel = loginViewModel.getAuthValue();
+                IAuthorizeService authorizeService = loginViewModel.getAuthorizeService();
+                // We react only if value is true
+                if (value && authModel != null) {
+                    switch (authModel.getAuthType()) {
+                        case AUTH_UNLOCK:
+                        case AUTH_PASSWORD_LOGIN:
+                            authorizeService.onPasswordLogin(authModel);
+                            break;
+                        case AUTH_REGISTRATION:
+                            authorizeService.onRegistration(authModel);
+                            break;
+                        case AUTH_BIOMETRIC_LOGIN:
+                            authorizeService.onBiometricLogin();
+                            break;
+                    }
+                }
+            }
+        });
+
+        loginViewModel.getShowRegistrationUISetFlag().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                // We react only if value is true
+                if (aBoolean) {
+                    Log.info(TAG, "addFragment() - open Registration fragment");
+                    addFragment(new RegisterFragment(), FRAGMENT_TAG, true);
                 }
             }
         });
@@ -171,9 +175,8 @@ public class AuthorizationActivity extends AppCompatActivity implements LoginFra
         LoginFragment loginFragment = (LoginFragment) fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG);
         loginFragment.onUserAccountCreated();
 
+        IAuthorizeService authorizeService = loginViewModel.getAuthorizeService();
         authorizeService.onUserRegistered(this);
-
-        Toast.makeText(this, getString(R.string.toast_registration_done), Toast.LENGTH_SHORT).show();
     }
 
     /**

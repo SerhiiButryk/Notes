@@ -21,7 +21,7 @@ import com.serhii.apps.notes.control.types.AuthorizeType;
 import com.serhii.apps.notes.databinding.FragmentRegistrationViewBinding;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
-import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
+import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.utils.GoodUtils;
 
 public class RegisterFragment extends Fragment implements IViewBindings {
@@ -29,19 +29,19 @@ public class RegisterFragment extends Fragment implements IViewBindings {
     public static final String FRAGMENT_TAG = "RegisterFragmentTag";
 
     private  EditText emailField;
-    private  TextView titleLabel;
+    private  TextView titleField;
     private  EditText passwordField;
     private  EditText confirmPasswordField;
     private  Button registerButton;
 
-    private AuthorizationViewModel authorizationViewModel;
+    private LoginViewModel loginViewModel;
 
     private EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 // Set data
-                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION));
+                loginViewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION));
                 return true;
             }
             return false;
@@ -53,7 +53,7 @@ public class RegisterFragment extends Fragment implements IViewBindings {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance on ViewModel
-        authorizationViewModel = new ViewModelProvider(getActivity()).get(AuthorizationViewModel.class);
+        loginViewModel = new ViewModelProvider(getActivity()).get(LoginViewModel.class);
     }
 
     @Nullable
@@ -62,13 +62,13 @@ public class RegisterFragment extends Fragment implements IViewBindings {
 
         View view = initBinding(inflater, container);
 
-        titleLabel.setText(getString(R.string.title_reg));
+        titleField.setText(getString(R.string.title_reg));
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Set data
-                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION));
+                loginViewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION));
             }
         });
 
@@ -84,10 +84,16 @@ public class RegisterFragment extends Fragment implements IViewBindings {
 
         // Set references
         emailField = binding.usrEmail;
-        titleLabel = binding.title;
+        titleField = binding.title;
         passwordField = binding.usrPassword;
         confirmPasswordField = binding.confirmPassword;
         registerButton = binding.btnRegister;
+
+        binding.textInputLayout.setVisibility(View.VISIBLE);
+        binding.textInputLayout2.setVisibility(View.VISIBLE);
+        binding.textInputLayout3.setVisibility(View.VISIBLE);
+
+        registerButton.setVisibility(View.VISIBLE);
 
         return binding.getRoot();
     }

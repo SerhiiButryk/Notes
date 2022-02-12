@@ -18,6 +18,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.managers.BiometricAuthManager;
@@ -25,17 +26,17 @@ import com.serhii.apps.notes.control.types.AuthorizeType;
 import com.serhii.apps.notes.databinding.FragmentLoginViewBinding;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
-import com.serhii.apps.notes.ui.view_model.AuthorizationViewModel;
+import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.log.Log;
 import com.serhii.core.security.Hash;
 import com.serhii.core.utils.GoodUtils;
 
 public class LoginFragment extends Fragment implements IViewBindings {
 
-    private static String TAG = LoginFragment.class.getSimpleName();
+    private static final String TAG = LoginFragment.class.getSimpleName();
     public static final String FRAGMENT_TAG = "LoginFragment";
 
-    private AuthorizationViewModel authorizationViewModel;
+    private LoginViewModel loginViewModel;
 
     private EditText emailField;
     private EditText passwordField;
@@ -43,18 +44,18 @@ public class LoginFragment extends Fragment implements IViewBindings {
     private Button registerAccountBtn;
     private TextView titleLabel;
     private Button fingerprintBtn;
+    private TextInputLayout emailLayout;
+    private TextInputLayout passwordLayout;
 
-    private BiometricAuthManager biometricAuthManager = new BiometricAuthManager();
+    private final BiometricAuthManager biometricAuthManager = new BiometricAuthManager();
     private boolean isFingerprintAvailable;
     private final NativeBridge nativeBridge = new NativeBridge();
-
-    private ShowRegistrationUIListener showRegistrationUIListener;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
     }
 
-    private EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
+    private final EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -64,7 +65,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
                 }
 
                 // Set data
-                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
+                loginViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
                 return true;
             }
             return false;
@@ -88,9 +89,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
         super.onActivityCreated(savedInstanceState);
 
         // Retrieve an instance of ViewModel
-        authorizationViewModel = new ViewModelProvider(getActivity()).get(AuthorizationViewModel.class);
-
-        showRegistrationUIListener = (ShowRegistrationUIListener) getActivity();
+        loginViewModel = new ViewModelProvider(getActivity()).get(LoginViewModel.class);
     }
 
     @Nullable
@@ -113,6 +112,10 @@ public class LoginFragment extends Fragment implements IViewBindings {
             registerAccountBtn.setVisibility(View.GONE);
             passwordField.requestFocus();
 
+            loginButton.setVisibility(View.VISIBLE);
+            passwordLayout.setVisibility(View.VISIBLE);
+            emailLayout.setVisibility(View.VISIBLE);
+
             if (isFingerprintAvailable) {
                 fingerprintBtn.setVisibility(View.VISIBLE);
             } else {
@@ -123,6 +126,8 @@ public class LoginFragment extends Fragment implements IViewBindings {
             Log.info(TAG, "onCreateView() user doesn't exist");
 
             registerAccountBtn.setVisibility(View.VISIBLE);
+            passwordLayout.setVisibility(View.GONE);
+            emailLayout.setVisibility(View.GONE);
         }
 
         fingerprintBtn.setOnClickListener(new View.OnClickListener() {
@@ -136,7 +141,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
             @Override
             public void onSuccess() {
                 // Set data
-                authorizationViewModel.setAuthValue(createEmptyModel(AuthorizeType.AUTH_BIOMETRIC_LOGIN));
+                loginViewModel.setAuthValue(createEmptyModel(AuthorizeType.AUTH_BIOMETRIC_LOGIN));
             }
         });
 
@@ -145,7 +150,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
         registerAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showRegistrationUIListener.onShowRegistrationUI();
+                loginViewModel.showRegistrationUI();
             }
         });
 
@@ -158,7 +163,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
                 }
 
                 // Set data
-                authorizationViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
+                loginViewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN));
             }
         });
 
@@ -185,6 +190,9 @@ public class LoginFragment extends Fragment implements IViewBindings {
         titleLabel = binding.title;
         fingerprintBtn = binding.btnLoginBiometric;
 
+        emailLayout = binding.emailLayout;
+        passwordLayout = binding.passwordLayout;
+
         return binding.getRoot();
     }
 
@@ -205,10 +213,6 @@ public class LoginFragment extends Fragment implements IViewBindings {
         AuthModel authModel = new AuthModel();
         authModel.setAuthType(type);
         return authModel;
-    }
-
-    public interface ShowRegistrationUIListener {
-        void onShowRegistrationUI();
     }
 
 }

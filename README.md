@@ -30,6 +30,7 @@ The interface is simple to use.
 
 # Screenshots
 
-<img src="images/screenshot_1.png" height="400"> <img src="images/screenshot_2.png" height="400">
-<img src="images/screenshot_3.png" height="400"> <img src="images/screenshot_4.png" height="400"> 
-<img src="images/screenshot_5.png" height="400"> <img src="images/screenshot_6.png" height="400">
+<img src="images/Screenshot_1.png" height="400"> <img src="images/Screenshot_2.png" height="400">
+<img src="images/Screenshot_3.png" height="400"> <img src="images/Screenshot_4.png" height="400"> 
+<img src="images/Screenshot_5.png" height="400"> <img src="images/Screenshot_6.png" height="400">
+<img src="images/Screenshot_7.png" height="400">
