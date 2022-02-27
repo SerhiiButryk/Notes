@@ -17,7 +17,7 @@ import com.serhii.core.utils.GoodUtils;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    private static String TAG = LoginFragment.class.getSimpleName();
+    private static final String TAG = "LoginFragment";
 
     private Preference loginAttempts;
 

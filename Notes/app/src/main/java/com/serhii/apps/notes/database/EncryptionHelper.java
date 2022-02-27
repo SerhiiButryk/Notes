@@ -16,7 +16,7 @@ import java.util.List;
 
 class EncryptionHelper {
 
-    private static final String TAG = EncryptionHelper.class.getSimpleName();
+    private static final String TAG = "EncryptionHelper";
 
     private static final String IV_DATA_FILE = "com.example.app.db.pref.local";
 

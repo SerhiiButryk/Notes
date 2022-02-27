@@ -24,7 +24,7 @@ import static com.serhii.apps.notes.database.impl.model.NoteTableModel.QUERY_DRO
 
 public class NoteDatabaseIml extends DatabaseImpl<NoteModel> {
 
-    private static final String TAG = NoteDatabaseIml.class.getSimpleName();
+    private static final String TAG = "NoteDatabaseIml";
 
     private SQLiteDatabase databaseWrite;
     private SQLiteDatabase databaseRead;

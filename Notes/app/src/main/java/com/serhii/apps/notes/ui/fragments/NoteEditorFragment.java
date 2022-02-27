@@ -40,7 +40,7 @@ import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory;
 
 public class NoteEditorFragment extends Fragment implements IViewBindings {
 
-    private static final String TAG = NoteEditorFragment.class.getSimpleName();
+    private static final String TAG = "NoteEditorFragment";
 
     public static final String FRAGMENT_TAG = "NoteEditorFragmentTAG";
 

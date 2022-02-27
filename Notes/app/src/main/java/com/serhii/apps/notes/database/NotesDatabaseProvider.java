@@ -17,7 +17,7 @@ import java.util.List;
 
 public class NotesDatabaseProvider implements Database<NoteModel> {
 
-    public static final String TAG = NotesDatabaseProvider.class.getSimpleName();
+    public static final String TAG = "NotesDatabaseProvider";
 
     private final EncryptionHelper encryptionHelper;
 

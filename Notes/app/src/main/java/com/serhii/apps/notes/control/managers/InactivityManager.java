@@ -18,7 +18,7 @@ import com.serhii.core.log.Log;
 
 public class InactivityManager implements LifecycleObserver {
 
-    private static final String TAG = InactivityManager.class.getSimpleName();
+    private static final String TAG = "InactivityManager";
 
     private static final int REQUEST_CODE = 1;
 

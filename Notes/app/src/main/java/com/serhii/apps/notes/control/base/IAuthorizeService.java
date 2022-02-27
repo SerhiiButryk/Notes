@@ -5,7 +5,7 @@ import android.content.Context;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 
 /**
- *   The interface to handle user authorization events
+ *   The interface to handle user authentication events
  */
 
 public interface IAuthorizeService {

@@ -17,7 +17,7 @@ import com.serhii.core.security.Cipher;
  */
 public class EventService implements IAuthorizeService {
 
-    private static String TAG = EventService.class.getSimpleName();
+    private static final String TAG = "EventService";
 
     private static EventService instance;
 

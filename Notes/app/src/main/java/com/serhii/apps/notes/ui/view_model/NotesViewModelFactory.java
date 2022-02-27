@@ -10,29 +10,24 @@ import androidx.lifecycle.ViewModelProvider;
 import com.serhii.core.log.Log;
 
 /**
- *  Model view factory for NotesViewActivity
+ *  View view factory for {@link com.serhii.apps.notes.ui.view_model.NotesViewModel} class
  */
 
 public class NotesViewModelFactory extends ViewModelProvider.AndroidViewModelFactory {
 
-    private static final String TAG = NotesViewModelFactory.class.getSimpleName();
-
-    private Context context;
+    private static final String TAG = "NotesViewModelFactory";
 
     public NotesViewModelFactory(@NonNull Application application) {
         super(application);
-        context = application.getApplicationContext();
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-
-        ViewModel viewModel = new NotesViewModel(context);
-
+        Log.info(TAG, "create(), IN");
+        T viewModel = super.create(modelClass);
         Log.info(TAG, "create(), created: " + viewModel);
-
-        return (T) viewModel;
+        return viewModel;
     }
 
 }

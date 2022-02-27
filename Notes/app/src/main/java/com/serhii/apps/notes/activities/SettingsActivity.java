@@ -30,8 +30,7 @@ import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final String TAG = SettingsActivity.class.getSimpleName();
-
+    private static final String TAG = "SettingsActivity";
     private static final String SETTINGS_FRAGMENT_TAG = "main settings";
 
     private Toolbar toolbar;
@@ -41,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Enable unsecured screen content settings
-        Log.info(TAG, "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
+        GoodUtils.enableUnsecureScreenProtection(this);
 
         initBinding();
 
@@ -94,8 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
         }
@@ -110,19 +108,34 @@ public class SettingsActivity extends AppCompatActivity {
 
                 Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES");
 
-                extractNotes(data);
+                if (data != null) {
+                    extractNotes(data);
+                } else {
+                    // Should not happen
+                    Log.info(TAG, "onActivityResult() 1");
+                }
 
             } else if (requestCode == REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
 
                 Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES");
 
-                backupNotes(data);
+                if (data != null) {
+                    backupNotes(data);
+                } else {
+                    // Should not happen
+                    Log.info(TAG, "onActivityResult() 2");
+                }
 
             } else if (requestCode == REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
 
                 Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE");
 
-                restoreNotes(data);
+                if (data != null) {
+                    restoreNotes(data);
+                } else {
+                    // Should not happen
+                    Log.info(TAG, "onActivityResult() 3");
+                }
 
             }
 

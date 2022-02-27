@@ -23,7 +23,7 @@ import static com.serhii.core.security.Cipher.CRYPTO_PROVIDER_OPENSSL;
 
 public class BackupManager {
 
-    public static final String TAG = BackupManager.class.getSimpleName();
+    public static final String TAG = "BackupManager";
 
     public static final int REQUEST_CODE_EXTRACT_NOTES = 1;
     public static final int REQUEST_CODE_BACKUP_NOTES = 2;

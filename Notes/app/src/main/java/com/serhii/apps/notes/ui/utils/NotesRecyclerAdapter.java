@@ -3,6 +3,7 @@ package com.serhii.apps.notes.ui.utils;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,7 @@ import java.util.List;
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.NoteViewHolder> {
 
     private List<NoteModel> notes = new ArrayList<>();
-    private NoteViewHolder.ClickListener clickListener;
+    private final NoteViewHolder.ClickListener clickListener;
 
     public NotesRecyclerAdapter(NoteViewHolder.ClickListener clickListener) {
         this.clickListener = clickListener;
@@ -50,6 +51,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         return notes.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setDataChanged(List<NoteModel> noteModels) {
         notes = noteModels;
 
@@ -58,8 +60,8 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
     public static class NoteViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView title;
-        private TextView description;
+        private final TextView title;
+        private final TextView description;
 
         public NoteViewHolder(@NonNull View itemView, final NotesRecyclerAdapter.ClickListener clickListener) {
             super(itemView);

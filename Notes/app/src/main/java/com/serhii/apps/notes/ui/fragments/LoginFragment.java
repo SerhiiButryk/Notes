@@ -33,7 +33,7 @@ import com.serhii.core.utils.GoodUtils;
 
 public class LoginFragment extends Fragment implements IViewBindings {
 
-    private static final String TAG = LoginFragment.class.getSimpleName();
+    private static final String TAG = "LoginFragment";
     public static final String FRAGMENT_TAG = "LoginFragment";
 
     private LoginViewModel loginViewModel;

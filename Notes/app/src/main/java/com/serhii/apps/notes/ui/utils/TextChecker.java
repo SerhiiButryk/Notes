@@ -6,10 +6,13 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * Helper class for enabling button if edit text has entered text
+ */
 public class TextChecker implements TextWatcher {
 
-    private EditText controlField;
-    private Button controlButton;
+    private final EditText controlField;
+    private final Button controlButton;
 
     public TextChecker(EditText controlField, Button controlButton) {
         this.controlField = controlField;

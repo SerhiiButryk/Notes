@@ -21,7 +21,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class BiometricAuthManager {
 
-    private final static String TAG = BiometricAuthManager.class.getSimpleName();
+    private final static String TAG = "BiometricAuthManager";
 
     private static final int UNLOCK_KEYSTORE_REQUEST_CODE = 200;
 

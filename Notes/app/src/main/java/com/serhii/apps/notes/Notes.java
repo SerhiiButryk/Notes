@@ -7,7 +7,7 @@ import com.serhii.core.log.Log;
 
 public class Notes extends Application {
 
-    private static final String TAG = Notes.class.getSimpleName();
+    private static final String TAG = "Notes";
 
     @Override
     public void onCreate() {
@@ -15,12 +15,12 @@ public class Notes extends Application {
 
         Log.info(TAG, "onCreate(), in");
 
-        // Initialize here application configuration
+        // Initialize application configuration
         Log.setTag(AppConstants.APP_LOG_TAG);
 
         // Enable detailed logs
         if (BuildConfig.DEBUG) {
-            Log.info(TAG, "onCreate(), application is running in DEBUG mode");
+            Log.info(TAG, "onCreate(), this is Debug build");
             Log.setDetailedLogs(true);
         }
 

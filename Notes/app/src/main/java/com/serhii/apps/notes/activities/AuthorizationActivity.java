@@ -28,11 +28,10 @@ import static com.serhii.apps.notes.ui.fragments.RegisterFragment.FRAGMENT_TAG;
 
 public class AuthorizationActivity extends AppCompatActivity {
 
-    private static final String TAG = AuthorizationActivity.class.getSimpleName();
+    private static final String TAG = "AuthorizationActivity";
 
     private LoginViewModel loginViewModel;
     private FragmentManager fragmentManager;
-    private final NativeBridge nativeBridge = new NativeBridge();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,7 @@ public class AuthorizationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_authorization);
 
         // Enable unsecured screen content settings
-        boolean isUnsecureScreenEnabled = GoodUtils.enableUnsecureScreenProtection(this);
-        Log.info(TAG, "onCreate() SS: " + isUnsecureScreenEnabled);
+        GoodUtils.enableUnsecureScreenProtection(this);
 
         fragmentManager = getSupportFragmentManager();
 
@@ -67,7 +65,7 @@ public class AuthorizationActivity extends AppCompatActivity {
         Log.info(TAG, "onBackPressed()");
 
         // Allow user to go back to the Login UI
-        // If there is one fragment in the stack then Registration UI is displayed
+        // if there is one fragment in the stack which means that Registration UI is displayed
         if (fragmentManager.getBackStackEntryCount() == 1) {
             super.onBackPressed();
         } else {
@@ -80,8 +78,10 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         // Ensure that the fragment is added only once when the activity
         // is launched the first time. When configuration is changed the fragment
-        // doesn't need to be added as it is restored from the savedInstanceState
+        // doesn't need to be added as it is restored from the 'savedInstanceState' Bundle
         if (savedInstanceState == null) {
+
+            NativeBridge nativeBridge = new NativeBridge();
 
             if (nativeBridge.isAppBlocked()) {
 
@@ -100,35 +100,13 @@ public class AuthorizationActivity extends AppCompatActivity {
     }
 
     private void setupObservers() {
-        loginViewModel.getAuthModelSetFlag().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean value) {
-                AuthModel authModel = loginViewModel.getAuthValue();
-                IAuthorizeService authorizeService = loginViewModel.getAuthorizeService();
-                // We react only if value is true
-                if (value && authModel != null) {
-                    switch (authModel.getAuthType()) {
-                        case AUTH_UNLOCK:
-                        case AUTH_PASSWORD_LOGIN:
-                            authorizeService.onPasswordLogin(authModel);
-                            break;
-                        case AUTH_REGISTRATION:
-                            authorizeService.onRegistration(authModel);
-                            break;
-                        case AUTH_BIOMETRIC_LOGIN:
-                            authorizeService.onBiometricLogin();
-                            break;
-                    }
-                }
-            }
-        });
 
         loginViewModel.getShowRegistrationUISetFlag().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                // We react only if value is true
-                if (aBoolean) {
-                    Log.info(TAG, "addFragment() - open Registration fragment");
+            public void onChanged(Boolean shouldPerformAction) {
+                // Do action if it is needed
+                if (shouldPerformAction) {
+                    Log.info(TAG, "addFragment(), open Registration fragment");
                     addFragment(new RegisterFragment(), FRAGMENT_TAG, true);
                 }
             }
@@ -138,12 +116,11 @@ public class AuthorizationActivity extends AppCompatActivity {
     private void addFragment(Fragment fragment, String tag, boolean shouldSave) {
 
         if (tag != null && fragmentManager.findFragmentByTag(tag) != null) {
-            Log.info(TAG, "addFragment() - fragment is already opened");
+            Log.info(TAG, "addFragment(), fragment is already opened");
             return;
         }
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-
         transaction.replace(R.id.main_layout, fragment, tag);
         transaction.setReorderingAllowed(true); // Needed for optimization
 
@@ -161,7 +138,7 @@ public class AuthorizationActivity extends AppCompatActivity {
         // Close activity
         finish();
 
-        Log.info(TAG, "onAuthorize() - activity finished");
+        Log.info(TAG, "onAuthorize(), activity finished");
     }
 
     /**
@@ -170,6 +147,7 @@ public class AuthorizationActivity extends AppCompatActivity {
     public void userRegistered() {
         Log.info(TAG, "userRegistered()");
 
+        // Close Registration UI
         onBackPressed();
 
         LoginFragment loginFragment = (LoginFragment) fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG);
@@ -183,41 +161,44 @@ public class AuthorizationActivity extends AppCompatActivity {
      *  Called from native
      */
     private void showAlertDialog(int type) {
+        Log.info(TAG, "showAlertDialog(), type " + type);
 
-        boolean isBlockNeeded = false;
+        boolean shouldShowDialog = false;
 
         if (type == AuthResult.WRONG_PASSWORD.getTypeId()) {
 
+            NativeBridge nativeBridge = new NativeBridge();
+
             int currentLimit = nativeBridge.getLimitLeft();
 
+            // If limit is exceeded then need to block application
             if (currentLimit == 1) {
 
                 // Block application
-                isBlockNeeded = true;
+                nativeBridge.executeBlockApp();
 
-                Log.info(TAG, "showAlertDialog() - blocked due to password limit attempts ");
+                clearFragmentStack();
+
+                addFragment(new BlockFragment(), null, false);
+
+                shouldShowDialog = true;
+
+                Log.info(TAG, "showAlertDialog(), BB SS");
 
             } else {
-
+                // Update password limit value
                 nativeBridge.setLimitLeft(currentLimit - 1);
+
+                Log.info(TAG, "showAlertDialog(), AA SS");
             }
 
         }
 
-        if (isBlockNeeded) {
-
-            nativeBridge.executeBlockApp();
-
-            clearFragmentStack();
-
-            addFragment(new BlockFragment(), null, false);
-
-        } else {
-
+        if (shouldShowDialog) {
+            Log.info(TAG, "showAlertDialog(), show dialog");
             DialogHelper.showAlertDialog(type, this);
         }
 
-        Log.info(TAG, "showAlertDialog() - type " + type);
     }
 
     private void clearFragmentStack() {

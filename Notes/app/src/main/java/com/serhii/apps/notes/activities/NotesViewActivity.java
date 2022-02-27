@@ -33,18 +33,19 @@ import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
 public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUser,
         NoteViewFragment.NoteInteraction, NoteEditorFragment.EditorNoteInteraction {
 
-    private static final String TAG = NotesViewActivity.class.getSimpleName();
+    private static final String TAG = "NotesViewActivity";
 
-    private NativeBridge nativeBridge = new NativeBridge();
     private NotesViewModel notesViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.info(TAG, "onCreate() IN");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_view);
 
         // Enable unsecured screen content settings
-        Log.info(TAG, "onCreate() is unsecured screen content enabled - " + GoodUtils.enableUnsecureScreenProtection(this));
+        GoodUtils.enableUnsecureScreenProtection(this);
 
         if (savedInstanceState == null) {
             addFragment();
@@ -53,12 +54,14 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         // Start authorization process
         authorizeUser(savedInstanceState);
 
-        initNative(this);
+        String filePath = GoodUtils.getFilePath(this);
+        Log.info(TAG, "onCreate() PPP " + filePath);
+        initNativeConfigs(filePath);
 
         // Initialize lifecycle aware components
         InactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
-        Log.info(TAG, "onCreate()");
+        Log.info(TAG, "onCreate() OUT");
     }
 
     private void addFragment() {
@@ -73,7 +76,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
-
         InactivityManager.getInstance().onUserInteraction();
     }
 
@@ -93,7 +95,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     protected void onDestroy() {
         Log.info(TAG, "onDestroy()");
         super.onDestroy();
-
         BackupManager.getInstance().clearNotesViewModelWeakReference();
     }
 
@@ -102,7 +103,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         super.onActivityResult(requestCode, resultCode, data);
 
         if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
-            Log.info(TAG, "onActivityResult() - Need to reload data");
+            Log.info(TAG, "onActivityResult(), reload data");
             notesViewModel.resetErrorState();
             notesViewModel.updateData();
         }
@@ -114,8 +115,9 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
      */
     @Override
     public void onUserAuthorized() {
-        Log.info(TAG, "onAuthorize() - User is authorized");
+        Log.info(TAG, "onAuthorize(), User is authorized");
 
+        NativeBridge nativeBridge = new NativeBridge();
         nativeBridge.resetLoginLimitLeft(this);
 
         notesViewModel = new ViewModelProvider(this, new NotesViewModelFactory(getApplication())).get(NotesViewModel.class);
@@ -186,7 +188,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
 
     private void authorizeUser(Bundle bundle) {
         /**
-         *  Activity is started by Android OS from launcher icon
+         *  Activity is launched first time
          */
         if (bundle == null) {
             /*
@@ -203,10 +205,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
      *  Native interface
      *
      */
-    private void initNative(Context context) {
-        initNativeConfigs(GoodUtils.getFilePath(context));
-    }
-
     private native void initNativeConfigs(String path);
 
     static {

@@ -79,6 +79,7 @@ public class GoodUtils {
      * Enable unsecured screen content settings if it's Release build
      */
     public static boolean enableUnsecureScreenProtection(Activity activity) {
+        // Enable for release build
         if (!BuildConfig.DEBUG) {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             return true;

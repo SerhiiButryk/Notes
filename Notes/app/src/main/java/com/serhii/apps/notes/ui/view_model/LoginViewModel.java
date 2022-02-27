@@ -9,38 +9,41 @@ import com.serhii.apps.notes.control.base.IAuthorizeService;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 
 /**
- *  View model for AuthorizationActivity activity
+ *  View model for managing authentication data and User's actions.
  */
 
 public class LoginViewModel extends ViewModel {
 
     private final IAuthorizeService authorizeService = EventService.getInstance();
-    private final MutableLiveData<Boolean> authModelSetFlag = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> showRegistrationUISetFlag = new MutableLiveData<>(false);
-    private AuthModel authModel;
 
     public void setAuthValue(AuthModel newValue) {
-        authModel = newValue;
-        // Notify observers that value is set
-        authModelSetFlag.setValue(true);
-        // Reset flag
-        authModelSetFlag.setValue(false);
-    }
-
-    public AuthModel getAuthValue() {
-        return authModel;
+        // If data is set then perform corresponding action
+        if (newValue != null) {
+            switch (newValue.getAuthType()) {
+                case AUTH_UNLOCK:
+                case AUTH_PASSWORD_LOGIN:
+                    // Proceed with Login
+                    authorizeService.onPasswordLogin(newValue);
+                    break;
+                case AUTH_REGISTRATION:
+                    // Proceed with User's registration
+                    authorizeService.onRegistration(newValue);
+                    break;
+                case AUTH_BIOMETRIC_LOGIN:
+                    // Proceed with Login
+                    authorizeService.onBiometricLogin();
+                    break;
+            }
+        }
     }
 
     public IAuthorizeService getAuthorizeService() { return authorizeService; }
 
-    public LiveData<Boolean> getAuthModelSetFlag() {
-        return authModelSetFlag;
-    }
-
     public void showRegistrationUI() {
-        // Notify observers that value is set
+        // Notify observers that action should be performed
         showRegistrationUISetFlag.setValue(true);
-        // Reset flag
+        // Reset flag to notify that activity doesn't need to perform any action
         showRegistrationUISetFlag.setValue(false);
     }
 

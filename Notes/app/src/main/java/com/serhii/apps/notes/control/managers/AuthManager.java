@@ -13,7 +13,7 @@ import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
  */
 public class AuthManager {
 
-    public static final String TAG = AuthManager.class.getSimpleName();
+    public static final String TAG = "AuthManager";
 
     public void handleRequest(RequestType type, AuthModel data) {
 

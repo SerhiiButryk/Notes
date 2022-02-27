@@ -38,7 +38,7 @@ import java.util.List;
 
 public class NoteViewFragment extends Fragment implements IViewBindings {
 
-    private static final String TAG = NoteViewFragment.class.getSimpleName();
+    private static final String TAG = "NoteViewFragment";
 
     private static final int NOTES_COLUMN_COUNT = 2;
 
