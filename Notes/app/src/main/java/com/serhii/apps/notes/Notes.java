@@ -13,14 +13,14 @@ public class Notes extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Log.info(TAG, "onCreate(), in");
-
         // Initialize application configuration
         Log.setTag(AppConstants.APP_LOG_TAG);
 
+        Log.info(TAG, "onCreate(), in");
+
         // Enable detailed logs
         if (BuildConfig.DEBUG) {
-            Log.info(TAG, "onCreate(), this is Debug build");
+            Log.info(TAG, "onCreate(), running debug build");
             Log.setDetailedLogs(true);
         }
 

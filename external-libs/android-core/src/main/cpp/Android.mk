@@ -7,12 +7,12 @@ LIB_PATH := ../../../libs
 
     include $(CLEAR_VARS)
     LOCAL_MODULE := ssl_static
-    LOCAL_SRC_FILES := $(LIB_PATH)/libs/arch-$(TARGET_ARCH_ABI)/lib/libssl.a
+    LOCAL_SRC_FILES := $(LIB_PATH)/arch-$(TARGET_ARCH_ABI)/openssl/libssl.a
     include $(PREBUILT_STATIC_LIBRARY)
 
     include $(CLEAR_VARS)
     LOCAL_MODULE := crypto_static
-    LOCAL_SRC_FILES := $(LIB_PATH)/libs/arch-$(TARGET_ARCH_ABI)/lib/libcrypto.a
+    LOCAL_SRC_FILES := $(LIB_PATH)/arch-$(TARGET_ARCH_ABI)/openssl/libcrypto.a
     include $(PREBUILT_STATIC_LIBRARY)
 
 # END

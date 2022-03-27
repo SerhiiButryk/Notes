@@ -23,7 +23,7 @@ android {
 
         // NDK settings
         ndk {
-            abiFilters 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a', 'x86', 'x86_64'
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -36,11 +36,16 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            // App name
+            manifestPlaceholders = [appLabel: "@string/app_name"]
         }
 
         debug {
             debuggable true
             jniDebuggable = true
+            // App name
+            manifestPlaceholders = [appLabel: "@string/app_name_debug"]
+            applicationIdSuffix ".dev"
         }
     }
 
@@ -53,31 +58,6 @@ android {
         ndkBuild {
             path file('src/main/cpp/build_ndk.mk')
         }
-    }
-    // Fix for Android Bumblebee which requires definition of NDK version
-    ndkVersion '21.1.6352462'
-
-    flavorDimensions "product"
-    productFlavors {
-
-        prod {
-            // App name
-            manifestPlaceholders = [appLabel: "Notes"]
-
-            dimension "product"
-        }
-
-        dev {
-            // Indicates version for testing
-            applicationIdSuffix ".dev"
-            versionNameSuffix "-dev"
-
-            // App name
-            manifestPlaceholders = [appLabel: "DevNotes"]
-
-            dimension "product"
-        }
-
     }
 
 }

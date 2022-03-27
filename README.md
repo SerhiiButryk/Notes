@@ -24,9 +24,20 @@ The interface is simple to use.
 # Used technologies
 
 - Languages: Java/JNI, C++17
-- Libraries: OpenSSL, Boost
+- Libraries: OpenSSL (1.1.1v), Boost
 - Build tools: NDK, Gradle
 - Android conponents / libraries: fragments, view model, view binding, SQL database.
+
+# Supported platforms
+
+- Android version: Android 8 - Android 11
+- Supported ABIs: x86, x86_64, armeabi-v7a
+
+# Build instraction
+
+- NDK verions: 21+
+
+Use .gradlew or Android Studio ('Build' menu) to build this application
 
 # Screenshots
 
