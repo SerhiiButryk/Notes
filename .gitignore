@@ -6,6 +6,5 @@
 **/.classpath
 **/.externalNativeBuild/
 **/build/
-**/gradle/
 **/.vscode/
 **/local.properties

@@ -35,7 +35,10 @@ The interface is simple to use.
 
 # Build instraction
 
-- NDK verions: 21+
+Required tools:
+
+1) NDK verions: 21.4.7075529
+2) Java veriosn: 11
 
 Use .gradlew or Android Studio ('Build' menu) to build this application
 

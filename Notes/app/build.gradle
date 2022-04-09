@@ -7,7 +7,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("keystore.jks")
+            storeFile file("test_only.jks")
             storePassword 'password'
             keyAlias 'key0'
             keyPassword 'password'
@@ -60,11 +60,17 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // Android library dependency
     implementation project(":LibCoreAndroid")
 
     implementation 'androidx.appcompat:appcompat:1.1.0'

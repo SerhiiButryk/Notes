@@ -13,7 +13,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        // Android Gradle Plugin Version
+        classpath 'com.android.tools.build:gradle:7.1.2'
     }
 
 }
@@ -56,6 +57,11 @@ android {
         ndkBuild {
             path file('src/main/cpp/Android.mk')
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
 }

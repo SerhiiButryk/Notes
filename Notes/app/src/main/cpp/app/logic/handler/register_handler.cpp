@@ -9,7 +9,7 @@
 #include "utils/log.h"
 #include "app/logic/utils/auth_utils.h"
 #include "app/logic/base/system_constants.h"
-#include "crypto/hash.h""
+#include "crypto/hash.h"
 
 using namespace MYLIB;
 
