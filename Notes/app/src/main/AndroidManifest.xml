@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.serhii.apps.notes">
 
-    <!--  TODO: Need to test if removing of 'appComponentFactory' doesn't cause issues -->
+    <!--  TODO: Need to check if 'appComponentFactory' is needed -->
     <application
         android:name="com.serhii.apps.notes.Notes"
         android:allowBackup="false"

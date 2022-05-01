@@ -6,6 +6,12 @@ public class Result {
     private byte[] iv;
     private CryptoError error;
 
+    public Result() {
+        message = "";
+        iv = new byte[0];
+        error = CryptoError.UNKNOWN;
+    }
+
     public Result(String message, byte[] iv, CryptoError error) {
         this.message = message;
         this.iv = iv;

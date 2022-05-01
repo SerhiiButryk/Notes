@@ -1,5 +1,0 @@
-# Hack to make repository be visible as java project 
-
-*.h linguist-language=Java
-
-*.hpp linguist-language=Java 

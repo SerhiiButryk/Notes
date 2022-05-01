@@ -1,35 +1,50 @@
+/**
+ * Copyright 2022. Happy coding ! :)
+ * Author: Serhii Butryk
+ */
 package com.serhii.apps.notes
 
+import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.serhii.apps.notes.common.AppConstants
 import com.serhii.apps.notes.database.NotesDatabaseProvider
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.core.log.Log
 import com.serhii.core.security.Cipher
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
+/**
+ * Unit Tests for
+ * @linkcom.serhii.apps.notes.database.NotesDatabaseProvider
+ */
+
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class SQLDatabaseTestSuit {
+class DatabaseTests {
 
     @Before
     fun setup() {
-        Log.setTag("AppTests")
+        Log.i(TAG, "setup() IN")
 
-        Log.info(TAG, "setup() IN")
-
-        val cipher = Cipher()
-        cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, false)
+        if (!isKeyCreated) {
+            Log.i(TAG, "setup() Create keys")
+            // Create key for notes data encryption
+            val cipher = Cipher()
+            cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, false)
+            isKeyCreated = true
+        } else {
+            Log.i(TAG, "setup() Keys are created")
+        }
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
+        // Init database
         val notesDatabase = NotesDatabaseProvider(context)
         notesDatabase.init(context)
 
-        Log.info(TAG, "setup() OUT")
+        Log.i(TAG, "setup() OUT")
     }
 
     /**
@@ -43,7 +58,7 @@ class SQLDatabaseTestSuit {
     @Test
     fun test01_SimpleTest() {
 
-        Log.info(TAG, "test01_SimpleTest() IN")
+        Log.i(TAG, "test01_SimpleTest() IN")
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
@@ -63,23 +78,24 @@ class SQLDatabaseTestSuit {
         Assert.assertEquals("Note is not correct", retrievedNote.note, noteText)
         Assert.assertEquals("Note title is not correct", retrievedNote.title, noteTitle)
 
-        Log.info(TAG, "test01_SimpleTest() OUT")
+        Log.i(TAG, "test01_SimpleTest() OUT")
     }
 
     @After
     fun tearDown() {
-        Log.info(TAG, "tearDown() IN")
+        Log.i(TAG, "tearDown() IN")
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
         val notesDatabase = NotesDatabaseProvider(context)
         notesDatabase.close()
 
-        Log.info(TAG, "tearDown() OUT")
+        Log.i(TAG, "tearDown() OUT")
     }
 
     companion object {
-        val TAG = SQLDatabaseTestSuit::class.java.simpleName
+        val TAG = DatabaseTests::class.java.simpleName
+        var isKeyCreated = false
     }
 
 }

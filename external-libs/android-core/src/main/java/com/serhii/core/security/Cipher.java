@@ -16,6 +16,7 @@ public class Cipher {
     public static final String CRYPTO_PROVIDER_OPENSSL = "openssl";
     public static final String CRYPTO_PROVIDER_ANDROID = "android";
 
+    // Uses default android crypto provider
     public Cipher() {
         CoreEngine.getInstance().configure(this);
     }
