@@ -9,7 +9,9 @@ pipeline {
         // Building the app stage
         stage('Build') {
             steps {
-                sh "cd Notes" 
+                sh "pwd"
+                sh "cd Notes"
+                sh "pwd"
                 sh "./gradlew tasks"
                 sh "./gradlew assemble"
             }
