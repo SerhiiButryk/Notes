@@ -12,6 +12,7 @@ pipeline {
                 sh "pwd"
                 sh "cd Notes"
                 sh "pwd"
+                sh "ls -la"
                 sh "./gradlew tasks"
                 sh "./gradlew assemble"
             }
