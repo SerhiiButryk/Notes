@@ -1,12 +1,17 @@
+// Copyright 2022. Happy coding ! :)
+// Author: Serhii Butryk 
+
 pipeline {
     // Build on any available node
     agent any 
 
     stages {
-    
-        stage('Stage 1') {
+        // Building the app stage
+        stage('Build') {
             steps {
-                echo 'Hello world!' 
+                echo 'Started with building Notes' 
+                sh "./Notes/gradlew assemble"
+                echo 'Finished with building Notes' 
             }
         }
         
