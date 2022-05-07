@@ -7,9 +7,13 @@ pipeline {
 
     stages {
         // Building the app stage
-        stage('Build') {
+        stage('Build App') {
             steps {
-                sh -c "./tools/build_app.sh"
+                script {
+                    dir("${env.WORKSPACE}/Notes") {
+                        sh "./gradlew assemble
+                    }
+                }
             }
         }
         
