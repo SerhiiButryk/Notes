@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     dir("${env.WORKSPACE}/Notes") {
-                        sh "./gradlew assemble
+                        sh "./gradlew assemble"
                     }
                 }
             }
