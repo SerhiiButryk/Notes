@@ -5,4 +5,4 @@
 
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 
-./${SCRIPT_ABSOLUTE_PATH}/../Notes/gradlew assemble
+./${SCRIPT_ABSOLUTE_PATH}/../Notes/gradlew clean assemble

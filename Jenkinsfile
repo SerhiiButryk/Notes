@@ -13,8 +13,9 @@ pipeline {
                 
                 script {
                     // Go to Notes directory
-                    dir("${env.WORKSPACE}/Notes") {
-                        sh "./gradlew assemble"
+                    dir("${env.WORKSPACE}/tools") {
+                        // Execute build script
+                        sh "./build_app"
                     }
                 }
                 
