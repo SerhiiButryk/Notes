@@ -34,12 +34,12 @@ pushd ${SCRIPT_ABSOLUTE_PATH}/../
 # Delete directory if already exists
 rm -rf $ARTIFACT_FOLDER_NAME
 # Create folder for artifacts 
-mkdir -p ${ARTIFACT_FOLDER_NAM}/
+mkdir -p ${ARTIFACT_FOLDER_NAM}
 popd 
 
 echo "Copying files"
 
 cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
-cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/
+cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 echo "******** Finished *********"
