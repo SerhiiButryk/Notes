@@ -7,12 +7,18 @@ pipeline {
 
     stages {
         // Building the app stage
-        stage('Build') {
+        stage('Build Android App') {
+            
             steps {
-                sh -c "./tools/build_app.sh"
-            }
-        }
-        
-    }
-
-}
+                
+                script {
+                    // Go to Notes directory
+                    dir("${env.WORKSPACE}/Notes") {
+                        sh "./gradlew assemble"
+                    }
+                }
+                
+            } // end step
+        } // end stage
+    } // end stages
+} // end pipeline
