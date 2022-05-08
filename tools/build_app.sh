@@ -9,8 +9,8 @@ echo $SCRIPT_ABSOLUTE_PATH
 
 pwd
 
-pushd ${SCRIPT_ABSOLUTE_PATH}/../Notes/
+# pushd ${SCRIPT_ABSOLUTE_PATH}/../Notes/
 
-./gradlew clean assemble
+./${SCRIPT_ABSOLUTE_PATH}/../Notes/gradlew clean assemble
 
-popd
+# popd
