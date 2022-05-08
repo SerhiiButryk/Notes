@@ -15,7 +15,7 @@ pipeline {
                     // Go to Notes directory
                     dir("${env.WORKSPACE}/tools") {
                         // Execute build script
-                        sh -c "./build_app.sh"
+                        sh "./build_app.sh"
                     }
                 }
                 
