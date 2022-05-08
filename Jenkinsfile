@@ -22,7 +22,7 @@ pipeline {
         
         stage('Archive artifacts') {
             steps {
-                archiveArtifacts artifacts: 'dist/*', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+                archiveArtifacts artifacts: '${env.WORKSPACE}/dist/*', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
             }
         } // end stage
 
