@@ -6,11 +6,10 @@ pipeline {
     agent any 
 
     stages {
+        
         // Building the app stage
         stage('Build Android App') {
-            
             steps {
-                
                 script {
                     // Go to Notes directory
                     dir("${env.WORKSPACE}/tools") {
@@ -18,8 +17,14 @@ pipeline {
                         sh "./build_app.sh"
                     }
                 }
-                
             } // end step
+        } // end stage 
+        
+        stage('Archive artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'dist/*', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+            }
         } // end stage
+
     } // end stages
 } // end pipeline

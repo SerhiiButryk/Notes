@@ -32,8 +32,10 @@ echo "******** Finished *********"
 echo "******** Prepare artifacts *********"
 
 pushd ${SCRIPT_ABSOLUTE_PATH}/../
+# Delete directory if already exists
+rm -rf $ARTIFACT_FOLDER_NAME
 # Create folder for artifacts 
-mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
+mkdir -p ${ARTIFACT_FOLDER_NAM}/${MAPPING_FOLDER_NAME}
 popd 
 
 echo "Copying files"
