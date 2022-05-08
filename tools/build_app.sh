@@ -16,9 +16,8 @@ SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 
 BUILD_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/"
 APK_FILES_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/apk"
-MAPPING_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/mapping/release"
+MAPPING_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/mapping"
 ARTIFACT_FOLDER_NAME="dist"
-MAPPING_FOLDER_NAME="mapping"
 
 echo "******** Started building *********"
 
@@ -35,12 +34,12 @@ pushd ${SCRIPT_ABSOLUTE_PATH}/../
 # Delete directory if already exists
 rm -rf $ARTIFACT_FOLDER_NAME
 # Create folder for artifacts 
-mkdir -p ${ARTIFACT_FOLDER_NAM}/${MAPPING_FOLDER_NAME}
+mkdir -p ${ARTIFACT_FOLDER_NAM}/
 popd 
 
 echo "Copying files"
 
 cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
-cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${MAPPING_FOLDER_NAME}
+cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/
 
 echo "******** Finished *********"
