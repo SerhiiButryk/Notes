@@ -25,7 +25,7 @@ pipeline {
                 script {
 
                     archiveArtifacts([
-                        artifacts: '**/*', 
+                        artifacts: '/dist/*', 
                         fingerprint: true, 
                         followSymlinks: false, 
                         onlyIfSuccessful: true        
