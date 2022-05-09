@@ -24,8 +24,9 @@ pipeline {
             steps {
                 script {
 
+                    // Archive app artifacts    
                     archiveArtifacts([
-                        artifacts: 'dist/**/*.*', 
+                        artifacts: 'Notes-App/**/*.*', 
                         fingerprint: true, 
                         followSymlinks: false, 
                         onlyIfSuccessful: true        

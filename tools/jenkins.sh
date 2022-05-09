@@ -38,6 +38,8 @@ help() {
     print_message "--stop        - stop Jenkins"
     print_message "--status      - current status of Jenkins"
     print_message "--password    - shows unlock password"
+    # TODO: Need to configure job names and jenkins home path
+    print_message "--clear       - clear build files in jenkins home directory"
     print_message "*****************************************************"
 }
 
@@ -46,6 +48,7 @@ FLAG_INIT_JENKINS=false
 FLAG_START_JENKINS=false
 FLAG_STOP_JENKINS=false
 FLAG_GET_STATUS_JENKINS=false
+FLAG_CLEAR_JENKINS_FILES=false
 
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 JENKINS_DATA_FILES_PATH=$SCRIPT_ABSOLUTE_PATH/../jenkins
@@ -79,6 +82,9 @@ do
                 # Get unlock password
                 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
                 exit 1    
+                ;;
+            clear)
+                FLAG_CLEAR_JENKINS_FILES=true
                 ;;
         esac    
         ;;  
@@ -181,6 +187,45 @@ then
 
     # Delete temp directory
     rm -rf ${JENKINS_DATA_FILES_PATH}/temp
+
+    print_message "> Completed"
+
+elif [ "$FLAG_CLEAR_JENKINS_FILES" = true ];
+then
+    # TODO: Remove hardcoded job names and provide as a param
+    # Jobs dirs to clear
+    declare -a JOBS_NAMES=(
+        "Notes-App-Job"
+    )
+
+    print_message "> Clearing build files"
+
+    for JOB in $"${JOBS_NAMES[@]}"
+    do 
+        pushd ${JENKINS_HOME_DIR_PATH}/jobs/${JOB} > /dev/null
+        
+        # Delete build files
+        sudo rm -rf builds/
+        
+        popd > /dev/null
+    done
+
+    # Cache dirs to clear in Jenkins home dir
+    declare -a CACHE_FILES=(
+        "logs"
+    )
+
+    print_message "> Clearing cache/build files"
+
+    for FILE in $"${CACHE_FILES[@]}"
+    do 
+        pushd ${JENKINS_HOME_DIR_PATH} > /dev/null
+        
+        # Delete files
+        sudo rm -rf ${FILE}
+        
+        popd > /dev/null
+    done
 
     print_message "> Completed"
 
