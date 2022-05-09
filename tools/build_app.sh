@@ -46,3 +46,4 @@ cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 echo ""
 echo "******** Finished *********"
+echo ""

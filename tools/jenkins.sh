@@ -213,6 +213,8 @@ then
     # Cache dirs to clear in Jenkins home dir
     declare -a CACHE_FILES=(
         "logs"
+        "fingerprints"
+        "caches"
     )
 
     print_message "> Clearing cache/build files"
