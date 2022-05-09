@@ -23,14 +23,14 @@ pipeline {
         stage('Archive artifacts') {
             steps {
 
-                def rootDir = "${env.WORKSPACE}/dist"    
+                def distDir = "${env.WORKSPACE}/dist"    
 
                 archiveArtifacts }
-                    artifacts: "${rootDir}/*", 
+                    artifacts: "${distDir}/", 
                     fingerprint: true, 
                     followSymlinks: false, 
                     onlyIfSuccessful: true
-                    
+
             }
         } // end stage
 
