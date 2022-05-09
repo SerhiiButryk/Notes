@@ -26,7 +26,7 @@ pipeline {
                 def distDir = "${env.WORKSPACE}/dist"    
 
                 archiveArtifacts }
-                    artifacts: "${distDir}/", 
+                    artifacts: "dist/", 
                     fingerprint: true, 
                     followSymlinks: false, 
                     onlyIfSuccessful: true
