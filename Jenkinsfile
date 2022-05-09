@@ -22,10 +22,18 @@ pipeline {
         
         stage('Archive artifacts') {
             steps {
+                script {
+                    
+                    def distDir = "${env.WORKSPACE}/dist"    
 
-                def distDir = "${env.WORKSPACE}/dist"    
-
-                archiveArtifacts artifacts: '${env.WORKSPACE}/dist/*', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+                    archiveArtifacts([
+                        artifacts: '${env.WORKSPACE}/dist/*', 
+                        fingerprint: true, 
+                        followSymlinks: false, 
+                        onlyIfSuccessful: true        
+                    ]) 
+                    
+                }        
 
             }
         } // end stage
