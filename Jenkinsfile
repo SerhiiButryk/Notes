@@ -7,7 +7,7 @@ pipeline {
 
     stages {
         
-        // Building the app stage
+        // Building app stage
         stage('Build Android App') {
             steps {
                 script {
@@ -20,6 +20,7 @@ pipeline {
             } // end step
         } // end stage 
         
+        // Archive artifacts stage
         stage('Archive artifacts') {
             steps {
                 script {
@@ -34,7 +35,7 @@ pipeline {
                     
                 }        
 
-            }
+            } // end step
         } // end stage
 
     } // end stages
