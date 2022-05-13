@@ -122,9 +122,13 @@ then
         do 
             pushd ${JENKINS_HOME_DIR_PATH}/jobs/${JOB} > /dev/null
             
-            # Delete build files
+            # Delete job files
+
             sudo rm -rf builds/
-            
+            sudo rm -rf workspace/
+            sudo rm -rf workspace@tmp/
+            sudo rm -rf workspace@script/
+
             popd > /dev/null
         done
     else

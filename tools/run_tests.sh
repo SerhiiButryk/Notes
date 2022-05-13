@@ -86,7 +86,7 @@ do
     echo "******** Tests are completed *********"
     echo ""
 
-    echo "******** Killing emulators tests on $EMULATOR emulator *********"
+    echo "******** Killing emulator *********"
     echo ""
 
     # Stop all running emulators
