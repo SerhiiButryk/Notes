@@ -28,6 +28,8 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
+$EMULATOR_DIR/emulator -list-avds
+
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
 then
