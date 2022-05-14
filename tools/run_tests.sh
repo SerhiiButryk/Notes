@@ -79,7 +79,7 @@ for EMULATOR in $EMULATOR_LIST
 do
     
     # Create directory for saving test results
-    mkdir -p $TEST_RESULT_DIR/$EMULATOR
+    mkdir -p $TEST_RESULT_DIR/$EMULATOR/reports
 
     echo "******** Starting $EMULATOR emulator *********"
     echo ""
@@ -91,8 +91,8 @@ do
     echo "******** Running tests on $EMULATOR emulator *********"
     echo ""
 
-    # Wait 30 seconds for device to be online
-    sleep 30
+    # Wait 60 seconds for device to be online
+    sleep 60
 
     # Run tests
     pushd ${SCRIPT_RELEVANT_PATH}/../Notes/ > /dev/null
@@ -100,6 +100,9 @@ do
     ./gradlew connectedAndroidTest
     
     popd > /dev/null
+
+    # Copying reports
+    cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/androidTests/connected/*  ${SCRIPT_RELEVANT_PATH}/../$TEST_RESULT_DIR/$EMULATOR/reports
 
     echo ""
     echo "******** Tests are completed *********"
