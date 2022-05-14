@@ -36,7 +36,7 @@ then
 fi
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
-if [[ -z $EMULATOR_LIST ]]
+if [[ -z $EMULATOR_LIST ]] && [[ "$JENKINS_CONTEXT" == "" ]]
 then
     # Local emulators can be invisible on Jenkins
     # We need to create new explicitly. 
@@ -67,7 +67,7 @@ do
     emulator_number=emulator_number+1
 done
 
-if [[ ! $emulator_number == "2" ]] 
+if [[ ! $emulator_number == "2" ]]  && [[ "$JENKINS_CONTEXT" == "" ]]
 then
    echo "To run test you need at least 2 emulators available, aborting..."
    exit 1 
@@ -80,6 +80,11 @@ echo ""
 
 # Delete test results directory
 rm -rf $TEST_RESULT_DIR
+
+if [[ "$JENKINS_CONTEXT" == true ]]
+then
+    EMULATOR_LIST="Pixel_API_26 Pixel_API_30"
+fi
 
 for EMULATOR in $EMULATOR_LIST
 do
