@@ -28,6 +28,7 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
+echo "+ $PATH"
 echo "+ ${ANDROID_SDK_ROOT}/tools/emulator -list-avds"
 sudo ${ANDROID_SDK_ROOT}/tools/emulator -list-avds
 
