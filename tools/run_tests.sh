@@ -29,21 +29,6 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
-# TEST ONLY NOT FINAL VERSION
-
-SYSTEM_PATHES="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
-
-JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64/bin"
-ANDROID_TOOLS="/home/serhii/Android/Sdk/platform-tools"
-ANDROID_NDK_HOME="/home/serhii/Android/Sdk/ndk/21.4.7075529"
-
-ANDROID_SDK_ROOT="/home/serhii/Android/Sdk"
-export ANDROID_SDK_ROOT
-
-export PATH="$CHROMIUM_DEPOT_TOOLS:$JAVA_HOME:$SYSTEM_PATHES:$ANDROID_TOOLS:$ANDROID_NDK_HOME:$JENKINS_HOME:$ANDROID_SDK_ROOT"
-
-# END
-
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
 then
@@ -56,13 +41,15 @@ then
     echo ""
     
     # It requires latest cmdline tools Android
-    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
+    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-25;google_apis;x86"
+    
+    # ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     
     echo "Creating emulator Pixel_API_30"
     echo ""
 
     # It requires latest cmdline tools Android
-    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-30;google_apis_playstore;x86"
+    # ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-30;google_apis_playstore;x86"
 
 fi
 
