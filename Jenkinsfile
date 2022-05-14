@@ -14,7 +14,7 @@ pipeline {
                     // Go to directory
                     dir("${env.WORKSPACE}/tools") {
                         // Execute script
-                        sh "./build_app.sh"
+                        // sh "./build_app.sh"
                     }
                 }
             } // end step
