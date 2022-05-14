@@ -29,6 +29,12 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
+if [[ "$JENKINS_CONTEXT" == true ]]
+then
+    echo "******** Running on Jenkins *********"
+    echo ""
+fi
+
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
 then
@@ -41,15 +47,13 @@ then
     echo ""
     
     # It requires latest cmdline tools Android
-    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-26;google_apis_playstore;x86"
-    
-    # ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
+    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     
     echo "Creating emulator Pixel_API_30"
     echo ""
 
     # It requires latest cmdline tools Android
-    # ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-30;google_apis_playstore;x86"
+    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-30;google_apis_playstore;x86"
 
 fi
 
