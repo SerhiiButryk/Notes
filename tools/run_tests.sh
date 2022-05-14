@@ -31,7 +31,7 @@ echo ""
 echo "$EMULATOR_DIR/emulator"
 
 echo "Run command"
-$EMULATOR_DIR/emulator -list-avds
+${ANDROID_SDK_ROOT}/emulator/emulator -list-avds
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
