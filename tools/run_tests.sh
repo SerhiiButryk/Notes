@@ -28,6 +28,9 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
+echo "$EMULATOR_DIR/emulator"
+
+echo "Run command"
 $EMULATOR_DIR/emulator -list-avds
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
@@ -36,6 +39,8 @@ then
     echo "No emulators available, aborting..."
     exit 1
 fi
+
+exit 1
 
 # Checking the number of emulators
 declare -i emulator_number
