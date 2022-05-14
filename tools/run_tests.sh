@@ -22,22 +22,37 @@ then
     exit 1
 fi
 
+# Local pathes
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 
 echo "******** Running tests *********"
 echo ""
 
-echo "+ $PATH"
-echo "+ ${ANDROID_SDK_ROOT}/tools/emulator -list-avds"
-sudo ${ANDROID_SDK_ROOT}/tools/emulator -list-avds
-
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
 then
+    # Local emulators can be invisible on Jenkins
+    # We need to create new explicitly. 
     echo "No emulators available, creating emulators"
+    echo ""
+
+    echo "Creating emulator Pixel_API_26"
+    echo ""
+    
+    # It requires latest cmdline tools Android
+    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
+    
+    echo "Creating emulator Pixel_API_30"
+    echo ""
+
+    # It requires latest cmdline tools Android
+    ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-30;google_apis_playstore;x86"
 
 fi
+
+# Re-check if emulators available
+EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 
 # Checking the number of emulators
 declare -i emulator_number
