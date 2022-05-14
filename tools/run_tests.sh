@@ -28,19 +28,15 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
-echo "$EMULATOR_DIR/emulator"
-
-echo "Run command"
-${ANDROID_SDK_ROOT}/emulator/emulator -list-avds
+echo "+ ${ANDROID_SDK_ROOT}/tools/emulator -list-avds"
+${ANDROID_SDK_ROOT}/tools/emulator -list-avds
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
 then
-    echo "No emulators available, aborting..."
-    exit 1
-fi
+    echo "No emulators available, creating emulators"
 
-exit 1
+fi
 
 # Checking the number of emulators
 declare -i emulator_number
