@@ -29,7 +29,7 @@ echo "******** Running tests *********"
 echo ""
 
 echo "+ ${ANDROID_SDK_ROOT}/tools/emulator -list-avds"
-${ANDROID_SDK_ROOT}/tools/emulator -list-avds
+sudo ${ANDROID_SDK_ROOT}/tools/emulator -list-avds
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [[ -z $EMULATOR_LIST ]]
