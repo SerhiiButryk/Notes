@@ -41,8 +41,6 @@ else
     EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 fi
 
-exit 1
-
 if [[ -z $EMULATOR_LIST ]]
 then
     
@@ -55,7 +53,7 @@ then
     # It requires latest cmdline tools Android
     if [[ "$JENKINS_CONTEXT" = true ]]
     then
-        sudo runuser -l $RUN_AS_USER -c '$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"'
+        sudo runuser -l $RUN_AS_USER -c "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86""
     else 
         ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     fi
@@ -66,7 +64,7 @@ then
     # It requires latest cmdline tools Android
     if [[ "$JENKINS_CONTEXT" = true ]]
     then
-        sudo runuser -l $RUN_AS_USER -c '$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"'
+        sudo runuser -l $RUN_AS_USER -c "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86""
     else 
         ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     fi
@@ -76,7 +74,7 @@ fi
 # Re-check if emulators available
 if [[ "$JENKINS_CONTEXT" = true ]]
 then
-    EMULATOR_LIST=$( sudo runuser -l $RUN_AS_USER -c '/home/serhii/Android/Sdk/emulator/emulator -list-avds' )
+    EMULATOR_LIST=$( sudo runuser -l $RUN_AS_USER -c "$ANDROID_SDK_ROOT/emulator/emulator -list-avds" )
 else 
     EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 fi
@@ -97,6 +95,8 @@ fi
 echo "Available $emulator_number emulators:"
 echo $EMULATOR_LIST
 echo ""
+
+exit 1
 
 # Delete test results directory
 rm -rf $TEST_RESULT_DIR
