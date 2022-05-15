@@ -36,7 +36,7 @@ echo ""
 
 if [[ "$JENKINS_CONTEXT" = true ]]
 then
-    EMULATOR_LIST=$( sudo runuser -l $RUN_AS_USER -c '$ANDROID_SDK_ROOT/emulator/emulator -list-avds' )
+    EMULATOR_LIST=$( sudo runuser -l $RUN_AS_USER -c "$ANDROID_SDK_ROOT/emulator/emulator -list-avds" )
 else 
     EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 fi
