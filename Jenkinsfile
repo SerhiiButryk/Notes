@@ -20,9 +20,10 @@ pipeline {
         //     } // end step
         // } // end stage 
 
-        // There are issues with starting emulator on Jenkins
-        // Currently this stage is failing
         // Running tests
+        // To run tests jenkins user should be able to run commands as super user.
+        // To configure this edit '/etc/sudoers' file on Linux and add the next line:
+        // "jenkins hostname = (root) NOPASSWD: /usr/sbin/", where hostname is yout machine name.
         stage('Running tests') {
             steps {
                 script {
