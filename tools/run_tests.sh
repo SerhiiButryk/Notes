@@ -26,14 +26,24 @@ fi
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 
+# For some reason, Jenkins can't run avd commands as jenkins user.
+# They fail with stange errors. This is work-around fix.
+# We will run some commands as different user.
+RUN_AS_USER="serhii"
+
 echo "******** Running tests *********"
 echo ""
 
-EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
+if [[ "$JENKINS_CONTEXT" = true ]]
+then
+    EMULATOR_LIST=$( sudo runuser -l serhii -c '/home/serhii/Android/Sdk/emulator/emulator -list-avds' )
+else
+    EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
+fi
+
 if [[ -z $EMULATOR_LIST ]]
 then
-    # Local emulators can be invisible on Jenkins
-    # We need to create new explicitly. 
+    
     echo "No emulators available, creating emulators"
     echo ""
 
