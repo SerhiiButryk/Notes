@@ -30,8 +30,6 @@ fi
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 
-export ANDROID_AVD_HOME="~/jenkins"
-
 echo "******** Running tests *********"
 echo ""
 
