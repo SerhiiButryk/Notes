@@ -26,11 +26,6 @@ fi
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 
-# For some reason, Jenkins can't run avd commands as jenkins user.
-# They fail with stange errors. In order to fix this, some commands
-# will run as different user. 
-RUN_AS_USER="serhii"
-
 echo "******** Running tests *********"
 echo ""
 
@@ -40,8 +35,6 @@ then
 else 
     EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 fi
-
-exit 1
 
 if [[ -z $EMULATOR_LIST ]]
 then
@@ -55,7 +48,7 @@ then
     # It requires latest cmdline tools Android
     if [[ "$JENKINS_CONTEXT" = true ]]
     then
-        sudo runuser -l $RUN_AS_USER -c "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86""
+        sudo $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     else 
         ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     fi
@@ -66,7 +59,7 @@ then
     # It requires latest cmdline tools Android
     if [[ "$JENKINS_CONTEXT" = true ]]
     then
-        sudo runuser -l $RUN_AS_USER -c "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86""
+        sudo $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     else 
         ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     fi
@@ -76,7 +69,7 @@ fi
 # Re-check if emulators available
 if [[ "$JENKINS_CONTEXT" = true ]]
 then
-    EMULATOR_LIST=$( sudo $ANDROID_SDK_ROOT/emulator/emulator -list-avds" )
+    EMULATOR_LIST=$( sudo $ANDROID_SDK_ROOT/emulator/emulator -list-avds )
 else 
     EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 fi
@@ -115,7 +108,7 @@ do
     
     if [[ "$JENKINS_CONTEXT" = true ]]
     then
-        sudo runuser -l $RUN_AS_USER -c "$EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &"
+        sudo $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
     else 
         $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
     fi
@@ -146,7 +139,7 @@ do
     # Stop all running emulators
     if [[ "$JENKINS_CONTEXT" = true ]]
     then
-        sudo runuser -l $RUN_AS_USER -c "${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done"
+        sudo ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
     else 
         ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
     fi
