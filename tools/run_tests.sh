@@ -96,8 +96,6 @@ echo "Available $emulator_number emulators:"
 echo $EMULATOR_LIST
 echo ""
 
-exit 1
-
 # Delete test results directory
 rm -rf $TEST_RESULT_DIR
 
@@ -112,7 +110,13 @@ do
 
     # Start emulator from cold start
     # Run this command in background
-    $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
+    
+    if [[ "$JENKINS_CONTEXT" = true ]]
+    then
+        sudo runuser -l $RUN_AS_USER -c "$EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &"
+    else 
+        $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
+    fi
 
     echo "******** Running tests on $EMULATOR emulator *********"
     echo ""
@@ -138,7 +142,12 @@ do
     echo ""
 
     # Stop all running emulators
-    ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+    if [[ "$JENKINS_CONTEXT" = true ]]
+    then
+        sudo runuser -l $RUN_AS_USER -c "${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done"
+    else 
+        ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+    fi
 
 done
 
