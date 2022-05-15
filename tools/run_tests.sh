@@ -8,6 +8,10 @@
 # One for testing on mis supported SDK version and another one 
 # for max supported SDK version.
 
+# Note that commands on jenkins runs as super user.
+# You need to add super user permissions for jenkins
+# See '/etc/sudoers' file and add this line 'jenkins hostname = (root) NOPASSWD: ALL'
+
 # Fail if somthing is wrong
 set -e
 
@@ -25,6 +29,8 @@ fi
 # Local pathes
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
+
+sudo export ANDROID_AVD_HOME="~/jenkins"
 
 echo "******** Running tests *********"
 echo ""
