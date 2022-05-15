@@ -7,34 +7,34 @@ pipeline {
 
     stages {
         
-        // Building app stage
-        stage('Build Android App') {
-            steps {
-                script {
-                    // Go to directory
-                    dir("${env.WORKSPACE}/tools") {
-                        // Execute script
-                        sh "./build_app.sh"
-                    }
-                }
-            } // end step
-        } // end stage 
-
-        // There are issues with starting emulator on Jenkins
-        // Currently this stage is failing
-        // // Running tests
-        // stage('Running tests') {
+        // // Building app stage
+        // stage('Build Android App') {
         //     steps {
         //         script {
         //             // Go to directory
         //             dir("${env.WORKSPACE}/tools") {
         //                 // Execute script
-        //                 sh "./run_tests.sh"
+        //                 sh "./build_app.sh"
         //             }
-        //         }        
-
+        //         }
         //     } // end step
-        // } // end stage
+        // } // end stage 
+
+        // There are issues with starting emulator on Jenkins
+        // Currently this stage is failing
+        // Running tests
+        stage('Running tests') {
+            steps {
+                script {
+                    // Go to directory
+                    dir("${env.WORKSPACE}/tools") {
+                        // Execute script
+                        sh "./run_tests.sh"
+                    }
+                }        
+
+            } // end step
+        } // end stage
         
         // Archive artifacts stage
         stage('Archive artifacts') {
