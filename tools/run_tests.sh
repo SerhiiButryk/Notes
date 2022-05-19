@@ -3,20 +3,16 @@
 # Copyright 2022. Happy coding ! :)
 # Author: Serhii Butryk 
 
-# This is siple stript to run tests on Android emulator.
-# Before running tests 2 Android Emulators should be available.
-# One for testing on mis supported SDK version and another one 
-# for max supported SDK version.
-
-# Note that commands on jenkins runs as super user.
-# You need to add super user permissions for jenkins
-# See '/etc/sudoers' file and add this line 'jenkins hostname = (root) NOPASSWD: ALL'
+# This is simple script to run tests on Android emulator.
+# The script will start emulators if it's needed.
+# But it doesn't download Emulator images.
+# They should be downloaded and available in advance.
 
 # Fail if somthing is wrong
 set -e
 
-# Tests are not running on Jenkins, because emulator fails to launch ob Jenkins.
-if [ $JENKINS_CONTEXT = true ]
+# Tests are not running on Jenkins, because emulator fails to launch on Jenkins.
+if [ "$JENKINS_CONTEXT" = true ]
 then
     echo "Skipping tests on Jenkins"
     exit 0
@@ -44,12 +40,16 @@ fi
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 
-echo "******** Running tests *********"
+# Android emulator API level configs
+EMULATOR_API_LEVEL_MIN="26"
+EMULATOR_API_LEVEL_MAX="30"
+
+echo "******** Running tests on API $EMULATOR_API_LEVEL_MIN $EMULATOR_API_LEVEL_MAX levels *********"
 echo ""
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 
-if [ -z $EMULATOR_LIST ]
+if [ -z "$EMULATOR_LIST" ]
 then
     
     echo "No emulators available, creating emulators"
@@ -58,14 +58,18 @@ then
     echo "Creating emulator Pixel_API_26"
     echo ""
     
-    # It requires latest cmdline tools Android
-    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
+    DEVICE_NAME="Pixel_API_$EMULATOR_API_LEVEL_MIN"
+
+    # It requires cmdline tools Android
+    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n "$DEVICE_NAME" --device "pixel" -k "system-images;android-${EMULATOR_API_LEVEL_MIN};google_apis_playstore;x86"
     
     echo "Creating emulator Pixel_API_30"
     echo ""
 
-    # It requires latest cmdline tools Android
-    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
+    DEVICE_NAME="Pixel_API_$EMULATOR_API_LEVEL_MAX"
+
+    # It requires cmdline tools Android
+    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n "$DEVICE_NAME" --device "pixel" -k "system-images;android-${EMULATOR_API_LEVEL_MAX};google_apis_playstore;x86"
     
 fi
 
@@ -129,7 +133,7 @@ do
     echo ""
 
     # Stop all running emulators
-    ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+    ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK_ROOT}/platform-tools/adb -s $line emu kill; done;
 
 done
 
