@@ -33,13 +33,15 @@ help() {
     print_message "Script for running Jenkins locally on Linux machine"
     print_message "*****************************************************"
     print_message "Available options:"
-    print_message "--init        - init Jenkins"
-    print_message "--start       - start Jenkins"
-    print_message "--stop        - stop Jenkins"
-    print_message "--status      - current status of Jenkins"
-    print_message "--password    - shows unlock password"
-    print_message "--clear       - clear build files in jenkins home directory"
-    print_message "-j [jobName]  - pass job names for processing,for example: -j \"JobName1 JobName2 JobName3\""
+    print_message "--init                    - init Jenkins"
+    print_message "--start                   - start Jenkins"
+    print_message "--stop                    - stop Jenkins"
+    print_message "--status                  - current status of Jenkins"
+    print_message "--password                - shows unlock password"
+    print_message "--clear                   - clear build files in jenkins home directory"
+    print_message "--disable-autostart       - disables automatic start of Jenkins after reboot"
+    print_message "-j [jobName]              - pass job names for processing"
+    print_message "                            example: -j \"JobName1 JobName2 JobName3\""
     print_message "*****************************************************"
 }
 
@@ -49,6 +51,7 @@ FLAG_START_JENKINS=false
 FLAG_STOP_JENKINS=false
 FLAG_GET_STATUS_JENKINS=false
 FLAG_CLEAR_JENKINS_FILES=false
+FLAG_DISABLE_AUTOSTART_JENKINS=false
 # Job name for processing
 JOBS_NAMES=""
 # Script path
@@ -90,6 +93,9 @@ do
                 ;;
             clear)
                 FLAG_CLEAR_JENKINS_FILES=true
+                ;;
+            disable-autostart)
+                FLAG_DISABLE_AUTOSTART_JENKINS=true
                 ;;
         esac    
         ;;  
@@ -248,3 +254,8 @@ then
     sudo systemctl status jenkins
 fi
 
+if [ "$FLAG_DISABLE_AUTOSTART_JENKINS" = true ]
+then
+    sudo systemctl disable jenkins.service
+    print_message "> Disabled auto start Jenkins" 
+fi

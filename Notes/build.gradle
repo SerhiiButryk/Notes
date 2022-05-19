@@ -9,15 +9,17 @@ buildscript {
         google()
         jcenter()
         maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+        // SpotBugs repository location
+        // See: https://plugins.gradle.org/plugin/com.github.spotbugs
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
         // Android Gradle Plugin Version
         classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        // SpotBugs Gradle Plugin dependency
+        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.3.0"
     }
 }
 

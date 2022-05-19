@@ -1,5 +1,8 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: "com.github.spotbugs"
 
 android {
 
@@ -72,6 +75,34 @@ android {
         jvmTarget = '1.8'
     }
 
+}
+
+// SpotBugs tasks
+tasks.withType(SpotBugsTask) {
+    // Dependent tasks
+    dependsOn 'assembleDebug'
+    group = "verification"
+
+    // Paths for .class files
+    classes = fileTree("build/intermediates/javac/debug/classes/com") + fileTree("build/tmp/kotlin-classes/debug/")
+
+    // Generate HTML report
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+// SpotBug tool configuration.
+// More settings: https://spotbugs-gradle-plugin.netlify.app/com/github/spotbugs/snom/spotbugsextension
+// Or https://github.com/spotbugs/spotbugs-gradle-plugin
+spotbugs {
+    toolVersion = '3.1.10' // Possible it is not necessary
+    ignoreFailures = true
+    effort = 'max' // Find as much as possible issues
+    reportLevel = 'low' // Report all issues
+    maxHeapSize = '1g'
+    reportsDir = file("$buildDir/spotbugs") // Reports directory
 }
 
 dependencies {

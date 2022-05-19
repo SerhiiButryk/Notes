@@ -41,10 +41,12 @@ EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 
 # Android emulator API level configs
-EMULATOR_API_LEVEL_MIN="26"
-EMULATOR_API_LEVEL_MAX="30"
+declare -a EMULATOR_APIS=(
+        "26"
+        "30"
+    )
 
-echo "******** Running tests on API $EMULATOR_API_LEVEL_MIN $EMULATOR_API_LEVEL_MAX levels *********"
+echo "******** Running tests on API ${EMULATOR_APIS[@]} levels *********"
 echo ""
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
@@ -55,21 +57,17 @@ then
     echo "No emulators available, creating emulators"
     echo ""
 
-    echo "Creating emulator Pixel_API_26"
-    echo ""
-    
-    DEVICE_NAME="Pixel_API_$EMULATOR_API_LEVEL_MIN"
+    # Create amulators
+    for API in $"${EMULATOR_APIS[@]}"
+    do 
+        echo "Creating emulator Pixel_API_${API}"
+        echo ""
 
-    # It requires cmdline tools Android
-    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n "$DEVICE_NAME" --device "pixel" -k "system-images;android-${EMULATOR_API_LEVEL_MIN};google_apis_playstore;x86"
-    
-    echo "Creating emulator Pixel_API_30"
-    echo ""
+        DEVICE_NAME="Pixel_API_$API"
 
-    DEVICE_NAME="Pixel_API_$EMULATOR_API_LEVEL_MAX"
-
-    # It requires cmdline tools Android
-    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n "$DEVICE_NAME" --device "pixel" -k "system-images;android-${EMULATOR_API_LEVEL_MAX};google_apis_playstore;x86"
+        # It requires cmdline tools Android
+        $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n "$DEVICE_NAME" --device "pixel" -k "system-images;android-${API};google_apis_playstore;x86"
+    done
     
 fi
 
