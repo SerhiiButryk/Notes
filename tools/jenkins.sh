@@ -28,7 +28,7 @@ check_and_exit_if_no_args_provided() {
 
 # show help
 help() {
-    print_message "HELP:"
+    print_message "HELP"
     print_message "*****************************************************"
     print_message "Script for running Jenkins locally on Linux machine"
     print_message "*****************************************************"
@@ -38,6 +38,8 @@ help() {
     print_message "--stop        - stop Jenkins"
     print_message "--status      - current status of Jenkins"
     print_message "--password    - shows unlock password"
+    print_message "--clear       - clear build files in jenkins home directory"
+    print_message "-j [jobName]  - pass job names for processing,for example: -j \"JobName1 JobName2 JobName3\""
     print_message "*****************************************************"
 }
 
@@ -46,14 +48,20 @@ FLAG_INIT_JENKINS=false
 FLAG_START_JENKINS=false
 FLAG_STOP_JENKINS=false
 FLAG_GET_STATUS_JENKINS=false
-
+FLAG_CLEAR_JENKINS_FILES=false
+# Job name for processing
+JOBS_NAMES=""
+# Script path
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
+# Jenkins locations
 JENKINS_DATA_FILES_PATH=$SCRIPT_ABSOLUTE_PATH/../jenkins
 JENKINS_HOME_DIR_PATH="/var/lib/jenkins"
 JENKINS_BACKUP_FILE_NAME="backup_of_jenkins"
 
-# parse arguments 
-while getopts ":h-:" OPTION
+# parse arguments
+# colon at the beginning it's silent mode
+# color after symbol tells that option takes argument
+while getopts ":h-:j:" OPTION
 do 
     case $OPTION in
     -)  
@@ -80,12 +88,19 @@ do
                 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
                 exit 1    
                 ;;
+            clear)
+                FLAG_CLEAR_JENKINS_FILES=true
+                ;;
         esac    
         ;;  
     h) 
         help
         exit 1    
         ;;   
+
+    j)
+        JOBS_NAMES=$OPTARG
+        ;;
     \?) 
         print_error "Error: invalid arguments" 
         help
@@ -95,31 +110,54 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ "$FLAG_START_JENKINS" = true ];
+if [ "$FLAG_CLEAR_JENKINS_FILES" = true ];
 then
-    print_message "> Start Jenkins"
-    # Run as super user
-    sudo systemctl start jenkins
 
-    print_message "> Open browser"
-    # Open browser
-    xdg-open http://localhost:8080
+    # Deleting job build files
+    if [ ! -z $JOBS_NAMES ]
+    then 
+        print_message "> Clearing jobs build files $JOBS_NAMES"
 
+        for JOB in $JOBS_NAMES
+        do 
+            pushd ${JENKINS_HOME_DIR_PATH}/jobs/${JOB} > /dev/null
+            
+            # Delete job files
 
-elif [ "$FLAG_STOP_JENKINS" = true ];
-then
-    print_message "> Stop Jenkins"
-    # Run as super user
-    sudo systemctl stop jenkins
+            sudo rm -rf builds/
+            sudo rm -rf workspace/
+            sudo rm -rf workspace@tmp/
+            sudo rm -rf workspace@script/
 
+            popd > /dev/null
+        done
+    else
+        print_message "> Skipping clearing jobs build files, no job names are passed"
+    fi
 
-elif [ "$FLAG_GET_STATUS_JENKINS" = true ];
-then
-    print_message "> Status of Jenkins"
-    # Run as super user
-    sudo systemctl status jenkins
+    # Cache dirs to clear in Jenkins home dir
+    declare -a CACHE_FILES=(
+        "logs"
+        "fingerprints"
+        "caches"
+    )
 
-elif [ "$FLAG_INIT_JENKINS" = true ];
+    print_message "> Clearing cache/build files"
+
+    for FILE in $"${CACHE_FILES[@]}"
+    do 
+        pushd ${JENKINS_HOME_DIR_PATH} > /dev/null
+        
+        # Delete files
+        sudo rm -rf ${FILE}
+        
+        popd > /dev/null
+    done
+
+    print_message "> Completed"
+fi    
+
+if [ "$FLAG_INIT_JENKINS" = true ]
 then
     print_message "> Init Jenkins"
     
@@ -183,7 +221,30 @@ then
     rm -rf ${JENKINS_DATA_FILES_PATH}/temp
 
     print_message "> Completed"
-
-else 
-    print_error "> Invalid commend received. Nothing to do."
 fi
+
+if [ "$FLAG_STOP_JENKINS" = true ]
+then
+    print_message "> Stop Jenkins"
+    # Run as super user
+    sudo systemctl stop jenkins
+fi
+
+if [ "$FLAG_START_JENKINS" = true ]
+then
+    print_message "> Start Jenkins"
+    # Run as super user
+    sudo systemctl start jenkins
+
+    print_message "> Open browser"
+    # Open browser
+    xdg-open http://localhost:8080
+fi
+
+if [ "$FLAG_GET_STATUS_JENKINS" = true ]
+then
+    print_message "> Status of Jenkins"
+    # Run as super user
+    sudo systemctl status jenkins
+fi
+

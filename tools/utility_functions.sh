@@ -12,6 +12,9 @@
 #
 # This ensures that scripts are correctly called
 
+# Fail if somthing is wrong
+set -e
+
 # Prints text in green color
 print_message() {
 
