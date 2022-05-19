@@ -15,14 +15,28 @@
 # Fail if somthing is wrong
 set -e
 
+# Tests are not running on Jenkins, because emulator fails to launch ob Jenkins.
+if [ $JENKINS_CONTEXT = true ]
+then
+    echo "Skipping tests on Jenkins"
+    exit 0
+fi
+
 # Add untility scripts
 SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 . $SCRIPT_RELEVANT_PATH/utility_functions.sh
 
 # Check if env variable is defined
-if [[ -z $ANDROID_SDK_ROOT ]]
+if [ -z $ANDROID_SDK_ROOT ]
 then
     echo "ANDROID_SDK_ROOT is undefined, aborting..."
+    exit 1
+fi
+
+# Check if env variable is defined
+if [ -z $ANDROID_CMD_TOOLS ]
+then
+    echo "ANDROID_CMD_TOOLS is undefined, aborting..."
     exit 1
 fi
 
@@ -33,14 +47,9 @@ TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
 echo "******** Running tests *********"
 echo ""
 
-if [[ "$JENKINS_CONTEXT" = true ]]
-then
-    EMULATOR_LIST=$( sudo $ANDROID_SDK_ROOT/emulator/emulator -list-avds )
-else 
-    EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
-fi
+EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 
-if [[ -z $EMULATOR_LIST ]]
+if [ -z $EMULATOR_LIST ]
 then
     
     echo "No emulators available, creating emulators"
@@ -50,33 +59,18 @@ then
     echo ""
     
     # It requires latest cmdline tools Android
-    if [[ "$JENKINS_CONTEXT" = true ]]
-    then
-        sudo $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
-    else 
-        ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
-    fi
+    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n Pixel_API_26 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
     
     echo "Creating emulator Pixel_API_30"
     echo ""
 
     # It requires latest cmdline tools Android
-    if [[ "$JENKINS_CONTEXT" = true ]]
-    then
-        sudo $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
-    else 
-        ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
-    fi
-
+    $ANDROID_CMD_TOOLS/bin/avdmanager create avd -n Pixel_API_30 --device "pixel" -k "system-images;android-26;google_apis_playstore;x86"
+    
 fi
 
 # Re-check if emulators available
-if [[ "$JENKINS_CONTEXT" = true ]]
-then
-    EMULATOR_LIST=$( sudo $ANDROID_SDK_ROOT/emulator/emulator -list-avds )
-else 
-    EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
-fi
+EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 
 # Checking the number of emulators
 declare -i emulator_number
@@ -85,7 +79,7 @@ do
     emulator_number=emulator_number+1
 done
 
-if [[ ! $emulator_number == "2" ]] 
+if [ ! $emulator_number == "2" ]
 then
    echo "To run test you need at least 2 emulators available, aborting..."
    exit 1 
@@ -109,13 +103,7 @@ do
 
     # Start emulator from cold start
     # Run this command in background
-    
-    if [[ "$JENKINS_CONTEXT" = true ]]
-    then
-        sudo $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
-    else 
-        $EMULATOR_DIR/emulator -avd $EMULATOR -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
-    fi
+    $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
 
     echo "******** Running tests on $EMULATOR emulator *********"
     echo ""
@@ -141,12 +129,7 @@ do
     echo ""
 
     # Stop all running emulators
-    if [[ "$JENKINS_CONTEXT" = true ]]
-    then
-        sudo ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
-    else 
-        ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
-    fi
+    ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
 
 done
 

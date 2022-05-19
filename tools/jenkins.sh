@@ -39,7 +39,7 @@ help() {
     print_message "--status      - current status of Jenkins"
     print_message "--password    - shows unlock password"
     print_message "--clear       - clear build files in jenkins home directory"
-    print_message "-j [args]     - pass job names for processing,for example: -j \"JobName1 JobName2 JobName3\""
+    print_message "-j [jobName]  - pass job names for processing,for example: -j \"JobName1 JobName2 JobName3\""
     print_message "*****************************************************"
 }
 
@@ -114,7 +114,7 @@ if [ "$FLAG_CLEAR_JENKINS_FILES" = true ];
 then
 
     # Deleting job build files
-    if [[ ! -z $JOBS_NAMES ]]
+    if [ ! -z $JOBS_NAMES ]
     then 
         print_message "> Clearing jobs build files $JOBS_NAMES"
 
@@ -157,7 +157,7 @@ then
     print_message "> Completed"
 fi    
 
-if [ "$FLAG_INIT_JENKINS" = true ];
+if [ "$FLAG_INIT_JENKINS" = true ]
 then
     print_message "> Init Jenkins"
     
@@ -223,14 +223,14 @@ then
     print_message "> Completed"
 fi
 
-if [ "$FLAG_STOP_JENKINS" = true ];
+if [ "$FLAG_STOP_JENKINS" = true ]
 then
     print_message "> Stop Jenkins"
     # Run as super user
     sudo systemctl stop jenkins
 fi
 
-if [ "$FLAG_START_JENKINS" = true ];
+if [ "$FLAG_START_JENKINS" = true ]
 then
     print_message "> Start Jenkins"
     # Run as super user
@@ -241,7 +241,7 @@ then
     xdg-open http://localhost:8080
 fi
 
-if [ "$FLAG_GET_STATUS_JENKINS" = true ];
+if [ "$FLAG_GET_STATUS_JENKINS" = true ]
 then
     print_message "> Status of Jenkins"
     # Run as super user

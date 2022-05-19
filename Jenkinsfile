@@ -7,18 +7,18 @@ pipeline {
 
     stages {
         
-//         // Building app stage
-//         stage('Build Android App') {
-//             steps {
-//                 script {
-//                     // Go to directory
-//                     dir("${env.WORKSPACE}/tools") {
-//                         // Execute script
-//                         sh "./build_app.sh"
-//                     }
-//                 }
-//             } // end step
-//         } // end stage 
+        // Building app stage
+        stage('Build Android App') {
+            steps {
+                script {
+                    // Go to directory
+                    dir("${env.WORKSPACE}/tools") {
+                        // Execute script
+                        sh "./build_app.sh"
+                    }
+                }
+            } // end step
+        } // end stage 
 
         // Running tests
         stage('Running tests') {
@@ -38,7 +38,6 @@ pipeline {
         stage('Archive artifacts') {
             steps {
                 script {
-
                     // Archive app artifacts    
                     archiveArtifacts([
                         artifacts: 'Notes-App/**/*.*', 
@@ -46,7 +45,6 @@ pipeline {
                         followSymlinks: false, 
                         onlyIfSuccessful: true        
                     ]) 
-                    
                 }        
 
             } // end step
