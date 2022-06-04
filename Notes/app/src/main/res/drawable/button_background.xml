@@ -3,14 +3,14 @@
     <item android:state_pressed="true">
         <shape>
             <stroke android:color="@color/login_primary" android:width="2dp"/>
-            <corners android:radius="2dp" />
+            <corners android:radius="@dimen/button_selector_corners" />
         </shape>
     </item>
 
     <item>
         <shape>
             <stroke android:color="@color/login_light" android:width="2dp"/>
-            <corners android:radius="2dp" />
+            <corners android:radius="@dimen/button_selector_corners" />
         </shape>
     </item>
 </selector>

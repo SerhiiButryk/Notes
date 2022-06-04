@@ -35,9 +35,9 @@ class CipherTest {
      *  3. Test verifies expected results
      */
     @Test
-    fun test01_SimpleEncryptDecrypt() {
+    fun test01_encryptDecryptUsingOpenSSL() {
 
-       Log.i(TAG, "test01_SimpleEncryptDecrypt() IN")
+       Log.i(TAG, "test01_encryptDecryptUsingOpenSSL() IN")
 
         var cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
 
@@ -62,7 +62,7 @@ class CipherTest {
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
 
-       Log.i(TAG, "test01_SimpleEncryptDecrypt() OUT")
+       Log.i(TAG, "test01_encryptDecryptUsingOpenSSL() OUT")
     }
 
     /**
@@ -78,9 +78,9 @@ class CipherTest {
      *  4. Test verifies expected results
      */
     @Test
-    fun test02_SimpleEncryptDecryptUsingSecureStore() {
+    fun test02_encryptDecryptUsingSecureStore() {
 
-       Log.i(TAG, "test02_SimpleEncryptDecryptUsingSecureStore() IN")
+       Log.i(TAG, "test02_encryptDecryptUsingSecureStore() IN")
 
         val cipher = Cipher()
         cipher.createKey(SECRET_KET_TEST_A, false)
@@ -110,7 +110,7 @@ class CipherTest {
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
 
-       Log.i(TAG, "test02_SimpleEncryptDecryptUsingSecureStore() OUT")
+       Log.i(TAG, "test02_encryptDecryptUsingSecureStore() OUT")
     }
 
     companion object {

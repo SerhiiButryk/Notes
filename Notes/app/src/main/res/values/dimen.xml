@@ -70,4 +70,7 @@
     // Dialogs
     <dimen name="padding_edittext_dialog">18dp</dimen>
 
+    // Drawables
+    <dimen name="button_selector_corners">30dp</dimen>
+
 </resources>

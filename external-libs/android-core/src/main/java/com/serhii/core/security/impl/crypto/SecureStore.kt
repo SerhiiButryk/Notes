@@ -103,8 +103,8 @@ internal class SecureStore : CryptoProvider {
     private fun isSecretKeyExists(key: String): Boolean {
         try {
             require(keyStore != null) { "Keystore is not initialized" }
-            keyStore.getEntry(key, null) as KeyStore.SecretKeyEntry
-            return true
+            val entry: KeyStore.Entry? = keyStore.getEntry(key, null)
+            return entry != null
         } catch (e: KeyStoreException) {
             Log.error(TAG, "exception: " + e.message)
             e.printStackTrace()

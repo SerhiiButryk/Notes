@@ -46,6 +46,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
     private Button fingerprintBtn;
     private TextInputLayout emailLayout;
     private TextInputLayout passwordLayout;
+    private TextView description;
 
     private final BiometricAuthManager biometricAuthManager = new BiometricAuthManager();
     private boolean isFingerprintAvailable;
@@ -110,6 +111,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
 
             emailField.setText(userName);
             registerAccountBtn.setVisibility(View.GONE);
+            description.setVisibility(View.GONE);
             passwordField.requestFocus();
 
             loginButton.setVisibility(View.VISIBLE);
@@ -126,6 +128,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
             Log.info(TAG, "onCreateView() user doesn't exist");
 
             registerAccountBtn.setVisibility(View.VISIBLE);
+            description.setVisibility(View.VISIBLE);
             passwordLayout.setVisibility(View.GONE);
             emailLayout.setVisibility(View.GONE);
         }
@@ -174,6 +177,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
 
     public void onUserAccountCreated() {
         registerAccountBtn.setVisibility(View.GONE);
+        description.setVisibility(View.GONE);
         emailField.setText(nativeBridge.getUserName());
         passwordField.requestFocus();
     }
@@ -189,6 +193,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
         registerAccountBtn = binding.btnRegister;
         titleLabel = binding.title;
         fingerprintBtn = binding.btnLoginBiometric;
+        description = binding.description;
 
         emailLayout = binding.emailLayout;
         passwordLayout = binding.passwordLayout;

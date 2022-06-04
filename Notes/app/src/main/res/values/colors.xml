@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/blue_contrast</color>
-    <color name="colorPrimaryDark">@color/blue</color>
-    <color name="colorAccent">@color/blue_accent</color>
+    // Blue theme TODO: Refactor theme styles
+<!--    <color name="colorPrimary">@color/blue_contrast</color>-->
+<!--    <color name="colorPrimaryDark">@color/blue</color>-->
+<!--    <color name="colorAccent">@color/blue_accent</color>-->
+
+    // Buttons
+<!--    <color name="login_primary">#ccffffff</color>-->
+<!--    <color name="login_light">#1affffff</color>-->
+<!--    <color name="login_medium">#66ffffff</color>-->
+    // End
+
+    // Light theme
+    <color name="colorPrimary">@color/dark_grey</color>
+    <color name="colorPrimaryDark">@color/dark_grey</color>
+    <color name="colorAccent">@color/white</color>
+
+    // Buttons
+    <color name="login_primary">@color/dark_grey</color>
+    <color name="login_light">@color/light_grey</color>
+    <color name="login_medium">@color/light_grey</color>
+    // End
 
     <color name="grey">#E0E0E0</color>
     <color name="dark_grey">#616161</color>
@@ -26,10 +44,6 @@
     <color name="light_blue">#3F51B5</color>
     <color name="blue_accent">#4FC3F7</color>
     <color name="grey_background">#BDBDBD</color>
-
-    <color name="login_primary">#ccffffff</color>
-    <color name="login_light">#1affffff</color>
-    <color name="login_medium">#66ffffff</color>
 
     <color name="semitransparent_white">#77ffffff</color>
 

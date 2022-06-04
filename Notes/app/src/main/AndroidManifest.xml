@@ -17,7 +17,7 @@
         <activity
             android:name="com.serhii.apps.notes.activities.SettingsActivity"
             android:exported="false"
-            android:theme="@style/AppThemeNoActionbarTheme" />
+            android:theme="@style/AppSettingsThemeNoActionbarTheme" />
 
         <activity
             android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
