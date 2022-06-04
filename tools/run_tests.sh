@@ -37,8 +37,10 @@ then
 fi
 
 # Local pathes
+SCRIPT_ABSOLUTE_PATH=$(pwd)
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
+CODE_COVERAGE_FOLDER_NAME="$TEST_RESULT_DIR/codecoverage"
 
 # Android emulator API level configs
 declare -a EMULATOR_APIS=(
@@ -110,13 +112,18 @@ do
     echo "******** Running tests on $EMULATOR emulator *********"
     echo ""
 
+    echo "Waiting for device to be online"
+    echo ""
+
     # Wait 60 seconds for device to be online
     sleep 60
 
     # Run tests
     pushd ${SCRIPT_RELEVANT_PATH}/../Notes/ > /dev/null
-    
-    ./gradlew connectedAndroidTest
+
+    # This will run tests and create coverage report
+    # ./gradlew --console plain Project:task -Pandroid.testInstrumentationRunnerArguments.class=fullclassbname
+    ./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests jacocoTestReport
     
     popd > /dev/null
 
@@ -134,6 +141,22 @@ do
     ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK_ROOT}/platform-tools/adb -s $line emu kill; done;
 
 done
+
+mkdir -p $CODE_COVERAGE_FOLDER_NAME
+
+# Copy files
+cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/coverage/androidTest/debug/* $CODE_COVERAGE_FOLDER_NAME
+
+echo ""
+
+# Show reports
+for EMULATOR in $EMULATOR_LIST
+do
+    echo "See reports: file://${SCRIPT_ABSOLUTE_PATH}/test-results/$EMULATOR/reports/index.html"
+done
+
+# Show covarage report
+echo "See coverage reports: file://${SCRIPT_ABSOLUTE_PATH}/test-results/codecoverage/index.html"
 
 echo ""
 echo "******** Finished *********"

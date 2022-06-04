@@ -36,7 +36,8 @@
     <string name="kbtn_cancel">Cancel</string>
 
     // Login Activity
-    <string name="title_description">Create user</string>
+    <string name="text_description">Welcome to note app. Manage all your notes here. Firstly you need to create a user. Click \"Continue\" button to proceed.</string>
+    <string name="btn_create_user">Continue</string>
     <string name="login_btn">Login</string>
     <string name="create_account_bnt">Done</string>
     <string name="usr_psw">Your user password</string>
@@ -44,7 +45,7 @@
     <string name="usr_new_psw">Enter your password</string>
     <string name="usr_approve_new_psw">Repeat your password</string>
     <string name="usr_new_email">Enter your user email</string>
-    <string name="title_login">Welcome !</string>
+    <string name="title_login">Welcome</string>
     <string name="title_reg">Registration</string>
     <string name="login_with_biometric">Login with biometric</string>
 
@@ -149,8 +150,8 @@
     <string name="change_password_toast_password_error">Error occurred</string>
 
     // Set password dialog
-    <string name="set_password_dialog_title">Set a password</string>
-    <string name="set_password_dialog_hint">Enter a password</string>
+    <string name="set_password_dialog_title">Enter your password</string>
+    <string name="set_password_dialog_title2">Enter password.\nPlease, make sure that this is the same password as you used to backup this notes. Otherwise this operation will fail.</string>
 
     // BlockView
     <string name="block_title">Access is restricted</string>
@@ -172,6 +173,9 @@
     // Errors / Info
     <string name="result_success">Success</string>
     <string name="result_failed">Failed</string>
+    <string name="result_canceled">Canceled</string>
+
     <string name="empty_login">Empty username or password</string>
+    <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
 
 </resources>

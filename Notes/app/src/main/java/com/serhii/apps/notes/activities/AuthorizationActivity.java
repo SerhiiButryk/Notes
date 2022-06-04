@@ -1,30 +1,28 @@
 package com.serhii.apps.notes.activities;
 
+import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
+import static com.serhii.apps.notes.ui.fragments.RegisterFragment.FRAGMENT_TAG;
+
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeService;
+import com.serhii.apps.notes.control.idle_lock.InactivityManager;
 import com.serhii.apps.notes.control.types.AuthResult;
-import com.serhii.apps.notes.control.types.AuthorizeType;
-import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.fragments.BlockFragment;
 import com.serhii.apps.notes.ui.fragments.LoginFragment;
 import com.serhii.apps.notes.ui.fragments.RegisterFragment;
 import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.log.Log;
-import com.serhii.core.utils.GoodUtils;
-
-import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
-import static com.serhii.apps.notes.ui.fragments.RegisterFragment.FRAGMENT_TAG;
 
 public class AuthorizationActivity extends AppCompatActivity {
 
@@ -37,9 +35,6 @@ public class AuthorizationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
-
-        // Enable unsecured screen content settings
-        GoodUtils.enableUnsecureScreenProtection(this);
 
         fragmentManager = getSupportFragmentManager();
 
@@ -56,7 +51,8 @@ public class AuthorizationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        // Cancel inactivity timer
+        InactivityManager.cancelAlarm(this);
         Log.info(TAG, "onResume()");
     }
 

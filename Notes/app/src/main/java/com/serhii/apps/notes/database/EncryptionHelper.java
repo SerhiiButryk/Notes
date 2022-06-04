@@ -113,7 +113,7 @@ class EncryptionHelper {
         String stime = preferences.getString(KEY_IV_TIME, "");
 
         if (stitle.isEmpty() || snote.isEmpty() || stime.isEmpty()) {
-            throw new IllegalStateException(TAG + " can not retrieve iv from shared preferences");
+            Log.error(TAG, "removeMetaData() meta data is absent");
         }
 
         ivTitle = Base64.decode(stitle, Base64.NO_WRAP);

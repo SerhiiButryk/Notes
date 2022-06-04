@@ -17,7 +17,7 @@
         <activity
             android:name="com.serhii.apps.notes.activities.SettingsActivity"
             android:exported="false"
-            android:theme="@style/AppThemeNoActionbarTheme" />
+            android:theme="@style/AppSettingsThemeNoActionbarTheme" />
 
         <activity
             android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
@@ -35,7 +35,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.serhii.apps.notes.control.broadcast.InactivityEventReceiver"
+        <service android:name="com.serhii.apps.notes.control.idle_lock.IdleLockJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false"/>
 
     </application>

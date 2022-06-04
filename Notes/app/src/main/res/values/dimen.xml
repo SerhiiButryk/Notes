@@ -54,6 +54,9 @@
 
     <dimen name="biomertric_button_top_margin">6dp</dimen>
 
+    <dimen name="description_end_start">15dp</dimen>
+    <dimen name="description_top">50dp</dimen>
+
     // Note editor screen
     <dimen name="padding_layout">16dp</dimen>
     <dimen name="toolbar_height">80dp</dimen>
@@ -65,9 +68,12 @@
     <dimen name="grid_padding_layout">12dp</dimen>
 
     // BlockView
-    <dimen name="message_size_text">20sp</dimen>
+    <dimen name="message_size_text">18sp</dimen>
 
     // Dialogs
     <dimen name="padding_edittext_dialog">18dp</dimen>
+
+    // Drawables
+    <dimen name="button_selector_corners">30dp</dimen>
 
 </resources>

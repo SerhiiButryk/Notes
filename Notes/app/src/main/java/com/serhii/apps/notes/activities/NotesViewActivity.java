@@ -1,36 +1,28 @@
 package com.serhii.apps.notes.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.serhii.apps.notes.BuildConfig;
-import com.serhii.apps.notes.control.managers.BackupManager;
-import com.serhii.core.log.Log;
-import com.serhii.core.security.impl.crypto.CryptoError;
-import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.EventService;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeUser;
+import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.control.managers.BiometricAuthManager;
-import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment;
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory;
+import com.serhii.core.log.Log;
+import com.serhii.core.security.impl.crypto.CryptoError;
+import com.serhii.core.utils.GoodUtils;
 
-import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
-
-public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUser,
+public class NotesViewActivity extends AppBaseActivity implements IAuthorizeUser,
         NoteViewFragment.NoteInteraction, NoteEditorFragment.EditorNoteInteraction {
 
     private static final String TAG = "NotesViewActivity";
@@ -44,22 +36,16 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_view);
 
-        // Enable unsecured screen content settings
-        GoodUtils.enableUnsecureScreenProtection(this);
+        // Need to call initNativeConfigs() before authorization process at the beginning.
+        String filePath = GoodUtils.getFilePath(this);
+        initNativeConfigs(filePath);
 
         if (savedInstanceState == null) {
             addFragment();
         }
 
-        // Start authorization process
+        // Start authorization process.
         authorizeUser(savedInstanceState);
-
-        String filePath = GoodUtils.getFilePath(this);
-        Log.info(TAG, "onCreate() PPP " + filePath);
-        initNativeConfigs(filePath);
-
-        // Initialize lifecycle aware components
-        InactivityManager.getInstance().setLifecycle(this, getLifecycle());
 
         Log.info(TAG, "onCreate() OUT");
     }
@@ -74,18 +60,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
     }
 
     @Override
-    public void onUserInteraction() {
-        super.onUserInteraction();
-        InactivityManager.getInstance().onUserInteraction();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.info(TAG, "onResume()");
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         Log.info(TAG, "onStop()");
@@ -93,9 +67,10 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
 
     @Override
     protected void onDestroy() {
-        Log.info(TAG, "onDestroy()");
+        Log.info(TAG, "onDestroy() IN");
         super.onDestroy();
         BackupManager.getInstance().clearNotesViewModelWeakReference();
+        Log.info(TAG, "onDestroy() OUT");
     }
 
     @Override
@@ -186,6 +161,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         fm.popBackStack();
     }
 
+    // This will authorization activity for user to login
     private void authorizeUser(Bundle bundle) {
         /**
          *  Activity is launched first time
@@ -206,9 +182,4 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
      *
      */
     private native void initNativeConfigs(String path);
-
-    static {
-        System.loadLibrary(RUNTIME_LIBRARY);
-    }
-
 }

@@ -24,27 +24,79 @@ import org.junit.runners.MethodSorters
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DatabaseTests {
 
+    companion object {
+        private val TAG: String = DatabaseTests::class.java.simpleName
+        private var isKeyCreated = false
+
+        @BeforeClass
+        @JvmStatic
+        fun onetimeSetup() {
+            Log.i(TAG, "onetimeSetup() IN")
+
+            if (!isKeyCreated) {
+                Log.i(TAG, "onetimeSetup() Create keys")
+                // Create key for notes data encryption
+                val cipher = Cipher()
+                cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, false)
+                isKeyCreated = true
+            } else {
+                Log.i(TAG, "onetimeSetup() Keys are created")
+            }
+
+            Assert.assertTrue("Failed to create key", isKeyCreated)
+
+            val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+
+            // Init database
+            val notesDatabase = NotesDatabaseProvider(context)
+            notesDatabase.init(context)
+
+            Log.i(TAG, "onetimeSetup() OUT")
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun cleanup() {
+            Log.i(TAG, "cleanup()")
+            val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+            val notesDatabase = NotesDatabaseProvider(context)
+            notesDatabase.close()
+        }
+
+    }
+
     @Before
     fun setup() {
-        Log.i(TAG, "setup() IN")
-
-        if (!isKeyCreated) {
-            Log.i(TAG, "setup() Create keys")
-            // Create key for notes data encryption
-            val cipher = Cipher()
-            cipher.createKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS, false)
-            isKeyCreated = true
-        } else {
-            Log.i(TAG, "setup() Keys are created")
-        }
+        Log.i(TAG, "setup()")
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
-        // Init database
         val notesDatabase = NotesDatabaseProvider(context)
-        notesDatabase.init(context)
 
-        Log.i(TAG, "setup() OUT")
+        // Delete records
+        val numberOfRecords = notesDatabase.recordsCount
+        for (i in 0..numberOfRecords) {
+            notesDatabase.deleteRecord(i.toString())
+        }
+
+        Log.i(TAG, "setup() is database empty: ${notesDatabase.recordsCount}, OUT")
+    }
+
+    @After
+    fun tearDown() {
+        Log.i(TAG, "tearDown()")
+
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+
+        val notesDatabase = NotesDatabaseProvider(context)
+
+        // Delete records
+        val numberOfRecords = notesDatabase.recordsCount
+        for (i in 0..numberOfRecords) {
+            notesDatabase.deleteRecord(i.toString())
+        }
+
+        Log.i(TAG, "tearDown() is database empty: ${notesDatabase.recordsCount}, OUT")
     }
 
     /**
@@ -56,9 +108,9 @@ class DatabaseTests {
      *  4. Verifies the results
      */
     @Test
-    fun test01_SimpleTest() {
+    fun test01_AddRecord() {
 
-        Log.i(TAG, "test01_SimpleTest() IN")
+        Log.i(TAG, "test01_AddRecord() IN")
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
@@ -78,24 +130,7 @@ class DatabaseTests {
         Assert.assertEquals("Note is not correct", retrievedNote.note, noteText)
         Assert.assertEquals("Note title is not correct", retrievedNote.title, noteTitle)
 
-        Log.i(TAG, "test01_SimpleTest() OUT")
-    }
-
-    @After
-    fun tearDown() {
-        Log.i(TAG, "tearDown() IN")
-
-        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-
-        val notesDatabase = NotesDatabaseProvider(context)
-        notesDatabase.close()
-
-        Log.i(TAG, "tearDown() OUT")
-    }
-
-    companion object {
-        val TAG = DatabaseTests::class.java.simpleName
-        var isKeyCreated = false
+        Log.i(TAG, "test01_AddRecord() OUT")
     }
 
 }

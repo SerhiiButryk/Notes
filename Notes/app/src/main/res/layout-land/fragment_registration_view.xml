@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/usr_new_email"
-                android:imeOptions="actionNext"
+                android:imeOptions="actionNext|flagNoExtractUi"
                 android:inputType="textEmailAddress|textNoSuggestions" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/usr_new_psw"
-                android:imeOptions="actionNext"
+                android:imeOptions="actionNext|flagNoExtractUi"
                 android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -82,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/usr_approve_new_psw"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionDone|flagNoExtractUi"
                 android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>

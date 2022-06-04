@@ -24,9 +24,7 @@ namespace MYLIB
     void FileSystem::initFilePath(const std::string& path)
     {
         env_path = path;
-
-        // DEBUG ONLY
-        // Log::Info("FileSystem", "initFilePath(): Path: %s \n", path);
+        Log::Info("FileSystem", "initFilePath(): INITIALIZED \n");
     }
 
     std::string FileSystem::getFilePath() const

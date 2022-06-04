@@ -8,8 +8,6 @@ import com.serhii.apps.notes.database.NotesDatabaseProvider;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.core.log.Log;
-import com.serhii.core.security.Cipher;
-import com.serhii.core.security.impl.crypto.Result;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
@@ -19,8 +17,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.serhii.core.security.Cipher.CRYPTO_PROVIDER_OPENSSL;
-
 public class BackupManager {
 
     public static final String TAG = "BackupManager";
@@ -29,9 +25,10 @@ public class BackupManager {
     public static final int REQUEST_CODE_BACKUP_NOTES = 2;
     public static final int REQUEST_CODE_OPEN_BACKUP_FILE = 3;
 
-    private static final String TEXT_FILE_TYPE = "text/plain";
-    private static final String FILE_NAME_EXTRACT_DATA = "NotesExtracted.txt";
-    private static final String FILE_NAME_BACKUP = "NotesBackup.txt";
+    private static final String FILE_MIME_TYPE = "text/plain";
+    private static final String FILE_NAME_EXTRACTED_DATA = "NotesExtracted.txt";
+    private static final String FILE_NAME_BACKUP_DATA = "NotesBackup.txt";
+    private static final String IV_KEY_MARKER = "RTSASPE00";
 
     private WeakReference<NotesViewModel> notesViewModelWeakReference;
 
@@ -60,21 +57,21 @@ public class BackupManager {
 
         Log.info(TAG, "openDirectoryChooser()");
 
-        activity.startActivityForResult(createIntent(FILE_NAME_EXTRACT_DATA), REQUEST_CODE_EXTRACT_NOTES);
+        activity.startActivityForResult(createIntent(FILE_NAME_EXTRACTED_DATA), REQUEST_CODE_EXTRACT_NOTES);
     }
 
     public void openDirectoryChooserForBackup(Activity activity) {
 
         Log.info(TAG, "openDirectoryChooserForBackup()");
 
-        activity.startActivityForResult(createIntent(FILE_NAME_BACKUP), REQUEST_CODE_BACKUP_NOTES);
+        activity.startActivityForResult(createIntent(FILE_NAME_BACKUP_DATA), REQUEST_CODE_BACKUP_NOTES);
     }
 
     public void openBackUpFile(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(TEXT_FILE_TYPE);
-        intent.putExtra(Intent.EXTRA_TITLE, FILE_NAME_BACKUP);
+        intent.setType(FILE_MIME_TYPE);
+        intent.putExtra(Intent.EXTRA_TITLE, FILE_NAME_BACKUP_DATA);
 
         activity.startActivityForResult(intent, REQUEST_CODE_OPEN_BACKUP_FILE);
     }
@@ -190,8 +187,17 @@ public class BackupManager {
             notesDatabaseProvider.addRecord(new NoteModel(note.note, note.title));
         }
 
-        if (notesViewModelWeakReference != null && notesViewModelWeakReference.get() != null) {
-            notesViewModelWeakReference.get().updateData();
+        if (notesViewModelWeakReference != null) {
+            NotesViewModel notesViewModel = notesViewModelWeakReference.get();
+            if (notesViewModel != null) {
+                notesViewModel.updateData();
+            } else {
+                Log.error(TAG, "restoreData() nvm is null");
+                return false;
+            }
+        } else {
+            Log.error(TAG, "restoreData() wr is null");
+            return false;
         }
 
         return true;
@@ -201,7 +207,7 @@ public class BackupManager {
         // Show directory chooser
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(TEXT_FILE_TYPE);
+        intent.setType(FILE_MIME_TYPE);
         intent.putExtra(Intent.EXTRA_TITLE, fileName);
         return intent;
     }

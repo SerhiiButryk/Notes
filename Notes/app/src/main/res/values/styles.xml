@@ -13,6 +13,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppSettingsThemeNoActionbarTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/black</item>
+    </style>
+
     <style name="NotesThemeDark" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="NotesThemeLight" parent="ThemeOverlay.AppCompat.Light" />
@@ -36,6 +42,8 @@
         <item name="android:textSize">20sp</item>
         <item name="android:lineSpacingMultiplier">1.2</item>
         <item name="android:importantForAutofill">no</item>
+        <!--  See: https://stackoverflow.com/questions/7238450/set-edittext-cursor-color-->
+        <item name="android:textCursorDrawable">@null</item>
     </style>
 
     <style name="NoteTextView">
@@ -48,8 +56,12 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
     <style name="LoginButton">
-        <item name="android:background">@drawable/button_background</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:gravity">center</item>
         <item name="android:visibility">gone</item>
@@ -58,36 +70,54 @@
         <item name="android:layout_marginLeft">@dimen/margin_edges</item>
         <item name="android:layout_marginEnd">@dimen/margin_edges</item>
         <item name="android:layout_marginRight">@dimen/margin_edges</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent</item>
     </style>
 
     <style name="LoginTextView">
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">@dimen/title_size_text</item>
-        <item name="android:fontFamily">@font/roboto_thin</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:layout_marginStart">@dimen/margin_edges_textview</item>
         <item name="android:layout_marginLeft">@dimen/margin_edges_textview</item>
         <item name="android:layout_marginEnd">@dimen/margin_edges_textview</item>
         <item name="android:layout_marginRight">@dimen/margin_edges_textview</item>
     </style>
 
+    <style name="ShapeAppearance.App.SmallComponent2" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">10dp</item>
+    </style>
+
     <style name="LoginInputTextView" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/text_color</item>
         <item name="android:visibility">gone</item>
-        <item name="android:textColorHint">@color/white</item>
+        <item name="android:textColorHint">@color/black</item>
         <item name="android:layout_marginStart">@dimen/margin_edges</item>
         <item name="android:layout_marginLeft">@dimen/margin_edges</item>
         <item name="android:layout_marginEnd">@dimen/margin_edges</item>
         <item name="android:layout_marginRight">@dimen/margin_edges</item>
+        <!--  See: https://stackoverflow.com/questions/7238450/set-edittext-cursor-color-->
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent2</item>
     </style>
 
     <style name="LoginEditText">
-        <item name="android:background">@drawable/edit_text_background</item>
         <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">18sp</item>
+        <!-- See: https://www.generacodice.com/en/articolo/801175/disabling-the-fullscreen-editing-view-for-soft-keyboard-input-in-landscape-->
         <item name="android:imeOptions">flagNoExtractUi</item>
         <item name="android:importantForAutofill">no</item>
+        <!--  See: https://stackoverflow.com/questions/7238450/set-edittext-cursor-color-->
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
+
+    <style name="LoginDescription">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:importantForAutofill">no</item>
+        <item name="android:gravity">center</item>
     </style>
 
 </resources>

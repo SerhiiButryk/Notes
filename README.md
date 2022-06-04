@@ -30,7 +30,7 @@ The interface is simple to use.
 
 # Supported platforms
 
-- Android version: Android 8 - Android 11
+- Android version: Android 8 - Android 13
 - Supported ABIs: x86, x86_64, armeabi-v7a
 
 # Build instraction
@@ -42,9 +42,9 @@ Required tools:
 
 Use .gradlew or Android Studio ('Build' menu) to build this application
 
-# Screenshots
+# App designs
 
-<img src="images/Screenshot_1.png" height="400"> <img src="images/Screenshot_2.png" height="400">
-<img src="images/Screenshot_3.png" height="400"> <img src="images/Screenshot_4.png" height="400"> 
-<img src="images/Screenshot_5.png" height="400"> <img src="images/Screenshot_6.png" height="400">
-<img src="images/Screenshot_7.png" height="400">
+<img src="images/Screenshot_1.jpg" height="420" width="220"> <img src="images/Screenshot_2.jpg" height="420" width="220">
+<img src="images/Screenshot_7.jpg" height="420" width="220"> <img src="images/Screenshot_4.jpg" height="420" width="220"> 
+<img src="images/Screenshot_5.jpg" height="420" width="220"> <img src="images/Screenshot_6.jpg" height="420" width="220">
+<img src="images/Screenshot_3.jpg" height="420" width="220"> <img src="images/Screenshot_8.jpg" height="420" width="220">

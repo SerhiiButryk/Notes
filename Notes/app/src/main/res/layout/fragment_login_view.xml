@@ -84,16 +84,31 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_login" />
 
+        <TextView
+            android:id="@+id/description"
+            style="@style/LoginDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/description_top"
+            android:layout_marginStart="@dimen/description_end_start"
+            android:layout_marginEnd="@dimen/description_end_start"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            android:text="@string/text_description"
+            tools:text="Description"/>
+
         <Button
             android:id="@+id/btn_register"
             style="@style/LoginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:text="@string/title_description"
+            android:layout_marginBottom="100dp"
+            android:text="@string/btn_create_user"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

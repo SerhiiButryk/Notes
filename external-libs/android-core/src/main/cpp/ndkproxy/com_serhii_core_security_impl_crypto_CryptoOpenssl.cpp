@@ -10,6 +10,8 @@
 
 #include <memory>
 
+#define TESTING 1
+
 using namespace MYLIB;
 
 #ifdef __cplusplus
@@ -25,20 +27,34 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     JString key(env, jkey);
     JString iv(env, jiv);
 
-    std::unique_ptr<unsigned char> ciphertext(new unsigned char[plaintext.getSize()]{ 0 } );
+    unsigned char _key[KEY_SIZE] = {0};
+    unsigned char _iv[BLOCK_SIZE] = {0};
 
-    /* Encrypt the plaintext */
-    size_t ciphertext_len = CryptoUtils::encryptSymmetric(plaintext, plaintext.getSize(), key, iv,
-                                                          ciphertext.get());
+    strncpy((char*) _key, key, KEY_SIZE);
+    strncpy((char*) _iv, iv, BLOCK_SIZE);
 
-    std::string res = Base64::encode(ciphertext.get(), ciphertext_len);
+#ifdef TESTING
+    int result = CryptoUtils::genKey(_key, _iv);
+    if (result != 1) {
+        Log::Error("JNI", " %s failed to gen keys OUT", __FUNCTION__ );
+        return env->NewStringUTF("");
+    }
+#endif
 
-    // DEBUG ONLY
-    //Log::Info("JNI", " %s, Encrypted text: %s  OUT", __FUNCTION__, res.c_str());
+    std::string cypherText;
+    result = CryptoUtils::AESEncrypt(_key, _iv, plaintext, cypherText);
+    if (result != 1) {
+        Log::Error("JNI", " %s failed to encrypt OUT", __FUNCTION__ );
+        return env->NewStringUTF("");
+    }
+
+    std::string encodedText = Base64::encode((unsigned char*) cypherText.c_str(), cypherText.length());
+    std::string encodedIV = Base64::encode(_key, KEY_SIZE);
+    std::string encodedKey = Base64::encode(_iv, BLOCK_SIZE);
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
-    return env->NewStringUTF(res.c_str());
+    return env->NewStringUTF(encodedText.c_str());
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenssl__1decryptSymmetric(JNIEnv *env,
@@ -50,30 +66,21 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     JString key(env, jkey);
     JString iv(env, jiv);
 
-    // DEBUG ONLY
-    // Log::Info("JNI", "Encrypted text: %s", (const char*) cypherText);
+    std::string decodedText = Base64::decode(cypherText);
+    std::string decodedIV = Base64::decode(key);
+    std::string decodedKEY = Base64::decode(iv);
 
-    std::string rez = Base64::decode(cypherText);
-
-    std::unique_ptr<unsigned char> decryptedtext(new unsigned char[cypherText.getSize()]{ 0 } );
-
-    int decryptedtext_len;
-
-    /* Decrypt the ciphertext */
-    decryptedtext_len = CryptoUtils::decryptSymmetric((unsigned char *) rez.c_str(), rez.length(),
-                                                      key, iv, decryptedtext.get());
-
-    /* Add a NULL terminator. We are expecting printable text */
-    decryptedtext.get()[decryptedtext_len] = '\0';
-
-    std::string rezText((char*) decryptedtext.get(), decryptedtext_len);
-
-    // DEBUG ONLY
-    // Log::Info("JNI", " %s, Decrypted text: %s  OUT", __FUNCTION__, decryptedtext);
+    std::string plainText;
+    std::string cypherTextString = cypherText;
+    int result = CryptoUtils::AESDecrypt((unsigned char*) decodedKEY.c_str(), (unsigned char*) decodedIV.c_str(), plainText, cypherTextString);
+    if (result != 1) {
+        Log::Error("JNI", " %s failed to decrypt OUT", __FUNCTION__ );
+        return env->NewStringUTF("");
+    }
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
-    return env->NewStringUTF(rezText.c_str());
+    return env->NewStringUTF(plainText.c_str());
 }
 
 #ifdef __cplusplus

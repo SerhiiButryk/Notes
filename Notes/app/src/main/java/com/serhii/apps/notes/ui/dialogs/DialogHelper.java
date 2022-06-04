@@ -3,13 +3,14 @@ package com.serhii.apps.notes.ui.dialogs;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.ui.ChangePasswordDialogUI;
-import com.serhii.apps.notes.ui.SetPasswordDialogUI;
+import com.serhii.apps.notes.ui.DialogWithEnterFieled;
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper;
 
 public class DialogHelper {
@@ -25,8 +26,13 @@ public class DialogHelper {
         dialog.show(activity.getSupportFragmentManager(), CPD_DIALOG_TAG);
     }
 
-    public static void showSetPasswordDialog(FragmentActivity activity, SetPasswordDialogUI.OnPasswordSetListener listener) {
-        SetPasswordDialogUI dialog = new SetPasswordDialogUI(listener);
+    public static void showDialogWithEnterField(FragmentActivity activity, DialogWithEnterFieled.DialogListener listener,
+                                                String title, String hint) {
+        DialogWithEnterFieled dialog = new DialogWithEnterFieled(listener);
+        Bundle args = new Bundle();
+        args.putString(DialogWithEnterFieled.EXTRA_TITLE_TEXT, title);
+        args.putString(DialogWithEnterFieled.EXTRA_HINT_TEXT, hint);
+        dialog.setArguments(args);
         dialog.show(activity.getSupportFragmentManager(), SPD_DIALOG_TAG);
     }
 

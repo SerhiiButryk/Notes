@@ -1,6 +1,7 @@
 package com.serhii.apps.notes.ui.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
@@ -46,6 +48,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
     private Button fingerprintBtn;
     private TextInputLayout emailLayout;
     private TextInputLayout passwordLayout;
+    private TextView description;
 
     private final BiometricAuthManager biometricAuthManager = new BiometricAuthManager();
     private boolean isFingerprintAvailable;
@@ -110,6 +113,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
 
             emailField.setText(userName);
             registerAccountBtn.setVisibility(View.GONE);
+            description.setVisibility(View.GONE);
             passwordField.requestFocus();
 
             loginButton.setVisibility(View.VISIBLE);
@@ -126,6 +130,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
             Log.info(TAG, "onCreateView() user doesn't exist");
 
             registerAccountBtn.setVisibility(View.VISIBLE);
+            description.setVisibility(View.VISIBLE);
             passwordLayout.setVisibility(View.GONE);
             emailLayout.setVisibility(View.GONE);
         }
@@ -174,6 +179,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
 
     public void onUserAccountCreated() {
         registerAccountBtn.setVisibility(View.GONE);
+        description.setVisibility(View.GONE);
         emailField.setText(nativeBridge.getUserName());
         passwordField.requestFocus();
     }
@@ -189,6 +195,7 @@ public class LoginFragment extends Fragment implements IViewBindings {
         registerAccountBtn = binding.btnRegister;
         titleLabel = binding.title;
         fingerprintBtn = binding.btnLoginBiometric;
+        description = binding.description;
 
         emailLayout = binding.emailLayout;
         passwordLayout = binding.passwordLayout;
@@ -203,6 +210,8 @@ public class LoginFragment extends Fragment implements IViewBindings {
         AuthModel authModel = new AuthModel();
 
         authModel.setPassword(hash.hashMD5(GoodUtils.getText(passwordField)));
+        // For safety
+        passwordField.setText("");
         authModel.setEmail(GoodUtils.getText(emailField));
         authModel.setAuthType(type);
 

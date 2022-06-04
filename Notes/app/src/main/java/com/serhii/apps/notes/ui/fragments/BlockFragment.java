@@ -89,11 +89,10 @@ public class BlockFragment extends Fragment implements IViewBindings {
 
         Hash hash = new Hash();
         AuthModel authModel = new AuthModel();
-
-        String enteredKey = GoodUtils.getText(accessKeyField);
-
         authModel.setAuthType(AuthorizeType.AUTH_UNLOCK);
-        authModel.setPassword(hash.hashMD5(enteredKey));
+        authModel.setPassword(hash.hashMD5(GoodUtils.getText(accessKeyField)));
+        // For safety
+        accessKeyField.setText("");
 
         // Set data
         loginViewModel.setAuthValue(authModel);
