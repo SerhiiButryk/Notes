@@ -15,11 +15,14 @@ buildscript {
     }
 
     dependencies {
-        // Android Gradle Plugin Version
+        // Android Gradle Plugin dependency
         classpath 'com.android.tools.build:gradle:7.1.2'
+        // Kotlin Gradle Plugin dependency
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // SpotBugs Gradle Plugin dependency
         classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.3.0"
+        // JaCoCo Gradle Plugin dependency
+        classpath "org.jacoco:org.jacoco.core:0.8.4"
     }
 }
 

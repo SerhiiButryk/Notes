@@ -39,6 +39,7 @@ fi
 # Local pathes
 EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../test-results"
+CODE_COVERAGE_FOLDER_NAME="$TEST_RESULT_DIR/codecoverage"
 
 # Android emulator API level configs
 declare -a EMULATOR_APIS=(
@@ -116,7 +117,8 @@ do
     # Run tests
     pushd ${SCRIPT_RELEVANT_PATH}/../Notes/ > /dev/null
     
-    ./gradlew connectedAndroidTest
+    # This will run tests and create coverage report
+    ./gradlew jacocoTestReport
     
     popd > /dev/null
 
@@ -134,6 +136,11 @@ do
     ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK_ROOT}/platform-tools/adb -s $line emu kill; done;
 
 done
+
+mkdir -p $CODE_COVERAGE_FOLDER_NAME
+
+# Copy files
+cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/coverage/androidTest/debug/* $CODE_COVERAGE_FOLDER_NAME
 
 echo ""
 echo "******** Finished *********"

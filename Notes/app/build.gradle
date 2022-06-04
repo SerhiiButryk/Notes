@@ -2,7 +2,8 @@ import com.github.spotbugs.snom.SpotBugsTask
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: "com.github.spotbugs"
+apply plugin: 'com.github.spotbugs'
+apply plugin: 'jacoco'
 
 android {
 
@@ -52,6 +53,8 @@ android {
             // App name
             manifestPlaceholders = [appLabel: "@string/app_name_debug"]
             applicationIdSuffix ".dev"
+            // Enable test coverage
+            testCoverageEnabled true
         }
     }
 
@@ -103,6 +106,11 @@ spotbugs {
     reportLevel = 'low' // Report all issues
     maxHeapSize = '1g'
     reportsDir = file("$buildDir/spotbugs") // Reports directory
+}
+
+// Code coverage task
+// Docs: https://docs.gradle.org/current/dsl/org.gradle.testing.jacoco.tasks.JacocoReport.html
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
 }
 
 dependencies {
