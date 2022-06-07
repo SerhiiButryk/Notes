@@ -16,6 +16,9 @@
     <color name="colorPrimaryDark">@color/dark_grey</color>
     <color name="colorAccent">@color/white</color>
 
+    // Background
+    <color name="layout_background">@color/light_grey</color>
+
     // Buttons
     <color name="login_primary">@color/dark_grey</color>
     <color name="login_light">@color/light_grey</color>
@@ -36,7 +39,6 @@
     <color name="dark">#f2f1f6</color>
 
     <color name="light_grey">#ebebf0</color>
-    <color name="background_color">@color/light_grey</color>
     <color name="span_color">@color/light_grey</color>
     <color name="text_color">@color/black</color>
 
