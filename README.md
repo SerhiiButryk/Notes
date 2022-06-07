@@ -42,7 +42,7 @@ Required tools:
 
 Use .gradlew or Android Studio ('Build' menu) to build this application
 
-# Designs
+# App designs
 
 <img src="images/Screenshot_1.jpg" height="400"> <img src="images/Screenshot_2.jpg" height="400">
 <img src="images/Screenshot_3.jpg" height="400"> <img src="images/Screenshot_4.jpg" height="400"> 
