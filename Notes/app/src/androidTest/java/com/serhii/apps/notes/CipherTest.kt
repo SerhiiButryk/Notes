@@ -6,14 +6,18 @@ package com.serhii.apps.notes
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.serhii.core.security.Cipher
+import com.serhii.core.security.Hash
 import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.security.impl.crypto.Result
 import org.junit.Assert
 import org.junit.FixMethodOrder
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
+import java.lang.IllegalArgumentException
 
 /**
  * Unit Tests for
@@ -49,7 +53,7 @@ class CipherTest {
         var decryptedMessage: Result
 
         // Encrypt message
-        encryptedMessage = cipher.encryptSymmetricWithKey(originalMessage, key, iv.toByteArray())
+        encryptedMessage = cipher.encryptSymmetric(originalMessage, key, iv.toByteArray())
 
         Assert.assertFalse("Failed to encrypt", encryptedMessage.error != CryptoError.OK)
 
@@ -57,7 +61,7 @@ class CipherTest {
         cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
 
         // Decrypted message
-        decryptedMessage = cipher.decryptSymmetricWithKey(encryptedMessage.message, key, iv.toByteArray())
+        decryptedMessage = cipher.decryptSymmetric(encryptedMessage.message, key, iv.toByteArray())
 
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
@@ -113,11 +117,133 @@ class CipherTest {
        Log.i(TAG, "test02_encryptDecryptUsingSecureStore() OUT")
     }
 
-    companion object {
-        val TAG: String = CipherTest::class.java.simpleName
+    @Test
+    fun test03_encryptDecryptUsingOpenSSL_LongText() {
+        Log.i(TAG, "test03_encryptDecryptUsingOpenSSL_LongText() IN")
 
-        const val SECRET_KET_TEST_A = "Key1"
-        const val SECRET_KET_TEST_B = "Key2"
+        var cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+
+        val originalMessage = TestUtility.readFileFromTestAssets("long_text_example.txt")
+        Assert.assertFalse("Failed to read file in assets", originalMessage.isEmpty())
+
+        val key = "01234567890123456789012345678901"
+        val iv = "0123456789012345"
+
+        var encryptedMessage: Result
+        var decryptedMessage: Result
+
+        // Encrypt message
+        encryptedMessage = cipher.encryptSymmetric(originalMessage, key, iv.toByteArray())
+
+        Assert.assertFalse("Failed to encrypt", encryptedMessage.error != CryptoError.OK)
+
+        // Create new object
+        cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+
+        // Decrypted message
+        decryptedMessage = cipher.decryptSymmetric(encryptedMessage.message, key, iv.toByteArray())
+
+        Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
+        Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
+
+        Log.i(TAG, "test03_encryptDecryptUsingOpenSSL_LongText() OUT")
+    }
+
+    @Test
+    fun test04_encryptDecryptUsingSecureStore_LongText() {
+        Log.i(TAG, "test04_encryptDecryptUsingSecureStore_LongText() IN")
+
+        val cipher = Cipher()
+        cipher.createKey(SECRET_KET_TEST_A, false)
+        cipher.createKey(SECRET_KET_TEST_B, false)
+
+        cipher.selectKey(SECRET_KET_TEST_A)
+
+        val message = TestUtility.readFileFromTestAssets("long_text_example.txt")
+        Assert.assertFalse("Failed to read file in assets", message.isEmpty())
+
+        val encMessage: Result = cipher.encryptSymmetric(message)
+        Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
+
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
+
+        Assert.assertEquals("Text are not correct", decMessage.message, message)
+
+        cipher.selectKey(SECRET_KET_TEST_B)
+
+        val message2 = TestUtility.readFileFromTestAssets("long_text_example.txt")
+        Assert.assertFalse("Failed to read file in assets", message2.isEmpty())
+
+        val encMessage2: Result = cipher.encryptSymmetric(message2)
+        Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
+
+        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, encMessage2.iv)
+        Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
+
+        Assert.assertEquals("Text are not correct", decMessage2.message, message2)
+
+        Log.i(TAG, "test04_encryptDecryptUsingSecureStore_LongText() OUT")
+    }
+
+    @Test
+    fun test05_doubleKeyCreation() {
+        Log.i(TAG, "test05_doubleKeyCreation() IN")
+        val cipher = Cipher()
+        cipher.createKey(SECRET_KET_TEST_C, false)
+        cipher.createKey(SECRET_KET_TEST_C, false)
+        Log.i(TAG, "test05_doubleKeyCreation() OUT")
+    }
+
+    @Test
+    fun test06_selectInvalidProvider() {
+        Log.i(TAG, "test06_selectInvalidProvider() IN")
+
+        var exception: Exception? = null
+        var isExceptionThrown = false
+        try {
+
+            // Expected result is 'IllegalArgumentException' exception
+            val cipher = Cipher("Invalid")
+
+        } catch (e: Exception) {
+            exception = e
+            isExceptionThrown = true
+        }
+
+        Assert.assertTrue("Unexpected result, should throw exception", isExceptionThrown)
+        Assert.assertTrue("Exception type is wrong", exception is IllegalArgumentException)
+        Assert.assertTrue("Wrong message", exception?.message == "Unknown crypto provider is passed")
+
+        Log.i(TAG, "test06_selectInvalidProvider() IN")
+    }
+
+    // TODO: Need to fix this bug
+    @Ignore("Failing")
+    @Test
+    fun test07_hashGeneration() {
+        Log.i(TAG, "test07_hashGeneration() IN")
+
+        val message = "Apple Inc. is an American multinational technology " +
+                "company that specializes in consumer electronics, software and online"
+
+        val hash = Hash()
+        val result = hash.hashMD5(message)
+
+        val expectedResult = "9eac0d0af4a655636a06b791d2c999bd"
+
+        Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
+
+        Log.i(TAG, "test07_hashGeneration() OUT")
+    }
+
+    companion object {
+        private val TAG: String = CipherTest::class.java.simpleName
+        private val context = InstrumentationRegistry.getInstrumentation().context
+
+        private const val SECRET_KET_TEST_A = "Key1"
+        private const val SECRET_KET_TEST_B = "Key2"
+        private const val SECRET_KET_TEST_C = "Key3"
     }
 
 }

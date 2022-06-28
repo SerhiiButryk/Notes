@@ -12,31 +12,40 @@ import com.serhii.core.security.impl.crypto.SecureStore
 import com.serhii.core.log.Log
 import com.serhii.core.security.Cipher
 import com.serhii.core.security.impl.crypto.CryptoOpenssl
+import com.serhii.core.security.impl.crypto.CryptoProvider
+import com.serhii.core.security.impl.hash.HashGenerator
 import java.lang.IllegalArgumentException
 
+/**
+ * Class which initializes library components configuration.
+ */
 internal object CoreEngine : Components {
 
     private const val RUNTIME_LIBRARY = "core"
     private const val TAG = "CE"
 
-    override fun configure(hash: Hash) {
+    override fun configure(hash: Hash) : HashGenerator {
         Log.info(TAG, "configure(), HH $hash")
-        hash.setGenerator(HashAlgorithms())
+        return HashAlgorithms()
     }
 
-    override fun configure(cipher: Cipher) {
+    override fun configure(cipher: Cipher) : CryptoProvider {
         Log.info(TAG, "configure(), CC $cipher")
-        cipher.setCryptoProvider(SecureStore())
+        return SecureStore()
     }
 
-    override fun configure(cipher: Cipher, provider: String) {
+    override fun configure(cipher: Cipher, provider: String) : CryptoProvider {
         Log.info(TAG, "configure(), CC1 $cipher : $provider")
-        if (provider == Cipher.CRYPTO_PROVIDER_ANDROID) {
-            cipher.setCryptoProvider(SecureStore())
-        } else if (provider == Cipher.CRYPTO_PROVIDER_OPENSSL) {
-            cipher.setCryptoProvider(CryptoOpenssl())
-        } else {
-            throw IllegalArgumentException("Unknown crypto provider is passed")
+        return when (provider) {
+            Cipher.CRYPTO_PROVIDER_ANDROID -> {
+                SecureStore()
+            }
+            Cipher.CRYPTO_PROVIDER_OPENSSL -> {
+                CryptoOpenssl()
+            }
+            else -> {
+                throw IllegalArgumentException("Unknown crypto provider is passed")
+            }
         }
     }
 

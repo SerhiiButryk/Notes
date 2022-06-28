@@ -25,8 +25,8 @@ import org.junit.runners.MethodSorters
 class DatabaseTests {
 
     companion object {
-        val TAG = DatabaseTests::class.java.simpleName
-        var isKeyCreated = false
+        private val TAG: String = DatabaseTests::class.java.simpleName
+        private var isKeyCreated = false
 
         @BeforeClass
         @JvmStatic

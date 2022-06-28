@@ -7,6 +7,7 @@ package com.serhii.core.security.impl.crypto
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
+import android.telephony.mbms.MbmsErrors
 import android.util.Base64
 import com.serhii.core.log.Log
 import java.io.IOException
@@ -20,11 +21,12 @@ import javax.crypto.spec.GCMParameterSpec
 
 internal class SecureStore : CryptoProvider {
 
-    private val keyStore: KeyStore?
+    private val keyStore: KeyStore
     private var selectedKey: String? = null
 
     override fun selectKey(key: String) {
         Log.detail(TAG, "selectKey(): $key")
+        // Throw exception in case of error. Cannot proceed.
         require(isSecretKeyExists(key)) { "No key with this alias ($key) is created" }
         selectedKey = key
     }
@@ -35,9 +37,10 @@ internal class SecureStore : CryptoProvider {
     }
 
     override fun encryptSymmetric(message: String, inputIV: ByteArray, key: String?): Result {
+        // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No secret key is selected for cryptographic operation" }
         try {
-            val secretKey = keyStore!!.getKey(selectedKey, null) as SecretKey
+            val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
             val encryptionCipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
             encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey)
             val _iv = encryptionCipher.iv
@@ -56,9 +59,10 @@ internal class SecureStore : CryptoProvider {
     }
 
     override fun decryptSymmetric(message: String, inputIV: ByteArray, key: String?): Result {
+        // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No secret key is selected for cryptographic operation" }
         try {
-            val secretKey = keyStore!!.getKey(selectedKey, null) as SecretKey
+            val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
             val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
             val spec = GCMParameterSpec(128, inputIV)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
@@ -102,7 +106,6 @@ internal class SecureStore : CryptoProvider {
 
     private fun isSecretKeyExists(key: String): Boolean {
         try {
-            require(keyStore != null) { "Keystore is not initialized" }
             val entry: KeyStore.Entry? = keyStore.getEntry(key, null)
             return entry != null
         } catch (e: KeyStoreException) {
@@ -142,13 +145,15 @@ internal class SecureStore : CryptoProvider {
         return false
     }
 
-    private fun initKeyStore(): KeyStore? {
+    private fun initKeyStore(): KeyStore {
         try {
             return KeyStore.getInstance("AndroidKeyStore")
         } catch (e: KeyStoreException) {
             Log.error(TAG, "exception: failed to init keyStore object" + e.message)
+            e.printStackTrace()
+            // Cannot proceed
+            throw RuntimeException("Failed to init keystore", e)
         }
-        return null
     }
 
     private fun getKeyGenerator(algorithm: String): KeyGenerator? {
@@ -186,12 +191,8 @@ internal class SecureStore : CryptoProvider {
 
     init {
         keyStore = initKeyStore()
-        if (keyStore != null) {
-            val success = load(keyStore)
-            Log.detail(TAG, "SecureStore(): is key store loaded $success")
-        } else {
-            Log.error(TAG, "SecureStore(): failed to init keystore")
-        }
+        val success = load(keyStore)
+        Log.detail(TAG, "SecureStore(): is key store loaded $success")
     }
 
 }

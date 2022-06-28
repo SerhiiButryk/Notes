@@ -11,6 +11,7 @@ package com.serhii.core.log
 class Log {
 
     // TODO: Replace with object declaration
+    // Added for compatibility with Java code
     companion object {
 
         @JvmStatic

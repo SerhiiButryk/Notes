@@ -9,19 +9,10 @@ import com.serhii.core.CoreEngine
 
 class Hash {
 
-    private var generator: HashGenerator? = null
-
-    fun setGenerator(generator: HashGenerator?) {
-        this.generator = generator
-    }
+    private val generator: HashGenerator = CoreEngine.configure(this)
 
     fun hashMD5(message: String): String {
-        return generator?.makeHashMD5(message)
-            ?: throw IllegalStateException("Hash was not initialized")
-    }
-
-    init {
-        CoreEngine.configure(this)
+        return generator.makeHashMD5(message)
     }
 
 }
