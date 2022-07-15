@@ -218,8 +218,8 @@ class CipherTest {
         Log.i(TAG, "test06_selectInvalidProvider() IN")
     }
 
-    // TODO: Need to fix this bug
-    @Ignore("Failing")
+    // TODO: Need to fix this test
+    @Ignore("Fix me")
     @Test
     fun test07_hashGeneration() {
         Log.i(TAG, "test07_hashGeneration() IN")

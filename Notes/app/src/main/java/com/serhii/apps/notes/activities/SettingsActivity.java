@@ -1,10 +1,12 @@
 package com.serhii.apps.notes.activities;
 
+import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_BACKUP_NOTES;
+import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +15,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.serhii.apps.notes.R;
+import com.serhii.apps.notes.control.broadcast.InactivityEventReceiver;
+import com.serhii.apps.notes.control.managers.AppForegroundListener;
 import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
@@ -25,15 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_BACKUP_NOTES;
-import static com.serhii.apps.notes.control.managers.BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE;
-
 public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity";
     private static final String SETTINGS_FRAGMENT_TAG = "main settings";
 
     private Toolbar toolbar;
+    private final AppForegroundListener appForegroundListener = new AppForegroundListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +53,17 @@ public class SettingsActivity extends AppCompatActivity {
         setActionBar();
 
         // Lifecycle aware component
-        InactivityManager.getInstance().setLifecycle(this, getLifecycle());
+        getLifecycle().addObserver(appForegroundListener);
 
+    }
+
+    @Override
+    protected void onResume() {
+        Log.info(TAG, "onResume()");
+        super.onResume();
+        InactivityEventReceiver.checkIfInactivityTimeoutReceived(this);
+        // Trigger time out
+        InactivityManager.getInstance().scheduleAlarm();
     }
 
     private void addFragment() {

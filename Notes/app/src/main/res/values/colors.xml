@@ -25,6 +25,9 @@
     <color name="login_medium">@color/light_grey</color>
     // End
 
+    // EditText
+    <color name="edit_text_background">@color/white</color>
+
     <color name="grey">#E0E0E0</color>
     <color name="dark_grey">#616161</color>
     <color name="white">#FFFFFF</color>

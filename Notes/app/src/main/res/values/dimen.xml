@@ -54,6 +54,9 @@
 
     <dimen name="biomertric_button_top_margin">6dp</dimen>
 
+    <dimen name="description_end_start">15dp</dimen>
+    <dimen name="description_top">50dp</dimen>
+
     // Note editor screen
     <dimen name="padding_layout">16dp</dimen>
     <dimen name="toolbar_height">80dp</dimen>

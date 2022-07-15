@@ -6,17 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 import androidx.preference.PreferenceManager;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.broadcast.InactivityEventReceiver;
 import com.serhii.core.log.Log;
 
-public class InactivityManager implements LifecycleObserver {
+public class InactivityManager {
 
     private static final String TAG = "InactivityManager";
 
@@ -38,7 +34,7 @@ public class InactivityManager implements LifecycleObserver {
     private InactivityManager() {
     }
 
-    private void initManager(Context context) {
+    public void initManager(Context context) {
 
         if (context == null) {
             Log.error(TAG, "initManager(), passed context is null");
@@ -71,32 +67,26 @@ public class InactivityManager implements LifecycleObserver {
         timeoutTimeMillis = Integer.parseInt(time);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void scheduleAlarm() {
 
-        Log.detail(TAG, "inactivity alarm is scheduled TIME: " + System.currentTimeMillis());
+        Log.detail(TAG, "scheduleAlarm(), inactivity alarm is scheduled TIME: " + System.currentTimeMillis());
 
         alarmManager.setExact(AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + timeoutTimeMillis, inactivityIntent);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void cancelAlarm() {
 
-        Log.detail(TAG, "inactivity alarm is canceled ");
+        Log.detail(TAG, "cancelAlarm(), inactivity alarm is canceled");
 
         alarmManager.cancel(inactivityIntent);
     }
 
     public void onUserInteraction() {
+        Log.detail(TAG, "onUserInteraction()");
         // Reschedule
         InactivityManager.getInstance().cancelAlarm();
         InactivityManager.getInstance().scheduleAlarm();
-    }
-
-    public void setLifecycle(Context context, Lifecycle lifecycle) {
-        initManager(context);
-        lifecycle.addObserver(this);
     }
 
 }
