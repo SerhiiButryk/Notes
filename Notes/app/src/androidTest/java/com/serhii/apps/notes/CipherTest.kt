@@ -218,19 +218,32 @@ class CipherTest {
         Log.i(TAG, "test06_selectInvalidProvider() IN")
     }
 
-    // TODO: Need to fix this test
-    @Ignore("Fix me")
     @Test
     fun test07_hashGeneration() {
         Log.i(TAG, "test07_hashGeneration() IN")
 
-        val message = "Apple Inc. is an American multinational technology " +
-                "company that specializes in consumer electronics, software and online"
-
+        val message1 = "0123456789"
         val hash = Hash()
-        val result = hash.hashMD5(message)
 
-        val expectedResult = "9eac0d0af4a655636a06b791d2c999bd"
+        var result = hash.hashMD5(message1)
+        var expectedResult = "781e5e245d69b566979b86e28d23f2c7"
+
+        Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
+
+        val message2 = "Apple Inc. is an American multinational technology"
+
+        result = hash.hashMD5(message2)
+        expectedResult = "0b29dd825349b4f080e05991de4f3d29"
+
+        Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
+
+        val message3 = "Apple Inc. is an American multinational technology" +
+            " that specializes in consumer electronics, software and online services headquartered in " +
+            "Cupertino, California, United States. Apple is the largest technology company by revenue" +
+            " (totaling US365.8 billion in 2021) and"
+
+        result = hash.hashMD5(message3)
+        expectedResult = "ef62781f3cbd4199f4dffb73bff18d8e"
 
         Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
 
