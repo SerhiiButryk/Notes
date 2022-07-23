@@ -44,7 +44,7 @@ Use .gradlew or Android Studio ('Build' menu) to build this application
 
 # App designs
 
-<img src="images/Screenshot_1.jpg" height="400"> <img src="images/Screenshot_2.jpg" height="400">
-<img src="images/Screenshot_7.jpg" height="400"> <img src="images/Screenshot_4.jpg" height="400"> 
+<img src="images/Screenshot_1.jpg" height="400" height="800"> <img src="images/Screenshot_2.jpg" height="400" height="800">
+<img src="images/Screenshot_7.jpg" height="400" height="800"> <img src="images/Screenshot_4.jpg" height="400" height="800"> 
 <img src="images/Screenshot_5.jpg" height="400"> <img src="images/Screenshot_6.jpg" height="400">
 <img src="images/Screenshot_3.jpg" height="400"> <img src="images/Screenshot_8.jpg" height="400">
