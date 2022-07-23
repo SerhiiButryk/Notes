@@ -46,16 +46,16 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         // Enable unsecured screen content settings
         GoodUtils.enableUnsecureScreenProtection(this);
 
+        // Need to call initNativeConfigs() before authorization process at the beginning.
+        String filePath = GoodUtils.getFilePath(this);
+        initNativeConfigs(filePath);
+
         if (savedInstanceState == null) {
             addFragment();
         }
 
-        // Start authorization process
+        // Start authorization process.
         authorizeUser(savedInstanceState);
-
-        String filePath = GoodUtils.getFilePath(this);
-        Log.info(TAG, "onCreate() PPP " + filePath);
-        initNativeConfigs(filePath);
 
         // Initialize lifecycle aware components
         getLifecycle().addObserver(appForegroundListener);
@@ -189,6 +189,7 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         fm.popBackStack();
     }
 
+    // This will authorization activity for user to login
     private void authorizeUser(Bundle bundle) {
         /**
          *  Activity is launched first time

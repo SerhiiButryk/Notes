@@ -37,9 +37,6 @@ public class AuthorizationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
 
-        // Enable unsecured screen content settings
-        GoodUtils.enableUnsecureScreenProtection(this);
-
         fragmentManager = getSupportFragmentManager();
 
         showLoginFragment(savedInstanceState);

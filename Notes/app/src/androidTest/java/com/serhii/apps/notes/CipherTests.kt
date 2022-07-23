@@ -13,7 +13,6 @@ import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.security.impl.crypto.Result
 import org.junit.Assert
 import org.junit.FixMethodOrder
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -25,7 +24,7 @@ import java.lang.IllegalArgumentException
  */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class CipherTest {
+class CipherTests {
 
     /**
      * Symmetric enc / dec
@@ -251,7 +250,7 @@ class CipherTest {
     }
 
     companion object {
-        private val TAG: String = CipherTest::class.java.simpleName
+        private val TAG: String = CipherTests::class.java.simpleName
         private val context = InstrumentationRegistry.getInstrumentation().context
 
         private const val SECRET_KET_TEST_A = "Key1"
