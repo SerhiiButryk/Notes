@@ -96,9 +96,10 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
 
     @Override
     protected void onDestroy() {
-        Log.info(TAG, "onDestroy()");
+        Log.info(TAG, "onDestroy() IN");
         super.onDestroy();
         BackupManager.getInstance().clearNotesViewModelWeakReference();
+        Log.info(TAG, "onDestroy() OUT");
     }
 
     @Override

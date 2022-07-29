@@ -15,13 +15,17 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.serhii.apps.notes.R;
+import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.broadcast.InactivityEventReceiver;
 import com.serhii.apps.notes.control.managers.AppForegroundListener;
 import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
+import com.serhii.apps.notes.ui.DialogWithEnterFieled;
+import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.fragments.SettingsFragment;
 import com.serhii.core.log.Log;
+import com.serhii.core.security.Hash;
 import com.serhii.core.utils.GoodUtils;
 
 import java.io.FileNotFoundException;
@@ -171,32 +175,98 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void backupNotes(Intent data) {
-            OutputStream outputStream = null;
-            try {
-                outputStream = getContentResolver().openOutputStream(data.getData());
-            } catch (FileNotFoundException e) {
-                Log.error(TAG, "backupNotes() error: " + e);
-                e.printStackTrace();
-                return;
-            }
+            Log.info(TAG, "backupNotes() IN");
 
-            boolean result = BackupManager.getInstance().backupData(outputStream, this);
-            if (result) {
-                GoodUtils.showToast(this, R.string.result_success);
-            } else {
-                GoodUtils.showToast(this, R.string.result_failed);
-            }
+            // Localized strings
+            String hint = getString(R.string.set_password_dialog_title);
+            String title = getString(R.string.set_password_dialog_title);
+
+            // Ask for password
+            DialogHelper.showDialogWithEnterField(this, new DialogWithEnterFieled.DialogListener() {
+
+                @Override
+                public void onOkClicked(String enteredText) {
+                    Log.info(TAG, "onOkClicked() IN");
+                    OutputStream outputStream = null;
+                    try {
+                        outputStream = getContentResolver().openOutputStream(data.getData());
+                    } catch (FileNotFoundException e) {
+                        Log.error(TAG, "onOkClicked() error: " + e);
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    Hash hash = new Hash();
+                    String pass = hash.hashMD5(enteredText);
+
+                    NativeBridge nativeBridge = new NativeBridge();
+                    if (!nativeBridge.verifyPassword(pass)) {
+                        GoodUtils.showToast(SettingsActivity.this, R.string.wrong_pass);
+                        Log.error(TAG, "onOkClicked() wrong pass");
+                        return;
+                    }
+
+                    boolean result = BackupManager.getInstance().backupData(outputStream, SettingsActivity.this, hash.hashMD5(pass));
+                    if (result) {
+                        GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
+                    } else {
+                        GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
+                    }
+                    Log.info(TAG, "onOkClicked() OUT");
+                }
+
+                @Override
+                public void onCancelClicked() {
+                    Log.info(TAG, "onCanceledClicked() IN");
+                    GoodUtils.showToast(SettingsActivity.this, R.string.result_canceled);
+                }
+
+            }, title, hint);
 
         }
 
         private void restoreNotes(Intent data) {
+            Log.info(TAG, "restoreNotes() IN");
+
+            // Localized strings
+            String hint = getString(R.string.set_password_dialog_title);
+            String title = getString(R.string.set_password_dialog_title2);
+
+            // Ask for password
+            DialogHelper.showDialogWithEnterField(this, new DialogWithEnterFieled.DialogListener() {
+                @Override
+                public void onOkClicked(String enteredText) {
+                    Log.info(TAG, "onOkClicked() IN");
+
+                    String json = readBackupFile(data);
+                    Hash hash = new Hash();
+
+                    boolean result = BackupManager.getInstance().restoreData(json, SettingsActivity.this, hash.hashMD5(enteredText));
+                    if (result) {
+                        GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
+                    } else {
+                        GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
+                    }
+
+                }
+
+                @Override
+                public void onCancelClicked() {
+                    Log.info(TAG, "onCanceledClicked() IN");
+                    GoodUtils.showToast(SettingsActivity.this, R.string.result_canceled);
+                }
+            }, title, hint);
+
+        }
+
+        private String readBackupFile(Intent data) {
             InputStream inputStream = null;
             try {
                 inputStream = getContentResolver().openInputStream(data.getData());
             } catch (FileNotFoundException e) {
-                Log.error(TAG, "restoreNotes() error: " + e);
+                Log.error(TAG, "readBackupFile() error: " + e);
                 e.printStackTrace();
-                return;
+                return "";
             }
 
             StringBuilder content = new StringBuilder();
@@ -210,9 +280,9 @@ public class SettingsActivity extends AppCompatActivity {
                 }
 
             } catch (Exception e) {
-                Log.error(TAG, "restoreNotes() exception while reading the file: " + e);
+                Log.error(TAG, "readBackupFile() exception while reading the file: " + e);
                 e.printStackTrace();
-                return;
+                return "";
             } finally {
                 try {
                     inputStream.close();
@@ -221,12 +291,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
 
-            boolean result = BackupManager.getInstance().restoreData(content.toString(), this);
-            if (result) {
-                GoodUtils.showToast(this, R.string.result_success);
-            } else {
-                GoodUtils.showToast(this, R.string.result_failed);
-            }
+            return content.toString();
         }
 
 }

@@ -12,6 +12,9 @@
 
 using namespace MYLIB;
 
+// TODO: Check this later if this can be removed
+int MAX_LENGTH_BOUNDARY = 100;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,20 +28,24 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     JString key(env, jkey);
     JString iv(env, jiv);
 
-    std::unique_ptr<unsigned char> ciphertext(new unsigned char[plaintext.getSize()]{ 0 } );
+    /* Need to make that this buffer is long enough for ciphertext */
+    auto* buffer = new unsigned char[plaintext.getSize() + MAX_LENGTH_BOUNDARY];
+    int bufferLen;
 
     /* Encrypt the plaintext */
-    size_t ciphertext_len = CryptoUtils::encryptSymmetric(plaintext, plaintext.getSize(), key, iv,
-                                                          ciphertext.get());
+    bufferLen = CryptoUtils::encryptSymmetric(plaintext, plaintext.getSize(), key, iv, buffer);
 
-    std::string res = Base64::encode(ciphertext.get(), ciphertext_len);
+    /* Add a NULL terminator */
+    buffer[bufferLen] = '\0';
 
-    // DEBUG ONLY
-    //Log::Info("JNI", " %s, Encrypted text: %s  OUT", __FUNCTION__, res.c_str());
+    std::string encryptedText = Base64::encode(buffer, bufferLen);
+
+    // Delete allocated memory
+    delete[] buffer;
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
-    return env->NewStringUTF(res.c_str());
+    return env->NewStringUTF(encryptedText.c_str());
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenssl__1decryptSymmetric(JNIEnv *env,
@@ -50,30 +57,25 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     JString key(env, jkey);
     JString iv(env, jiv);
 
-    // DEBUG ONLY
-    // Log::Info("JNI", "Encrypted text: %s", (const char*) cypherText);
+    std::string inputText = Base64::decode(cypherText);
 
-    std::string rez = Base64::decode(cypherText);
-
-    std::unique_ptr<unsigned char> decryptedtext(new unsigned char[cypherText.getSize()]{ 0 } );
-
-    int decryptedtext_len;
+    auto* buffer = new unsigned char[inputText.size()];
+    int bufferLen;
 
     /* Decrypt the ciphertext */
-    decryptedtext_len = CryptoUtils::decryptSymmetric((unsigned char *) rez.c_str(), rez.length(),
-                                                      key, iv, decryptedtext.get());
+    bufferLen = CryptoUtils::decryptSymmetric((unsigned char *) inputText.c_str(), inputText.length(), key, iv, buffer);
 
     /* Add a NULL terminator. We are expecting printable text */
-    decryptedtext.get()[decryptedtext_len] = '\0';
+    buffer[bufferLen] = '\0';
 
-    std::string rezText((char*) decryptedtext.get(), decryptedtext_len);
+    std::string plainText((char*) buffer, bufferLen);
 
-    // DEBUG ONLY
-    // Log::Info("JNI", " %s, Decrypted text: %s  OUT", __FUNCTION__, decryptedtext);
+    // Delete allocated memory
+    delete[] buffer;
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
-    return env->NewStringUTF(rezText.c_str());
+    return env->NewStringUTF(plainText.c_str());
 }
 
 #ifdef __cplusplus

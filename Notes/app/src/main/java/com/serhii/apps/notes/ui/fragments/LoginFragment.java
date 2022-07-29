@@ -210,6 +210,8 @@ public class LoginFragment extends Fragment implements IViewBindings {
         AuthModel authModel = new AuthModel();
 
         authModel.setPassword(hash.hashMD5(GoodUtils.getText(passwordField)));
+        // For safety
+        passwordField.setText("");
         authModel.setEmail(GoodUtils.getText(emailField));
         authModel.setAuthType(type);
 

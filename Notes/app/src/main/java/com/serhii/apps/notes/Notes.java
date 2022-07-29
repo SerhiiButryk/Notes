@@ -24,6 +24,8 @@ public class Notes extends Application {
         if (BuildConfig.DEBUG) {
             Log.info(TAG, "onCreate(), running debug build");
             Log.setDetailedLogs(true);
+        } else {
+            Log.info(TAG, "onCreate(), running release build");
         }
         // Init inactivity manager
         InactivityManager.getInstance().initManager(this);

@@ -150,8 +150,8 @@
     <string name="change_password_toast_password_error">Error occurred</string>
 
     // Set password dialog
-    <string name="set_password_dialog_title">Set a password</string>
-    <string name="set_password_dialog_hint">Enter a password</string>
+    <string name="set_password_dialog_title">Enter your password</string>
+    <string name="set_password_dialog_title2">Enter password.\nPlease, make sure that this is the same password as you used to backup this notes. Otherwise this operation will fail.</string>
 
     // BlockView
     <string name="block_title">Access is restricted</string>
@@ -173,6 +173,9 @@
     // Errors / Info
     <string name="result_success">Success</string>
     <string name="result_failed">Failed</string>
+    <string name="result_canceled">Canceled</string>
+
     <string name="empty_login">Empty username or password</string>
+    <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
 
 </resources>

@@ -29,11 +29,8 @@ public class NativeBridge {
         return _getUserName();
     }
 
-    public boolean verifyPassword(String password) {
-
-        Hash hash = new Hash();
-
-        return _verifyPassword(_getUserName(), hash.hashMD5(password));
+    public boolean verifyPassword(String passwordHash) {
+        return _verifyPassword(_getUserName(), passwordHash);
     }
 
     public boolean setNewPassword(String password) {

@@ -251,7 +251,6 @@ class CipherTests {
 
     companion object {
         private val TAG: String = CipherTests::class.java.simpleName
-        private val context = InstrumentationRegistry.getInstrumentation().context
 
         private const val SECRET_KET_TEST_A = "Key1"
         private const val SECRET_KET_TEST_B = "Key2"

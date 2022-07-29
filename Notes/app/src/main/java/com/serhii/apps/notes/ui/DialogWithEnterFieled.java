@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,20 +19,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.core.utils.GoodUtils;
 
-public class SetPasswordDialogUI extends DialogFragment {
+public class DialogWithEnterFieled extends DialogFragment {
+
+    public static final String EXTRA_TITLE_TEXT =  "dialog title";
+    public static final String EXTRA_HINT_TEXT =  "dialog hint";
 
     private Button okButton;
-    private EditText password;
-
+    private EditText editTextField;
     private TextChecker textChecker;
+    private DialogListener listener;
 
-    private OnPasswordSetListener passwordSetListener;
-
-    public SetPasswordDialogUI(OnPasswordSetListener passwordSetListener) {
-        this.passwordSetListener = passwordSetListener;
+    public DialogWithEnterFieled(DialogListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -51,20 +50,23 @@ public class SetPasswordDialogUI extends DialogFragment {
 
     @SuppressLint("InflateParams")
     private ViewGroup initView(LayoutInflater inflater) {
-        ViewGroup dialogView = (ViewGroup) inflater.inflate(R.layout.set_password_dialog, null);
+        ViewGroup dialogView = (ViewGroup) inflater.inflate(R.layout.dialog_with_input_field, null);
+
+        Bundle bundle = getArguments();
 
         TextView title = dialogView.findViewById(R.id.title_dialog);
-        title.setText(inflater.getContext().getString(R.string.set_password_dialog_title));
+        title.setText(bundle.getString(EXTRA_TITLE_TEXT));
 
-        password = dialogView.findViewById(R.id.edit_text_field);
-        password.requestFocus();
+        editTextField = dialogView.findViewById(R.id.edit_text_field);
+        editTextField.setHint(bundle.getString(EXTRA_HINT_TEXT));
+        editTextField.requestFocus();
 
         okButton = dialogView.findViewById(R.id.btn_ok);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (passwordSetListener != null) {
-                    passwordSetListener.onPasswordSet(GoodUtils.getText(password));
+                if (listener != null) {
+                    listener.onOkClicked(GoodUtils.getText(editTextField));
                     dismiss();
                 }
             }
@@ -72,13 +74,16 @@ public class SetPasswordDialogUI extends DialogFragment {
         // By default
         okButton.setEnabled(false);
 
-        textChecker = new TextChecker(password, okButton);
-        password.addTextChangedListener(textChecker);
+        textChecker = new TextChecker(editTextField, okButton);
+        editTextField.addTextChangedListener(textChecker);
 
         Button cancelButton = dialogView.findViewById(R.id.btn_cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (listener != null) {
+                    listener.onCancelClicked();
+                }
                 dismiss();
             }
         });
@@ -114,8 +119,9 @@ public class SetPasswordDialogUI extends DialogFragment {
 
     }
 
-    public interface OnPasswordSetListener {
-        void onPasswordSet(String password);
+    public interface DialogListener {
+        void onOkClicked(String enteredText);
+        void onCancelClicked();
     }
 
 }
