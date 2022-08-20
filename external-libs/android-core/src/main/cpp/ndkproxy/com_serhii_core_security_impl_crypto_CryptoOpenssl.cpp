@@ -10,10 +10,9 @@
 
 #include <memory>
 
-using namespace MYLIB;
+#define TESTING 1
 
-// TODO: Check this later if this can be removed
-int MAX_LENGTH_BOUNDARY = 100;
+using namespace MYLIB;
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,24 +27,34 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     JString key(env, jkey);
     JString iv(env, jiv);
 
-    /* Need to make that this buffer is long enough for ciphertext */
-    auto* buffer = new unsigned char[plaintext.getSize() + MAX_LENGTH_BOUNDARY];
-    int bufferLen;
+    unsigned char _key[KEY_SIZE] = {0};
+    unsigned char _iv[BLOCK_SIZE] = {0};
 
-    /* Encrypt the plaintext */
-    bufferLen = CryptoUtils::encryptSymmetric(plaintext, plaintext.getSize(), key, iv, buffer);
+    strncpy((char*) _key, key, KEY_SIZE);
+    strncpy((char*) _iv, iv, BLOCK_SIZE);
 
-    /* Add a NULL terminator */
-    buffer[bufferLen] = '\0';
+#ifdef TESTING
+    int result = CryptoUtils::genKey(_key, _iv);
+    if (result != 1) {
+        Log::Error("JNI", " %s failed to gen keys OUT", __FUNCTION__ );
+        return env->NewStringUTF("");
+    }
+#endif
 
-    std::string encryptedText = Base64::encode(buffer, bufferLen);
+    std::string cypherText;
+    result = CryptoUtils::AESEncrypt(_key, _iv, plaintext, cypherText);
+    if (result != 1) {
+        Log::Error("JNI", " %s failed to encrypt OUT", __FUNCTION__ );
+        return env->NewStringUTF("");
+    }
 
-    // Delete allocated memory
-    delete[] buffer;
+    std::string encodedText = Base64::encode((unsigned char*) cypherText.c_str(), cypherText.length());
+    std::string encodedIV = Base64::encode(_key, KEY_SIZE);
+    std::string encodedKey = Base64::encode(_iv, BLOCK_SIZE);
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 
-    return env->NewStringUTF(encryptedText.c_str());
+    return env->NewStringUTF(encodedText.c_str());
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenssl__1decryptSymmetric(JNIEnv *env,
@@ -57,21 +66,17 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     JString key(env, jkey);
     JString iv(env, jiv);
 
-    std::string inputText = Base64::decode(cypherText);
+    std::string decodedText = Base64::decode(cypherText);
+    std::string decodedIV = Base64::decode(key);
+    std::string decodedKEY = Base64::decode(iv);
 
-    auto* buffer = new unsigned char[inputText.size()];
-    int bufferLen;
-
-    /* Decrypt the ciphertext */
-    bufferLen = CryptoUtils::decryptSymmetric((unsigned char *) inputText.c_str(), inputText.length(), key, iv, buffer);
-
-    /* Add a NULL terminator. We are expecting printable text */
-    buffer[bufferLen] = '\0';
-
-    std::string plainText((char*) buffer, bufferLen);
-
-    // Delete allocated memory
-    delete[] buffer;
+    std::string plainText;
+    std::string cypherTextString = cypherText;
+    int result = CryptoUtils::AESDecrypt((unsigned char*) decodedKEY.c_str(), (unsigned char*) decodedIV.c_str(), plainText, cypherTextString);
+    if (result != 1) {
+        Log::Error("JNI", " %s failed to decrypt OUT", __FUNCTION__ );
+        return env->NewStringUTF("");
+    }
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 

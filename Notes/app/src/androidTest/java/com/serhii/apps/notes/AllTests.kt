@@ -11,5 +11,9 @@ import com.serhii.apps.notes.CipherTests
 import com.serhii.apps.notes.DatabaseTests
 
 @RunWith(Suite::class)
-@SuiteClasses(CipherTests::class, DatabaseTests::class)
+@SuiteClasses(
+    CipherTests::class,
+    DatabaseTests::class,
+    AppTests::class
+)
 class AllTests

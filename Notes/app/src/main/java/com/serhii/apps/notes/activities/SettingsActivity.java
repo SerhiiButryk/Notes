@@ -177,85 +177,112 @@ public class SettingsActivity extends AppCompatActivity {
         private void backupNotes(Intent data) {
             Log.info(TAG, "backupNotes() IN");
 
+            OutputStream outputStream = null;
+            try {
+                outputStream = getContentResolver().openOutputStream(data.getData());
+            } catch (FileNotFoundException e) {
+                Log.error(TAG, "onOkClicked() error: " + e);
+                e.printStackTrace();
+                return;
+            }
+
+            boolean result = BackupManager.getInstance().backupData(outputStream, SettingsActivity.this);
+            if (result) {
+                GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
+            } else {
+                GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
+            }
+
+            // TODO: This doesn't work because of issue with symmetric encryption
             // Localized strings
-            String hint = getString(R.string.set_password_dialog_title);
-            String title = getString(R.string.set_password_dialog_title);
+//            String hint = getString(R.string.set_password_dialog_title);
+//            String title = getString(R.string.set_password_dialog_title);
 
             // Ask for password
-            DialogHelper.showDialogWithEnterField(this, new DialogWithEnterFieled.DialogListener() {
-
-                @Override
-                public void onOkClicked(String enteredText) {
-                    Log.info(TAG, "onOkClicked() IN");
-                    OutputStream outputStream = null;
-                    try {
-                        outputStream = getContentResolver().openOutputStream(data.getData());
-                    } catch (FileNotFoundException e) {
-                        Log.error(TAG, "onOkClicked() error: " + e);
-                        e.printStackTrace();
-                        return;
-                    }
-
-                    Hash hash = new Hash();
-                    String pass = hash.hashMD5(enteredText);
-
-                    NativeBridge nativeBridge = new NativeBridge();
-                    if (!nativeBridge.verifyPassword(pass)) {
-                        GoodUtils.showToast(SettingsActivity.this, R.string.wrong_pass);
-                        Log.error(TAG, "onOkClicked() wrong pass");
-                        return;
-                    }
-
-                    boolean result = BackupManager.getInstance().backupData(outputStream, SettingsActivity.this, hash.hashMD5(pass));
-                    if (result) {
-                        GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
-                    } else {
-                        GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
-                    }
-                    Log.info(TAG, "onOkClicked() OUT");
-                }
-
-                @Override
-                public void onCancelClicked() {
-                    Log.info(TAG, "onCanceledClicked() IN");
-                    GoodUtils.showToast(SettingsActivity.this, R.string.result_canceled);
-                }
-
-            }, title, hint);
+//            DialogHelper.showDialogWithEnterField(this, new DialogWithEnterFieled.DialogListener() {
+//
+//                @Override
+//                public void onOkClicked(String enteredText) {
+//                    Log.info(TAG, "onOkClicked() IN");
+//                    OutputStream outputStream = null;
+//                    try {
+//                        outputStream = getContentResolver().openOutputStream(data.getData());
+//                    } catch (FileNotFoundException e) {
+//                        Log.error(TAG, "onOkClicked() error: " + e);
+//                        e.printStackTrace();
+//                        return;
+//                    }
+//
+//                    Hash hash = new Hash();
+//                    String pass = hash.hashMD5(enteredText);
+//
+//                    NativeBridge nativeBridge = new NativeBridge();
+//                    if (!nativeBridge.verifyPassword(pass)) {
+//                        GoodUtils.showToast(SettingsActivity.this, R.string.wrong_pass);
+//                        Log.error(TAG, "onOkClicked() wrong pass");
+//                        return;
+//                    }
+//
+//                    boolean result = BackupManager.getInstance().backupData(outputStream, SettingsActivity.this, hash.hashMD5(pass));
+//                    if (result) {
+//                        GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
+//                    } else {
+//                        GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
+//                    }
+//                    Log.info(TAG, "onOkClicked() OUT");
+//                }
+//
+//                @Override
+//                public void onCancelClicked() {
+//                    Log.info(TAG, "onCanceledClicked() IN");
+//                    GoodUtils.showToast(SettingsActivity.this, R.string.result_canceled);
+//                }
+//
+//            }, title, hint);
 
         }
 
         private void restoreNotes(Intent data) {
             Log.info(TAG, "restoreNotes() IN");
 
+            String json = readBackupFile(data);
+
+            boolean result = BackupManager.getInstance().restoreData(json, SettingsActivity.this);
+            if (result) {
+                GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
+            } else {
+                GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
+            }
+
+            // TODO: This doesn't work because of issue with symmetric encryption
             // Localized strings
-            String hint = getString(R.string.set_password_dialog_title);
-            String title = getString(R.string.set_password_dialog_title2);
+//            String hint = getString(R.string.set_password_dialog_title);
+//            String title = getString(R.string.set_password_dialog_title2);
 
             // Ask for password
-            DialogHelper.showDialogWithEnterField(this, new DialogWithEnterFieled.DialogListener() {
-                @Override
-                public void onOkClicked(String enteredText) {
-                    Log.info(TAG, "onOkClicked() IN");
-
-                    String json = readBackupFile(data);
-                    Hash hash = new Hash();
-
-                    boolean result = BackupManager.getInstance().restoreData(json, SettingsActivity.this, hash.hashMD5(enteredText));
-                    if (result) {
-                        GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
-                    } else {
-                        GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
-                    }
-
-                }
-
-                @Override
-                public void onCancelClicked() {
-                    Log.info(TAG, "onCanceledClicked() IN");
-                    GoodUtils.showToast(SettingsActivity.this, R.string.result_canceled);
-                }
-            }, title, hint);
+//            DialogHelper.showDialogWithEnterField(this, new DialogWithEnterFieled.DialogListener() {
+//                @Override
+//                public void onOkClicked(String enteredText) {
+//                    Log.info(TAG, "onOkClicked() IN");
+//
+//                    String json = readBackupFile(data);
+//                    Hash hash = new Hash();
+//
+//                    boolean result = BackupManager.getInstance().restoreData(json, SettingsActivity.this, hash.hashMD5(enteredText));
+//                    if (result) {
+//                        GoodUtils.showToast(SettingsActivity.this, R.string.result_success);
+//                    } else {
+//                        GoodUtils.showToast(SettingsActivity.this, R.string.result_failed);
+//                    }
+//
+//                }
+//
+//                @Override
+//                public void onCancelClicked() {
+//                    Log.info(TAG, "onCanceledClicked() IN");
+//                    GoodUtils.showToast(SettingsActivity.this, R.string.result_canceled);
+//                }
+//            }, title, hint);
 
         }
 

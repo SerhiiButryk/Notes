@@ -8,9 +8,6 @@ import com.serhii.apps.notes.database.NotesDatabaseProvider;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.core.log.Log;
-import com.serhii.core.security.Cipher;
-import com.serhii.core.security.Hash;
-import com.serhii.core.security.impl.crypto.Result;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
@@ -19,7 +16,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class BackupManager {
 
@@ -127,7 +123,7 @@ public class BackupManager {
         return false;
     }
 
-    public boolean backupData(final OutputStream outputStream, Context context, String passwordHash) {
+    public boolean backupData(final OutputStream outputStream, Context context) {
 
         NotesDatabaseProvider notesDatabaseProvider = new NotesDatabaseProvider(context);
 
@@ -149,65 +145,28 @@ public class BackupManager {
 
             String json = jsonAdapter.toJson(backupAdapter);
 
-            // Gen random iv every time
-//            String iv = UUID.randomUUID().toString();
-            passwordHash = "passwordHash112";
-            String iv = "902r9eworweoijf";
-
-            // Encrypt
-            Cipher cipher = new Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL);
-            Result result = cipher.encryptSymmetric(json, passwordHash, iv.getBytes());
-
-            if (result.isResultAvailable() && !result.getMessage().isEmpty()) {
-                try {
-                    // Encrypted data
-                    outputStream.write(result.getMessage().getBytes());
-                    outputStream.write(IV_KEY_MARKER.getBytes());
-                    outputStream.write(iv.getBytes());
-                    outputStream.flush();
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.info(TAG, "backupDataAsEncryptedText() error: " + e);
-                    e.printStackTrace();
-                    return false;
-                }
-                // Succeeded to backup data
-                return true;
-            } else {
-                Log.info(TAG, "backupDataAsEncryptedText() failed to encrypt data");
+            try {
+                outputStream.write(json.getBytes());
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                Log.info(TAG, "backupDataAsEncryptedText() error: " + e);
+                e.printStackTrace();
+                return false;
             }
 
-            // Failed to backup data
-            return false;
+            return true;
 
         } else {
             Log.info(TAG, "backupDataAsEncryptedText() database is empty");
         }
 
-        // Failed no data to backup
         return false;
     }
 
-    public boolean restoreData(String json, Context context, String passwordHash) {
+    public boolean restoreData(String json, Context context) {
 
         Log.detail(TAG, "restoreData() json: " + json);
-
-        // Get iv
-        //String iv = json.split(IV_KEY_MARKER)[1];
-        passwordHash = "passwordHash112";
-        String iv = "902r9eworweoijf";
-        // Get data
-        json = json.split(IV_KEY_MARKER)[0];
-
-        // Decrypt
-        Cipher cipher = new Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL);
-        Result result = cipher.decryptSymmetric(json, passwordHash, iv.getBytes());
-        if (!result.isResultAvailable() || result.getMessage().isEmpty()) {
-            Log.error(TAG, "restoreData() failed to decrypt");
-            return false;
-        }
-        // Decrypted data
-        json = result.getMessage();
 
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<BackupAdapter> jsonAdapter = moshi.adapter(BackupAdapter.class);

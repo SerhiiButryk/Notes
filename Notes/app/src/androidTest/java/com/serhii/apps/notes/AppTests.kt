@@ -38,13 +38,7 @@ class AppTests {
     }
 
     @Test
-    fun test01_BackUp() {
-        Log.i(TAG, "test01_BackUp() IN")
-
-        TestUtility.waitFor(2*1000)
-
-        Log.i(TAG, "test01_BackUp() OUT")
-    }
+    fun test() {}
 
     companion object {
         private val TAG: String = AppTests::class.java.simpleName
