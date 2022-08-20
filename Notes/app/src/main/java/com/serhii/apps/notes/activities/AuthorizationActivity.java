@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeService;
-import com.serhii.apps.notes.control.managers.InactivityManager;
+import com.serhii.apps.notes.control.idle_lock.InactivityManager;
 import com.serhii.apps.notes.control.types.AuthResult;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.fragments.BlockFragment;
@@ -23,7 +23,6 @@ import com.serhii.apps.notes.ui.fragments.LoginFragment;
 import com.serhii.apps.notes.ui.fragments.RegisterFragment;
 import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.log.Log;
-import com.serhii.core.utils.GoodUtils;
 
 public class AuthorizationActivity extends AppCompatActivity {
 
@@ -53,7 +52,7 @@ public class AuthorizationActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Cancel inactivity timer
-        InactivityManager.getInstance().cancelAlarm();
+        InactivityManager.cancelAlarm(this);
         Log.info(TAG, "onResume()");
     }
 

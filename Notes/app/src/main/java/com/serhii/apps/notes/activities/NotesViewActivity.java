@@ -1,12 +1,9 @@
 package com.serhii.apps.notes.activities;
 
-import static com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY;
-
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,11 +11,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.base.IAuthorizeUser;
-import com.serhii.apps.notes.control.broadcast.InactivityEventReceiver;
-import com.serhii.apps.notes.control.managers.AppForegroundListener;
 import com.serhii.apps.notes.control.managers.BackupManager;
 import com.serhii.apps.notes.control.managers.BiometricAuthManager;
-import com.serhii.apps.notes.control.managers.InactivityManager;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment;
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment;
@@ -28,13 +22,12 @@ import com.serhii.core.log.Log;
 import com.serhii.core.security.impl.crypto.CryptoError;
 import com.serhii.core.utils.GoodUtils;
 
-public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUser,
+public class NotesViewActivity extends AppBaseActivity implements IAuthorizeUser,
         NoteViewFragment.NoteInteraction, NoteEditorFragment.EditorNoteInteraction {
 
     private static final String TAG = "NotesViewActivity";
 
     private NotesViewModel notesViewModel;
-    private final AppForegroundListener appForegroundListener = new AppForegroundListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +35,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_view);
-
-        // Enable unsecured screen content settings
-        GoodUtils.enableUnsecureScreenProtection(this);
 
         // Need to call initNativeConfigs() before authorization process at the beginning.
         String filePath = GoodUtils.getFilePath(this);
@@ -57,9 +47,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         // Start authorization process.
         authorizeUser(savedInstanceState);
 
-        // Initialize lifecycle aware components
-        getLifecycle().addObserver(appForegroundListener);
-
         Log.info(TAG, "onCreate() OUT");
     }
 
@@ -70,22 +57,6 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
         fm.beginTransaction().replace(R.id.main_layout, f, null)
                 .setReorderingAllowed(true) // Needed for optimization
                 .commit();
-    }
-
-    @Override
-    public void onUserInteraction() {
-        super.onUserInteraction();
-        // TODO: Need also check whether Authorize activity has already shown
-        InactivityManager.getInstance().onUserInteraction();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        InactivityEventReceiver.checkIfInactivityTimeoutReceived(this);
-        // Trigger time out
-        InactivityManager.getInstance().scheduleAlarm();
-        Log.info(TAG, "onResume()");
     }
 
     @Override
@@ -211,9 +182,4 @@ public class NotesViewActivity extends AppCompatActivity implements IAuthorizeUs
      *
      */
     private native void initNativeConfigs(String path);
-
-    static {
-        System.loadLibrary(RUNTIME_LIBRARY);
-    }
-
 }

@@ -15,17 +15,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.NativeBridge;
-import com.serhii.apps.notes.control.broadcast.InactivityEventReceiver;
-import com.serhii.apps.notes.control.managers.AppForegroundListener;
+import com.serhii.apps.notes.control.idle_lock.IdleLockHandler;
+import com.serhii.apps.notes.control.AppForegroundListener;
 import com.serhii.apps.notes.control.managers.BackupManager;
-import com.serhii.apps.notes.control.managers.InactivityManager;
+import com.serhii.apps.notes.control.idle_lock.InactivityManager;
 import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
-import com.serhii.apps.notes.ui.DialogWithEnterFieled;
-import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.fragments.SettingsFragment;
 import com.serhii.core.log.Log;
-import com.serhii.core.security.Hash;
 import com.serhii.core.utils.GoodUtils;
 
 import java.io.FileNotFoundException;
@@ -33,21 +29,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppBaseActivity {
 
     private static final String TAG = "SettingsActivity";
     private static final String SETTINGS_FRAGMENT_TAG = "main settings";
 
     private Toolbar toolbar;
-    private final AppForegroundListener appForegroundListener = new AppForegroundListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Enable unsecured screen content settings
-        GoodUtils.enableUnsecureScreenProtection(this);
-
         initBinding();
 
         if (savedInstanceState == null) {
@@ -55,19 +46,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         setActionBar();
-
-        // Lifecycle aware component
-        getLifecycle().addObserver(appForegroundListener);
-
-    }
-
-    @Override
-    protected void onResume() {
-        Log.info(TAG, "onResume()");
-        super.onResume();
-        InactivityEventReceiver.checkIfInactivityTimeoutReceived(this);
-        // Trigger time out
-        InactivityManager.getInstance().scheduleAlarm();
     }
 
     private void addFragment() {
@@ -83,13 +61,6 @@ public class SettingsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(getString(R.string.preference_title));
         }
-    }
-
-    @Override
-    public void onUserInteraction() {
-        super.onUserInteraction();
-
-        InactivityManager.getInstance().onUserInteraction();
     }
 
     private void initBinding() {

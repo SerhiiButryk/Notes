@@ -9,7 +9,7 @@ import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.common.AppConstants;
 import com.serhii.apps.notes.control.NativeBridge;
 import com.serhii.apps.notes.control.managers.BackupManager;
-import com.serhii.apps.notes.control.managers.InactivityManager;
+import com.serhii.apps.notes.control.idle_lock.InactivityManager;
 import com.serhii.apps.notes.database.NotesDatabaseProvider;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.log.Log;
@@ -68,7 +68,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 int selectedTime = Integer.parseInt(newValue.toString());
                 Log.info(TAG, "onPreferenceChange(), selected idle lock time " + selectedTime);
-                InactivityManager.getInstance().updateTimeout(getContext());
+                InactivityManager.updateTimeout(getContext());
                 return true;
             }
         });

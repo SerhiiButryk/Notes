@@ -9,4 +9,6 @@ public class AppConstants {
     public static final String SECRET_KEY_DATA_ENC_ALIAS = "SK-729034";
     public static final String SECRET_KEY_PASSWORD_ENC_ALIAS = "SK-99411";
 
+    public static final int IDLE_LOCK_JOB_SERVICE_ID = 100;
+
 }

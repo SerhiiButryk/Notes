@@ -3,12 +3,8 @@ package com.serhii.apps.notes;
 import android.app.Application;
 
 import com.serhii.apps.notes.common.AppConstants;
-import com.serhii.apps.notes.control.managers.InactivityManager;
-import com.serhii.core.CoreEngine;
+import com.serhii.apps.notes.control.idle_lock.InactivityManager;
 import com.serhii.core.log.Log;
-import com.serhii.core.log.LogImpl;
-import com.serhii.core.security.Hash;
-import com.serhii.core.security.impl.crypto.Result;
 
 public class Notes extends Application {
 
@@ -27,8 +23,6 @@ public class Notes extends Application {
         } else {
             Log.info(TAG, "onCreate(), running release build");
         }
-        // Init inactivity manager
-        InactivityManager.getInstance().initManager(this);
         Log.info(TAG, "onCreate(), OUT");
     }
 }
