@@ -30,7 +30,7 @@ The interface is simple to use.
 
 # Supported platforms
 
-- Android version: Android 8 - Android 11
+- Android version: Android 8 - Android 13
 - Supported ABIs: x86, x86_64, armeabi-v7a
 
 # Build instraction
