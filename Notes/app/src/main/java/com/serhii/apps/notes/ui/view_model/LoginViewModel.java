@@ -14,7 +14,7 @@ import com.serhii.apps.notes.ui.data_model.AuthModel;
 
 public class LoginViewModel extends ViewModel {
 
-    private final IAuthorizeService authorizeService = EventService.getInstance();
+    private final IAuthorizeService authorizeService = EventService.INSTANCE;
     private final MutableLiveData<Boolean> showRegistrationUISetFlag = new MutableLiveData<>(false);
 
     public void setAuthValue(AuthModel newValue) {
