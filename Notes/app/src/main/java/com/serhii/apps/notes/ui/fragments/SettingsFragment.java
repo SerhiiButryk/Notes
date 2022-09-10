@@ -20,7 +20,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private static final String TAG = "LoginFragment";
 
     private Preference loginAttempts;
-
     private final NativeBridge nativeBridge = new NativeBridge();
 
     @Override
@@ -85,7 +84,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     return true;
                 }
 
-                BackupManager.getInstance().openDirectoryChooserForExtractData(getActivity());
+                BackupManager.INSTANCE.openDirectoryChooserForExtractData(getActivity());
                 return true;
             }
         });
@@ -100,7 +99,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     return true;
                 }
 
-                BackupManager.getInstance().openDirectoryChooserForBackup(getActivity());
+                BackupManager.INSTANCE.openDirectoryChooserForBackup(getActivity());
 
                 return false;
             }
@@ -113,7 +112,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         restoreNotes.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                BackupManager.getInstance().openBackUpFile(getActivity());
+                BackupManager.INSTANCE.openBackUpFile(getActivity());
                 return true;
             }
         });

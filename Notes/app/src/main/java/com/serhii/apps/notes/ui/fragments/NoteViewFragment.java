@@ -9,34 +9,32 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.serhii.core.log.Log;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.activities.SettingsActivity;
-import com.serhii.apps.notes.databinding.FragmentNotesViewBinding;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
-import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
 import com.serhii.apps.notes.ui.utils.NotesRecyclerAdapter;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.serhii.core.log.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NoteViewFragment extends Fragment implements IViewBindings {
+public class NoteViewFragment extends Fragment {
 
     private static final String TAG = "NoteViewFragment";
 
@@ -48,6 +46,8 @@ public class NoteViewFragment extends Fragment implements IViewBindings {
     private NotesRecyclerAdapter adapter;
     private NoteInteraction interaction;
     private Toolbar toolbar;
+    private ImageView noNotesImage;
+    private TextView noNotesText;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -70,7 +70,7 @@ public class NoteViewFragment extends Fragment implements IViewBindings {
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View v = initBinding(inflater, container);
+        View v = initView(inflater, container);
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,16 +96,15 @@ public class NoteViewFragment extends Fragment implements IViewBindings {
         return v;
     }
 
-    @Override
-    public View initBinding(LayoutInflater inflater, ViewGroup container) {
-        FragmentNotesViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_notes_view, container, false);
-
+    public View initView(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.fragment_notes_view, container, false);
         // Set references
-        actionButton = binding.fab;
-        notesRecyclerView = binding.noteListView.noteRecyclerView;
-        toolbar = binding.toolbar;
-
-        return binding.getRoot();
+        actionButton = view.findViewById(R.id.fab);
+        notesRecyclerView = view.findViewById(R.id.note_recycler_view);
+        toolbar = view.findViewById(R.id.toolbar);
+        noNotesImage = view.findViewById(R.id.placeholder_imv);
+        noNotesText = view.findViewById(R.id.placeholder_txv);
+        return view;
     }
 
     @Override
@@ -119,17 +118,12 @@ public class NoteViewFragment extends Fragment implements IViewBindings {
             @Override
             public void onChanged(List<NoteModel> noteModels) {
                 Log.info(TAG, "onChanged() new data received, size = " + noteModels.size());
-
-                // Add template note
-                if (noteModels.isEmpty()) {
-                    List<NoteModel> notes = new ArrayList<>();
-                    notes.add(NoteModel.createTemplateNote(getContext()));
-
-                    adapter.setDataChanged(notes);
-                } else {
+                if (!noteModels.isEmpty()) {
                     adapter.setDataChanged(notesViewModel.getNotes().getValue());
+                    // Hide "no notes" image and text
+                    noNotesImage.setVisibility(View.GONE);
+                    noNotesText.setVisibility(View.GONE);
                 }
-
             }
         });
 

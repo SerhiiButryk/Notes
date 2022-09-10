@@ -23,6 +23,8 @@ import androidx.preference.PreferenceManager
  */
 object InactivityManager {
 
+    private const val IDLE_LOCK_JOB_SERVICE_ID = 100
+
     private var timeoutTimeMillis = 0
     private const val TAG = "InactivityManager"
 
@@ -44,7 +46,7 @@ object InactivityManager {
         updateTimeout(context)
 
         val componentName = ComponentName(context, IdleLockJobService::class.java)
-        val info = JobInfo.Builder(AppConstants.IDLE_LOCK_JOB_SERVICE_ID, componentName)
+        val info = JobInfo.Builder(IDLE_LOCK_JOB_SERVICE_ID, componentName)
             .setMinimumLatency(timeoutTimeMillis.toLong())
             .build()
 
@@ -64,7 +66,7 @@ object InactivityManager {
     fun cancelAlarm(context: Context) {
         detail(TAG, "cancelAlarm(), inactivity alarm is canceled")
         val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        scheduler.cancel(AppConstants.IDLE_LOCK_JOB_SERVICE_ID)
+        scheduler.cancel(IDLE_LOCK_JOB_SERVICE_ID)
     }
 
     @JvmStatic

@@ -44,7 +44,7 @@ class EncryptionHelper {
         resetErrors();
 
         Cipher csk = new Cipher();
-        csk.selectKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS);
+        csk.selectKey(Keys.SECRET_KEY_DATA_ENC_ALIAS);
 
         Result note = csk.encryptSymmetric(noteModel.getNote());
         Result title = csk.encryptSymmetric(noteModel.getTitle());
@@ -159,7 +159,7 @@ class EncryptionHelper {
 
     private NoteModel decryptInternal(final NoteModel encData) {
         Cipher csk = new Cipher();
-        csk.selectKey(AppConstants.SECRET_KEY_DATA_ENC_ALIAS);
+        csk.selectKey(Keys.SECRET_KEY_DATA_ENC_ALIAS);
 
         Result decodedNote = csk.decryptSymmetric(encData.getNote(), ivNote);
         Result decodedTitle = csk.decryptSymmetric(encData.getTitle(), ivTitle);

@@ -3,11 +3,9 @@ package com.serhii.apps.notes.ui.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
@@ -24,21 +22,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.serhii.core.log.Log;
-import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.databinding.FragmentNoteEditorViewBinding;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
-import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory;
+import com.serhii.core.log.Log;
+import com.serhii.core.utils.GoodUtils;
 
-public class NoteEditorFragment extends Fragment implements IViewBindings {
+public class NoteEditorFragment extends Fragment {
 
     private static final String TAG = "NoteEditorFragment";
 
@@ -82,20 +77,17 @@ public class NoteEditorFragment extends Fragment implements IViewBindings {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return initBinding(inflater, container);
+        return initView(inflater, container);
     }
 
-    @Override
-    public View initBinding(LayoutInflater inflater, ViewGroup container) {
-        FragmentNoteEditorViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_note_editor_view, container, false);
-
+    public View initView(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.fragment_note_editor_view, container, false);
         // Set references
-        titleNoteField = binding.titleNote;
-        noteFiled = binding.noteText;
-        toolbar = binding.toolbar;
-        noteTimeFiled = binding.dateTimeView;
-
-        return binding.getRoot();
+        titleNoteField = view.findViewById(R.id.title_note);
+        noteFiled = view.findViewById(R.id.note_text);
+        toolbar = view.findViewById(R.id.toolbar);
+        noteTimeFiled = view.findViewById(R.id.date_time_view);
+        return view;
     }
 
     @Override
