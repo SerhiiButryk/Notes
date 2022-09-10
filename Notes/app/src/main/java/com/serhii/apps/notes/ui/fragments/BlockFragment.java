@@ -26,7 +26,6 @@ import com.serhii.core.utils.GoodUtils;
 public class BlockFragment extends Fragment {
 
     private EditText accessKeyField;
-
     private LoginViewModel loginViewModel;
 
     private final EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
