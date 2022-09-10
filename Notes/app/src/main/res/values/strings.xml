@@ -3,6 +3,9 @@
     <string name="app_name">Notes</string>
     <string name="app_name_debug">NotesDev</string>
 
+    // NotesView activity
+    <string name="ms_no_notes">No notes yet</string>
+
     // Alter Dialog
     <string name="ms_no_user_account">This user account is not authorized. \nPlease, authorize your user.</string>
     <string name="title_no_user_account">Authorize error</string>

@@ -66,6 +66,7 @@
 
     // Notes view screen
     <dimen name="grid_padding_layout">12dp</dimen>
+    <dimen name="no_notes_img">100dp</dimen>
 
     // BlockView
     <dimen name="message_size_text">18sp</dimen>
