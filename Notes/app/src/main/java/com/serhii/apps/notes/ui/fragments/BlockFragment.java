@@ -12,28 +12,23 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.serhii.core.security.Hash;
-import com.serhii.core.utils.GoodUtils;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.types.AuthorizeType;
-import com.serhii.apps.notes.databinding.FragmentBlockViewBinding;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
-import com.serhii.apps.notes.ui.fragments.base.IViewBindings;
 import com.serhii.apps.notes.ui.utils.TextChecker;
 import com.serhii.apps.notes.ui.view_model.LoginViewModel;
+import com.serhii.core.security.Hash;
+import com.serhii.core.utils.GoodUtils;
 
-public class BlockFragment extends Fragment implements IViewBindings {
+public class BlockFragment extends Fragment {
 
     private EditText accessKeyField;
-    private Button ok;
-
     private LoginViewModel loginViewModel;
 
-    private EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
+    private final EditText.OnEditorActionListener keyEventActionDone = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -47,7 +42,6 @@ public class BlockFragment extends Fragment implements IViewBindings {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         // Retrieve an instance of ViewModel
         loginViewModel = new ViewModelProvider(getActivity()).get(LoginViewModel.class);
     }
@@ -55,18 +49,14 @@ public class BlockFragment extends Fragment implements IViewBindings {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        return initBinding(inflater, container);
+        return initView(inflater, container);
     }
 
-    @Override
-    public View initBinding(LayoutInflater inflater, ViewGroup viewGroup) {
+    public View initView(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.fragment_block_view, container, false);
 
-        FragmentBlockViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_block_view, viewGroup, false);
-
-        accessKeyField = binding.accessKey;
-        ok = binding.btnLogin;
-
+        accessKeyField = view.findViewById(R.id.access_key);
+        Button ok = view.findViewById(R.id.btn_login);
         ok.setEnabled(false);
 
         accessKeyField.addTextChangedListener(new TextChecker(accessKeyField, ok));
@@ -80,20 +70,17 @@ public class BlockFragment extends Fragment implements IViewBindings {
         });
 
         ok.setVisibility(View.VISIBLE);
-        binding.emailLayout.setVisibility(View.VISIBLE);
-
-        return binding.getRoot();
+        view.findViewById(R.id.email_layout).setVisibility(View.VISIBLE);
+        return view;
     }
 
     private void unlockApplication() {
-
         Hash hash = new Hash();
         AuthModel authModel = new AuthModel();
         authModel.setAuthType(AuthorizeType.AUTH_UNLOCK);
         authModel.setPassword(hash.hashMD5(GoodUtils.getText(accessKeyField)));
         // For safety
         accessKeyField.setText("");
-
         // Set data
         loginViewModel.setAuthValue(authModel);
     }

@@ -38,8 +38,8 @@ open class AppBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        IdleLockHandler.checkIfInactivityTimeoutReceived(this)
         // Trigger time out
+        IdleLockHandler.checkIfInactivityTimeoutReceived(this)
         InactivityManager.scheduleAlarm(this)
         Log.info(TAG, "onResume() called")
     }

@@ -10,16 +10,10 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.databinding.DataBindingUtil;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.idle_lock.IdleLockHandler;
-import com.serhii.apps.notes.control.AppForegroundListener;
 import com.serhii.apps.notes.control.managers.BackupManager;
-import com.serhii.apps.notes.control.idle_lock.InactivityManager;
-import com.serhii.apps.notes.databinding.ActivitySettingsBinding;
 import com.serhii.apps.notes.ui.fragments.SettingsFragment;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
@@ -39,7 +33,14 @@ public class SettingsActivity extends AppBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initBinding();
+
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         if (savedInstanceState == null) {
             addFragment();
@@ -61,20 +62,6 @@ public class SettingsActivity extends AppBaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(getString(R.string.preference_title));
         }
-    }
-
-    private void initBinding() {
-        ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
-
-        // Set references
-        toolbar = binding.toolbar;
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
     }
 
     @Override
