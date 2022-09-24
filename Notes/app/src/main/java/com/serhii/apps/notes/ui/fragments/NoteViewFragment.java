@@ -119,11 +119,15 @@ public class NoteViewFragment extends Fragment {
             public void onChanged(List<NoteModel> noteModels) {
                 Log.info(TAG, "onChanged() new data received, size = " + noteModels.size());
                 if (!noteModels.isEmpty()) {
-                    adapter.setDataChanged(notesViewModel.getNotes().getValue());
                     // Hide "no notes" image and text
                     noNotesImage.setVisibility(View.GONE);
                     noNotesText.setVisibility(View.GONE);
+                } else {
+                    // Show "no notes" image and text
+                    noNotesImage.setVisibility(View.VISIBLE);
+                    noNotesText.setVisibility(View.VISIBLE);
                 }
+                adapter.setDataChanged(notesViewModel.getNotes().getValue());
             }
         });
 

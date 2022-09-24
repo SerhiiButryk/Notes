@@ -5,15 +5,11 @@
 package com.serhii.apps.notes.control
 
 import android.content.Context
-import com.serhii.apps.notes.common.AppConstants
 import com.serhii.apps.notes.control.base.IAuthorizeService
 import com.serhii.apps.notes.control.managers.AuthManager
 import com.serhii.apps.notes.control.types.RequestType
-import com.serhii.apps.notes.database.Keys.SECRET_KEY_DATA_ENC_ALIAS
-import com.serhii.apps.notes.database.Keys.SECRET_KEY_PASSWORD_ENC_ALIAS
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.Cipher
 
 /**
  * Class which receives the events from the system and delivers them to corresponding manager
@@ -55,13 +51,10 @@ object EventService : IAuthorizeService {
      */
     override fun onUserRegistered(context: Context) {
         info(TAG, "onUserRegistered()")
-        // Create protection keys
-        val cipher = Cipher()
-        cipher.createKey(SECRET_KEY_DATA_ENC_ALIAS, false)
-        cipher.createKey(SECRET_KEY_PASSWORD_ENC_ALIAS, false)
-        NativeBridge().createUnlockKey()
+        val nativeBridge = NativeBridge()
+        nativeBridge.createUnlockKey()
         // Set login password limit
-        NativeBridge().setLoginLimitFromDefault(context)
+        nativeBridge.setLoginLimitFromDefault(context)
     }
 
     private const val TAG = "EventService"

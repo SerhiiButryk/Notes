@@ -80,9 +80,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         info(TAG, "onAuthorize(), User is authorized")
         val nativeBridge = NativeBridge()
         nativeBridge.resetLoginLimitLeft(this)
-        notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application)).get(
-            NotesViewModel::class.java
-        )
+        notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application)).get(NotesViewModel::class.java)
         notesViewModel?.errorStateData?.observe(this) { cryptoError ->
             if (cryptoError === CryptoError.USER_NOT_AUTHORIZED) {
                 // Request KeyStore Unlock

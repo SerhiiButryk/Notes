@@ -8,9 +8,7 @@ import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppConstants
 import com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY
-import com.serhii.apps.notes.database.Keys
 import com.serhii.core.security.Cipher
 import com.serhii.core.security.Hash
 import java.util.*
@@ -48,10 +46,13 @@ class NativeBridge {
     private fun setLimitAndEnc(value: Int) {
         // Encrypt value
         val cipher = Cipher()
-        cipher.selectKey(Keys.SECRET_KEY_PASSWORD_ENC_ALIAS)
         val (message, iv1) = cipher.encryptSymmetric(value.toString())
         val iv = String(Base64.encode(iv1, Base64.NO_WRAP))
-        val encMessage = message + LOG_LIMIT_MARKER + iv
+        // Iv should have 16 length
+        if (iv.length != 16) {
+            throw RuntimeException("Failed to set limit. Expected length: 16, actual length: ${iv.length}")
+        }
+        val encMessage = iv + message
         // Pass enc data
         _setLimitLeft(encMessage)
     }
@@ -64,11 +65,10 @@ class NativeBridge {
         get() {
             val encMessage = _getLimitLeft()
             // Decrypt value
-            val encLimit = encMessage.split(LOG_LIMIT_MARKER).toTypedArray()[0]
-            val encIv = encMessage.split(LOG_LIMIT_MARKER).toTypedArray()[1]
+            val encLimit = encMessage.substring(16)
+            val encIv = encMessage.substring(0, 16)
             val iv = Base64.decode(encIv.toByteArray(), Base64.NO_WRAP)
             val cipher = Cipher()
-            cipher.selectKey(Keys.SECRET_KEY_PASSWORD_ENC_ALIAS)
             val (message) = cipher.decryptSymmetric(encLimit, iv)
             // Return result
             return message.toInt()
@@ -84,37 +84,36 @@ class NativeBridge {
     }
 
     fun createUnlockKey() {
-        var unlockKey = UUID.randomUUID().toString()
+        var randomString = UUID.randomUUID().toString()
         // Take the first 8 characters
-        unlockKey = unlockKey.substring(0, unlockKey.indexOf('-'))
+        randomString = randomString.substring(0, 8)
         // Encrypt value
         val cipher = Cipher()
-        cipher.selectKey(Keys.SECRET_KEY_PASSWORD_ENC_ALIAS)
-        val (message, iv1) = cipher.encryptSymmetric(unlockKey)
+        val (message, iv1) = cipher.encryptSymmetric(randomString)
         val iv = String(Base64.encode(iv1, Base64.NO_WRAP))
-        val encMessage = message + LOG_UNLOCK_KEY_MARKER + iv
+        // Iv should have 16 length
+        if (iv.length != 16) {
+            throw RuntimeException("Failed to create unlock key. Expected length: 16, actual length: ${iv.length}")
+        }
+         val encMessage = iv + message
         _setUnlockKey(encMessage)
     }
 
-    // Decrypt value
     val unlockKey: String
-        // Return result
         get() {
             val unlockKey = _getUnlockKey()
+            val iv = unlockKey.substring(0, 16)
+            val encMessage = unlockKey.substring(16)
             // Decrypt value
-            val encLimit = unlockKey.split(LOG_UNLOCK_KEY_MARKER).toTypedArray()[0]
-            val encIv = unlockKey.split(LOG_UNLOCK_KEY_MARKER).toTypedArray()[1]
-            val iv = Base64.decode(encIv.toByteArray(), Base64.NO_WRAP)
+            val ivDecoded = Base64.decode(iv.toByteArray(), Base64.NO_WRAP)
             val cipher = Cipher()
-            cipher.selectKey(Keys.SECRET_KEY_PASSWORD_ENC_ALIAS)
-            val (message) = cipher.decryptSymmetric(encLimit, iv)
-            // Return result
-            return message
+            // Return decrypted result
+            return cipher.decryptSymmetric(encMessage, ivDecoded).message
         }
 
     // TODO: Check password strength
     fun checkPasswordRequirements(password: String?): Boolean {
-        return if (password == null || password.isEmpty()) false else true
+        return !(password == null || password.isEmpty())
     }
 
     private external fun _getUserName(): String
@@ -128,12 +127,8 @@ class NativeBridge {
     private external fun _getUnlockKey(): String
     private external fun _setUnlockKey(unlockKey: String)
 
-    companion object {
-        private const val LOG_LIMIT_MARKER = "SSDD" // Random value
-        private const val LOG_UNLOCK_KEY_MARKER = "AALL" // Random value
-
-        init {
-            System.loadLibrary(RUNTIME_LIBRARY)
-        }
+    init {
+        System.loadLibrary(RUNTIME_LIBRARY)
     }
+
 }

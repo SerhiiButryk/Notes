@@ -187,11 +187,14 @@ internal class SecureStore : CryptoProvider {
     companion object {
         private const val TAG = "SecureStore"
         private const val SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding"
+        private const val DEFAULT_KEY = "Default-key-160375068"
     }
 
     init {
         keyStore = initKeyStore()
         val success = load(keyStore)
+        createKey(DEFAULT_KEY, 0, false)
+        selectKey(DEFAULT_KEY)
         Log.detail(TAG, "SecureStore(): is key store loaded $success")
     }
 
