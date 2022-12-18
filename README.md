@@ -2,17 +2,17 @@
 
 # Overview
 
-This application is developed for keeping and accessing all your notes on a device securely. 
-The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication. 
-The interface is simple to use.
+This application is developed for keeping and accessing all your notes securely on a device. 
+The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication
+and it provides simple interface for use.
 
 # Features
 
 - Password and biometric authentication
 - Basic text editing
-- Limitation of User login attempts
-- Application inactivity lock
-- Apllication block (after login attempts are exceeded)
+- Limitation of user login attempts
+- Application inactivity lock (idle lock timeout)
+- Application block (after login attempts are exceeded)
 - Secure information storage
 - Backup/restore support
 
@@ -38,9 +38,9 @@ The interface is simple to use.
 Required tools:
 
 1) NDK verions: 21.4.7075529
-2) Java veriosn: 11
+2) Java version: 11
 
-Use .gradlew or Android Studio ('Build' menu) to build this application
+Use gradlew or Android Studio ('Build' menu) to build this application
 
 # App designs
 
@@ -48,3 +48,7 @@ Use .gradlew or Android Studio ('Build' menu) to build this application
 <img src="images/Screenshot_7.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220"> 
 <img src="images/Screenshot_5.png" height="420" width="220"> <img src="images/Screenshot_6.png" height="420" width="220">
 <img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_8.png" height="420" width="220">
+
+# Contacts
+
+Reach out to me for questions, help or collaboration - sergeybutr@gmail.com.

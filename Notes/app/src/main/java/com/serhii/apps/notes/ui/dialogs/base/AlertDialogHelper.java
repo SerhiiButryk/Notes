@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
-import com.serhii.apps.notes.control.types.AuthResult;
+import com.serhii.apps.notes.control.auth.types.AuthResult;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.utils.GoodUtils;
 

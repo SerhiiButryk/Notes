@@ -5,16 +5,15 @@
 package com.serhii.apps.notes.control
 
 import android.content.Context
-import com.serhii.apps.notes.control.base.IAuthorizeService
-import com.serhii.apps.notes.control.managers.AuthManager
-import com.serhii.apps.notes.control.types.RequestType
+import com.serhii.apps.notes.control.auth.base.IAuthorizeService
+import com.serhii.apps.notes.control.auth.AuthManager
+import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log.Companion.info
 
 /**
- * Class which receives the events from the system and delivers them to corresponding manager
- *
- * See interface definition
+ * Class which receives the events from the system and delivers them to corresponding party.
+ * See interface definition.
  */
 object EventService : IAuthorizeService {
     /**

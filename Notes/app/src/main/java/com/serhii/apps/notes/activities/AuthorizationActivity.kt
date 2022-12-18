@@ -10,10 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppConstants
+import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.idle_lock.InactivityManager.cancelAlarm
-import com.serhii.apps.notes.control.types.AuthResult
+import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.BlockFragment
 import com.serhii.apps.notes.ui.fragments.LoginFragment
@@ -22,6 +22,9 @@ import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 
+/**
+ * Activity for user authorization
+ */
 class AuthorizationActivity : AppCompatActivity() {
 
     private var loginViewModel: LoginViewModel? = null
@@ -46,7 +49,7 @@ class AuthorizationActivity : AppCompatActivity() {
     override fun onResume() {
         info(TAG, "onResume()")
         super.onResume()
-        // Cancel inactivity timer. This activity is exception from idle lock timeout.
+        // Cancel inactivity timer. This activity is an exception from idle lock timeout.
         cancelAlarm(this)
     }
 
@@ -109,7 +112,7 @@ class AuthorizationActivity : AppCompatActivity() {
     fun onAuthorizationFinished() {
         // Close activity
         finish()
-        info(TAG, "onAuthorize(), activity finished")
+        info(TAG, "onAuthorize(), activity is closed")
     }
 
     /**
@@ -135,7 +138,7 @@ class AuthorizationActivity : AppCompatActivity() {
      */
     private fun showAlertDialog(type: Int) {
         info(TAG, "showAlertDialog(), type $type")
-        var shouldShowDialog = false
+        var shouldShowDialog = true
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
             val nativeBridge = NativeBridge()
             val currentLimit = nativeBridge.limitLeft
@@ -145,7 +148,8 @@ class AuthorizationActivity : AppCompatActivity() {
                 nativeBridge.executeBlockApp()
                 clearFragmentStack()
                 addFragment(BlockFragment(), null, false)
-                shouldShowDialog = true
+                // Block Ui is going to be shown. So do not show dialog.
+                shouldShowDialog = false
                 info(TAG, "showAlertDialog(), BB SS")
             } else {
                 // Update password limit value
@@ -174,7 +178,7 @@ class AuthorizationActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "AuthorizationActivity"
         init {
-            System.loadLibrary(AppConstants.RUNTIME_LIBRARY)
+            System.loadLibrary(AppDetails.RUNTIME_LIBRARY)
         }
     }
 

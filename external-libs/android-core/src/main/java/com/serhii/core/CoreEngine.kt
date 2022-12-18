@@ -11,7 +11,7 @@ import com.serhii.core.security.impl.hash.HashAlgorithms
 import com.serhii.core.security.impl.crypto.SecureStore
 import com.serhii.core.log.Log
 import com.serhii.core.security.Cipher
-import com.serhii.core.security.impl.crypto.CryptoOpenssl
+import com.serhii.core.security.impl.crypto.Openssl
 import com.serhii.core.security.impl.crypto.CryptoProvider
 import com.serhii.core.security.impl.hash.HashGenerator
 import java.lang.IllegalArgumentException
@@ -41,7 +41,7 @@ internal object CoreEngine : Components {
                 SecureStore()
             }
             Cipher.CRYPTO_PROVIDER_OPENSSL -> {
-                CryptoOpenssl()
+                Openssl()
             }
             else -> {
                 throw IllegalArgumentException("Unknown crypto provider is passed")

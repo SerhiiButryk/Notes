@@ -6,11 +6,10 @@ package com.serhii.core.log
 
 /**
  * Class provides logging functionality.
- * Usage of the android logger directly is prohibited.
+ * It is replacement for android native logger.
  */
 class Log {
 
-    // TODO: Replace with object declaration
     // Added for compatibility with Java code
     companion object {
 
@@ -29,6 +28,9 @@ class Log {
             LogImpl.error(tag, message)
         }
 
+        /**
+         * Tag for [com.serhii.core.log.Log] class
+         */
         @JvmStatic
         var tag: String
             get() = LogImpl.tag
@@ -37,10 +39,18 @@ class Log {
             }
 
         @JvmStatic
-        fun setDetailedLogs(isEnabled: Boolean) {
+        fun enableDetailedLogs(isEnabled: Boolean) {
             LogImpl.setDetailedLogs(isEnabled)
         }
 
+        /**
+         * Enable detailed logs if it's debug build.
+         * No-op if it's release build.
+         */
+        @JvmStatic
+        fun enableDetailedLogsForDebug() {
+            LogImpl.setDetailedLogsForDebug()
+        }
     }
 
 }

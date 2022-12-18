@@ -11,15 +11,14 @@ internal object LogImpl : ILog {
 
     private var TAG: String = ""
     private const val DELIMITER = " "
-    private var ENABLED_DETAILED_LOGS = false
 
     override fun info(tag: String, message: String) {
         Log.i(TAG + DELIMITER + tag + DELIMITER, message)
     }
 
     override fun detail(tag: String, message: String) {
-        if (ENABLED_DETAILED_LOGS) {
-            Log.i("$TAG DETAIL $tag$DELIMITER", message)
+        if (getDetailedLogsEnabled()) {
+            Log.i("DETAIL $TAG$DELIMITER$tag$DELIMITER", message)
         }
     }
 
@@ -35,12 +34,23 @@ internal object LogImpl : ILog {
         }
 
     fun setDetailedLogs(isEnabled: Boolean) {
-        ENABLED_DETAILED_LOGS = isEnabled
+        _setDetailLog(isEnabled)
+    }
+
+    fun setDetailedLogsForDebug() {
+        _enableDetailLogForDebug()
+    }
+
+    fun getDetailedLogsEnabled(): Boolean {
+        return _getDetailLog()
     }
 
     init {
         loadNativeLibrary()
     }
 
-    private external fun _setTag(tag: String?)
+    private external fun _setTag(tag: String)
+    private external fun _setDetailLog(enable: Boolean)
+    private external fun _getDetailLog(): Boolean
+    private external fun _enableDetailLogForDebug()
 }

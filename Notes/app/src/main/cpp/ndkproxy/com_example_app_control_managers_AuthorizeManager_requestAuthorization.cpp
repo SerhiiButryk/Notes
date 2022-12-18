@@ -15,7 +15,7 @@ using namespace MYLIB;
 extern "C" {
 #endif
 
-  JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestAuthorization
+  JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestAuthorization
   (JNIEnv* env, jobject, jstring jpassword, jstring jusername)
   {
        Log::Info("JNI", " %s IN", __FUNCTION__ );
@@ -32,7 +32,7 @@ extern "C" {
       Log::Info("JNI", " %s OUT", __FUNCTION__ );
   }
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestRegistration
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestRegistration
   (JNIEnv* env, jobject, jstring jpassword, jstring jconfirm_password, jstring jusername)
   {
       Log::Info("JNI", " %s IN", __FUNCTION__ );
@@ -51,7 +51,7 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_r
       Log::Info("JNI", " %s OUT", __FUNCTION__ );
   }
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestUnlock
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestUnlock
         (JNIEnv* env, jobject, jstring junlockKey, jstring jcurrentKey)
 {
       Log::Info("JNI", " %s IN", __FUNCTION__ );
@@ -68,7 +68,7 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_r
       Log::Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestBiometricLogin
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestBiometricLogin
         (JNIEnv *, jobject)
 {
     Log::Info("JNI", " %s IN", __FUNCTION__ );

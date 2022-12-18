@@ -7,16 +7,16 @@
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestAuthorization
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestAuthorization
   (JNIEnv *, jobject, jstring, jstring);
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestRegistration
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestRegistration
         (JNIEnv *, jobject, jstring, jstring, jstring);
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestUnlock
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestUnlock
         (JNIEnv *, jobject, jstring, jstring);
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_managers_AuthManager_requestBiometricLogin
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestBiometricLogin
         (JNIEnv *, jobject);
 
 #ifdef __cplusplus

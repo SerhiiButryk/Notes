@@ -2,12 +2,12 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.control.managers
+package com.serhii.apps.notes.control.backup
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.serhii.apps.notes.database.NotesDatabaseProvider
+import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.log.Log.Companion.detail
@@ -59,7 +59,8 @@ object BackupManager {
     fun saveDataAsPlainText(outputStream: OutputStream?, context: Context?): Boolean {
         info(TAG, "backupDataAsPlainText()")
         try {
-            val notesDatabaseProvider = NotesDatabaseProvider(context)
+            val notesDatabaseProvider = UserNotesDatabase.getInstance()
+            notesDatabaseProvider.init(context)
 
             if (notesDatabaseProvider.recordsCount != 0) {
                 val notes = notesDatabaseProvider.records
@@ -92,7 +93,9 @@ object BackupManager {
     }
 
     fun backupData(outputStream: OutputStream?, context: Context?): Boolean {
-        val notesDatabaseProvider = NotesDatabaseProvider(context)
+
+        val notesDatabaseProvider = UserNotesDatabase.getInstance()
+        notesDatabaseProvider.init(context)
 
         info(TAG, "backupDataAsEncryptedText() records: " + notesDatabaseProvider.recordsCount)
 
@@ -144,7 +147,8 @@ object BackupManager {
         }
 
         val notes = backupAdapter!!.notes
-        val notesDatabaseProvider = NotesDatabaseProvider(context)
+        val notesDatabaseProvider = UserNotesDatabase.getInstance()
+        notesDatabaseProvider.init(context)
 
         for (note in notes) {
             notesDatabaseProvider.addRecord(NoteModel(note.note, note.title))

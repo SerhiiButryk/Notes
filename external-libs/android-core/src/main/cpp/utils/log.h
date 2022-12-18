@@ -12,18 +12,24 @@ namespace MYLIB
 {
 
     /**
-     * Class provides common logging functionality
-     *
-     * Note: It uses Boos for message formatting
+     * Class provides common logging functionality.
+     * It uses Boost for message formatting.
      */
     class Log
     {
         public:
 
-             /**
-              * Sets tag for log filtering
-              * @param tag - tag for filtering
-              */
+            /**
+             * Detailed logs
+             */
+            static bool detailedLogsEnabled;
+            static bool isDetailedLogsEnabled();
+            static void setIsDetailedLogsEnabled(bool isDetailedLogsEnabled);
+
+        /**
+         * Sets tag for log filtering
+         * @param tag - tag for filtering
+         */
             static void setTag(const std::string& tag);
 
             template<typename T, typename... Args>

@@ -4,7 +4,7 @@
  */
 package com.serhii.apps.notes.common
 
-object AppConstants {
+object AppDetails {
     const val RUNTIME_LIBRARY = "rabbit"
     const val VERSION_LIBRARY = "1.0.0"
     const val APP_LOG_TAG = "NotesApp"

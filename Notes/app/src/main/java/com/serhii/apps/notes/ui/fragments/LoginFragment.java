@@ -20,8 +20,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.TextInputLayout;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.control.NativeBridge;
-import com.serhii.apps.notes.control.managers.BiometricAuthManager;
-import com.serhii.apps.notes.control.types.AuthorizeType;
+import com.serhii.apps.notes.control.auth.BiometricAuthManager;
+import com.serhii.apps.notes.control.auth.types.AuthorizeType;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.log.Log;
@@ -193,19 +193,16 @@ public class LoginFragment extends Fragment {
 
     private AuthModel createModel(AuthorizeType type) {
         Hash hash = new Hash();
-        AuthModel authModel = new AuthModel();
-        authModel.setPassword(hash.hashMD5(GoodUtils.getText(passwordField)));
+        AuthModel authModel = new AuthModel(GoodUtils.getText(emailField),
+                hash.hashMD5(GoodUtils.getText(passwordField)),
+                "", type);
         // For safety
         passwordField.setText("");
-        authModel.setEmail(GoodUtils.getText(emailField));
-        authModel.setAuthType(type);
         return authModel;
     }
 
     private AuthModel createEmptyModel(AuthorizeType type) {
-        AuthModel authModel = new AuthModel();
-        authModel.setAuthType(type);
-        return authModel;
+        return new AuthModel("", "", "", type);
     }
 
 }

@@ -7,7 +7,7 @@ package com.serhii.apps.notes.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY
+import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
 import com.serhii.apps.notes.control.AppForegroundListener
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.apps.notes.control.idle_lock.InactivityManager
@@ -27,26 +27,29 @@ open class AppBaseActivity : AppCompatActivity() {
         GoodUtils.enableUnsecureScreenProtection(this)
         // Initialize lifecycle aware components
         lifecycle.addObserver(AppForegroundListener)
-        Log.info(TAG, "onCreate() called")
+        Log.info(TAG, "onCreate() out")
     }
 
     override fun onUserInteraction() {
         super.onUserInteraction()
         InactivityManager.onUserInteraction(this)
-        Log.info(TAG, "onUserInteraction() called")
+        Log.info(TAG, "onUserInteraction() out")
     }
 
     override fun onResume() {
         super.onResume()
-        // Trigger time out
-        IdleLockHandler.checkIfInactivityTimeoutReceived(this)
-        InactivityManager.scheduleAlarm(this)
-        Log.info(TAG, "onResume() called")
+        Log.info(TAG, "onResume() int")
+        // Trigger idle timeout
+        if (!IdleLockHandler.checkIfInactivityTimeoutReceived(this)) {
+            // If timeout is not triggered then schedule new alarm
+            InactivityManager.scheduleAlarm(this)
+        }
+        Log.info(TAG, "onResume() out")
     }
 
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
-        Log.info(TAG, "init() called")
+        Log.info(TAG, "init() out")
     }
 
 }

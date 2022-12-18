@@ -6,11 +6,11 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.common.AppConstants;
+import com.serhii.apps.notes.common.AppDetails;
 import com.serhii.apps.notes.control.NativeBridge;
-import com.serhii.apps.notes.control.managers.BackupManager;
+import com.serhii.apps.notes.control.backup.BackupManager;
 import com.serhii.apps.notes.control.idle_lock.InactivityManager;
-import com.serhii.apps.notes.database.NotesDatabaseProvider;
+import com.serhii.apps.notes.database.UserNotesDatabase;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
@@ -58,7 +58,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         Preference version = findPreference(getString(R.string.preference_about_version_key));
-        version.setSummary(AppConstants.VERSION_LIBRARY);
+        version.setSummary(AppDetails.VERSION_LIBRARY);
 
         Preference idleLockTimeOut = findPreference(getString(R.string.preference_idle_lock_timeout_key));
 
@@ -120,7 +120,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     private boolean isDataAvailable() {
-        NotesDatabaseProvider notesDatabaseProvider = new NotesDatabaseProvider(getActivity());
+        UserNotesDatabase notesDatabaseProvider = UserNotesDatabase.getInstance();
+        notesDatabaseProvider.init(getContext());
 
         // Check if there is data to extract
         if (notesDatabaseProvider.getRecordsCount() == 0) {

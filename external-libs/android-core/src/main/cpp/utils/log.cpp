@@ -4,6 +4,10 @@
 
 namespace MYLIB
 {
+    std::mutex Log::_mutex_log_guard;
+    std::string Log::_TAG_APP_ = "";
+    bool Log::detailedLogsEnabled = false;
+
     void Log::log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage) {
 
         std::lock_guard guard(_mutex_log_guard);
@@ -21,7 +25,6 @@ namespace MYLIB
         log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message);
     }
 
-    std::string Log::_TAG_APP_ = "";
 
     void Log::setTag(const std::string& tag) {
 
@@ -30,6 +33,12 @@ namespace MYLIB
         _TAG_APP_ = tag;
     }
 
-    std::mutex Log::_mutex_log_guard;
+    bool Log::isDetailedLogsEnabled() {
+        return detailedLogsEnabled;
+    }
+
+    void Log::setIsDetailedLogsEnabled(bool logsEnabled) {
+        Log::detailedLogsEnabled = logsEnabled;
+    }
 
 }

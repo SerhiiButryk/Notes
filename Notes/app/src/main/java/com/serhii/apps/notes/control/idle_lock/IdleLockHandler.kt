@@ -29,13 +29,15 @@ object IdleLockHandler {
         }
     }
 
-    // Called from onResume() in NotesViewActivity and SettingsActivity activities
     @JvmStatic
-    fun checkIfInactivityTimeoutReceived(context: Context) {
+    fun checkIfInactivityTimeoutReceived(context: Context): Boolean {
         if (isInactivityTimeoutReceived) {
             detail(TAG,"checkIfInactivityTimeoutReceived(), time out received, start auth activity")
             startActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            return true
+
         }
+        return false
     }
 
     private fun startActivity(context: Context, flags: Int) {

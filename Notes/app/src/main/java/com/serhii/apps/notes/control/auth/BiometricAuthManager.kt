@@ -2,19 +2,16 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.control.managers
+package com.serhii.apps.notes.control.auth
 
 import com.serhii.core.log.Log.Companion.info
 import androidx.biometric.BiometricPrompt.PromptInfo
-import com.serhii.apps.notes.control.managers.BiometricAuthManager.OnAuthenticateListener
 import androidx.core.content.ContextCompat
-import com.serhii.apps.notes.control.managers.BiometricAuthManager
 import com.serhii.apps.notes.R
 import android.content.pm.PackageManager
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
-import android.content.Intent
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment

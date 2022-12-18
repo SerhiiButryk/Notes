@@ -8,13 +8,13 @@ import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppConstants.RUNTIME_LIBRARY
+import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
 import com.serhii.core.security.Cipher
 import com.serhii.core.security.Hash
 import java.util.*
 
 /**
- * Class accessor for underling C++ APIs
+ * Global point for underling C++ functionality and APIs
  */
 class NativeBridge {
 
@@ -53,7 +53,7 @@ class NativeBridge {
             throw RuntimeException("Failed to set limit. Expected length: 16, actual length: ${iv.length}")
         }
         val encMessage = iv + message
-        // Pass enc data
+        // Set enc data
         _setLimitLeft(encMessage)
     }
 

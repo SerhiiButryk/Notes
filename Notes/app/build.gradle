@@ -128,6 +128,9 @@ dependencies {
     // JSON library - https://github.com/square/moshi
     implementation("com.squareup.moshi:moshi:1.12.0")
 
+    // Kotlin Json lib
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+
     // Tests use Kotlin
     androidTestImplementation "androidx.core:core-ktx:$kotlin_version"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

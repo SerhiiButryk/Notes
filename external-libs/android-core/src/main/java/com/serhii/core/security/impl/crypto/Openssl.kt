@@ -5,15 +5,12 @@
 package com.serhii.core.security.impl.crypto
 
 import com.serhii.core.CoreEngine.loadNativeLibrary
-import com.serhii.core.security.impl.crypto.CryptoProvider
-import com.serhii.core.security.impl.crypto.CryptoError
-import com.serhii.core.CoreEngine
 import java.lang.RuntimeException
 
 /**
- * Class provides OpenSSL interface for crypto_utils operations
+ * Class provides OpenSSL interface for crypto operations
  */
-internal class CryptoOpenssl : CryptoProvider {
+internal class Openssl : CryptoProvider {
 
     override fun encryptSymmetric(message: String, inputIV: ByteArray, key: String?): Result {
         var resultData : Result

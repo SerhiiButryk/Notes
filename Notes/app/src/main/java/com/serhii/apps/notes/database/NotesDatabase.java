@@ -1,77 +1,31 @@
+/*
+ * Copyright 2022. Happy coding ! :)
+ * Author: Serhii Butryk
+ */
 package com.serhii.apps.notes.database;
 
 import android.content.Context;
 
-import com.serhii.apps.notes.database.impl.NoteDatabaseIml;
-import com.serhii.apps.notes.database.impl.base.DatabaseImpl;
-import com.serhii.apps.notes.ui.data_model.NoteModel;
-
 import java.util.List;
 
-/**
- * Thread safe singleton implementation
- */
+public interface NotesDatabase<T> {
 
-class NotesDatabase implements Database<NoteModel> {
+    void init(Context context);
 
-    private volatile static NotesDatabase INSTANCE;
+    void clear();
 
-    private final DatabaseImpl impl;
+    int addRecord(final T uiData);
 
-    private NotesDatabase() { impl = NoteDatabaseIml.getInstance(); }
+    boolean deleteRecord(final String id);
 
-    public static NotesDatabase getInstance() {
-        if (INSTANCE == null) {
-            synchronized (NotesDatabase.class) {
-                if (INSTANCE == null)
-                    INSTANCE = new NotesDatabase();
-            }
-        }
-        return INSTANCE;
-    }
+    boolean updateRecord(final String id, final T uiData);
 
-    @Override
-    public void init(Context context) {
-        impl.initDbImpl(context);
-    }
+    T getRecord(final String id);
 
-    @Override
-    public void clear() {
-        impl.clearDatabaseImpl();
-    }
+    List<T> getRecords();
 
-    @Override
-    public int addRecord(final NoteModel uiData) {
-        return impl.addRecordImpl(uiData);
-    }
+    int getRecordsCount();
 
-    @Override
-    public boolean deleteRecord(final String id) {
-        return impl.deleteRecordImpl(id);
-    }
+    void close();
 
-    @Override
-    public boolean updateRecord(final String id, final NoteModel newData) {
-        return impl.updateRecordImpl(id, newData);
-    }
-
-    @Override
-    public NoteModel getRecord(final String id) {
-        return (NoteModel) impl.getRecordImpl(id);
-    }
-
-    @Override
-    public List<NoteModel> getRecords() {
-        return impl.getRecordsImpl();
-    }
-
-    @Override
-    public int getRecordsCount() {
-        return impl.getRecordsCountImpl();
-    }
-
-    @Override
-    public void close() {
-        impl.closeImpl();
-    }
 }

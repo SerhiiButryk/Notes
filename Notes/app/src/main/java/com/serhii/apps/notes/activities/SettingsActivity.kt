@@ -4,12 +4,13 @@
  */
 package com.serhii.apps.notes.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.managers.BackupManager
+import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
@@ -19,6 +20,9 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
+/**
+ * Activity for app settings
+ */
 class SettingsActivity : AppBaseActivity() {
 
     private var toolbar: Toolbar? = null
@@ -134,6 +138,7 @@ class SettingsActivity : AppBaseActivity() {
         }
     }
 
+    @SuppressLint("Recycle")
     private fun readBackupFile(data: Intent): String {
         var inputStream: InputStream? = null
         inputStream = try {

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2022. Happy coding ! :)
+ * Author: Serhii Butryk
+ */
 package com.serhii.apps.notes.database.impl;
 
 import android.content.Context;
@@ -5,17 +9,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
-import static com.serhii.apps.notes.database.impl.model.NoteTableModel.*;
+import static com.serhii.apps.notes.database.impl.tables.NoteTableModel.*;
 
-public class NoteDBHelper extends SQLiteOpenHelper {
+public class NotesDBHelper extends SQLiteOpenHelper {
 
-    public NoteDBHelper(@Nullable Context context) {
+    public NotesDBHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(QUERY_CREATE_TABLE);
+        db.execSQL(QUERY_CREATE_USER_NOTES_TABLE);
     }
 
     @Override
@@ -23,6 +27,6 @@ public class NoteDBHelper extends SQLiteOpenHelper {
     }
 
     public void deleteTable(SQLiteDatabase db) {
-        db.execSQL(QUERY_DROP_TABLE);
+        db.execSQL(QUERY_DROP_USER_NOTES_TABLE);
     }
 }

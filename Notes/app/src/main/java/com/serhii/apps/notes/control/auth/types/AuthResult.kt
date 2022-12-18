@@ -2,7 +2,7 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.control.types
+package com.serhii.apps.notes.control.auth.types
 
 enum class AuthResult(var typeId: Int, var typeName: String) {
     // Has to have non positive value

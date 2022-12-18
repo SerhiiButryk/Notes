@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.serhii.apps.notes.control.EventService;
-import com.serhii.apps.notes.control.base.IAuthorizeService;
+import com.serhii.apps.notes.control.auth.base.IAuthorizeService;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 
 /**

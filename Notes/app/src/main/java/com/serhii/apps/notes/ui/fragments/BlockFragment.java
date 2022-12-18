@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.types.AuthorizeType;
+import com.serhii.apps.notes.control.auth.types.AuthorizeType;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.utils.TextChecker;
 import com.serhii.apps.notes.ui.view_model.LoginViewModel;
@@ -76,9 +76,10 @@ public class BlockFragment extends Fragment {
 
     private void unlockApplication() {
         Hash hash = new Hash();
-        AuthModel authModel = new AuthModel();
-        authModel.setAuthType(AuthorizeType.AUTH_UNLOCK);
-        authModel.setPassword(hash.hashMD5(GoodUtils.getText(accessKeyField)));
+        AuthModel authModel = new AuthModel("",
+                hash.hashMD5(GoodUtils.getText(accessKeyField)),
+                "",
+                AuthorizeType.AUTH_UNLOCK);
         // For safety
         accessKeyField.setText("");
         // Set data

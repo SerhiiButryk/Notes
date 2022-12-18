@@ -277,10 +277,10 @@ public class NoteEditorFragment extends Fragment {
 
         if (action.equals(ACTION_NOTE_OPEN) && !noteId.equals(ARG_NOTE_TEMPLATE)) {
             Log.info(TAG, "saveUserNote() updated note");
-            result = notesViewModel.updateNote(noteId, new NoteModel(note, title));
+            result = notesViewModel.updateNote(noteId, new NoteModel(note, title, "", ""));
         } else {
             Log.info(TAG, "saveUserNote() add new note");
-            result = notesViewModel.addNote(new NoteModel(note, title));
+            result = notesViewModel.addNote(new NoteModel(note, title, "", ""));
         }
 
         /*

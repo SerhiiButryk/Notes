@@ -2,7 +2,7 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.control.types
+package com.serhii.apps.notes.control.auth.types
 
 enum class AuthorizeType(var description: String, var type: Int) {
     AUTH_REGISTRATION("AUTH_REGISTRATION", 101), AUTH_PASSWORD_LOGIN(

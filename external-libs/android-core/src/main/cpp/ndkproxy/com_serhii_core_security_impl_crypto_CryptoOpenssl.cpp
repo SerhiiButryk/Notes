@@ -18,8 +18,8 @@ using namespace MYLIB;
 extern "C" {
 #endif
 
-JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenssl__1encryptSymmetric(JNIEnv *env,
-    jobject thiz, jstring jplaintext, jstring jkey, jstring jiv)
+JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1encryptSymmetric(JNIEnv *env,
+                                                                                               jobject thiz, jstring jplaintext, jstring jkey, jstring jiv)
 {
     Log::Info("JNI", " %s IN", __FUNCTION__ );
 
@@ -57,8 +57,8 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenss
     return env->NewStringUTF(encodedText.c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_CryptoOpenssl__1decryptSymmetric(JNIEnv *env,
-    jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv)
+JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env,
+                                                                                               jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv)
 {
     Log::Info("JNI", " %s IN", __FUNCTION__ );
 

@@ -4,19 +4,16 @@
  */
 package com.serhii.apps.notes.control.idle_lock
 
-import com.serhii.core.log.Log.Companion.detail
-import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.log.Log.Companion.error
-import android.content.SharedPreferences
-import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.idle_lock.InactivityManager
-import android.content.ComponentName
-import com.serhii.apps.notes.control.idle_lock.IdleLockJobService
 import android.app.job.JobInfo
-import com.serhii.apps.notes.common.AppConstants
 import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.idle_lock.IdleLockJobService
+import com.serhii.core.log.Log.Companion.detail
+import com.serhii.core.log.Log.Companion.error
+import com.serhii.core.log.Log.Companion.info
 
 /**
  * Helper class which schedule and reschedule job for idle timeout
@@ -64,7 +61,7 @@ object InactivityManager {
     // Stop job service
     @JvmStatic
     fun cancelAlarm(context: Context) {
-        detail(TAG, "cancelAlarm(), inactivity alarm is canceled")
+        detail(TAG, "cancelAlarm() in")
         val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         scheduler.cancel(IDLE_LOCK_JOB_SERVICE_ID)
     }

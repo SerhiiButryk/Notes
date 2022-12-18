@@ -8,12 +8,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.activities.AuthorizationActivity
-import com.serhii.apps.notes.common.AppConstants
+import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.base.IAuthorizeUser
-import com.serhii.apps.notes.control.managers.BackupManager
-import com.serhii.apps.notes.control.managers.BiometricAuthManager
+import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
+import com.serhii.apps.notes.control.backup.BackupManager
+import com.serhii.apps.notes.control.auth.BiometricAuthManager
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment.EditorNoteInteraction
@@ -25,6 +24,9 @@ import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.utils.GoodUtils.Companion.getFilePath
 
+/**
+ * Activity which displays user note list
+ */
 class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, EditorNoteInteraction {
 
     private var notesViewModel: NotesViewModel? = null
@@ -77,7 +79,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
      * Called when user is authorized
      */
     override fun onUserAuthorized() {
-        info(TAG, "onAuthorize(), User is authorized")
+        info(TAG, "onAuthorize(), user is authorized")
         val nativeBridge = NativeBridge()
         nativeBridge.resetLoginLimitLeft(this)
         notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application)).get(NotesViewModel::class.java)
@@ -133,7 +135,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         fm.popBackStack()
     }
 
-    // This will authorization activity for user to login
+    // This will ask user to login
     private fun authorizeUser(bundle: Bundle?) {
         /**
          * Activity is launched first time
@@ -158,7 +160,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     companion object {
         private const val TAG = "NotesViewActivity"
         init {
-            System.loadLibrary(AppConstants.RUNTIME_LIBRARY)
+            System.loadLibrary(AppDetails.RUNTIME_LIBRARY)
         }
     }
 }

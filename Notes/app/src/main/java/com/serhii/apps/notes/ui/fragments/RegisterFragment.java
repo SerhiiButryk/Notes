@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.serhii.apps.notes.R;
-import com.serhii.apps.notes.control.types.AuthorizeType;
+import com.serhii.apps.notes.control.auth.types.AuthorizeType;
 import com.serhii.apps.notes.ui.data_model.AuthModel;
 import com.serhii.apps.notes.ui.view_model.LoginViewModel;
 import com.serhii.core.utils.GoodUtils;
@@ -92,12 +92,10 @@ public class RegisterFragment extends Fragment {
     }
 
     private AuthModel createModel(AuthorizeType type) {
-        AuthModel authModel = new AuthModel();
-        authModel.setPassword(GoodUtils.getText(passwordField));
-        authModel.setEmail(GoodUtils.getText(emailField));
-        authModel.setConfirmPassword(GoodUtils.getText(confirmPasswordField));
-        authModel.setAuthType(type);
-        return authModel;
+        return new AuthModel(GoodUtils.getText(emailField),
+                GoodUtils.getText(passwordField),
+                GoodUtils.getText(confirmPasswordField),
+                type);
     }
 
 }

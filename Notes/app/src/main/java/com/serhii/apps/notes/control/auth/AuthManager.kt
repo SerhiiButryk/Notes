@@ -2,16 +2,16 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.control.managers
+package com.serhii.apps.notes.control.auth
 
 import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.types.AuthorizeType
-import com.serhii.apps.notes.control.types.RequestType
+import com.serhii.apps.notes.control.auth.types.AuthorizeType
+import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.security.Hash
 
 /**
- * Performs user authorization request processing
+ * Performs app authorization request processing
  */
 class AuthManager {
 

@@ -2,7 +2,7 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.control.base
+package com.serhii.apps.notes.control.auth.base
 
 import android.content.Context
 import com.serhii.apps.notes.ui.data_model.AuthModel

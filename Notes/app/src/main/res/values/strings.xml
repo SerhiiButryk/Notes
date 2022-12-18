@@ -80,7 +80,7 @@
     <string name="plans_item">Plans</string>
 
     // PreferenceActivity
-    <string name="preference_title">Preferences</string>
+    <string name="preference_title">App settings</string>
 
     <string name="preference_change_password_key">change_password</string>
     <string name="preference_change_password_title">Change password</string>
