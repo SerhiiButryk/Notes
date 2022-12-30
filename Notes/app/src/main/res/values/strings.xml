@@ -61,7 +61,7 @@
     // NoteEditor
     <string name="title_note">Enter your note title</string>
     <string name="body_note">Start typing your note</string>
-    <string name="time_date_label">Time: </string>
+    <string name="time_date_label">Last update time: </string>
     <string name="title_toolbar">Note editor</string>
     <string name="toast_action_message">Note is saved</string>
     <string name="toast_action_deleted_message">Note is deleted</string>
@@ -78,6 +78,7 @@
     <string name="clear_note_item">Clear note</string>
     <string name="settings_item">Settings</string>
     <string name="plans_item">Plans</string>
+    <string name="action_convert_to_list">Convert to list</string>
 
     // PreferenceActivity
     <string name="preference_title">App settings</string>
@@ -180,5 +181,29 @@
 
     <string name="empty_login">Empty username or password</string>
     <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
+
+    <!-- Relative date time format -->
+    <string name="date_rel_today">Today, %s</string>
+    <string name="date_rel_yesterday">Yesterday, %s</string>
+    <string name="date_rel_tomorrow">Tomorrow, %s</string>
+
+    <plurals name="date_rel_days_past">
+        <!-- used with quantity >= 2, format values: number of days, time -->
+        <item quantity="other">%d days ago, %s</item>
+    </plurals>
+    <plurals name="date_rel_days_future">
+        <!-- used with quantity >= 2, format values: number of days, time -->
+        <item quantity="other">In %d days, %s</item>
+    </plurals>
+    <!-- format values: date, time -->
+    <string name="date_rel_absolute">%1$s, %2$s</string>
+
+    <string name="edit_hint_note_content">Note</string>
+    <string name="edit_hint_note_item">List item</string>
+
+    <!-- Edit -->
+    <string name="edit_add_title">Create note</string>
+    <string name="edit_change_title">Edit note</string>
+    <string name="edit_hint_note_title">Title</string>
 
 </resources>

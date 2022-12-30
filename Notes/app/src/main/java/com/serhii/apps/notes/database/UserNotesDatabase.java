@@ -53,9 +53,16 @@ public class UserNotesDatabase implements NotesDatabase<NoteModel> {
         // Set last saved time for note
         uiData.setTime(GoodUtils.currentTimeToString());
 
+        int count = impl.getRecordsCountImpl();
+        Log.info(TAG, "addRecord(), current note count = " + count);
+
+        // Id is an index of note raw in a table// We assume index always is count + 1
+        uiData.setId(String.valueOf(count + 1));
+
         String noteEnc = encryptionHelper.encrypt(uiData);
 
         int index = impl.addRecordImpl(noteEnc);
+        Log.info(TAG, "addRecord(), added new note with index = " + index);
 
         if (index != -1) {
             encryptionHelper.saveMetaData(index);
@@ -77,7 +84,13 @@ public class UserNotesDatabase implements NotesDatabase<NoteModel> {
     public boolean updateRecord(final String id, final NoteModel newData) {
         // Set last saved time for note
         newData.setTime(GoodUtils.currentTimeToString());
+        // Set note id
+        newData.setId(id);
         String noteEnc = encryptionHelper.encrypt(newData);
+        // Save meta data
+        if (noteEnc != null && !noteEnc.isEmpty()) {
+            encryptionHelper.saveMetaData(Integer.parseInt(id));
+        }
         return impl.updateRecordImpl(id, noteEnc);
     }
 

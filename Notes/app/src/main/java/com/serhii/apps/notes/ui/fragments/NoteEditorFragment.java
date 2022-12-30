@@ -24,14 +24,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
+import com.serhii.apps.notes.ui.utils.NoteEditorAdapter;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
 import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory;
 import com.serhii.core.log.Log;
 import com.serhii.core.utils.GoodUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class NoteEditorFragment extends Fragment {
 
@@ -44,10 +51,8 @@ public class NoteEditorFragment extends Fragment {
 
     public static final String ARG_ACTION = "action arg";
     public static final String ARG_NOTE_ID = "note id arg";
-    public static final String ARG_NOTE_TEMPLATE = "template";
 
     private EditText titleNoteField;
-    private EditText noteFiled;
     private TextView noteTimeFiled;
     private Toolbar toolbar;
     private NotesViewModel notesViewModel;
@@ -56,7 +61,7 @@ public class NoteEditorFragment extends Fragment {
     private String checkNoteContent = "";
     private String action;
     private String noteId;
-    private boolean isTemplateNote;
+    private final NoteEditorAdapter noteEditorAdapter = new NoteEditorAdapter();
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -84,9 +89,13 @@ public class NoteEditorFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_note_editor_view, container, false);
         // Set references
         titleNoteField = view.findViewById(R.id.title_note);
-        noteFiled = view.findViewById(R.id.note_text);
         toolbar = view.findViewById(R.id.toolbar);
         noteTimeFiled = view.findViewById(R.id.date_time_view);
+
+        RecyclerView noteList = view.findViewById(R.id.note_list);
+        noteList.setLayoutManager(new LinearLayoutManager(getContext()));
+        noteList.setAdapter(noteEditorAdapter);
+
         return view;
     }
 
@@ -120,7 +129,7 @@ public class NoteEditorFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        notesViewModel = new ViewModelProvider(getActivity(), new NotesViewModelFactory(getActivity().getApplication()))
+        notesViewModel = new ViewModelProvider(requireActivity(), new NotesViewModelFactory(getActivity().getApplication()))
                 .get(NotesViewModel.class);
 
         action = getArguments().getString(ARG_ACTION);
@@ -131,12 +140,11 @@ public class NoteEditorFragment extends Fragment {
 
     private void processArgs() {
 
-        if (action.equals(ACTION_NOTE_CREATE) || noteId.equals(ARG_NOTE_TEMPLATE)) {
-            titleNoteField.setHint(getResources().getString(R.string.template_note_title));
-            noteFiled.setHint(getResources().getString(R.string.template_short_note));
-
-            isTemplateNote = true;
-
+        if (action.equals(ACTION_NOTE_CREATE)) {
+            // Display empty note
+            List<NoteModel> noteList = new ArrayList<>();
+            noteList.add(new NoteModel("", "", "", ""));
+            noteEditorAdapter.submitList(noteList);
         } else if (action.equals(ACTION_NOTE_OPEN)) {
 
             final NoteModel note = notesViewModel.getNote(noteId);
@@ -145,8 +153,14 @@ public class NoteEditorFragment extends Fragment {
                 checkNoteTitleContent = note.getTitle();
                 checkNoteContent = note.getNote();
 
+                // Set note title
                 titleNoteField.setText(checkNoteTitleContent);
-                noteFiled.setText(checkNoteContent);
+
+                // Set new data to list adapter. After that recycle view will be updated with
+                // new data from list.
+                List<NoteModel> noteList = new ArrayList<>();
+                noteList.add(note);
+                noteEditorAdapter.submitList(noteList);
 
                 String timeDate = note.getTime();
                 if (!timeDate.isEmpty()) {
@@ -163,30 +177,27 @@ public class NoteEditorFragment extends Fragment {
 
                     noteTimeFiled.setVisibility(View.VISIBLE);
                 }
-
-            } else {
-                throw new IllegalStateException("No record found, invalid id received");
             }
-
         }
-
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Remove settings item, we don't need it
-        menu.removeItem(R.id.settings_item);
-
+        // Remove all items in the menu
+        menu.clear();
         inflater.inflate(R.menu.editor_note_menu, menu);
     }
 
-    @SuppressLint("all") // Suppress "Checks use of resource IDs in places requiring constants." warnning
+    @SuppressLint("NonConstantResourceId") // Suppress "Checks use of resource IDs in places requiring constants." warnning
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
             case R.id.delete_note_item :
 
+                /**
+                 * Confirm dialog before delete
+                 */
                 DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
@@ -203,6 +214,9 @@ public class NoteEditorFragment extends Fragment {
 
             case R.id.save_note:
 
+                /**
+                 * Confirm dialog before save
+                 */
                 DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
@@ -225,11 +239,22 @@ public class NoteEditorFragment extends Fragment {
                 DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
-                        if (GoodUtils.getText(noteFiled).isEmpty()) {
-                            GoodUtils.showToast(getActivity(), R.string.toast_action_error_note_nothing_to_clear);
+
+                        List<NoteModel> noteModelList = noteEditorAdapter.getCurrentList();
+                        NoteModel noteModel = noteModelList.get(0);
+
+                        if (noteModel != null && noteModel.getNote().isEmpty()) {
+                            GoodUtils.showToast(requireActivity(), R.string.toast_action_error_note_nothing_to_clear);
                             return;
                         }
-                        noteFiled.setText("");
+
+                        if (noteModel != null) {
+                            List<NoteModel> copyList = new ArrayList<>();
+                            // Clear a note and copy other data
+                            copyList.add(new NoteModel("", noteModel.getTitle(), noteModel.getTime(), noteModel.getId()));
+                            // Pass new list to list adapter
+                            noteEditorAdapter.submitList(copyList);
+                        }
                     }
 
                     @Override
@@ -239,6 +264,12 @@ public class NoteEditorFragment extends Fragment {
                 }, R.string.confirm_dialog_clear_note_title, R.string.confirm_dialog_clear_note_message);
 
                 return true;
+
+            case R.id.item_type:
+
+                // To update
+
+            return true;
         }
 
         return false;
@@ -247,11 +278,11 @@ public class NoteEditorFragment extends Fragment {
     private void saveUserNote() {
 
         String title = GoodUtils.getText(titleNoteField);
-        String note = GoodUtils.getText(noteFiled);
+        String note = getNoteFromListAdapter().getNote();
 
         if (title.isEmpty() && note.isEmpty()) {
 
-            GoodUtils.showToast(getActivity(), R.string.toast_action_error_note_is_empty);
+            GoodUtils.showToast(requireContext(), R.string.toast_action_error_note_is_empty);
 
             return;
         }
@@ -261,21 +292,14 @@ public class NoteEditorFragment extends Fragment {
         */
         if (checkIfNoteChanged()) {
 
-            GoodUtils.showToast(getActivity(), R.string.toast_action_error_note_is_not_changed);
+            GoodUtils.showToast(requireContext(), R.string.toast_action_error_note_is_not_changed);
 
             return;
         }
 
         boolean result;
 
-        // If there is a one template note and it is currently edited
-        // then check if we need to update nodeId
-        if (isTemplateNote && (notesViewModel.getNotes().getValue().size() == 1)) {
-            noteId = notesViewModel.getNotes().getValue().get(0).getId();
-            Log.info(TAG, "saveUserNote() updated noteId, new noteId=" + noteId);
-        }
-
-        if (action.equals(ACTION_NOTE_OPEN) && !noteId.equals(ARG_NOTE_TEMPLATE)) {
+        if (action.equals(ACTION_NOTE_OPEN)) {
             Log.info(TAG, "saveUserNote() updated note");
             result = notesViewModel.updateNote(noteId, new NoteModel(note, title, "", ""));
         } else {
@@ -289,7 +313,7 @@ public class NoteEditorFragment extends Fragment {
         if (result) {
             Log.info(TAG, "saveUserNote() saved new note");
 
-            GoodUtils.showToast(getActivity(), R.string.toast_action_message);
+            GoodUtils.showToast(requireContext(), R.string.toast_action_message);
 
             // Cache new values
             checkNoteContent = note;
@@ -299,18 +323,14 @@ public class NoteEditorFragment extends Fragment {
     }
 
     private void deleteNote() {
-        if (isTemplateNote) {
-            GoodUtils.showToast(getActivity(), R.string.toast_action_delete_template_note);
-            return;
-        }
 
-        if (TextUtils.isEmpty(titleNoteField.getText()) && TextUtils.isEmpty(noteFiled.getText())) {
-            GoodUtils.showToast(getActivity(), R.string.toast_action_delete_error_note);
+        if (TextUtils.isEmpty(titleNoteField.getText()) && TextUtils.isEmpty(getNoteFromListAdapter().getNote())) {
+            GoodUtils.showToast(requireContext(), R.string.toast_action_delete_error_note);
             return;
         }
 
         if (notesViewModel.deleteNote(noteId)) {
-            GoodUtils.showToast(getActivity(), R.string.toast_action_deleted_message);
+            GoodUtils.showToast(requireContext(), R.string.toast_action_deleted_message);
             if (interaction != null) {
                 interaction.onDeleteNote();
             }
@@ -323,13 +343,18 @@ public class NoteEditorFragment extends Fragment {
      */
     private boolean checkIfNoteChanged() {
         String title = GoodUtils.getText(titleNoteField);
-        String note = GoodUtils.getText(noteFiled);
+        String note = getNoteFromListAdapter().getNote();
         return  isEmptyNote() || (checkNoteTitleContent.equals(title) && checkNoteContent.equals(note));
     }
 
     private boolean isEmptyNote() {
         return TextUtils.isEmpty(GoodUtils.getText(titleNoteField))
-                && TextUtils.isEmpty(GoodUtils.getText(noteFiled));
+                && TextUtils.isEmpty(getNoteFromListAdapter().getNote());
+    }
+
+    private NoteModel getNoteFromListAdapter() {
+        List<NoteModel> noteList = noteEditorAdapter.getCurrentList();
+         return noteList.get(0);
     }
 
     public interface EditorNoteInteraction {

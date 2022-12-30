@@ -77,4 +77,6 @@
     // Drawables
     <dimen name="button_selector_corners">30dp</dimen>
 
+    <dimen name="edit_dragged_item_elevation">2dp</dimen>
+
 </resources>

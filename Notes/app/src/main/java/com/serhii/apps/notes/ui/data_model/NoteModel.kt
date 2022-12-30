@@ -4,20 +4,14 @@
  */
 package com.serhii.apps.notes.ui.data_model
 
-import android.content.Context
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.json.JSONObject
 
-data class NoteModel(val note: String, val title: String, var time: String = "", val id: String = "") {
+data class NoteModel(var note: String, val title: String, var time: String = "", var id: String = "") {
 
     val isEmpty: Boolean
         get() = note.isEmpty() && title.isEmpty()
-
-    // TODO: Need to remove template notes handling
-    fun isTemplate(context: Context): Boolean {
-        return false
-    }
 
     companion object {
 

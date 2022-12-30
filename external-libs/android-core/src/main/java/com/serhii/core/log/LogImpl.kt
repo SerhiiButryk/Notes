@@ -9,21 +9,25 @@ import com.serhii.core.CoreEngine.loadNativeLibrary
 
 internal object LogImpl : ILog {
 
+    // Default values
     private var TAG: String = ""
     private const val DELIMITER = " "
 
     override fun info(tag: String, message: String) {
-        Log.i(TAG + DELIMITER + tag + DELIMITER, message)
+        val predicate = DELIMITER + tag + DELIMITER
+        Log.i(TAG, predicate + message)
     }
 
     override fun detail(tag: String, message: String) {
         if (getDetailedLogsEnabled()) {
-            Log.i("DETAIL $TAG$DELIMITER$tag$DELIMITER", message)
+            val predicate = "DETAIL$DELIMITER$tag$DELIMITER"
+            Log.i(TAG, predicate + message)
         }
     }
 
     override fun error(tag: String, message: String) {
-        Log.e(TAG + DELIMITER + tag + DELIMITER, message)
+        val predicate = DELIMITER + tag + DELIMITER
+        Log.e(TAG, predicate + message)
     }
 
     override var tag: String

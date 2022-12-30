@@ -106,15 +106,10 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         val args = Bundle()
         if (noteModel == null) {
             // Handle add note button click
-            args.putString(NoteEditorFragment.ARG_NOTE_ID, NoteEditorFragment.ARG_NOTE_TEMPLATE)
             args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_CREATE)
         } else {
             // Handle open note button click
-            if (noteModel.isTemplate(this)) {
-                args.putString(NoteEditorFragment.ARG_NOTE_ID, NoteEditorFragment.ARG_NOTE_TEMPLATE)
-            } else {
-                args.putString(NoteEditorFragment.ARG_NOTE_ID, noteModel.id)
-            }
+            args.putString(NoteEditorFragment.ARG_NOTE_ID, noteModel.id)
             args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_OPEN)
         }
 

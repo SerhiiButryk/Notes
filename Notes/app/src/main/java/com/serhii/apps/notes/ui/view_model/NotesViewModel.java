@@ -16,36 +16,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  View model for managing UI actions for storing and displaying User's note data
+ *  View model for managing UI data for User notes
+ *
+ *  Responsibilities:
+ *  1) Save data to Database
+ *  2) Get latest data from Database
+ *  3) Survive data during config changes
+ *  3) Close Database when User is done with notes
  */
 
-public class NotesViewModel extends AndroidViewModel {
+public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData {
 
-    private static final String TAG = "NotesVM";
+    private static final String TAG = "NotesViewModel";
 
     private final MutableLiveData<List<NoteModel>> notes = new MutableLiveData<>();
     private final MutableLiveData<CryptoError> errorState = new MutableLiveData<>();
-
-    private final NotesDatabase<NoteModel> notesDatabaseProvider;
+    private final NotesRepository notesRepository;
 
     public NotesViewModel(Application application) {
         super(application);
-
-        notesDatabaseProvider = UserNotesDatabase.getInstance();
-        notesDatabaseProvider.init(application.getApplicationContext());
-
+        notesRepository = new NotesRepository(application, this);
         errorState.setValue(CryptoError.OK);
-        notes.setValue(new ArrayList<NoteModel>());
-
+        notes.setValue(new ArrayList<>());
         Log.info(TAG, "NotesViewModel(), initialization is finished");
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-
-        notesDatabaseProvider.close();
-
+        notesRepository.close();
         Log.info(TAG, "onCleared(), clean up is finished");
     }
 
@@ -53,62 +52,35 @@ public class NotesViewModel extends AndroidViewModel {
         return notes;
     }
 
+    public LiveData<CryptoError> getErrorStateData() { return errorState; }
+
+    public void resetErrorState() { /* no-op */ }
+
     public boolean deleteNote(String index) {
         Log.info(TAG, "deleteNote()");
-
-        boolean result = notesDatabaseProvider.deleteRecord(index);
-
-        if (result) {
-            updateData();
-        }
-
-        return result;
+        return notesRepository.delete(index);
     }
 
     public boolean addNote(NoteModel noteModel) {
         Log.info(TAG, "addNote()");
-
-        // Save data in database
-        int result = notesDatabaseProvider.addRecord(noteModel);
-
-        if (result != -1 && result != 0) {
-            updateData();
-            return true;
-        }
-
-        // Failed to save data
-        return false;
+        return notesRepository.add(noteModel);
     }
 
     public boolean updateNote(String index, NoteModel noteModel) {
         Log.info(TAG, "updateNote(), index = " + index);
-
-        boolean result = notesDatabaseProvider.updateRecord(index, noteModel);
-
-        if (result) {
-            updateData();
-        }
-
-        return result;
+        return notesRepository.update(index, noteModel);
     }
 
     public NoteModel getNote(String index) {
         Log.info(TAG, "getNote(), index = " + index);
-
-        NoteModel data = notesDatabaseProvider.getRecord(index);
-
-        return data;
+        return notesRepository.get(index);
     }
 
+    @Override
     public void updateData() {
         Log.info(TAG, "retrieveData(), load data");
-
-        List<NoteModel> data = notesDatabaseProvider.getRecords();
+        List<NoteModel> data = notesRepository.getAll();
         notes.setValue(data);
     }
-
-    public LiveData<CryptoError> getErrorStateData() { return errorState; }
-
-    public void resetErrorState() { }
 
 }
