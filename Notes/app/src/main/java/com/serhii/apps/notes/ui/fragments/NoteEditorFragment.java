@@ -138,12 +138,27 @@ public class NoteEditorFragment extends Fragment {
         processArgs();
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        notesViewModel.cacheUserNote(noteEditorAdapter.getCurrentList());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        List<NoteModel> cachedList = notesViewModel.getCachedUserNotes();
+        if (cachedList != null) {
+            noteEditorAdapter.submitList(cachedList);
+        }
+    }
+
     private void processArgs() {
 
         if (action.equals(ACTION_NOTE_CREATE)) {
             // Display empty note
             List<NoteModel> noteList = new ArrayList<>();
-            noteList.add(new NoteModel("", "", "", ""));
+            noteList.add(NoteModel.Companion.create());
             noteEditorAdapter.submitList(noteList);
         } else if (action.equals(ACTION_NOTE_OPEN)) {
 
@@ -251,7 +266,7 @@ public class NoteEditorFragment extends Fragment {
                         if (noteModel != null) {
                             List<NoteModel> copyList = new ArrayList<>();
                             // Clear a note and copy other data
-                            copyList.add(new NoteModel("", noteModel.getTitle(), noteModel.getTime(), noteModel.getId()));
+                            copyList.add(NoteModel.Companion.create("", noteModel.getTitle(), noteModel.getTime(), noteModel.getId()));
                             // Pass new list to list adapter
                             noteEditorAdapter.submitList(copyList);
                         }
@@ -267,8 +282,7 @@ public class NoteEditorFragment extends Fragment {
 
             case R.id.item_type:
 
-                // To update
-
+                noteEditorAdapter.transformViewType();
             return true;
         }
 
@@ -301,10 +315,10 @@ public class NoteEditorFragment extends Fragment {
 
         if (action.equals(ACTION_NOTE_OPEN)) {
             Log.info(TAG, "saveUserNote() updated note");
-            result = notesViewModel.updateNote(noteId, new NoteModel(note, title, "", ""));
+            result = notesViewModel.updateNote(noteId, NoteModel.Companion.create(note, title, "", ""));
         } else {
             Log.info(TAG, "saveUserNote() add new note");
-            result = notesViewModel.addNote(new NoteModel(note, title, "", ""));
+            result = notesViewModel.addNote(NoteModel.Companion.create(note, title, "", ""));
         }
 
         /*

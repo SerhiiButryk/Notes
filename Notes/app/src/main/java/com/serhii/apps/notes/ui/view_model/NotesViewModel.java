@@ -31,6 +31,7 @@ public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData
 
     private final MutableLiveData<List<NoteModel>> notes = new MutableLiveData<>();
     private final MutableLiveData<CryptoError> errorState = new MutableLiveData<>();
+    private List<NoteModel> cachedUserNotes;
     private final NotesRepository notesRepository;
 
     public NotesViewModel(Application application) {
@@ -55,6 +56,19 @@ public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData
     public LiveData<CryptoError> getErrorStateData() { return errorState; }
 
     public void resetErrorState() { /* no-op */ }
+
+    public void cacheUserNote(List<NoteModel> userListCached) {
+        cachedUserNotes = userListCached;
+    }
+
+    public List<NoteModel> getCachedUserNotes() {
+        return cachedUserNotes;
+    }
+
+    public void onBackNavigation() {
+        // Clear cached data. Not need it anymore.
+        cachedUserNotes = null;
+    }
 
     public boolean deleteNote(String index) {
         Log.info(TAG, "deleteNote()");

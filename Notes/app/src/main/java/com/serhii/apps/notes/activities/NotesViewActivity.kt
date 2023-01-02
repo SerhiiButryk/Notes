@@ -128,6 +128,14 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     override fun onBackNavigation() {
         val fm = supportFragmentManager
         fm.popBackStack()
+        // Notify View Model
+        notesViewModel?.onBackNavigation()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // Notify View Model
+        notesViewModel?.onBackNavigation()
     }
 
     // This will ask user to login
