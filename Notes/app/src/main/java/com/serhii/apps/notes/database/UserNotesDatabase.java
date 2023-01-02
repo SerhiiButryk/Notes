@@ -53,18 +53,24 @@ public class UserNotesDatabase implements NotesDatabase<NoteModel> {
         // Set last saved time for note
         uiData.setTime(GoodUtils.currentTimeToString());
 
-        int count = impl.getRecordsCountImpl();
-        Log.info(TAG, "addRecord(), current note count = " + count);
+        // Create and insert empty string before real data
+        // This is a workaround to know row id beforehand
+        int index = impl.addRecordImpl("");
 
-        // Id is an index of note raw in a table// We assume index always is count + 1
-        uiData.setId(String.valueOf(count + 1));
+        if (index == -1) {
+            Log.error(TAG, "addRecord(), failed to add empty record, returned index -1");
+            return -1;
+        }
+
+        String rowId = String.valueOf(index);
+        uiData.setId(rowId);
 
         String noteEnc = encryptionHelper.encrypt(uiData);
 
-        int index = impl.addRecordImpl(noteEnc);
+        boolean result = impl.updateRecordImpl(rowId, noteEnc);
         Log.info(TAG, "addRecord(), added new note with index = " + index);
 
-        if (index != -1) {
+        if (result) {
             encryptionHelper.saveMetaData(index);
         } else {
             Log.error(TAG, "addRecord(), failed to add new record, returned index -1");

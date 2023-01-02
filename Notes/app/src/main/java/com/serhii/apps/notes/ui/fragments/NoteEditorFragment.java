@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +37,6 @@ import com.serhii.core.utils.GoodUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class NoteEditorFragment extends Fragment {
 
@@ -57,8 +55,6 @@ public class NoteEditorFragment extends Fragment {
     private Toolbar toolbar;
     private NotesViewModel notesViewModel;
     private EditorNoteInteraction interaction;
-    private String checkNoteTitleContent = "";
-    private String checkNoteContent = "";
     private String action;
     private String noteId;
     private final NoteEditorAdapter noteEditorAdapter = new NoteEditorAdapter();
@@ -141,7 +137,7 @@ public class NoteEditorFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        notesViewModel.cacheUserNote(noteEditorAdapter.getCurrentList());
+        notesViewModel.cacheUserNote(noteEditorAdapter.getNoteList());
     }
 
     @Override
@@ -149,7 +145,7 @@ public class NoteEditorFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         List<NoteModel> cachedList = notesViewModel.getCachedUserNotes();
         if (cachedList != null) {
-            noteEditorAdapter.submitList(cachedList);
+            noteEditorAdapter.setDataChanged(cachedList);
         }
     }
 
@@ -157,25 +153,20 @@ public class NoteEditorFragment extends Fragment {
 
         if (action.equals(ACTION_NOTE_CREATE)) {
             // Display empty note
-            List<NoteModel> noteList = new ArrayList<>();
-            noteList.add(NoteModel.Companion.create());
-            noteEditorAdapter.submitList(noteList);
+            noteEditorAdapter.prepareEmptyNote();
         } else if (action.equals(ACTION_NOTE_OPEN)) {
 
             final NoteModel note = notesViewModel.getNote(noteId);
 
             if (note != null) {
-                checkNoteTitleContent = note.getTitle();
-                checkNoteContent = note.getNote();
-
                 // Set note title
-                titleNoteField.setText(checkNoteTitleContent);
+                titleNoteField.setText(note.getTitle());
 
                 // Set new data to list adapter. After that recycle view will be updated with
                 // new data from list.
                 List<NoteModel> noteList = new ArrayList<>();
                 noteList.add(note);
-                noteEditorAdapter.submitList(noteList);
+                noteEditorAdapter.setDataChanged(noteList);
 
                 String timeDate = note.getTime();
                 if (!timeDate.isEmpty()) {
@@ -249,27 +240,24 @@ public class NoteEditorFragment extends Fragment {
             case R.id.clear_note:
 
                 /**
-                 * Clears EditTextView
+                 * Clears Edit Text Views
                  */
                 DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
 
-                        List<NoteModel> noteModelList = noteEditorAdapter.getCurrentList();
-                        NoteModel noteModel = noteModelList.get(0);
+                        List<NoteModel> noteModelList = noteEditorAdapter.getNoteList();
 
-                        if (noteModel != null && noteModel.getNote().isEmpty()) {
+                        if (noteEditorAdapter.getNote().isEmpty()) {
                             GoodUtils.showToast(requireActivity(), R.string.toast_action_error_note_nothing_to_clear);
                             return;
                         }
 
-                        if (noteModel != null) {
-                            List<NoteModel> copyList = new ArrayList<>();
-                            // Clear a note and copy other data
-                            copyList.add(NoteModel.Companion.create("", noteModel.getTitle(), noteModel.getTime(), noteModel.getId()));
-                            // Pass new list to list adapter
-                            noteEditorAdapter.submitList(copyList);
+                        for (NoteModel n : noteModelList) {
+                            n.clearNotes();
                         }
+
+                        noteEditorAdapter.setDataChanged(noteModelList);
                     }
 
                     @Override
@@ -281,8 +269,10 @@ public class NoteEditorFragment extends Fragment {
                 return true;
 
             case R.id.item_type:
-
-                noteEditorAdapter.transformViewType();
+                /**
+                 * Change note layout
+                 */
+                noteEditorAdapter.transformView();
             return true;
         }
 
@@ -291,22 +281,11 @@ public class NoteEditorFragment extends Fragment {
 
     private void saveUserNote() {
 
-        String title = GoodUtils.getText(titleNoteField);
-        String note = getNoteFromListAdapter().getNote();
+        NoteModel notes = noteEditorAdapter.getNote();
 
-        if (title.isEmpty() && note.isEmpty()) {
+        if (notes.isEmpty()) {
 
             GoodUtils.showToast(requireContext(), R.string.toast_action_error_note_is_empty);
-
-            return;
-        }
-
-        /*
-            Checks if note needs update
-        */
-        if (checkIfNoteChanged()) {
-
-            GoodUtils.showToast(requireContext(), R.string.toast_action_error_note_is_not_changed);
 
             return;
         }
@@ -315,10 +294,10 @@ public class NoteEditorFragment extends Fragment {
 
         if (action.equals(ACTION_NOTE_OPEN)) {
             Log.info(TAG, "saveUserNote() updated note");
-            result = notesViewModel.updateNote(noteId, NoteModel.Companion.create(note, title, "", ""));
+            result = notesViewModel.updateNote(noteId, notes);
         } else {
             Log.info(TAG, "saveUserNote() add new note");
-            result = notesViewModel.addNote(NoteModel.Companion.create(note, title, "", ""));
+            result = notesViewModel.addNote(notes);
         }
 
         /*
@@ -328,47 +307,28 @@ public class NoteEditorFragment extends Fragment {
             Log.info(TAG, "saveUserNote() saved new note");
 
             GoodUtils.showToast(requireContext(), R.string.toast_action_message);
-
-            // Cache new values
-            checkNoteContent = note;
-            checkNoteTitleContent = title;
         }
 
     }
 
     private void deleteNote() {
 
-        if (TextUtils.isEmpty(titleNoteField.getText()) && TextUtils.isEmpty(getNoteFromListAdapter().getNote())) {
+        if (noteEditorAdapter.getNote().isEmpty()) {
             GoodUtils.showToast(requireContext(), R.string.toast_action_delete_error_note);
             return;
         }
 
-        if (notesViewModel.deleteNote(noteId)) {
+        // Delete if this note already exists
+        if (noteId != null && notesViewModel.deleteNote(noteId)) {
             GoodUtils.showToast(requireContext(), R.string.toast_action_deleted_message);
             if (interaction != null) {
                 interaction.onDeleteNote();
             }
+        } else {
+            // Show warning message otherwise
+            GoodUtils.showToast(requireContext(), R.string.toast_action_deleted_message_no_note);
         }
 
-    }
-
-    /**
-     *  Compare notes before and after editing operation
-     */
-    private boolean checkIfNoteChanged() {
-        String title = GoodUtils.getText(titleNoteField);
-        String note = getNoteFromListAdapter().getNote();
-        return  isEmptyNote() || (checkNoteTitleContent.equals(title) && checkNoteContent.equals(note));
-    }
-
-    private boolean isEmptyNote() {
-        return TextUtils.isEmpty(GoodUtils.getText(titleNoteField))
-                && TextUtils.isEmpty(getNoteFromListAdapter().getNote());
-    }
-
-    private NoteModel getNoteFromListAdapter() {
-        List<NoteModel> noteList = noteEditorAdapter.getCurrentList();
-         return noteList.get(0);
     }
 
     public interface EditorNoteInteraction {

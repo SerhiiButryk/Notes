@@ -6,6 +6,12 @@
         android:title="@string/settings_item"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/item_layout"
+        android:icon="@drawable/ic_view_grid"
+        android:title="@string/action_layout_grid"
+        app:showAsAction="ifRoom" />
+
     <!--TODO: No implemented yet-->
     <!--    <item android:id="@+id/plans_item"-->
     <!--        android:title="@string/plans_item"-->

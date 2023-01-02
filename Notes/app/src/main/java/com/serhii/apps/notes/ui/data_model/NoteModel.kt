@@ -11,46 +11,63 @@ import kotlinx.serialization.json.put
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Classes which represent user note in this application
+ */
+
 data class NoteList(var note: String = "", var isChecked:Boolean = false)
 
-data class NoteModel(var note: String = "", val title: String = "",
+data class NoteModel(var note: String = "", var title: String = "",
                      var time: String = "", var id: String = "",
                      var viewType: Int = ONE_NOTE_VIEW_TYPE,
                      /**
                       * Currently there can be only 1 item in list
                       */
-                     var listNote: MutableList<NoteList> = mutableListOf()) {
+                     val listNote: MutableList<NoteList> = mutableListOf()) {
 
+    /*
+    * If this note has no user notes
+    */
     val isEmpty: Boolean
-        get() = note.isEmpty() && title.isEmpty()
+        get() {
+            if (viewType == ONE_NOTE_VIEW_TYPE) {
+                return note.isEmpty() && title.isEmpty()
+            } else if (viewType == LIST_NOTE_VIEW_TYPE) {
+                for (n in listNote) {
+                    if (n.note.isNotEmpty() && title.isEmpty()) {
+                        return false
+                    }
+                    return true
+                }
+            }
+            return false
+        }
 
-    /**
-     * Currently there can be only 1 item in list
-     */
     fun getNoteList(): NoteList {
         if (listNote.isEmpty())
             return NoteList()
         return listNote[0]
     }
 
-    /**
-     * Currently there can be only 1 item in list
-     */
     fun putListNote(note: String) {
-        if (listNote.isEmpty()) {
-            listNote.add(NoteList(note))
-        } else {
-            listNote[0].note = note
+        listNote.add(NoteList(note))
+    }
+
+    fun putListNote(note: String, isChecked: Boolean) {
+        listNote.add(NoteList(note, isChecked))
+    }
+
+    fun clearNotes() {
+        note = ""
+        title = ""
+        for (n in listNote) {
+            n.note = ""
+            n.isChecked = false
         }
     }
 
-    /**
-     * Currently there can be only 1 item in list
-     */
-    fun putListNoteChecked(isChecked: Boolean) {
-        if (listNote.isNotEmpty()) {
-            listNote[0].isChecked = isChecked
-        }
+    override fun toString(): String {
+        return ""
     }
 
     companion object {
@@ -119,6 +136,14 @@ data class NoteModel(var note: String = "", val title: String = "",
         fun getCopy(note: NoteModel) = NoteModel(note.note, note.title, note.time, note.id,
             note.viewType)
 
+        fun copy(noteTo: NoteModel, noteFrom: NoteModel) {
+            noteTo.note = noteFrom.note
+            noteTo.title = noteFrom.title
+            noteTo.id = noteFrom.id
+            noteTo.viewType = noteFrom.viewType
+            noteTo.time = noteFrom.time
+        }
+
         fun create(note: String, title: String, time: String, id: String): NoteModel {
             return NoteModel(note, title, time, id)
         }
@@ -127,9 +152,5 @@ data class NoteModel(var note: String = "", val title: String = "",
             return NoteModel()
         }
 
-    }
-
-    override fun toString(): String {
-        return ""
     }
 }

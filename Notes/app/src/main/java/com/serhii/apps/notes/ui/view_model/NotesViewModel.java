@@ -1,5 +1,7 @@
 package com.serhii.apps.notes.ui.view_model;
 
+import static com.serhii.apps.notes.ui.fragments.NoteViewFragment.DISPLAY_MODE_GRID;
+
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -31,6 +33,7 @@ public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData
 
     private final MutableLiveData<List<NoteModel>> notes = new MutableLiveData<>();
     private final MutableLiveData<CryptoError> errorState = new MutableLiveData<>();
+    private final MutableLiveData<Integer> displayNoteMode = new MutableLiveData<>(DISPLAY_MODE_GRID);
     private List<NoteModel> cachedUserNotes;
     private final NotesRepository notesRepository;
 
@@ -68,6 +71,14 @@ public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData
     public void onBackNavigation() {
         // Clear cached data. Not need it anymore.
         cachedUserNotes = null;
+    }
+
+    public LiveData<Integer> getDisplayMode() {
+        return displayNoteMode;
+    }
+
+    public void setDisplayNoteMode(int newMode) {
+        displayNoteMode.setValue(newMode);
     }
 
     public boolean deleteNote(String index) {

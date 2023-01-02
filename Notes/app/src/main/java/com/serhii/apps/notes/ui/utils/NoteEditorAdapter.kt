@@ -5,7 +5,10 @@
 
 package com.serhii.apps.notes.ui.utils
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -13,26 +16,78 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.ui.data_model.NoteList
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.apps.notes.ui.data_model.NoteModel.Companion.getCopy
+import com.serhii.apps.notes.ui.data_model.NoteModel.Companion.create
 import com.serhii.core.log.Log
 
 const val TAG = "NoteEditorAdapter"
 
-class NoteEditorAdapter : ListAdapter<NoteModel, NoteViewHolderBase>(DiffListAdapterCallback()) {
+/**
+ * Adapter for managing views and note data in Editor Note Fragment
+ */
+class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
 
+    /**
+     * This is a type of user list note
+     */
     private val ADD_NEW_NOTE_VIEW_TYPE = 101
 
-    private val viewHolders = mutableListOf<NoteViewHolderBase>()
+    private var notesData = mutableListOf<NoteModel>()
+    private var userNotesList = mutableListOf<NoteModel>()
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        viewHolders.clear()
+    /**
+     * Return note data which Recycle View displays
+     */
+    fun getNoteList() : MutableList<NoteModel> {
+        // This is for notes which has list view type
+        if (notesData.isNotEmpty() && getListType(notesData) == NoteModel.LIST_NOTE_VIEW_TYPE) {
+            // Clear as we are going to add new data
+            userNotesList.clear()
+            // Iterate through data list and gets note
+            for (note in notesData) {
+                if (note.viewType != ADD_NEW_NOTE_VIEW_TYPE)
+                    userNotesList.add(note)
+            }
+            return userNotesList
+        }
+        // Else return as it is
+        return notesData
+    }
+
+    /**
+     * Return note data which Recycle View displays
+     *
+     * Unlike above method this merges list note in one Note Model object
+     * and returns it
+     */
+    fun getNote() : NoteModel {
+        val note = NoteModel()
+        val list = getNoteList()
+
+        for (n in list) {
+            if (list.first() == n) {
+                NoteModel.copy(note, n)
+            }
+            val text = n.listNote[0].note
+            val isChecked = n.listNote[0].isChecked
+            note.putListNote(text, isChecked)
+        }
+
+        return note
+    }
+
+    override fun getItemCount() : Int {
+        val viewType = getListType(notesData)
+        if (viewType == NoteModel.ONE_NOTE_VIEW_TYPE) {
+            // We should always have only 1 item displayed
+            return 1
+        }
+        return notesData.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : NoteViewHolderBase {
@@ -51,8 +106,6 @@ class NoteEditorAdapter : ListAdapter<NoteModel, NoteViewHolderBase>(DiffListAda
             viewHolder = SimpleNoteViewHolder(view)
         }
 
-        viewHolders.add(viewHolder)
-
         return viewHolder
     }
 
@@ -61,61 +114,33 @@ class NoteEditorAdapter : ListAdapter<NoteModel, NoteViewHolderBase>(DiffListAda
         holder.bind(getItem(position), position)
     }
 
-    override fun submitList(list: MutableList<NoteModel>?) {
-        Log.info(TAG, "submitList() sz = ${list?.size}")
-        // Add 'add new list item' view item in list
-        addEmptyNote(list)
-        // Pass new list
-        super.submitList(list)
-    }
-
-    override fun onCurrentListChanged(previousList: MutableList<NoteModel>, currentList: MutableList<NoteModel>) {
-        // Show or hide delete button on item views
-        for (holder in viewHolders) {
-            holder.update()
-        }
-    }
-
-    private fun addEmptyNote(list: MutableList<NoteModel>?) {
-        list?.let {
-            if (list.isNotEmpty() && getListViewType(list) == NoteModel.LIST_NOTE_VIEW_TYPE) {
-                val last = list.last()
-                if (last.viewType != ADD_NEW_NOTE_VIEW_TYPE) {
-                    val newNote = NoteModel.EMPTY_NOTE
-                    newNote.viewType = ADD_NEW_NOTE_VIEW_TYPE
-                    list.add(newNote)
-                }
-            }
-        }
-    }
-
     override fun getItemViewType(position: Int): Int {
+        if (notesData.isEmpty())
+            return -1
         val type = getItem(position).viewType
         Log.info(TAG, "getItemViewType() view type = $type")
         return type
     }
 
-    override fun getCurrentList(): MutableList<NoteModel> {
-        val list = super.getCurrentList()
+    private fun getItem(position: Int) = notesData[position]
 
-        if (getListViewType(list) == NoteModel.LIST_NOTE_VIEW_TYPE) {
-            val copy = mutableListOf<NoteModel>()
-            for (n in list) {
-                copy.add(getCopy(n))
-            }
-
-            val last: NoteModel = copy.last()
-            if (last.viewType == ADD_NEW_NOTE_VIEW_TYPE) {
-                copy.remove(last)
-            }
-
-            return copy
-        }
-
-        return list
+    fun prepareEmptyNote() {
+        // Display empty note
+        val noteList: MutableList<NoteModel> = ArrayList()
+        noteList.add(NoteModel.create())
+        setDataChanged(noteList)
     }
 
-    fun getListViewType(list: List<NoteModel>): Int {
+    @SuppressLint("NotifyDataSetChanged")
+    fun setDataChanged(newData: MutableList<NoteModel>) {
+        // Add item for 'Add new item' view
+        addItemForListViewTypeIfNotFound(newData)
+        // Update list
+        notesData = newData
+        notifyDataSetChanged()
+    }
+
+    private fun getListType(list: List<NoteModel>): Int {
         var type = -1
         if (list.isNotEmpty()) {
             type = list[0].viewType
@@ -123,43 +148,66 @@ class NoteEditorAdapter : ListAdapter<NoteModel, NoteViewHolderBase>(DiffListAda
         return type
     }
 
-    fun transformViewType() {
-        val currentList: List<NoteModel> = currentList
-        val copyList = mutableListOf<NoteModel>()
-
-        for (noteModel in currentList) {
-            val copy = getCopy(noteModel)
-            // Change view type
-            if (copy.viewType == NoteModel.LIST_NOTE_VIEW_TYPE) {
-                copy.viewType = NoteModel.ONE_NOTE_VIEW_TYPE
-            } else if (copy.viewType == NoteModel.ONE_NOTE_VIEW_TYPE) {
-                copy.viewType = NoteModel.LIST_NOTE_VIEW_TYPE
+    private fun addItemForListViewTypeIfNotFound(list: MutableList<NoteModel>) {
+        if (list.isNotEmpty() && getListType(list) == NoteModel.LIST_NOTE_VIEW_TYPE) {
+            val last = list.last()
+            // Add empty note if it is not found
+            if (last.viewType != ADD_NEW_NOTE_VIEW_TYPE) {
+                val newNote = NoteModel.EMPTY_NOTE
+                newNote.viewType = ADD_NEW_NOTE_VIEW_TYPE
+                list.add(newNote)
             }
-            copyList.add(copy)
+        }
+    }
+
+    fun transformView() {
+
+        val currentList = getNoteList()
+
+        for (note in currentList) {
+            // Change view type
+            if (note.viewType == NoteModel.LIST_NOTE_VIEW_TYPE) {
+                note.viewType = NoteModel.ONE_NOTE_VIEW_TYPE
+            } else if (note.viewType == NoteModel.ONE_NOTE_VIEW_TYPE) {
+                note.viewType = NoteModel.LIST_NOTE_VIEW_TYPE
+            }
         }
 
         // Set new data to adapter
-        submitList(copyList)
+        setDataChanged(currentList)
     }
 
-    fun onAddNoteClicked() {
-        val currentList = currentList
+    ///////////////////////////////////////////////////////////////////////////
+    // Callbacks from View Holder
+    ///////////////////////////////////////////////////////////////////////////
+
+    fun onDelete(position: Int) {
+        notesData.removeAt(position)
+        setDataChanged(notesData)
+    }
+
+    fun onAdd() {
         val newNote = NoteModel()
         newNote.viewType = NoteModel.LIST_NOTE_VIEW_TYPE
-        currentList.add(newNote)
-        submitList(currentList)
-    }
-
-    fun onDeleteClicked(position: Int) {
-        Log.info(TAG, "onDeleteClicked() position = $position")
+        // Add before last
+        notesData.add(notesData.lastIndex - 1, newNote)
+        // Add a litter delay before updating list
+        // This is added to make changes in list more progressive or gradual
+        Handler(Looper.getMainLooper()).postDelayed({ setDataChanged(notesData) }, 400)
     }
 }
+
+///////////////////////////////////////////////////////////////////////////
+// View Holders
+///////////////////////////////////////////////////////////////////////////
 
 open class NoteViewHolderBase(view: View) : ViewHolder(view) {
     open fun bind(noteModel: NoteModel, position: Int) {}
-    open fun update() {}
 }
 
+/**
+ * View Holder which display one Edit Text and Text Vies
+ */
 class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
 
     private val editView: EditText
@@ -178,6 +226,9 @@ class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
     }
 }
 
+/**
+ * View Holder which display Edit Text list and Check boxes
+ */
 class ListNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolderBase(view) {
 
     private val checkBox: MaterialCheckBox
@@ -189,7 +240,7 @@ class ListNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolde
         editView = view.findViewById(R.id.content_edt)
         deleteBtn = view.findViewById(R.id.delete_imv)
         deleteBtn.setOnClickListener {
-            adapter.onDeleteClicked(adapterPosition)
+            adapter.onDelete(adapterPosition)
         }
 
         checkBox = view.findViewById(R.id.item_chk)
@@ -210,13 +261,10 @@ class ListNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolde
         editView.setText(listNote.note)
 
         checkBox.isChecked = listNote.isChecked
-    }
 
-    override fun update() {
-        if (adapterPosition != 0)
+        if (adapterPosition != 0) {
             deleteBtn.visibility = View.VISIBLE
-
-        editView.requestFocus()
+        }
     }
 
     private fun setCrossedOut(isChecked: Boolean) {
@@ -228,21 +276,24 @@ class ListNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolde
     }
 }
 
+/**
+ * View holder which displays 'Add list item' view
+ */
 class AddNewNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolderBase(view) {
 
-    val addBtn: ImageButton
+    private val addBtn: ImageButton
 
     init {
         addBtn = view.findViewById(R.id.add_imv)
         addBtn.setOnClickListener {
-            adapter.onAddNoteClicked()
+            adapter.onAdd()
         }
     }
-
-    override fun bind(noteModel: NoteModel, position: Int) {
-
-    }
 }
+
+///////////////////////////////////////////////////////////////////////////
+// Helper class
+///////////////////////////////////////////////////////////////////////////
 
 class NoteSaveHelper(private val viewHolder: NoteViewHolderBase) : TextWatcher {
 
@@ -261,22 +312,17 @@ class NoteSaveHelper(private val viewHolder: NoteViewHolderBase) : TextWatcher {
         if (viewHolder is SimpleNoteViewHolder) {
             note?.note = newText
         } else {
-            note?.putListNote(newText)
+            note?.listNote?.set(0, NoteList(newText))
         }
     }
 
     fun putChecked(isChecked: Boolean) {
-        note?.putListNoteChecked(isChecked)
-    }
-}
-
-class DiffListAdapterCallback : DiffUtil.ItemCallback<NoteModel>() {
-
-    override fun areItemsTheSame(oldItem: NoteModel, newItem: NoteModel): Boolean {
-        return oldItem.id == newItem.id && oldItem.viewType == newItem.viewType
-    }
-
-    override fun areContentsTheSame(oldItem: NoteModel, newItem: NoteModel): Boolean {
-        return oldItem.note == newItem.note && oldItem.title == newItem.title
+        var note = note?.listNote?.get(0)
+        if (note != null) {
+            note.isChecked = isChecked
+        } else {
+            note = NoteList("", isChecked)
+        }
+        this.note?.listNote?.set(0, note)
     }
 }

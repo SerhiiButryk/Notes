@@ -15,12 +15,12 @@ import com.serhii.apps.notes.ui.data_model.NoteModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.NoteViewHolder> {
+public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteViewHolder> {
 
     private List<NoteModel> notes = new ArrayList<>();
     private final NoteViewHolder.ClickListener clickListener;
 
-    public NotesRecyclerAdapter(NoteViewHolder.ClickListener clickListener) {
+    public NoteListAdapter(NoteViewHolder.ClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
@@ -54,7 +54,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     @SuppressLint("NotifyDataSetChanged")
     public void setDataChanged(List<NoteModel> noteModels) {
         notes = noteModels;
-
         notifyDataSetChanged();
     }
 
@@ -63,7 +62,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         private final TextView title;
         private final TextView description;
 
-        public NoteViewHolder(@NonNull View itemView, final NotesRecyclerAdapter.ClickListener clickListener) {
+        public NoteViewHolder(@NonNull View itemView, final NoteListAdapter.ClickListener clickListener) {
             super(itemView);
 
             title = itemView.findViewById(R.id.tv_note_title);
