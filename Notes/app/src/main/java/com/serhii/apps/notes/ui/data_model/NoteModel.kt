@@ -58,12 +58,18 @@ data class NoteModel(var note: String = "", var title: String = "",
     }
 
     fun clearNotes() {
-        note = ""
-        title = ""
-        for (n in listNote) {
-            n.note = ""
-            n.isChecked = false
+
+        if (viewType == ONE_NOTE_VIEW_TYPE) {
+            note = ""
         }
+
+        if (viewType == LIST_NOTE_VIEW_TYPE) {
+            for (n in listNote) {
+                n.note = ""
+                n.isChecked = false
+            }
+        }
+
     }
 
     override fun toString(): String {
@@ -134,7 +140,7 @@ data class NoteModel(var note: String = "", var title: String = "",
         }
 
         fun getCopy(note: NoteModel) = NoteModel(note.note, note.title, note.time, note.id,
-            note.viewType)
+            note.viewType, note.listNote)
 
         fun copy(noteTo: NoteModel, noteFrom: NoteModel) {
             noteTo.note = noteFrom.note

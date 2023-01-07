@@ -22,7 +22,6 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.data_model.NoteList
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.apps.notes.ui.data_model.NoteModel.Companion.create
 import com.serhii.core.log.Log
 
 const val TAG = "NoteEditorAdapter"
@@ -51,7 +50,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
             // Iterate through data list and gets note
             for (note in notesData) {
                 if (note.viewType != ADD_NEW_NOTE_VIEW_TYPE)
-                    userNotesList.add(note)
+                    userNotesList.add(NoteModel.getCopy(note))
             }
             return userNotesList
         }
@@ -70,12 +69,17 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
         val list = getNoteList()
 
         for (n in list) {
-            if (list.first() == n) {
-                NoteModel.copy(note, n)
+            if (n.title.isNotEmpty()) {
+                note.title = n.title
             }
-            val text = n.listNote[0].note
-            val isChecked = n.listNote[0].isChecked
-            note.putListNote(text, isChecked)
+            if (n.id.isNotEmpty()) {
+                note.id = n.id
+            }
+            if (n.listNote.isNotEmpty()) {
+                val text = n.listNote[0].note
+                val isChecked = n.listNote[0].isChecked
+                note.putListNote(text, isChecked)
+            }
         }
 
         return note
@@ -133,11 +137,21 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
 
     @SuppressLint("NotifyDataSetChanged")
     fun setDataChanged(newData: MutableList<NoteModel>) {
+        setData(newData)
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setDataChangedForAdd(newData: MutableList<NoteModel>) {
+        setData(newData)
+        notifyItemChanged(notesData.size - 1)
+    }
+
+    private fun setData(newData: MutableList<NoteModel>) {
         // Add item for 'Add new item' view
         addItemForListViewTypeIfNotFound(newData)
         // Update list
         notesData = newData
-        notifyDataSetChanged()
     }
 
     private fun getListType(list: List<NoteModel>): Int {
@@ -162,7 +176,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
 
     fun transformView() {
 
-        val currentList = getNoteList()
+        val currentList = notesData
 
         for (note in currentList) {
             // Change view type
@@ -193,7 +207,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
         notesData.add(notesData.lastIndex - 1, newNote)
         // Add a litter delay before updating list
         // This is added to make changes in list more progressive or gradual
-        Handler(Looper.getMainLooper()).postDelayed({ setDataChanged(notesData) }, 400)
+        Handler(Looper.getMainLooper()).postDelayed({ setDataChangedForAdd(notesData) }, 400)
     }
 }
 
@@ -229,7 +243,7 @@ class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
 /**
  * View Holder which display Edit Text list and Check boxes
  */
-class ListNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolderBase(view) {
+class ListNoteViewHolder(view: View, var adapter: NoteEditorAdapter) : NoteViewHolderBase(view) {
 
     private val checkBox: MaterialCheckBox
     private val editView: EditText
@@ -264,6 +278,8 @@ class ListNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolde
 
         if (adapterPosition != 0) {
             deleteBtn.visibility = View.VISIBLE
+        } else {
+            deleteBtn.visibility = View.INVISIBLE
         }
     }
 
@@ -312,7 +328,13 @@ class NoteSaveHelper(private val viewHolder: NoteViewHolderBase) : TextWatcher {
         if (viewHolder is SimpleNoteViewHolder) {
             note?.note = newText
         } else {
-            note?.listNote?.set(0, NoteList(newText))
+            note?.let { note: NoteModel ->
+                if (note.listNote.isEmpty()) {
+                    note.listNote.add(0, NoteList(newText))
+                } else {
+                    note.listNote[0].note = newText
+                }
+            }
         }
     }
 

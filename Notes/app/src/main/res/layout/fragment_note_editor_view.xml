@@ -51,6 +51,7 @@
                 <EditText
                     android:id="@+id/title_note"
                     style="@style/NoteEditText"
+                    android:padding="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/title_note"
@@ -59,7 +60,6 @@
                 <TextView
                     android:id="@+id/date_time_view"
                     style="@style/NoteTextView"
-                    android:textSize="16sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

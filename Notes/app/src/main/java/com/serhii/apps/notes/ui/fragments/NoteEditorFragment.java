@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.serhii.apps.notes.R;
+import com.serhii.apps.notes.ui.data_model.NoteList;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter;
@@ -166,6 +167,13 @@ public class NoteEditorFragment extends Fragment {
                 // new data from list.
                 List<NoteModel> noteList = new ArrayList<>();
                 noteList.add(note);
+
+                for (NoteList n : note.getListNote()) {
+                    NoteModel newNote = NoteModel.Companion.create();
+                    newNote.putListNote(n.getNote(), n.isChecked());
+                    noteList.add(newNote);
+                }
+
                 noteEditorAdapter.setDataChanged(noteList);
 
                 String timeDate = note.getTime();
@@ -248,7 +256,15 @@ public class NoteEditorFragment extends Fragment {
 
                         List<NoteModel> noteModelList = noteEditorAdapter.getNoteList();
 
-                        if (noteEditorAdapter.getNote().isEmpty()) {
+                        boolean isEmpty = true;
+                        for (NoteModel noteModel : noteModelList) {
+                            if (!noteModel.isEmpty()) {
+                                isEmpty = false;
+                                break;
+                            }
+                        }
+
+                        if (isEmpty) {
                             GoodUtils.showToast(requireActivity(), R.string.toast_action_error_note_nothing_to_clear);
                             return;
                         }
@@ -282,6 +298,7 @@ public class NoteEditorFragment extends Fragment {
     private void saveUserNote() {
 
         NoteModel notes = noteEditorAdapter.getNote();
+        notes.setTitle(GoodUtils.getText(titleNoteField));
 
         if (notes.isEmpty()) {
 
