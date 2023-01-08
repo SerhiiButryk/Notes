@@ -1,10 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+apply from: '../../gradle_configs/common_ndk_version.gradle'
+apply from: '../../gradle_configs/common_android_versions.gradle'
+
 buildscript {
 
-    // Update if it's needed
-    ext.kotlin_version = '1.6.0'
+    apply from: '../../gradle_configs/common_build_script_versions.gradle'
 
     repositories {
         mavenCentral()
@@ -17,7 +19,7 @@ buildscript {
 
     dependencies {
         // Android Gradle Plugin Version
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath "com.android.tools.build:gradle:$gradle_plugin_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 
@@ -32,24 +34,9 @@ repositories {
 
 android {
 
-    compileSdkVersion 33
-
     defaultConfig {
-
-        minSdkVersion 26
-        targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
-
         consumerProguardFiles 'consumer-rules.pro'
-
-        // NDK settings
-        ndk {
-            abiFilters 'armeabi-v7a', 'x86', 'x86_64'
-        }
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {

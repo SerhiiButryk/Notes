@@ -43,8 +43,8 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
      * Return note data which Recycle View displays
      */
     fun getNoteList() : MutableList<NoteModel> {
-        // This is for notes which has list view type
-        if (notesData.isNotEmpty() && getListType(notesData) == NoteModel.LIST_NOTE_VIEW_TYPE) {
+        // We need to remove empty note which we creates for displaying 'Add item list' option
+        if (notesData.isNotEmpty()) {
             // Clear as we are going to add new data
             userNotesList.clear()
             // Iterate through data list and gets note
@@ -78,6 +78,10 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
             if (n.note.isNotEmpty()) {
                 note.note = n.note
             }
+            if (n.time.isNotEmpty()) {
+                note.time = n.time
+            }
+            note.viewType = n.viewType
             if (n.listNote.isNotEmpty()) {
                 val text = n.listNote[0].note
                 val isChecked = n.listNote[0].isChecked

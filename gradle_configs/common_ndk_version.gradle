@@ -1,0 +1,11 @@
+// Copyright 2022. Happy coding ! :)
+// Author: Serhii Butryk
+
+android {
+    defaultConfig {
+        // NDK project settings
+        ndk {
+            abiFilters 'armeabi-v7a', 'x86', 'x86_64'
+        }
+    }
+}

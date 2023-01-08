@@ -5,9 +5,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.spotbugs'
 apply plugin: 'jacoco'
 
-android {
+apply from: '../../gradle_configs/common_ndk_version.gradle'
+apply from: '../../gradle_configs/common_android_versions.gradle'
 
-    compileSdkVersion 33
+android {
 
     signingConfigs {
         release {
@@ -23,16 +24,6 @@ android {
 
     defaultConfig {
         applicationId "com.serhii.apps.notes"
-        minSdkVersion 26
-        targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
-
-        // NDK settings
-        ndk {
-            abiFilters 'armeabi-v7a', 'x86', 'x86_64'
-        }
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -131,9 +122,9 @@ dependencies {
     // Kotlin Json lib
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
 
-    // Tests use Kotlin
-    androidTestImplementation "androidx.core:core-ktx:$kotlin_version"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // Kotlin
+    implementation "androidx.core:core-ktx:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // Tests dependencies
     androidTestImplementation 'junit:junit:4.13.2'

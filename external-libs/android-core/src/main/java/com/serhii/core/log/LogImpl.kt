@@ -42,7 +42,11 @@ internal object LogImpl : ILog {
     }
 
     fun setDetailedLogsForDebug() {
-        _enableDetailLogForDebug()
+        try {
+            // Can throw exception if running on release build
+            _enableDetailLogForDebug()
+        } catch (e: ClassNotFoundException) {
+        }
     }
 
     fun getDetailedLogsEnabled(): Boolean {

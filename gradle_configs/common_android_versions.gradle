@@ -1,0 +1,14 @@
+// Copyright 2022. Happy coding ! :)
+// Author: Serhii Butryk
+
+android {
+    
+    compileSdkVersion 33
+
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+    }
+}

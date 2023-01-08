@@ -1,9 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
 
-    // Update if it's needed
-    ext.kotlin_version = '1.6.0'
+    apply from: '../gradle_configs/common_build_script_versions.gradle'
 
     repositories {
         google()
@@ -16,7 +14,7 @@ buildscript {
 
     dependencies {
         // Android Gradle Plugin dependency
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath "com.android.tools.build:gradle:$gradle_plugin_version"
         // Kotlin Gradle Plugin dependency
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // SpotBugs Gradle Plugin dependency

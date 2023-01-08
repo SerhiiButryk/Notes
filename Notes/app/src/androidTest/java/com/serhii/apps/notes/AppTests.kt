@@ -128,24 +128,24 @@ class AppTests {
 
         var actualNote = adapter.getNote()
 
-        Assert.assertTrue("Wrong", actualNote.note == noteText1)
-        Assert.assertTrue("Wrong", actualNote.title == noteTitle1)
-        Assert.assertTrue("Wrong", actualNote.id == noteId)
-        Assert.assertTrue("Wrong", actualNote.time == noteTime1)
-        Assert.assertTrue("Wrong", actualNote.viewType == NoteModel.LIST_NOTE_VIEW_TYPE)
+        Assert.assertTrue("Wrong note", actualNote.note == noteText1)
+        Assert.assertTrue("Wrong title", actualNote.title == noteTitle1)
+        Assert.assertTrue("Wrong id", actualNote.id == noteId)
+        Assert.assertTrue("Wrong time", actualNote.time == noteTime1)
+        Assert.assertTrue("Wrong view type", actualNote.viewType == NoteModel.LIST_NOTE_VIEW_TYPE)
 
         Assert.assertTrue("Wrong size", actualNote.listNote.size == 2)
 
         val note1 = actualNote.listNote[0]
-        Assert.assertTrue("Wrong", note1.note == listText1)
-        Assert.assertTrue("Wrong", note1.isChecked == listChecked1)
+        Assert.assertTrue("Wrong note 1", note1.note == listText1)
+        Assert.assertTrue("Wrong check box 1", note1.isChecked == listChecked1)
 
         val note2 = actualNote.listNote[1]
-        Assert.assertTrue("Wrong", note2.note == listText2)
-        Assert.assertTrue("Wrong", note2.isChecked == listChecked2)
+        Assert.assertTrue("Wrong note 2", note2.note == listText2)
+        Assert.assertTrue("Wrong check box 2", note2.isChecked == listChecked2)
 
         var actualList = adapter.getNoteList()
-        Assert.assertTrue("Wrong", actualList == testList)
+        Assert.assertTrue("Wrong list", actualList == testList)
 
         adapter.transformView()
 
@@ -155,16 +155,16 @@ class AppTests {
 
         actualNote = adapter.getNote()
 
-        Assert.assertTrue("Wrong", actualNote.note == noteText1)
-        Assert.assertTrue("Wrong", actualNote.title == noteTitle1)
-        Assert.assertTrue("Wrong", actualNote.id == noteId)
-        Assert.assertTrue("Wrong", actualNote.time == noteTime1)
-        Assert.assertTrue("Wrong", actualNote.viewType == NoteModel.ONE_NOTE_VIEW_TYPE)
+        Assert.assertTrue("Wrong note", actualNote.note == noteText1)
+        Assert.assertTrue("Wrong title", actualNote.title == noteTitle1)
+        Assert.assertTrue("Wrong id", actualNote.id == noteId)
+        Assert.assertTrue("Wrong time", actualNote.time == noteTime1)
+        Assert.assertTrue("Wrong viewType", actualNote.viewType == NoteModel.ONE_NOTE_VIEW_TYPE)
 
         Assert.assertTrue("Wrong size", actualNote.listNote.size == 2)
 
         actualList = adapter.getNoteList()
-        Assert.assertTrue("Wrong", actualList == testList)
+        Assert.assertTrue("Wrong list", actualList == testList)
 
         Log.i(TAG, "test04_AdapterNote_test_list_data() OUT")
     }
