@@ -10,7 +10,7 @@ import com.serhii.apps.notes.common.AppDetails
 import com.serhii.core.log.Log
 
 /**
- * Application class fot initializing app components
+ * Application class which performs initialization of app components
  */
 class Notes : Application() {
 

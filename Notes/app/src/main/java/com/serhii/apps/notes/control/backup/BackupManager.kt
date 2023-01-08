@@ -13,7 +13,9 @@ import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.IOException
 import java.io.OutputStream
 import java.lang.ref.WeakReference
@@ -27,37 +29,32 @@ object BackupManager {
     }
 
     fun clearNotesViewModelWeakReference() {
-        if (notesViewModelWeakReference != null) {
-            notesViewModelWeakReference!!.clear()
-        }
+        notesViewModelWeakReference?.clear()
     }
 
     fun openDirectoryChooserForExtractData(activity: Activity) {
         info(TAG, "openDirectoryChooser()")
-        activity.startActivityForResult(
-            createIntent(FILE_NAME_EXTRACTED_DATA),
-            REQUEST_CODE_EXTRACT_NOTES
-        )
+        activity.startActivityForResult(createIntent(FILE_NAME_EXTRACTED_DATA), REQUEST_CODE_EXTRACT_NOTES)
     }
 
     fun openDirectoryChooserForBackup(activity: Activity) {
         info(TAG, "openDirectoryChooserForBackup()")
-        activity.startActivityForResult(
-            createIntent(FILE_NAME_BACKUP_DATA),
-            REQUEST_CODE_BACKUP_NOTES
-        )
+        activity.startActivityForResult(createIntent(FILE_NAME_BACKUP_DATA), REQUEST_CODE_BACKUP_NOTES)
     }
 
     fun openBackUpFile(activity: Activity) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = FILE_MIME_TYPE
-        intent.putExtra(Intent.EXTRA_TITLE, FILE_NAME_BACKUP_DATA)
+        with(intent) {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = FILE_MIME_TYPE
+            putExtra(Intent.EXTRA_TITLE, FILE_NAME_BACKUP_DATA)
+        }
         activity.startActivityForResult(intent, REQUEST_CODE_OPEN_BACKUP_FILE)
     }
 
     fun saveDataAsPlainText(outputStream: OutputStream?, context: Context?): Boolean {
         info(TAG, "backupDataAsPlainText()")
+
         try {
             val notesDatabaseProvider = UserNotesDatabase.getInstance()
             notesDatabaseProvider.init(context)
@@ -66,15 +63,14 @@ object BackupManager {
                 val notes = notesDatabaseProvider.records
                 val builder = StringBuilder()
                 for (note in notes) {
-                    builder.append("*********** ")
-                        .append(note.title.trim { it <= ' ' })
-                        .append(" ***********")
-                        .append("\n")
-                        .append(note.note.trim { it <= ' ' })
+                    builder.append("\n")
+                        .append(note.title.trim())
+                        .append("\n\n")
+                        .append(note.note.trim())
                         .append("\n")
                 }
                 val data = builder.toString()
-                if (!data.isEmpty()) {
+                if (data.isNotEmpty()) {
                     outputStream?.write(data.toByteArray())
                     outputStream?.flush()
                     outputStream?.close()
@@ -97,92 +93,95 @@ object BackupManager {
         val notesDatabaseProvider = UserNotesDatabase.getInstance()
         notesDatabaseProvider.init(context)
 
-        info(TAG, "backupDataAsEncryptedText() records: " + notesDatabaseProvider.recordsCount)
+        info(TAG, "backupDataAsEncryptedText() found records: " + notesDatabaseProvider.recordsCount)
 
         if (notesDatabaseProvider.recordsCount != 0) {
             val notes = notesDatabaseProvider.records
-            val serializedNotes: MutableList<NoteAdapter> = ArrayList()
+            val serializedNotes = mutableListOf<NoteAdapter>()
 
-            for (i in notes.indices) {
-                serializedNotes.add(NoteAdapter(i, notes[i].title, notes[i].note))
+            for ((index, note) in notes.withIndex()) {
+                serializedNotes.add(NoteAdapter("$index", NoteModel.getJson(note)))
             }
 
             val backupAdapter = BackupAdapter(serializedNotes)
-            val moshi = Moshi.Builder().build()
-            val jsonAdapter = moshi.adapter(
-                BackupAdapter::class.java
-            )
+
+            val moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+
+            val jsonAdapter = moshi.adapter(BackupAdapter::class.java)
 
             val json = jsonAdapter.toJson(backupAdapter)
+
             try {
                 outputStream?.write(json.toByteArray())
                 outputStream?.flush()
                 outputStream?.close()
             } catch (e: IOException) {
-                info(TAG, "backupDataAsEncryptedText() error: $e")
+                error(TAG, "backupDataAsEncryptedText() error: $e")
                 e.printStackTrace()
                 return false
             }
+
+            info(TAG, "backupDataAsEncryptedText() success OUT")
             return true
         } else {
             info(TAG, "backupDataAsEncryptedText() database is empty")
         }
 
+        info(TAG, "backupDataAsEncryptedText() failure OUT")
         return false
     }
 
     fun restoreData(json: String, context: Context?): Boolean {
-        detail(TAG, "restoreData() json: $json")
+        detail(TAG, "restoreData() IN")
 
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter(BackupAdapter::class.java)
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
 
-        var backupAdapter: BackupAdapter? = null
-        backupAdapter = try {
+        val jsonAdapter: JsonAdapter<BackupAdapter> = moshi.adapter(BackupAdapter::class.java)
+
+        val backupAdapter: BackupAdapter? = try {
             jsonAdapter.fromJson(json)
         } catch (e: IOException) {
+            error(TAG, "restoreData() error parsing json content: $e")
             e.printStackTrace()
-            info(TAG, "restoreData() error parsing json content: $e")
             return false
         }
 
         val notes = backupAdapter!!.notes
+
         val notesDatabaseProvider = UserNotesDatabase.getInstance()
         notesDatabaseProvider.init(context)
 
         for (note in notes) {
-            notesDatabaseProvider.addRecord(NoteModel(note.note, note.title))
+            val noteModel: NoteModel = NoteModel.fromJson(note.note)
+            notesDatabaseProvider.addRecord(noteModel)
         }
 
-        if (notesViewModelWeakReference != null) {
-            val notesViewModel = notesViewModelWeakReference!!.get()
-            if (notesViewModel != null) {
-                notesViewModel.updateData()
-            } else {
-                error(TAG, "restoreData() nvm is null")
-                return false
-            }
-        } else {
-            error(TAG, "restoreData() wr is null")
-            return false
+        notesViewModelWeakReference?.let { ref ->
+            val notesViewModel = ref.get()
+            notesViewModel?.updateData()
         }
+
         return true
     }
 
     private fun createIntent(fileName: String): Intent {
         // Show directory chooser
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = FILE_MIME_TYPE
-        intent.putExtra(Intent.EXTRA_TITLE, fileName)
+        with(intent) {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = FILE_MIME_TYPE
+            putExtra(Intent.EXTRA_TITLE, fileName)
+        }
         return intent
     }
 
-    /**
-     * Backup Adapter
-     */
-    class BackupAdapter(var notes: List<NoteAdapter>)
-    class NoteAdapter(private val id: Int, val title: String, val note: String)
+    class BackupAdapter(val notes: List<NoteAdapter>)
+
+    class NoteAdapter(val id: String, val note: String)
 
     private const val TAG = "BackupManager"
     const val REQUEST_CODE_EXTRACT_NOTES = 1
@@ -192,6 +191,4 @@ object BackupManager {
     private const val FILE_MIME_TYPE = "text/plain"
     private const val FILE_NAME_EXTRACTED_DATA = "NotesExtracted.txt"
     private const val FILE_NAME_BACKUP_DATA = "NotesBackup.txt"
-    private const val IV_KEY_MARKER = "RTSASPE00"
-
 }

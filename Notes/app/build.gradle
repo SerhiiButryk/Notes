@@ -126,7 +126,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.1.0'
 
     // JSON library - https://github.com/square/moshi
-    implementation("com.squareup.moshi:moshi:1.12.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.9.1")
 
     // Kotlin Json lib
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'

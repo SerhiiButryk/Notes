@@ -1,15 +1,12 @@
 package com.serhii.apps.notes.ui.view_model;
 
-import static com.serhii.apps.notes.ui.fragments.NoteViewFragment.DISPLAY_MODE_GRID;
-
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.serhii.apps.notes.database.NotesDatabase;
-import com.serhii.apps.notes.database.UserNotesDatabase;
+import com.serhii.apps.notes.control.preferences.PreferenceManager;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.core.log.Log;
 import com.serhii.core.security.impl.crypto.CryptoError;
@@ -33,7 +30,7 @@ public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData
 
     private final MutableLiveData<List<NoteModel>> notes = new MutableLiveData<>();
     private final MutableLiveData<CryptoError> errorState = new MutableLiveData<>();
-    private final MutableLiveData<Integer> displayNoteMode = new MutableLiveData<>(DISPLAY_MODE_GRID);
+    private final MutableLiveData<Integer> displayNoteMode = new MutableLiveData<>();
     private List<NoteModel> cachedUserNotes;
     private final NotesRepository notesRepository;
 
@@ -42,6 +39,8 @@ public class NotesViewModel extends AndroidViewModel implements NotifyUpdateData
         notesRepository = new NotesRepository(application, this);
         errorState.setValue(CryptoError.OK);
         notes.setValue(new ArrayList<>());
+        int mode = PreferenceManager.INSTANCE.getNoteDisplayMode(application.getApplicationContext());
+        displayNoteMode.setValue(mode);
         Log.info(TAG, "NotesViewModel(), initialization is finished");
     }
 

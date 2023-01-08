@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.activities.SettingsActivity;
+import com.serhii.apps.notes.control.preferences.PreferenceManager;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
 import com.serhii.apps.notes.ui.utils.NoteListAdapter;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
@@ -142,6 +143,7 @@ public class NoteViewFragment extends Fragment {
                 } else if (mode == DISPLAY_MODE_GRID) {
                     notesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), NOTES_COLUMN_COUNT));
                 }
+                PreferenceManager.INSTANCE.saveNoteDisplayMode(requireContext(), mode);
             }
         });
 
@@ -151,6 +153,8 @@ public class NoteViewFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.note_view_menu, menu);
+        MenuItem displayModeItem = menu.findItem(R.id.item_layout);
+        updateDisplayNoteViewIcon(displayModeItem);
     }
 
     @SuppressLint({"NonConstantResourceId", "NotifyDataSetChanged"})
@@ -163,18 +167,26 @@ public class NoteViewFragment extends Fragment {
             case R.id.item_layout:
                 if (notesViewModel.getDisplayMode().getValue() == DISPLAY_MODE_GRID) {
                     notesViewModel.setDisplayNoteMode(DISPLAY_MODE_LIST);
-                    // Update icon
-                    item.setIcon(R.drawable.ic_view_grid);
-                    item.setTitle(R.string.action_layout_grid);
                 } else {
                     notesViewModel.setDisplayNoteMode(DISPLAY_MODE_GRID);
-                    // Update icon
-                    item.setIcon(R.drawable.ic_view_list);
-                    item.setTitle(R.string.action_convert_to_list);
                 }
+                updateDisplayNoteViewIcon(item);
                 return true;
         }
         return false;
+    }
+
+    private void updateDisplayNoteViewIcon(MenuItem displayModeItem) {
+        int mode = notesViewModel.getDisplayMode().getValue();
+        if (mode == NoteModel.LIST_NOTE_VIEW_TYPE) {
+            // Update icon
+            displayModeItem.setIcon(R.drawable.ic_view_list);
+            displayModeItem.setTitle(R.string.action_convert_to_list);
+        } else if (mode == NoteModel.ONE_NOTE_VIEW_TYPE) {
+            // Update icon
+            displayModeItem.setIcon(R.drawable.ic_view_grid);
+            displayModeItem.setTitle(R.string.action_layout_grid);
+        }
     }
 
     public interface NoteInteraction {

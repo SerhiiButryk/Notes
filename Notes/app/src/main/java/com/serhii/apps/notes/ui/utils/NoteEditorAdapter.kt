@@ -69,11 +69,14 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
         val list = getNoteList()
 
         for (n in list) {
+            if (n.id.isNotEmpty()) {
+                note.id = n.id
+            }
             if (n.title.isNotEmpty()) {
                 note.title = n.title
             }
-            if (n.id.isNotEmpty()) {
-                note.id = n.id
+            if (n.note.isNotEmpty()) {
+                note.note = n.note
             }
             if (n.listNote.isNotEmpty()) {
                 val text = n.listNote[0].note
