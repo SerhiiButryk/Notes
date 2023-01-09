@@ -178,17 +178,11 @@ public class NoteEditorFragment extends Fragment {
 
                 String timeDate = note.getTime();
                 if (!timeDate.isEmpty()) {
-                    // TODO: Create helper class for such formatting and move this code away
+
                     String startText = getString(R.string.time_date_label);
-                    String label = startText + " " + timeDate;
+                    String label = startText + "\n" + timeDate;
 
-                    final StyleSpan boldSpan = new StyleSpan(android.graphics.Typeface.BOLD);
-                    Spannable finalText = new SpannableStringBuilder(label);
-                    finalText.setSpan(boldSpan, 0, startText.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-
-                    Spannable buffer = new SpannableString(finalText);
-                    noteTimeFiled.setText(buffer);
-
+                    noteTimeFiled.setText(label);
                     noteTimeFiled.setVisibility(View.VISIBLE);
                 }
             }
