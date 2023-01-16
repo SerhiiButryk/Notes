@@ -1,3 +1,7 @@
+/*
+ * Copyright 2023. Happy coding ! :)
+ * Author: Serhii Butryk
+ */
 package com.serhii.apps.notes.ui.fragments;
 
 import android.annotation.SuppressLint;
@@ -29,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.serhii.apps.notes.R;
 import com.serhii.apps.notes.ui.data_model.NoteList;
 import com.serhii.apps.notes.ui.data_model.NoteModel;
+import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback;
 import com.serhii.apps.notes.ui.dialogs.DialogHelper;
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter;
 import com.serhii.apps.notes.ui.view_model.NotesViewModel;
@@ -206,7 +211,7 @@ public class NoteEditorFragment extends Fragment {
                 /**
                  * Confirm dialog before delete
                  */
-                DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
+                DialogHelper.showConfirmDialog(requireActivity(), new ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
                         deleteNote();
@@ -225,7 +230,7 @@ public class NoteEditorFragment extends Fragment {
                 /**
                  * Confirm dialog before save
                  */
-                DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
+                DialogHelper.showConfirmDialog(requireActivity(), new ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
                         saveUserNote();
@@ -244,15 +249,17 @@ public class NoteEditorFragment extends Fragment {
                 /**
                  * Clears Edit Text Views
                  */
-                DialogHelper.showConfirmDialog(getActivity(), new DialogHelper.ConfirmDialogCallback() {
+                DialogHelper.showConfirmDialog(requireActivity(), new ConfirmDialogCallback() {
                     @Override
                     public void onOkClicked() {
 
-                        List<NoteModel> noteModelList = noteEditorAdapter.getNoteList();
+                        List<NoteModel> noteModelList = noteEditorAdapter.getCurrentList();
 
                         boolean isEmpty = true;
                         for (NoteModel noteModel : noteModelList) {
-                            if (!noteModel.isEmpty()) {
+                            if (noteModel.getViewType() == NoteModel.LIST_NOTE_VIEW_TYPE
+                                || noteModel.getViewType() == NoteModel.ONE_NOTE_VIEW_TYPE &&
+                                    !noteModel.isEmpty()) {
                                 isEmpty = false;
                                 break;
                             }

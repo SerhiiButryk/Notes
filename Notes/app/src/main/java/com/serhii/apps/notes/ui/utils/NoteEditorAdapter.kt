@@ -29,7 +29,7 @@ const val TAG = "NoteEditorAdapter"
 /**
  * Adapter for managing views and note data in Editor Note Fragment
  */
-class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
+class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserActionHandler {
 
     /**
      * This is a type of user list note
@@ -38,6 +38,10 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
 
     private var notesData = mutableListOf<NoteModel>()
     private var userNotesList = mutableListOf<NoteModel>()
+
+    fun getCurrentList(): MutableList<NoteModel> {
+        return notesData
+    }
 
     /**
      * Return note data which Recycle View displays
@@ -162,7 +166,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
     }
 
     private fun getListType(list: List<NoteModel>): Int {
-        var type = -1
+        var type = NoteModel.ONE_NOTE_VIEW_TYPE
         if (list.isNotEmpty()) {
             type = list[0].viewType
         }
@@ -202,25 +206,31 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>() {
     // Callbacks from View Holder
     ///////////////////////////////////////////////////////////////////////////
 
-    fun onDelete(position: Int) {
+    override fun onDelete(position: Int) {
         notesData.removeAt(position)
         setDataChanged(notesData)
     }
 
-    fun onAdd() {
+    override fun onAdd() {
         val newNote = NoteModel()
         newNote.viewType = NoteModel.LIST_NOTE_VIEW_TYPE
-        // Add before last
-        notesData.add(notesData.lastIndex - 1, newNote)
+        // Add item before the last item
+        notesData.add(notesData.lastIndex, newNote)
         // Add a litter delay before updating list
-        // This is added to make changes in list more progressive or gradual
+        // for more smooth behavior
         Handler(Looper.getMainLooper()).postDelayed({ setDataChangedForAdd(notesData) }, 400)
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// View Holders
+// View Holder classes
 ///////////////////////////////////////////////////////////////////////////
+
+// Interface for add/delete action in View
+interface UserActionHandler {
+    fun onAdd()
+    fun onDelete(position: Int)
+}
 
 open class NoteViewHolderBase(view: View) : ViewHolder(view) {
     open fun bind(noteModel: NoteModel, position: Int) {}
@@ -250,7 +260,7 @@ class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
 /**
  * View Holder which display Edit Text list and Check boxes
  */
-class ListNoteViewHolder(view: View, var adapter: NoteEditorAdapter) : NoteViewHolderBase(view) {
+class ListNoteViewHolder(view: View, var callback: UserActionHandler) : NoteViewHolderBase(view) {
 
     private val checkBox: MaterialCheckBox
     private val editView: EditText
@@ -261,7 +271,7 @@ class ListNoteViewHolder(view: View, var adapter: NoteEditorAdapter) : NoteViewH
         editView = view.findViewById(R.id.content_edt)
         deleteBtn = view.findViewById(R.id.delete_imv)
         deleteBtn.setOnClickListener {
-            adapter.onDelete(adapterPosition)
+            callback.onDelete(adapterPosition)
         }
 
         checkBox = view.findViewById(R.id.item_chk)
@@ -302,14 +312,14 @@ class ListNoteViewHolder(view: View, var adapter: NoteEditorAdapter) : NoteViewH
 /**
  * View holder which displays 'Add list item' view
  */
-class AddNewNoteViewHolder(view: View, adapter: NoteEditorAdapter) : NoteViewHolderBase(view) {
+class AddNewNoteViewHolder(view: View, callback: UserActionHandler) : NoteViewHolderBase(view) {
 
     private val addBtn: ImageButton
 
     init {
         addBtn = view.findViewById(R.id.add_imv)
         addBtn.setOnClickListener {
-            adapter.onAdd()
+            callback.onAdd()
         }
     }
 }

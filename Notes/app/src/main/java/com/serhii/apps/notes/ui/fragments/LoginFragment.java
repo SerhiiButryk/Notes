@@ -1,3 +1,7 @@
+/*
+ * Copyright 2023. Happy coding ! :)
+ * Author: Serhii Butryk
+ */
 package com.serhii.apps.notes.ui.fragments;
 
 import android.content.Context;
