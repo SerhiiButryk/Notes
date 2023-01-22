@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2023. Happy coding ! :)
+  ~ Author: Serhii Butryk
+  -->
 <resources>
     <string name="app_name">Notes</string>
     <string name="app_name_debug">NotesDev</string>
@@ -61,13 +65,12 @@
     // NoteEditor
     <string name="title_note">Enter your note title</string>
     <string name="body_note">Start typing your note</string>
-    <string name="time_date_label">Last update time: </string>
+    <string name="time_date_label">Last update time: %s</string>
     <string name="title_toolbar">Note editor</string>
 
     <string name="toast_action_message">Note is saved</string>
     <string name="toast_action_deleted_message">Note is deleted</string>
     <string name="toast_action_deleted_message_no_note">No note to delete</string>
-    <string name="toast_action_delete_template_note">A template note cannot be deleted</string>
     <string name="toast_action_delete_error_note">Can\'t delete an empty note</string>
     <string name="toast_action_delete_error_first_note">Can\'t delete a note.</string>
     <string name="toast_action_error_note_is_not_changed">Nothing to save</string>
@@ -82,7 +85,6 @@
     <string name="save_note_item">Save note</string>
     <string name="clear_note_item">Clear note</string>
     <string name="settings_item">Settings</string>
-    <string name="plans_item">Plans</string>
     <string name="action_convert_to_list">Convert to list</string>
     <string name="action_layout_grid">Convert to grid</string>
     <string name="action_layout_list">Convert to list</string>
@@ -188,21 +190,5 @@
 
     <string name="empty_login">Empty username or password</string>
     <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
-
-    <!-- Relative date time format -->
-<!--    <string name="date_rel_today">Today, %s</string>-->
-<!--    <string name="date_rel_yesterday">Yesterday, %s</string>-->
-<!--    <string name="date_rel_tomorrow">Tomorrow, %s</string>-->
-
-<!--    <plurals name="date_rel_days_past">-->
-        <!-- used with quantity >= 2, format values: number of days, time -->
-<!--        <item quantity="other">%d days ago, %s</item>-->
-<!--    </plurals>-->
-<!--    <plurals name="date_rel_days_future">-->
-        <!-- used with quantity >= 2, format values: number of days, time -->
-<!--        <item quantity="other">In %d days, %s</item>-->
-<!--    </plurals>-->
-    <!-- format values: date, time -->
-<!--    <string name="date_rel_absolute">%1$s, %2$s</string>-->
 
 </resources>

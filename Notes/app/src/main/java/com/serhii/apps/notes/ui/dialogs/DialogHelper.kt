@@ -4,13 +4,13 @@
  */
 package com.serhii.apps.notes.ui.dialogs
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.ChangePasswordDialogUI
+import com.serhii.apps.notes.ui.ClickListener
 import com.serhii.apps.notes.ui.DialogWithEnterFiled
 import com.serhii.apps.notes.ui.DialogWithEnterFiled.DialogListener
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper
@@ -19,6 +19,7 @@ object DialogHelper {
 
     private const val CPD_DIALOG_TAG = "Change password dialog"
     private const val SPD_DIALOG_TAG = "Set password dialog"
+    private const val AL_DIALOG_TAG = "Alert dialog"
 
     const val ALERT_DIALOG_TYPE_BACKUP_ERROR = 101
     const val ALERT_DIALOG_TYPE_PASSWORD_IS_WEAK = 102
@@ -46,17 +47,25 @@ object DialogHelper {
 
     @JvmStatic
     fun showConfirmDialog(
-        activity: Activity,
+        activity: FragmentActivity,
         callback: ConfirmDialogCallback?,
         title: Int,
         message: Int
     ) {
-        val builder = AlertDialog.Builder(activity)
-        builder.setPositiveButton(activity.resources.getString(R.string.kbtn_ok)) { _, _ -> callback?.onOkClicked() }
-        builder.setNegativeButton(activity.resources.getString(R.string.kbtn_cancel)) { _, _ -> callback?.onCancelClicked() }
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.create().show()
+        val titleString = activity.getString(title)
+        val messageString = activity.getString(message)
+
+        val alertDialog = com.serhii.apps.notes.ui.AlertDialog(object : ClickListener {
+            override fun onConfirm() {
+                callback?.onOkClicked()
+            }
+
+            override fun onCancel() {
+                callback?.onCancelClicked()
+            }
+        }, titleString, messageString)
+
+        alertDialog.show(activity.supportFragmentManager, AL_DIALOG_TAG)
     }
 
     @JvmStatic

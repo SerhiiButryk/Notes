@@ -33,12 +33,13 @@ data class NoteModel(var note: String = "", var title: String = "",
             if (viewType == ONE_NOTE_VIEW_TYPE) {
                 return note.isEmpty() && title.isEmpty()
             } else if (viewType == LIST_NOTE_VIEW_TYPE) {
+                var isEmpty = true
                 for (n in listNote) {
-                    if (n.note.isNotEmpty() && title.isEmpty()) {
-                        return false
+                    if (n.note.isNotEmpty() || title.isNotEmpty()) {
+                        isEmpty = false
                     }
-                    return true
                 }
+                return isEmpty
             }
             return false
         }
@@ -142,13 +143,8 @@ data class NoteModel(var note: String = "", var title: String = "",
         fun getCopy(note: NoteModel) = NoteModel(note.note, note.title, note.time, note.id,
             note.viewType, note.listNote)
 
-        fun copy(noteTo: NoteModel, noteFrom: NoteModel) {
-            noteTo.note = noteFrom.note
-            noteTo.title = noteFrom.title
-            noteTo.id = noteFrom.id
-            noteTo.viewType = noteFrom.viewType
-            noteTo.time = noteFrom.time
-        }
+        fun getCopy(note: NoteModel, listNote: MutableList<NoteList>) = NoteModel(note.note, note.title, note.time, note.id,
+            note.viewType, listNote)
 
         fun create(note: String, title: String, time: String, id: String): NoteModel {
             return NoteModel(note, title, time, id)

@@ -146,6 +146,36 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
         setDataChanged(noteList)
     }
 
+    fun setNoteData(notes: NoteModel) {
+
+        val newList = mutableListOf<NoteModel>()
+
+        val noteList: MutableList<NoteList> = mutableListOf()
+        if (notes.listNote.isNotEmpty()) {
+            val firstElement = notes.listNote[0]
+            noteList.add(NoteList(firstElement.note, firstElement.isChecked))
+        }
+
+        val noteNew = NoteModel.getCopy(notes, noteList)
+        newList.add(noteNew)
+
+        for ((index, valueNote) in notes.listNote.withIndex()) {
+            // Only care about second and other elements in note list
+            if (index > 0) {
+                val noteListCopy: MutableList<NoteList> = mutableListOf()
+
+                val element = notes.listNote[index]
+                noteListCopy.add(NoteList(element.note, element.isChecked))
+
+                val noteCopy = NoteModel.getCopy(notes, noteListCopy)
+
+                newList.add(noteCopy)
+            }
+        }
+
+        setDataChanged(newList)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun setDataChanged(newData: MutableList<NoteModel>) {
         setData(newData)

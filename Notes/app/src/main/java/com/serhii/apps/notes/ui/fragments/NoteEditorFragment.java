@@ -170,24 +170,12 @@ public class NoteEditorFragment extends Fragment {
 
                 // Set new data to list adapter. After that recycle view will be updated with
                 // new data from list.
-                List<NoteModel> noteList = new ArrayList<>();
-                noteList.add(note);
-
-                for (NoteList n : note.getListNote()) {
-                    NoteModel newNote = NoteModel.Companion.create();
-                    newNote.putListNote(n.getNote(), n.isChecked());
-                    noteList.add(newNote);
-                }
-
-                noteEditorAdapter.setDataChanged(noteList);
+                noteEditorAdapter.setNoteData(note);
 
                 String timeDate = note.getTime();
                 if (!timeDate.isEmpty()) {
-
-                    String startText = getString(R.string.time_date_label);
-                    String label = startText + "\n" + timeDate;
-
-                    noteTimeFiled.setText(label);
+                    String timeDateString = getString(R.string.time_date_label);
+                    noteTimeFiled.setText(String.format(timeDateString, timeDate));
                     noteTimeFiled.setVisibility(View.VISIBLE);
                 }
             }
