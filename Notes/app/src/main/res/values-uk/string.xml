@@ -26,7 +26,7 @@
     <string name="ms_space_contain">Пропуски не дозволяються у паролі. \n.Будь ласка введіть пароль ще раз.</string>
     <string name="title_space_contain">Повідомлення</string>
 
-    <string name="ms_unlock_key_invalid">Введений ключ не правильний. \nБудь ласка спробуйте знову.</string>
+    <string name="ms_unlock_key_invalid">Ведений ключ не правильний. \nБудь ласка спробуйте знову.</string>
     <string name="title_unlock_key_invalid">Помилка авторизації</string>
 
     <string name="ms_extract_data">Не має доступних даних.</string>
@@ -40,7 +40,7 @@
     <string name="kbtn_cancel">Відміна</string>
 
     // Login Activity
-    <string name="text_description">Вітаєм у додатку для запису нотатків. Зберігай усі нотаки тут. Спочатку ти має створити користувача. Натисни \"Далі\" щоб продовжити.</string>
+    <string name="text_description">Вітаєм у додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
     <string name="btn_create_user">Далі</string>
     <string name="login_btn">Війти</string>
     <string name="create_account_bnt">Готово</string>
@@ -79,7 +79,7 @@
 
     // Menu
     <string name="delete_note_item">Видалити нотатку</string>
-    <string name="save_note_item">Зберегети нотатку</string>
+    <string name="save_note_item">Зберегти нотатку</string>
     <string name="clear_note_item">Очистити нотатку</string>
     <string name="settings_item">Налаштування</string>
 
@@ -106,7 +106,7 @@
         <item>10 хвилини</item>
     </string-array>
 
-    <string name="preference_extract_title">Зберегти нотаки</string>
+    <string name="preference_extract_title">Зберегти нотатки</string>
     <string name="preference_extract_desc">Зберегти нотатки як нешифрований текст.</string>
 
     <string name="preference_backup_title">Зберегти нотатки</string>

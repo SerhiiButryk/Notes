@@ -1,5 +1,7 @@
 LOCAL_PATH:= $(call my-dir)
 
+$(info [MY-LOGS] Entering Android.mk file)
+
 # START app build settings
 
     include $(CLEAR_VARS)

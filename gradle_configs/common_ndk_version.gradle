@@ -7,5 +7,15 @@ android {
         ndk {
             abiFilters 'armeabi-v7a', 'x86', 'x86_64'
         }
+        // TODO: Add arguments here for NDK mk files if needed 
+        // externalNativeBuild {
+        //     ndkBuild {
+        //         // Commands for detailed logs
+        //         // ./gradlew --debug assembleDebug
+        //         // ./gradlew --info assembleDebug
+        //         // Passes an optional argument to ndk-build.
+        //         arguments "ARG_NAME=ARG_VALUE"
+        //     }
+        // }
     }
 }
