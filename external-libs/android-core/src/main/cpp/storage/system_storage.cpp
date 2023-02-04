@@ -11,7 +11,7 @@ namespace {
 namespace MYLIB
 {
 
-    bool SystemStorage::writeData(const std::string& file_name, const std::map<std::string, std::string>& data, bool shouldAppend) const
+    JNIEXPORT bool SystemStorage::writeData(const std::string& file_name, const std::map<std::string, std::string>& data, bool shouldAppend) const
     {
         FileSystem* fs = FileSystem::getInstance();
 
@@ -32,7 +32,7 @@ namespace MYLIB
         return false;
     }
 
-    void SystemStorage::overrideData(const std::string& file_name, const std::map<std::string, std::string>& data) const
+    JNIEXPORT void SystemStorage::overrideData(const std::string& file_name, const std::map<std::string, std::string>& data) const
     {
         FileSystem* fileSystem = FileSystem::getInstance();
 
@@ -49,7 +49,7 @@ namespace MYLIB
 
     }
 
-    void SystemStorage::addData(const std::string& file_name, const std::map<std::string, std::string>& data) const
+    JNIEXPORT void SystemStorage::addData(const std::string& file_name, const std::map<std::string, std::string>& data) const
     {
         if (!writeData(file_name, data, true))
         {
@@ -57,7 +57,7 @@ namespace MYLIB
         }
     }
 
-    std::map<std::string, std::string> SystemStorage::readData(const std::string& file_name) const
+    JNIEXPORT std::map<std::string, std::string> SystemStorage::readData(const std::string& file_name) const
     {
         FileSystem* fs = FileSystem::getInstance();
 
@@ -77,7 +77,7 @@ namespace MYLIB
         return data;
     }
 
-    bool SystemStorage::updateData(const std::string& file_name, const std::string& key, const std::string& new_value) const
+    JNIEXPORT bool SystemStorage::updateData(const std::string& file_name, const std::string& key, const std::string& new_value) const
     {
         std::map<std::string, std::string> data = readData(file_name);
         std::map<std::string, std::string>::iterator it = data.begin();
@@ -103,12 +103,12 @@ namespace MYLIB
         return isFound;
     }
 
-    bool SystemStorage::doesFileExist(const std::string& file_name) const
+    JNIEXPORT bool SystemStorage::doesFileExist(const std::string& file_name) const
     {
         return FileSystem::getInstance()->isExists(file_name);
     }
 
-    void SystemStorage::debugPrintAllValues(const std::string& file_name) const
+    JNIEXPORT void SystemStorage::debugPrintAllValues(const std::string& file_name) const
     {
         if (!doesFileExist(file_name))
         {
@@ -125,7 +125,7 @@ namespace MYLIB
 
     }
 
-    void SystemStorage::clearData(const std::string &file_name) const
+    JNIEXPORT void SystemStorage::clearData(const std::string &file_name) const
     {
         std::ofstream ofs;
 
@@ -148,7 +148,7 @@ namespace MYLIB
 
     }
 
-    void SystemStorage::removeData(const std::string& file_name) const
+    JNIEXPORT void SystemStorage::removeData(const std::string& file_name) const
     {
         FileSystem* fs = FileSystem::getInstance();
 
@@ -156,7 +156,7 @@ namespace MYLIB
         std::remove(fs->getAbsoluteFilePath(file_name).c_str());
     }
 
-    bool SystemStorage::doesValueByKeyExist(const std::string& file_name, const std::string& key, const std::string& value) const
+    JNIEXPORT bool SystemStorage::doesValueByKeyExist(const std::string& file_name, const std::string& key, const std::string& value) const
     {
         if (!doesFileExist(file_name))
             return false;
@@ -173,7 +173,7 @@ namespace MYLIB
         return false;
     }
 
-    bool SystemStorage::createFile(const std::string& file_name) const
+    JNIEXPORT bool SystemStorage::createFile(const std::string& file_name) const
     {
         if (doesFileExist(file_name))
         {
@@ -187,7 +187,7 @@ namespace MYLIB
         return writeData(file_name, empty_map, false);
     }
 
-    bool SystemStorage::doesKeyExist(const std::string& file_name, const std::string& key) const
+    JNIEXPORT bool SystemStorage::doesKeyExist(const std::string& file_name, const std::string& key) const
     {
         if (!doesFileExist(file_name))
             return false;
@@ -204,7 +204,7 @@ namespace MYLIB
         return false;
     }
 
-    std::string SystemStorage::getDataByKey(const std::string& file_name, const std::string& key) const
+    JNIEXPORT std::string SystemStorage::getDataByKey(const std::string& file_name, const std::string& key) const
     {
         if (!doesFileExist(file_name))
             return std::string();

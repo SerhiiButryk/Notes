@@ -14,7 +14,7 @@ namespace
 
 namespace MYLIB
 {
-    std::string Base64::encode(unsigned char const *bytes_to_encode, unsigned int in_length)
+    JNIEXPORT std::string Base64::encode(unsigned char const *bytes_to_encode, unsigned int in_length)
     {
         std::string ret;
         int i = 0;
@@ -57,7 +57,7 @@ namespace MYLIB
         return ret;
     }
 
-    std::string Base64::decode(const std::string& encoded_string)
+    JNIEXPORT std::string Base64::decode(const std::string& encoded_string)
     {
         int in_len = encoded_string.size();
         int i = 0;

@@ -5,7 +5,7 @@
 namespace MYLIB
 {
 
-    bool Algorithms::containSpace(const std::string& str)
+    JNIEXPORT bool Algorithms::containSpace(const std::string& str)
     {
         auto res = std::find_if(str.begin(), str.end(), [](char c) { return c == ' '; });
 

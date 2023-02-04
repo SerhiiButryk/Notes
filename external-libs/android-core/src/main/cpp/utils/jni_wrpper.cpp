@@ -13,18 +13,18 @@ namespace {
 namespace MYLIB
 {
 
-    JNIWrapper::JNIWrapper(JavaVM* javaVm) : javaVm(javaVm), jobj(nullptr), mID(nullptr), isThreadAttached(false),
+    JNIEXPORT JNIWrapper::JNIWrapper(JavaVM* javaVm) : javaVm(javaVm), jobj(nullptr), mID(nullptr), isThreadAttached(false),
         jniEnv(nullptr)
     {
     }
 
-    JNIWrapper::JNIWrapper(JavaVM* javaVm, jobject object, jmethodID mID) : javaVm(javaVm), mID(mID),
+    JNIEXPORT JNIWrapper::JNIWrapper(JavaVM* javaVm, jobject object, jmethodID mID) : javaVm(javaVm), mID(mID),
         isThreadAttached(false), jniEnv(nullptr)
     {
         setJObj(object);
     }
 
-    JNIWrapper::JNIWrapper(JNIWrapper&& from) noexcept : javaVm(from.javaVm), jobj(from.jobj), mID(from.mID),
+    JNIEXPORT JNIWrapper::JNIWrapper(JNIWrapper&& from) noexcept : javaVm(from.javaVm), jobj(from.jobj), mID(from.mID),
         isThreadAttached(std::exchange(from.isThreadAttached, false)), jniEnv(nullptr)
     {
         from.jniEnv = nullptr;
@@ -33,7 +33,7 @@ namespace MYLIB
         from.jobj = nullptr;
     }
 
-    JNIWrapper& JNIWrapper::operator=(JNIWrapper&& from) noexcept
+    JNIEXPORT JNIWrapper& JNIWrapper::operator=(JNIWrapper&& from) noexcept
     {
         if (this != &from)
         {
@@ -52,7 +52,7 @@ namespace MYLIB
         return *this;
     }
 
-    JNIWrapper::~JNIWrapper()
+    JNIEXPORT JNIWrapper::~JNIWrapper()
     {
         if (jobj != nullptr)
         {
@@ -70,29 +70,29 @@ namespace MYLIB
 
     }
 
-    JNIEnv* JNIWrapper::getJniEnv() const
+    JNIEXPORT JNIEnv* JNIWrapper::getJniEnv() const
     {
         return getSafeJniEnv();
     }
 
-    _jobject* JNIWrapper::getJobj() const
+    JNIEXPORT _jobject* JNIWrapper::getJobj() const
     {
         return jobj;
     }
 
-    _jmethodID* JNIWrapper::getMethodID() const
+    JNIEXPORT _jmethodID* JNIWrapper::getMethodID() const
     {
         return mID;
     }
 
-    void JNIWrapper::setJObj(jobject jobj)
+    JNIEXPORT void JNIWrapper::setJObj(jobject jobj)
     {
         jniEnv = getSafeJniEnv();
 
         this->jobj = jniEnv->NewGlobalRef(jobj);
     }
 
-    void JNIWrapper::setMethodID(jmethodID mID)
+    JNIEXPORT void JNIWrapper::setMethodID(jmethodID mID)
     {
         this->mID = mID;
     }

@@ -3,6 +3,7 @@
 #include <openssl/rsa.h>
 #include <openssl/evp.h>
 #include <string>
+#include <jni.h>
 
 namespace MYLIB
 {
@@ -12,10 +13,10 @@ namespace MYLIB
     class CryptoUtils
     {
     public:
-        static int AESEncrypt(const unsigned char* key, const unsigned char* iv, const std::string& ptext, std::string& ctext);
-        static int AESDecrypt(const unsigned char* key, const unsigned char* iv, const std::string& ctext, std::string& rtext);
+        JNIEXPORT static int AESEncrypt(const unsigned char* key, const unsigned char* iv, const std::string& ptext, std::string& ctext);
+        JNIEXPORT static int AESDecrypt(const unsigned char* key, const unsigned char* iv, const std::string& ctext, std::string& rtext);
 
-        static int genKey(unsigned char *key, unsigned char *iv);
+        JNIEXPORT static int genKey(unsigned char *key, unsigned char *iv);
     };
 
 }

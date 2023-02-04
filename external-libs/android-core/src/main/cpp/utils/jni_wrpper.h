@@ -26,23 +26,23 @@ namespace MYLIB
 
         public:
 
-            explicit JNIWrapper(JavaVM* javaVm);
+            JNIEXPORT explicit JNIWrapper(JavaVM* javaVm);
 
-            JNIWrapper(JavaVM* javaVm, jobject jobject, jmethodID mID);
-            ~JNIWrapper();
+            JNIEXPORT JNIWrapper(JavaVM* javaVm, jobject jobject, jmethodID mID);
+            JNIEXPORT ~JNIWrapper();
 
-            JNIWrapper(const JNIWrapper& obj) = delete;
-            JNIWrapper& operator=(const JNIWrapper& obj) = delete;
+            JNIEXPORT JNIWrapper(const JNIWrapper& obj) = delete;
+            JNIEXPORT JNIWrapper& operator=(const JNIWrapper& obj) = delete;
 
-            JNIWrapper(JNIWrapper&&) noexcept;
-            JNIWrapper& operator=(JNIWrapper&&) noexcept;
+            JNIEXPORT JNIWrapper(JNIWrapper&&) noexcept;
+            JNIEXPORT JNIWrapper& operator=(JNIWrapper&&) noexcept;
 
-            void setJObj(jobject jobj);
-            void setMethodID(jmethodID mID);
+            JNIEXPORT void setJObj(jobject jobj);
+            JNIEXPORT void setMethodID(jmethodID mID);
 
-            JNIEnv* getJniEnv() const;
-            _jobject* getJobj() const;
-            _jmethodID* getMethodID() const;
+            JNIEXPORT JNIEnv* getJniEnv() const;
+            JNIEXPORT _jobject* getJobj() const;
+            JNIEXPORT _jmethodID* getMethodID() const;
 
     private:
 

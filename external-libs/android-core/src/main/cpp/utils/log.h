@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <mutex>
+#include <jni.h>
 
 #define BOOST_NO_AUTO_PTR
 #include "boost/format.hpp"
@@ -22,52 +23,52 @@ namespace MYLIB
             /**
              * Detailed logs
              */
-            static bool detailedLogsEnabled;
-            static bool isDetailedLogsEnabled();
-            static void setIsDetailedLogsEnabled(bool isDetailedLogsEnabled);
+            JNIEXPORT static bool detailedLogsEnabled;
+            JNIEXPORT static bool isDetailedLogsEnabled();
+            JNIEXPORT static void setIsDetailedLogsEnabled(bool isDetailedLogsEnabled);
 
         /**
          * Sets tag for log filtering
          * @param tag - tag for filtering
          */
-            static void setTag(const std::string& tag);
+            JNIEXPORT static void setTag(const std::string& tag);
 
             template<typename T, typename... Args>
-            static void Error(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
+            JNIEXPORT static void Error(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
 
                 log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message, arg, args...);
             }
 
             template<typename T>
-            static void Error(const std::string& TAG, const std::string& message, const T& arg) {
+            JNIEXPORT static void Error(const std::string& TAG, const std::string& message, const T& arg) {
 
                 log(ANDROID_LOG_ERROR, _TAG_APP_, TAG + " " + message, arg);
             }
 
-            static void Error(const std::string& TAG, const std::string& message);
+            JNIEXPORT static void Error(const std::string& TAG, const std::string& message);
 
             template<typename T, typename... Args>
-            static void Info(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
+            JNIEXPORT static void Info(const std::string& TAG, const std::string& message, const T& arg, const Args&... args) {
 
                 log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message, arg, args...);
             }
 
             template<typename T>
-            static void Info(const std::string& TAG, const std::string& message, const T& arg) {
+            JNIEXPORT static void Info(const std::string& TAG, const std::string& message, const T& arg) {
 
                 log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message, arg);
             }
 
-            static void Info(const std::string& TAG, const std::string& message);
+            JNIEXPORT static void Info(const std::string& TAG, const std::string& message);
 
         private:
 
-            static std::string _TAG_APP_;
+            JNIEXPORT static std::string _TAG_APP_;
 
-            static std::mutex _mutex_log_guard; // Protects android log resource
+            JNIEXPORT static std::mutex _mutex_log_guard; // Protects android log resource
 
             template<typename T, typename... Args>
-            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {
+            JNIEXPORT static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {
 
                 std::lock_guard guard(_mutex_log_guard);
 
@@ -81,7 +82,7 @@ namespace MYLIB
             }
 
             template<typename T>
-            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg) {
+            JNIEXPORT static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg) {
 
                 std::lock_guard guard(_mutex_log_guard);
 
@@ -93,16 +94,16 @@ namespace MYLIB
                 __android_log_write(LOG_LEVEL, TAG.c_str(), formatter.str().c_str());
             }
 
-            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage);
+            JNIEXPORT static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage);
 
             template<typename T, typename... Args>
-            static const T& getArg(boost::format& f, const T& arg, const Args&... args) {
+            JNIEXPORT static const T& getArg(boost::format& f, const T& arg, const Args&... args) {
                 f % arg;
                 return getArg(f, args...);
             }
 
             template<typename T>
-            static const T& getArg(boost::format& f, const T& arg) {
+            JNIEXPORT static const T& getArg(boost::format& f, const T& arg) {
                 return arg;
             }
 

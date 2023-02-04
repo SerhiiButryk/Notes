@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <jni.h>
 
 namespace MYLIB
 {
@@ -15,11 +16,11 @@ namespace MYLIB
     {
         public:
 
-            static void cache(const std::string& file_name, const std::string& key, const std::string& value);
-            static void clearCache(const std::string& file_name);
+            JNIEXPORT static void cache(const std::string& file_name, const std::string& key, const std::string& value);
+            JNIEXPORT static void clearCache(const std::string& file_name);
 
-            static std::string getCachedData(const std::string& key, const std::string& file_name);
-            static std::map<std::string, std::string> getAllCachedData(const std::string& file_name);
+            JNIEXPORT static std::string getCachedData(const std::string& key, const std::string& file_name);
+            JNIEXPORT static std::map<std::string, std::string> getAllCachedData(const std::string& file_name);
     };
 
 }

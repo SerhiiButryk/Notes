@@ -9,7 +9,7 @@
 
 namespace MYLIB
 {
-    std::string Hash::makeHashMD5(const std::string& message)
+    JNIEXPORT std::string Hash::makeHashMD5(const std::string& message)
     {
         Log::Info("Hash", "makeHashMD5(), IN");
 

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <jni.h>
 
 namespace MYLIB
 {
@@ -13,24 +14,24 @@ namespace MYLIB
     {
         public:
 
-            void overrideData(const std::string& file_name, const std::map<std::string, std::string>& data) const;
+            JNIEXPORT void overrideData(const std::string& file_name, const std::map<std::string, std::string>& data) const;
 
-            void addData(const std::string& file_name, const std::map<std::string, std::string>& data) const;
+            JNIEXPORT void addData(const std::string& file_name, const std::map<std::string, std::string>& data) const;
 
-            std::map<std::string, std::string> readData(const std::string& file_name) const;
+            JNIEXPORT std::map<std::string, std::string> readData(const std::string& file_name) const;
 
-            bool updateData(const std::string& file_name, const std::string& key, const std::string& new_value) const;
+            JNIEXPORT bool updateData(const std::string& file_name, const std::string& key, const std::string& new_value) const;
 
-            bool doesFileExist(const std::string& file_name) const;
-            void clearData(const std::string& file_name) const;
-            void removeData(const std::string& file_name) const;
+            JNIEXPORT bool doesFileExist(const std::string& file_name) const;
+            JNIEXPORT void clearData(const std::string& file_name) const;
+            JNIEXPORT void removeData(const std::string& file_name) const;
 
-            bool doesValueByKeyExist(const std::string& file_name, const std::string& key, const std::string& value) const;
-            bool doesKeyExist(const std::string& file_name, const std::string& key) const;
+            JNIEXPORT bool doesValueByKeyExist(const std::string& file_name, const std::string& key, const std::string& value) const;
+            JNIEXPORT bool doesKeyExist(const std::string& file_name, const std::string& key) const;
 
-            bool createFile(const std::string& file_name) const;
+            JNIEXPORT bool createFile(const std::string& file_name) const;
 
-            std::string getDataByKey(const std::string& file_name, const std::string& key) const;
+            JNIEXPORT std::string getDataByKey(const std::string& file_name, const std::string& key) const;
 
         private:
 

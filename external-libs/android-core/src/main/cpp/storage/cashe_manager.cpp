@@ -5,7 +5,7 @@
 namespace MYLIB
 {
 
-    std::string CacheManager::getCachedData(const std::string& key, const std::string& file_name)
+    JNIEXPORT std::string CacheManager::getCachedData(const std::string& key, const std::string& file_name)
     {
         SystemStorage ss;
 
@@ -21,7 +21,7 @@ namespace MYLIB
         return "";
     }
 
-    void CacheManager::cache(const std::string& file_name, const std::string& key, const std::string& value)
+    JNIEXPORT void CacheManager::cache(const std::string& file_name, const std::string& key, const std::string& value)
     {
         SystemStorage ss;
 
@@ -60,7 +60,7 @@ namespace MYLIB
 
     }
 
-    void CacheManager::clearCache(const std::string& file_name)
+    JNIEXPORT void CacheManager::clearCache(const std::string& file_name)
     {
         SystemStorage ss;
 
@@ -70,7 +70,7 @@ namespace MYLIB
 
     }
 
-    std::map<std::string, std::string> CacheManager::getAllCachedData(const std::string &file_name)
+    JNIEXPORT std::map<std::string, std::string> CacheManager::getAllCachedData(const std::string &file_name)
     {
         SystemStorage ss;
 

@@ -21,20 +21,20 @@ namespace MYLIB
         JNIEnv* _env = nullptr;
 
     public:
-        JString(JNIEnv* env, jstring string);
-        ~JString();
+        JNIEXPORT JString(JNIEnv* env, jstring string);
+        JNIEXPORT ~JString();
 
-        JString(const JString&) = delete;
-        JString& operator=(const JString&) = delete;
+        JNIEXPORT JString(const JString&) = delete;
+        JNIEXPORT JString& operator=(const JString&) = delete;
 
-        JString(JString&&) noexcept;
-        JString& operator=(const JString&&) noexcept;
+        JNIEXPORT JString(JString&&) noexcept;
+        JNIEXPORT JString& operator=(const JString&&) noexcept;
 
-        size_t getSize() const;
+        JNIEXPORT size_t getSize() const;
 
-        operator std::string() const;
-        operator const char*() const;
-        operator unsigned char*() const;
+        JNIEXPORT operator std::string() const;
+        JNIEXPORT operator const char*() const;
+        JNIEXPORT operator unsigned char*() const;
     };
 
 }

@@ -15,19 +15,19 @@ namespace {
 
 namespace MYLIB
 {
-    FileSystem* FileSystem::getInstance()
+    JNIEXPORT FileSystem* FileSystem::getInstance()
     {
         static FileSystem f;
         return &f;
     }
 
-    void FileSystem::initFilePath(const std::string& path)
+    JNIEXPORT void FileSystem::initFilePath(const std::string& path)
     {
         env_path = path;
         Log::Info("FileSystem", "initFilePath(): INITIALIZED \n");
     }
 
-    std::string FileSystem::getFilePath() const
+    JNIEXPORT std::string FileSystem::getFilePath() const
     {
         Log::Info(TAG, "getFilePath() \n");
 
@@ -40,7 +40,7 @@ namespace MYLIB
         return env_path + FileSeparator;
     }
 
-    bool FileSystem::isEmpty(const std::string& file_name) const
+    JNIEXPORT bool FileSystem::isEmpty(const std::string& file_name) const
     {
         if (isExists(file_name))
         {
@@ -60,14 +60,14 @@ namespace MYLIB
         return false;
     }
 
-    std::string FileSystem::getAbsoluteFilePath(const std::string &file_name) const
+    JNIEXPORT std::string FileSystem::getAbsoluteFilePath(const std::string &file_name) const
     {
         Log::Info(TAG, "getAbsoluteFilePath(): file name: %s \n", file_name);
 
         return std::string(getFilePath() + file_name);
     }
 
-    bool FileSystem::openFile(const std::string &file_name, std::fstream& file)
+    JNIEXPORT bool FileSystem::openFile(const std::string &file_name, std::fstream& file)
     {
         std::string path = getFilePath() + file_name;
 
@@ -93,7 +93,7 @@ namespace MYLIB
         return true;
     }
 
-    bool FileSystem::openFile(const std::string &file_name, std::fstream& file, int mode)
+    JNIEXPORT bool FileSystem::openFile(const std::string &file_name, std::fstream& file, int mode)
     {
         std::string path = getFilePath() + file_name;
 
@@ -119,7 +119,7 @@ namespace MYLIB
         return true;
     }
 
-    bool FileSystem::_copen_f(const std::string& path)
+    JNIEXPORT bool FileSystem::_copen_f(const std::string& path)
     {
         FILE* _file = nullptr;
         _file = fopen(path.c_str(), "wr");
@@ -134,19 +134,19 @@ namespace MYLIB
         return false;
     }
 
-    bool FileSystem::_open_f(const std::string& path, std::fstream& file, std::ios_base::openmode mode)
+    JNIEXPORT bool FileSystem::_open_f(const std::string& path, std::fstream& file, std::ios_base::openmode mode)
     {
         file.open(path, mode);
         return  file.is_open();
     }
 
-    bool FileSystem::_open_f(const std::string& path, std::fstream& file)
+    JNIEXPORT bool FileSystem::_open_f(const std::string& path, std::fstream& file)
     {
         file.open(path);
         return  file.is_open();
     }
 
-    void FileSystem::writeFile(const std::map<std::string, std::string>& data, std::fstream& file)
+    JNIEXPORT void FileSystem::writeFile(const std::map<std::string, std::string>& data, std::fstream& file)
     {
         if (!file.is_open()) return;
 
@@ -162,7 +162,7 @@ namespace MYLIB
         file.close();
     }
 
-    std::map<std::string, std::string> FileSystem::readFile(std::fstream& file)
+    JNIEXPORT std::map<std::string, std::string> FileSystem::readFile(std::fstream& file)
     {
         if (!file.is_open()) return std::map<std::string, std::string>();
 
@@ -184,7 +184,7 @@ namespace MYLIB
         return _data;
     }
 
-    bool FileSystem::isExists(const std::string &file_name) const
+    JNIEXPORT bool FileSystem::isExists(const std::string &file_name) const
     {
         std::fstream fs;
 
@@ -200,7 +200,7 @@ namespace MYLIB
         return rez; // If file does not exist this will return false
     }
 
-    bool FileSystem::append(const std::map<std::string, std::string>& data, const std::string& file_name)
+    JNIEXPORT bool FileSystem::append(const std::map<std::string, std::string>& data, const std::string& file_name)
     {
         std::fstream file;
 

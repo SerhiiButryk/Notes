@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <jni.h>
 
 namespace MYLIB
 {
@@ -9,9 +10,9 @@ namespace MYLIB
     { 
         public:
 
-            static std::string encode(unsigned char const* bytes_to_encode, unsigned int in_length);
-            
-            static std::string decode(const std::string& encoded_string);
+            JNIEXPORT static std::string encode(unsigned char const* bytes_to_encode, unsigned int in_length);
+
+            JNIEXPORT static std::string decode(const std::string& encoded_string);
     };
     
 }

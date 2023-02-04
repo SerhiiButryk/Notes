@@ -14,7 +14,7 @@ namespace {
 
 namespace MYLIB {
 
-    int CryptoUtils::AESEncrypt(const unsigned char* key, const unsigned char* iv, const std::string& ptext, std::string& ctext)
+    JNIEXPORT int CryptoUtils::AESEncrypt(const unsigned char* key, const unsigned char* iv, const std::string& ptext, std::string& ctext)
     {
         using EVP_CIPHER_CTX_free_ptr = std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)>;
 
@@ -46,8 +46,8 @@ namespace MYLIB {
         ctext.resize(out_len1 + out_len2);
         return 1;
     }
-    
-    int CryptoUtils::AESDecrypt(const unsigned char* key, const unsigned char* iv, const std::string& ctext, std::string& rtext)
+
+    JNIEXPORT int CryptoUtils::AESDecrypt(const unsigned char* key, const unsigned char* iv, const std::string& ctext, std::string& rtext)
     {
         using EVP_CIPHER_CTX_free_ptr = std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)>;
 
@@ -78,7 +78,7 @@ namespace MYLIB {
         return 1;
     }
 
-    int CryptoUtils:: genKey(unsigned char *key, unsigned char *iv)
+    JNIEXPORT int CryptoUtils:: genKey(unsigned char *key, unsigned char *iv)
     {
         int rc = RAND_bytes(key, KEY_SIZE);
         if (rc != 1) {

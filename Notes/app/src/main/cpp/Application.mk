@@ -17,3 +17,9 @@ APP_STL := c++_static
 # C++ global settings
 APP_CPPFLAGS := -std=c++17 -frtti -fexceptions
 APP_LDFLAGS := -Wl
+
+# Configs for release build
+ifeq ($(NDK_DEBUG),0)
+    APP_CPPFLAGS += -fvisibility=hidden -ffunction-sections -fdata-sections
+    APP_LDFLAGS += -s
+endif

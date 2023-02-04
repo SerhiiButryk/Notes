@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <jni.h>
 
 namespace MYLIB
 {
@@ -8,7 +9,7 @@ namespace MYLIB
     class Algorithms
     {
         public:
-            static bool containSpace(const std::string& str);
+            JNIEXPORT static bool containSpace(const std::string& str);
     };
 
 }

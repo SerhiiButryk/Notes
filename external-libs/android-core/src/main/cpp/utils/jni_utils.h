@@ -14,13 +14,13 @@ namespace MYLIB
         /**
          *  Helper method to callback Java level
          */
-        static void callVoid(const JNIWrapper& callback);
+        JNIEXPORT static void callVoid(const JNIWrapper& callback);
 
         /**
          *  Helper method to callback Java level
          */
         template<typename T>
-        static void callVoid(const JNIWrapper& callback, T arg)
+        JNIEXPORT static void callVoid(const JNIWrapper& callback, T arg)
         {
             Log::Info(TAG, "callVoid(): Call callback with argument of type %s ", typeid(arg).name());
 
@@ -35,9 +35,9 @@ namespace MYLIB
 
     private:
 
-        static std::mutex m; // Access protection
+        JNIEXPORT static std::mutex m; // Access protection
 
-        static const std::string TAG;
+        JNIEXPORT static const std::string TAG;
 
     };
 
