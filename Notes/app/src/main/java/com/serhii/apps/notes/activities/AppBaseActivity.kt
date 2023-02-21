@@ -40,7 +40,7 @@ open class AppBaseActivity : AppCompatActivity() {
         super.onResume()
         Log.info(TAG, "onResume() int")
         // Trigger idle timeout
-        if (!IdleLockHandler.checkIfInactivityTimeoutReceived(this)) {
+        if (!IdleLockHandler.handleInactivityTimeoutReceived(this)) {
             // If timeout is not triggered then schedule new alarm
             InactivityManager.scheduleAlarm(this)
         }
@@ -49,7 +49,7 @@ open class AppBaseActivity : AppCompatActivity() {
 
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
-        Log.info(TAG, "init() out")
+        Log.info(TAG, "init() finished")
     }
 
 }

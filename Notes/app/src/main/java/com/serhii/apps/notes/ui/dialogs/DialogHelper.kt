@@ -22,7 +22,6 @@ object DialogHelper {
     private const val AL_DIALOG_TAG = "Alert dialog"
 
     const val ALERT_DIALOG_TYPE_BACKUP_ERROR = 101
-    const val ALERT_DIALOG_TYPE_PASSWORD_IS_WEAK = 102
 
     @JvmStatic
     fun showChangePasswordDialog(activity: FragmentActivity) {

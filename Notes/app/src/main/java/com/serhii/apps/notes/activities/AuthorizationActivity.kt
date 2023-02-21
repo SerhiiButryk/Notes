@@ -20,10 +20,11 @@ import com.serhii.apps.notes.ui.fragments.LoginFragment
 import com.serhii.apps.notes.ui.fragments.RegisterFragment
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log
+import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.info
 
 /**
- * Activity for user authorization
+ * Login activity for user authorization
  */
 class AuthorizationActivity : AppCompatActivity() {
 
@@ -43,20 +44,17 @@ class AuthorizationActivity : AppCompatActivity() {
         showLoginFragment(savedInstanceState)
         setupObservers()
 
-        info(TAG, "onCreate() OUT")
-    }
-
-    override fun onResume() {
-        info(TAG, "onResume()")
-        super.onResume()
-        // Cancel inactivity timer. This activity is an exception from idle lock timeout.
+        // Cancel inactivity timer as auth activity is already starting.
         cancelAlarm(this)
+
+        info(TAG, "onCreate() OUT")
     }
 
     override fun onBackPressed() {
         info(TAG, "onBackPressed()")
-        // Allow user to go back to the Login UI
-        // if there is one fragment in the stack which means that Registration UI is displayed
+        // When Registration fragment is displayed, back stack has 1 entry.
+        // In this case, allow to go back. Otherwise if back stack doesn't have entries,
+        // then move app to background.
         if (fragmentManager.backStackEntryCount == 1) {
             super.onBackPressed()
         } else {
@@ -72,7 +70,7 @@ class AuthorizationActivity : AppCompatActivity() {
             val nativeBridge = NativeBridge()
             if (nativeBridge.isAppBlocked) {
                 val blockFragment = BlockFragment()
-                addFragment(blockFragment, null, false)
+                addFragment(blockFragment, BlockFragment.FRAGMENT_TAG, false)
             } else {
                 val loginFragment = LoginFragment.newInstance()
                 addFragment(loginFragment, LoginFragment.FRAGMENT_TAG, false)
@@ -82,19 +80,19 @@ class AuthorizationActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         // Observer changes
-        loginViewModel?.let {
-            it.showRegistrationUISetFlag.observe(this) { shouldPerformAction -> // Do action if it is needed
-                if (shouldPerformAction) {
-                    info(TAG, "addFragment(), open Registration fragment")
+        loginViewModel?.let { viewmodel ->
+            viewmodel.showRegistrationUIFlag.observe(this) { shouldShowFragment ->
+                if (shouldShowFragment) {
+                    info(TAG, "addFragment(), adding Registration fragment")
                     addFragment(RegisterFragment(), RegisterFragment.FRAGMENT_TAG, true)
                 }
             }
         }
     }
 
-    private fun addFragment(fragment: Fragment, tag: String?, shouldSave: Boolean) {
-        if (tag != null && fragmentManager.findFragmentByTag(tag) != null) {
-            info(TAG, "addFragment(), fragment is already opened")
+    private fun addFragment(fragment: Fragment, tag: String, shouldSave: Boolean) {
+        if (fragmentManager.findFragmentByTag(tag) != null) {
+            info(TAG, "addFragment(), fragment $tag is already opened, return")
             return
         }
         val transaction = fragmentManager.beginTransaction()
@@ -107,23 +105,22 @@ class AuthorizationActivity : AppCompatActivity() {
     }
 
     /**
-     * Called from native
+     * Callback from native
      */
     fun onAuthorizationFinished() {
         // Close activity
         finish()
-        info(TAG, "onAuthorize(), activity is closed")
+        info(TAG, "onAuthorize(), activity is finishing")
     }
 
     /**
-     * Called from native
+     * Callback from native
      */
     fun userRegistered() {
-        info(TAG, "userRegistered()")
+        info(TAG, "userRegistered() IN")
         // Close Registration UI
         onBackPressed()
-        val loginFragment =
-            fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
+        val loginFragment = fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
         if (loginFragment != null) {
             loginFragment.onUserAccountCreated()
             val authorizeService = loginViewModel?.authorizeService
@@ -134,7 +131,7 @@ class AuthorizationActivity : AppCompatActivity() {
     }
 
     /**
-     * Called from native
+     * Called from native to show a dialog
      */
     private fun showAlertDialog(type: Int) {
         info(TAG, "showAlertDialog(), type $type")
@@ -147,14 +144,14 @@ class AuthorizationActivity : AppCompatActivity() {
                 // Block application
                 nativeBridge.executeBlockApp()
                 clearFragmentStack()
-                addFragment(BlockFragment(), null, false)
+                addFragment(BlockFragment(), BlockFragment.FRAGMENT_TAG, false)
                 // Block Ui is going to be shown. So do not show dialog.
                 shouldShowDialog = false
-                info(TAG, "showAlertDialog(), BB SS")
+                detail(TAG, "showAlertDialog(), add block fragment")
             } else {
                 // Update password limit value
-                nativeBridge.limitLeft = currentLimit - 1
-                info(TAG, "showAlertDialog(), AA SS")
+                nativeBridge.limitLeft -= 1
+                detail(TAG, "showAlertDialog(), updated limit")
             }
         }
         if (shouldShowDialog) {

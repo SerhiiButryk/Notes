@@ -8,6 +8,8 @@
 
 using namespace MYLIB;
 
+const int MIN_PASSWORD_LENGTH = 6;
+
 bool APP::AuthUtils::isUserAccountExists(const std::string& user_name)
 {
     SystemStorage ss;
@@ -44,6 +46,12 @@ bool APP::AuthUtils::verifyUserPassword(const std::string& user_name, const std:
 APP::SYSTEM_MESSAGE APP::AuthUtils::checkRules(const std::string &password, const std::string &confirm_password,
                                                const std::string &email, bool check_confirm)
 {
+
+    if (password.size() < MIN_PASSWORD_LENGTH)
+    {
+        return SYSTEM_MESSAGE::PASSWORD_IS_WEAK;
+    }
+
     if (password.empty() || email.empty())
     {
         return SYSTEM_MESSAGE::EMPTY_FIELD;

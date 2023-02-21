@@ -13,32 +13,25 @@ import com.serhii.apps.notes.ui.data_model.NoteModel
 /**
  * Encapsulates logic related to retrieving data from database provider
  */
-class NotesRepository(applicationContext: Context, private val callback: NotifyUpdateData) {
-
-    private val notesDatabaseProvider: NotesDatabase<NoteModel>
-
-    init {
-        notesDatabaseProvider = UserNotesDatabase.getInstance()
-        notesDatabaseProvider.init(applicationContext)
-    }
+class NotesRepository(private val callback: NotifyUpdateData) {
 
     fun close() {
-        notesDatabaseProvider.close()
+        UserNotesDatabase.close()
     }
 
-    fun delete(index: String): Boolean {
-        val result = notesDatabaseProvider.deleteRecord(index)
+    fun delete(index: String, context: Context): Boolean {
+        val result = UserNotesDatabase.deleteRecord(index)
         if (result) {
-            callback.updateData()
+            callback.updateData(context)
         }
         return result
     }
 
-    fun add(noteModel: NoteModel): Boolean {
+    fun add(noteModel: NoteModel, context: Context): Boolean {
         // Save data in database
-        val result = notesDatabaseProvider.addRecord(noteModel)
+        val result = UserNotesDatabase.addRecord(noteModel, context)
         if (result != -1 && result != 0) {
-            callback.updateData()
+            callback.updateData(context)
             return true
         }
 
@@ -46,20 +39,20 @@ class NotesRepository(applicationContext: Context, private val callback: NotifyU
         return false
     }
 
-    fun update(index: String, noteModel: NoteModel): Boolean {
-        val result = notesDatabaseProvider.updateRecord(index, noteModel)
+    fun update(index: String, noteModel: NoteModel, context: Context): Boolean {
+        val result = UserNotesDatabase.updateRecord(index, noteModel, context)
         if (result) {
-            callback.updateData()
+            callback.updateData(context)
         }
         return result
     }
 
-    fun get(index: String): NoteModel? {
-        return notesDatabaseProvider.getRecord(index)
+    fun get(index: String, context: Context): NoteModel {
+        return UserNotesDatabase.getRecord(index, context)
     }
 
-    fun getAll(): List<NoteModel> {
-        return notesDatabaseProvider.getRecords()
+    fun getAll(context: Context): List<NoteModel> {
+        return UserNotesDatabase.getRecords(context)
     }
 
 }
@@ -68,5 +61,5 @@ class NotesRepository(applicationContext: Context, private val callback: NotifyU
  * Interface for notifying View Model that data has changed recently
  */
 interface NotifyUpdateData {
-    fun updateData()
+    fun updateData(context: Context)
 }

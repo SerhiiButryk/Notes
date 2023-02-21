@@ -133,7 +133,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
         if (notesData.isEmpty())
             return -1
         val type = getItem(position).viewType
-        Log.info(TAG, "getItemViewType() view type = $type")
+        Log.detail(TAG, "getItemViewType() view type = $type")
         return type
     }
 

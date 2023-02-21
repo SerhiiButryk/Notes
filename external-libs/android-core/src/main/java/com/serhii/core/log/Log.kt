@@ -14,6 +14,11 @@ class Log {
     companion object {
 
         @JvmStatic
+        fun init() {
+            enableDetailedLogsForDebug()
+        }
+
+        @JvmStatic
         fun info(tag: String, message: String) {
             LogImpl.info(tag, message)
         }

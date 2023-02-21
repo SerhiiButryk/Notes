@@ -50,10 +50,6 @@ data class NoteModel(var note: String = "", var title: String = "",
         return listNote[0]
     }
 
-    fun putListNote(note: String) {
-        listNote.add(NoteList(note))
-    }
-
     fun putListNote(note: String, isChecked: Boolean) {
         listNote.add(NoteList(note, isChecked))
     }

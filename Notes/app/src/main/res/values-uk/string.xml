@@ -32,8 +32,8 @@
     <string name="ms_extract_data">Не має доступних даних.</string>
     <string name="title_extract_data">Помилка</string>
 
-    <string name="ms_password_weak">Помилка</string>
-    <string name="title_password_weak">Пароль слабкий. Будь ласка виберіть інший пароль.</string>
+    <string name="title_error">Помилка</string>
+    <string name="ms_password_is_short">Пароль короткий або пустий. Будь ласка виберіть пароль довший за 5 символів.</string>
 
     // Common buttons
     <string name="kbtn_ok">Добре</string>
@@ -43,7 +43,7 @@
     <string name="text_description">Вітаєм у додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
     <string name="btn_create_user">Далі</string>
     <string name="login_btn">Війти</string>
-    <string name="create_account_bnt">Готово</string>
+    <string name="create_account_bnt">Далі</string>
     <string name="usr_psw">Пароль користувача</string>
     <string name="usr_email">Електронна пошта користувача</string>
     <string name="usr_new_psw">Ведіть пароль</string>

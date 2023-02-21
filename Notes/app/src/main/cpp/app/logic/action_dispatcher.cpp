@@ -38,7 +38,8 @@ namespace APP
             message == SYSTEM_MESSAGE ::USER_NAME_EXISTS ||
             message == SYSTEM_MESSAGE ::PASSWORD_DIFFERS ||
             message == SYSTEM_MESSAGE ::SPACE_CONTAIN ||
-            message == SYSTEM_MESSAGE::UNLOCK_KEY_INVALID)
+            message == SYSTEM_MESSAGE ::UNLOCK_KEY_INVALID ||
+            message == SYSTEM_MESSAGE ::PASSWORD_IS_WEAK)
         {
             Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnShowDialog \n");
 

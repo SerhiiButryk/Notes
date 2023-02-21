@@ -32,6 +32,8 @@ namespace APP
 
         UNLOCK_KEYSTORE = -11,
 
+        PASSWORD_IS_WEAK = -12,
+
         NO_ERRORS = 1
     };
 }

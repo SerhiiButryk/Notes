@@ -16,7 +16,7 @@ import com.serhii.apps.notes.ui.data_model.AuthModel
  */
 class LoginViewModel : ViewModel() {
 
-    val showRegistrationUISetFlag = MutableLiveData(false)
+    val showRegistrationUIFlag = MutableLiveData(false)
 
     val authorizeService: IAuthorizeService
         get() = EventService
@@ -40,8 +40,8 @@ class LoginViewModel : ViewModel() {
 
     fun showRegistrationUI() {
         // Notify observers that action should be performed
-        showRegistrationUISetFlag.value = true
+        showRegistrationUIFlag.value = true
         // Reset flag to notify that activity doesn't need to perform any action
-        showRegistrationUISetFlag.value = false
+        showRegistrationUIFlag.value = false
     }
 }

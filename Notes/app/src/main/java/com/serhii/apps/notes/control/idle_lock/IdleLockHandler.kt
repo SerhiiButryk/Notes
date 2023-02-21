@@ -30,12 +30,11 @@ object IdleLockHandler {
     }
 
     @JvmStatic
-    fun checkIfInactivityTimeoutReceived(context: Context): Boolean {
+    fun handleInactivityTimeoutReceived(context: Context): Boolean {
         if (isInactivityTimeoutReceived) {
-            detail(TAG,"checkIfInactivityTimeoutReceived(), time out received, start auth activity")
+            detail(TAG,"handleInactivityTimeoutReceived(), time out received, start auth activity")
             startActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             return true
-
         }
         return false
     }

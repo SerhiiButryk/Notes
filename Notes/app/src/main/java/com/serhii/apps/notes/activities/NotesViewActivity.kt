@@ -35,18 +35,22 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_view)
+
         // Need to call initNativeConfigs() before authorization process at the beginning.
         val filePath = getFilePath(this)
         initNativeConfigs(filePath)
+
         if (savedInstanceState == null) {
-            addFragment()
+            addNoteViewFragment()
         }
+
         // Start authorization process.
         authorizeUser(savedInstanceState)
+
         info(TAG, "onCreate() OUT")
     }
 
-    private fun addFragment() {
+    private fun addNoteViewFragment() {
         val fm = supportFragmentManager
         val f = NoteViewFragment()
         fm.beginTransaction().replace(R.id.main_layout, f, null)
@@ -56,13 +60,11 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
 
     override fun onStop() {
         super.onStop()
-        info(TAG, "onStop()")
+        info(TAG, "onStop() OUT")
     }
 
     override fun onDestroy() {
-        info(TAG, "onDestroy() IN")
         super.onDestroy()
-        BackupManager.clearNotesViewModelWeakReference()
         info(TAG, "onDestroy() OUT")
     }
 
@@ -71,7 +73,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
             info(TAG, "onActivityResult(), reload data")
             notesViewModel?.resetErrorState()
-            notesViewModel?.updateData()
+            notesViewModel?.updateData(this)
         }
     }
 
@@ -80,9 +82,12 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
      */
     override fun onUserAuthorized() {
         info(TAG, "onAuthorize(), user is authorized")
+
         val nativeBridge = NativeBridge()
         nativeBridge.resetLoginLimitLeft(this)
+
         notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application)).get(NotesViewModel::class.java)
+
         notesViewModel?.errorStateData?.observe(this) { cryptoError ->
             if (cryptoError === CryptoError.USER_NOT_AUTHORIZED) {
                 // Request KeyStore Unlock
@@ -90,8 +95,8 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
                 BiometricAuthManager.requestUnlockActivity(this@NotesViewActivity)
             }
         }
-        notesViewModel?.updateData()
-        BackupManager.setNotesViewModelWeakReference(notesViewModel)
+
+        notesViewModel?.updateData(this)
     }
 
     override fun onOpenNote(noteModel: NoteModel?) {
@@ -138,7 +143,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         notesViewModel?.onBackNavigation()
     }
 
-    // This will ask user to login
+    // This will start auth activity
     private fun authorizeUser(bundle: Bundle?) {
         /**
          * Activity is launched first time

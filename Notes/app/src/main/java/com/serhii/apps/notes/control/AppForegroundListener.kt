@@ -20,14 +20,14 @@ object AppForegroundListener : LifecycleObserver {
     fun isInForeground() = isInForeground
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onForegroundEnter() {
-        info(TAG, "onForegroundEnter()")
+    fun onForegroundEntered() {
+        info(TAG, "onForegroundEntered()")
         isInForeground = true
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onForegroundExit() {
-        info(TAG, "onForegroundExit()")
+    fun onForegroundExited() {
+        info(TAG, "onForegroundExited()")
         isInForeground = false
     }
 

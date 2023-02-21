@@ -30,11 +30,14 @@ class SettingsActivity : AppBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
         toolbar = findViewById(R.id.toolbar)
         toolbar?.setNavigationOnClickListener { onBackPressed() }
+
         if (savedInstanceState == null) {
             addFragment()
         }
+
         setActionBar()
     }
 
@@ -70,7 +73,7 @@ class SettingsActivity : AppBaseActivity() {
                 extractNotes(data)
             } else {
                 // Should not happen
-                info(TAG, "onActivityResult() 1")
+                error(TAG, "onActivityResult() data is null")
             }
         } else if (requestCode == BackupManager.REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES")
@@ -78,7 +81,7 @@ class SettingsActivity : AppBaseActivity() {
                 backupNotes(data)
             } else {
                 // Should not happen
-                info(TAG, "onActivityResult() 2")
+                error(TAG, "onActivityResult() data is null")
             }
         } else if (requestCode == BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE")
@@ -86,21 +89,21 @@ class SettingsActivity : AppBaseActivity() {
                 restoreNotes(data)
             } else {
                 // Should not happen
-                info(TAG, "onActivityResult() 3")
+                error(TAG, "onActivityResult() data is null")
             }
         }
 
     }
 
     private fun extractNotes(data: Intent) {
-        var outputStream: OutputStream? = null
-        outputStream = try {
+        val outputStream: OutputStream? = try {
             contentResolver.openOutputStream(data.data!!)
         } catch (e: FileNotFoundException) {
             error(TAG, "extractNotes() error: $e")
             e.printStackTrace()
             return
         }
+
         val result = BackupManager.saveDataAsPlainText(outputStream, this)
         if (result) {
             showToast(this, R.string.result_success)
@@ -111,15 +114,15 @@ class SettingsActivity : AppBaseActivity() {
 
     private fun backupNotes(data: Intent) {
         info(TAG, "backupNotes() IN")
-        var outputStream: OutputStream? = null
-        outputStream = try {
+        val outputStream: OutputStream? = try {
             contentResolver.openOutputStream(data.data!!)
         } catch (e: FileNotFoundException) {
             error(TAG, "onOkClicked() error: $e")
             e.printStackTrace()
             return
         }
-        val result = BackupManager.backupData(outputStream, this@SettingsActivity)
+
+        val result = BackupManager.backupData(outputStream, this)
         if (result) {
             showToast(this@SettingsActivity, R.string.result_success)
         } else {
@@ -130,7 +133,7 @@ class SettingsActivity : AppBaseActivity() {
     private fun restoreNotes(data: Intent) {
         info(TAG, "restoreNotes() IN")
         val json = readBackupFile(data)
-        val result = BackupManager.restoreData(json, this@SettingsActivity)
+        val result = BackupManager.restoreData(json, this)
         if (result) {
             showToast(this@SettingsActivity, R.string.result_success)
         } else {
@@ -140,14 +143,14 @@ class SettingsActivity : AppBaseActivity() {
 
     @SuppressLint("Recycle")
     private fun readBackupFile(data: Intent): String {
-        var inputStream: InputStream? = null
-        inputStream = try {
+        val inputStream: InputStream? = try {
             contentResolver.openInputStream(data.data!!)
         } catch (e: FileNotFoundException) {
             error(TAG, "readBackupFile() error: $e")
             e.printStackTrace()
             return ""
         }
+
         val content = StringBuilder()
         try {
             val buffer = ByteArray(inputStream!!.available())
@@ -165,12 +168,13 @@ class SettingsActivity : AppBaseActivity() {
                 e.printStackTrace()
             }
         }
+
         return content.toString()
     }
 
     companion object {
         private const val TAG = "SettingsActivity"
-        private const val SETTINGS_FRAGMENT_TAG = "main settings"
+        private const val SETTINGS_FRAGMENT_TAG = "SettingsActivityTAG"
     }
 
 }

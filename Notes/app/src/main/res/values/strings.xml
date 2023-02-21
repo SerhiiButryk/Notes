@@ -35,8 +35,8 @@
     <string name="ms_extract_data">No data available.</string>
     <string name="title_extract_data">Error</string>
 
-    <string name="ms_password_weak">Error</string>
-    <string name="title_password_weak">Password is weak. Please, choose different password.</string>
+    <string name="title_error">Error</string>
+    <string name="ms_password_is_short">Password is short or empty. Please, enter password longer than 5 characters.</string>
 
     // Common buttons
     <string name="kbtn_ok">OK</string>

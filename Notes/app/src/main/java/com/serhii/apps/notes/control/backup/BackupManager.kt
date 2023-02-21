@@ -7,6 +7,8 @@ package com.serhii.apps.notes.control.backup
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
@@ -22,14 +24,15 @@ import java.lang.ref.WeakReference
 
 object BackupManager {
 
-    private var notesViewModelWeakReference: WeakReference<NotesViewModel>? = null
+    // View Model is observing changes to this field to get new data
+    private val updateDataFlag: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun setNotesViewModelWeakReference(notesViewModel: NotesViewModel?) {
-        notesViewModelWeakReference = WeakReference(notesViewModel)
+    fun getUpdateDataFlagData() : LiveData<Boolean> {
+        return updateDataFlag
     }
 
-    fun clearNotesViewModelWeakReference() {
-        notesViewModelWeakReference?.clear()
+    fun dataUpdated() {
+        updateDataFlag.value = false
     }
 
     fun openDirectoryChooserForExtractData(activity: Activity) {
@@ -52,15 +55,13 @@ object BackupManager {
         activity.startActivityForResult(intent, REQUEST_CODE_OPEN_BACKUP_FILE)
     }
 
-    fun saveDataAsPlainText(outputStream: OutputStream?, context: Context?): Boolean {
+    fun saveDataAsPlainText(outputStream: OutputStream?, context: Context): Boolean {
         info(TAG, "backupDataAsPlainText()")
 
         try {
-            val notesDatabaseProvider = UserNotesDatabase.getInstance()
-            notesDatabaseProvider.init(context)
 
-            if (notesDatabaseProvider.recordsCount != 0) {
-                val notes = notesDatabaseProvider.records
+            if (UserNotesDatabase.recordsCount != 0) {
+                val notes = UserNotesDatabase.getRecords(context)
                 val builder = StringBuilder()
                 for (note in notes) {
                     builder.append("\n")
@@ -88,15 +89,11 @@ object BackupManager {
         return false
     }
 
-    fun backupData(outputStream: OutputStream?, context: Context?): Boolean {
+    fun backupData(outputStream: OutputStream?, context: Context): Boolean {
+        info(TAG, "backupDataAsEncryptedText() found records: " + UserNotesDatabase.recordsCount)
 
-        val notesDatabaseProvider = UserNotesDatabase.getInstance()
-        notesDatabaseProvider.init(context)
-
-        info(TAG, "backupDataAsEncryptedText() found records: " + notesDatabaseProvider.recordsCount)
-
-        if (notesDatabaseProvider.recordsCount != 0) {
-            val notes = notesDatabaseProvider.records
+        if (UserNotesDatabase.recordsCount != 0) {
+            val notes = UserNotesDatabase.getRecords(context)
             val serializedNotes = mutableListOf<NoteAdapter>()
 
             for ((index, note) in notes.withIndex()) {
@@ -133,7 +130,7 @@ object BackupManager {
         return false
     }
 
-    fun restoreData(json: String, context: Context?): Boolean {
+    fun restoreData(json: String, context: Context): Boolean {
         detail(TAG, "restoreData() IN")
 
         val moshi = Moshi.Builder()
@@ -152,18 +149,12 @@ object BackupManager {
 
         val notes = backupAdapter!!.notes
 
-        val notesDatabaseProvider = UserNotesDatabase.getInstance()
-        notesDatabaseProvider.init(context)
-
         for (note in notes) {
             val noteModel: NoteModel = NoteModel.fromJson(note.note)
-            notesDatabaseProvider.addRecord(noteModel)
+            UserNotesDatabase.addRecord(noteModel, context)
         }
 
-        notesViewModelWeakReference?.let { ref ->
-            val notesViewModel = ref.get()
-            notesViewModel?.updateData()
-        }
+        updateDataFlag.value = true
 
         return true
     }
