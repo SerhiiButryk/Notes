@@ -95,7 +95,7 @@
     <string name="preference_category_title_backup">Сохранение и восстановление данных</string>
 
     <string name="preference_login_limit_title">Сменить лимит для ведения пароля</string>
-    <string name="preference_login_limit_summary">После % неуспешных попыток ведения пароля приложение будет заблокировано</string>
+    <string name="preference_login_limit_summary">После %s неуспешных попыток ведения пароля приложение будет заблокировано</string>
 
     <string name="preference_about_version_title">Версия</string>
 

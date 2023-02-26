@@ -103,7 +103,7 @@
 
     <string name="preference_login_limit_key">login_limit</string>
     <string name="preference_login_limit_title">Change login limit</string>
-    <string name="preference_login_limit_summary">After % unsuccessful login attempts the app will be blocked</string>
+    <string name="preference_login_limit_summary">After %s unsuccessful login attempts the app will be blocked</string>
 
     <string name="preference_login_limit_default">5</string>
 

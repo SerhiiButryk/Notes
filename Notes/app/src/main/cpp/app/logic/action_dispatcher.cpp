@@ -23,6 +23,7 @@ namespace APP
             Log::Info("ActionDispatcher", "sendEvent() - ACTION::AUTHORIZATION_DONE \n");
 
             notifyOnAuthorized();
+            return;
         }
 
         if (message == SYSTEM_MESSAGE::REGISTRATION_DONE)
@@ -30,6 +31,7 @@ namespace APP
             Log::Info("ActionDispatcher", "sendEvent() - ACTION::REGISTRATION_DONE \n");
 
             notifyOnRegistered();
+            return;
         }
 
         if (message == SYSTEM_MESSAGE ::ACCOUNT_INVALID ||
@@ -45,6 +47,7 @@ namespace APP
             Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnShowDialog \n");
 
             notifyOnShowDialog(static_cast<int>(message));
+            return;
         }
 
         Log::Error("ActionDispatcher", "sendEvent() - NO ACTION FOUND\n");

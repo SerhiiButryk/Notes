@@ -27,11 +27,11 @@ import com.serhii.core.utils.GoodUtils.Companion.formatString
  */
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private var loginAttempts: Preference? = null
+    private lateinit var loginAttempts: Preference
 
     private val nativeBridge = NativeBridge()
 
-    override fun onCreatePreferences(bundle: Bundle, s: String) {
+    override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         setPreferencesFromResource(R.xml.preferences, s)
         initLayout()
     }
@@ -40,26 +40,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val changePassword = findPreference<Preference>(getString(R.string.preference_change_password_key))
 
-        Preference.OnPreferenceClickListener {
+        changePassword?.setOnPreferenceChangeListener{ _, _ ->
             showChangePasswordDialog(requireActivity())
             true
-        }.also { changePassword?.onPreferenceClickListener = it }
+        }
 
-        loginAttempts = findPreference(getString(R.string.preference_login_limit_key))
+        val pref: Preference? = findPreference(getString(R.string.preference_login_limit_key))
+        if (pref != null) {
+            loginAttempts = pref
+        }
 
-        loginAttempts?.summary = formatString(
-            getString(R.string.preference_login_limit_summary),
-            nativeBridge.getLockLimit(requireContext())
-        )
+        loginAttempts.summary = formatString(getString(R.string.preference_login_limit_summary),
+            nativeBridge.getLockLimit(requireContext()))
 
-        loginAttempts!!.onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener { preference, newValue ->
+        loginAttempts.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
 
                 val selectedValue = newValue.toString().toInt()
 
                 info(TAG, "onPreferenceChange(), selected new login limit: $selectedValue")
 
-                loginAttempts?.summary =
+                loginAttempts.summary =
                     formatString(getString(R.string.preference_login_limit_summary), selectedValue)
 
                 nativeBridge.limitLeft = selectedValue
@@ -68,53 +69,66 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
         val version = findPreference<Preference>(getString(R.string.preference_about_version_key))
-        version?.summary = AppDetails.VERSION_LIBRARY
+        if (version != null) {
+            version.summary = AppDetails.VERSION_LIBRARY
+        }
 
-        val idleLockTimeOut =
-            findPreference<Preference>(getString(R.string.preference_idle_lock_timeout_key))
+        val idleLockTimeOut = findPreference<Preference>(getString(R.string.preference_idle_lock_timeout_key))
 
-        idleLockTimeOut?.onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener { preference, newValue ->
-                val selectedTime = newValue.toString().toInt()
-                info(TAG, "onPreferenceChange(), selected idle lock time $selectedTime")
-                updateTimeout(requireContext())
-                true
-            }
+        if (idleLockTimeOut != null) {
+            idleLockTimeOut.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { preference, newValue ->
+                    val selectedTime = newValue.toString().toInt()
+                    info(TAG, "onPreferenceChange(), selected idle lock time $selectedTime")
+                    updateTimeout(requireContext())
+                    true
+                }
+        }
 
         val extractNotes = findPreference<Preference>(getString(R.string.preference_extract_key))
-        extractNotes!!.onPreferenceClickListener = object : Preference.OnPreferenceClickListener {
-            override fun onPreferenceClick(preference: Preference): Boolean {
-                info(TAG, "onPreferenceClick()")
-                if (!isDataAvailable) {
-                    return true
+        if (extractNotes != null) {
+            extractNotes.onPreferenceClickListener =
+                object : Preference.OnPreferenceClickListener {
+                    override fun onPreferenceClick(preference: Preference): Boolean {
+                        info(TAG, "onPreferenceClick()")
+                        if (!isDataAvailable) {
+                            return true
+                        }
+                        openDirectoryChooserForExtractData(
+                            activity!!
+                        )
+                        return true
+                    }
                 }
-                openDirectoryChooserForExtractData(
-                    activity!!
-                )
-                return true
-            }
         }
 
         val backupNotes = findPreference<Preference>(getString(R.string.preference_backup_key))
-        backupNotes!!.onPreferenceClickListener = object : Preference.OnPreferenceClickListener {
-            override fun onPreferenceClick(preference: Preference): Boolean {
-                if (!isDataAvailable) {
-                    return true
+        if (backupNotes != null) {
+            backupNotes.onPreferenceClickListener =
+                object : Preference.OnPreferenceClickListener {
+                    override fun onPreferenceClick(preference: Preference): Boolean {
+                        if (!isDataAvailable) {
+                            return true
+                        }
+                        openDirectoryChooserForBackup(
+                            activity!!
+                        )
+                        return false
+                    }
                 }
-                openDirectoryChooserForBackup(
-                    activity!!
-                )
-                return false
-            }
         }
 
         val unlockNote = findPreference<Preference>(getString(R.string.preference_unlock_note_key))
-        unlockNote!!.summary = nativeBridge.unlockKey
+        if (unlockNote != null) {
+            unlockNote.summary = nativeBridge.unlockKey
+        }
 
         val restoreNotes = findPreference<Preference>(getString(R.string.preference_restore_note_key))
-        restoreNotes!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            openBackUpFile(requireActivity())
-            true
+        if (restoreNotes != null) {
+            restoreNotes.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                openBackUpFile(requireActivity())
+                true
+            }
         }
     }
 

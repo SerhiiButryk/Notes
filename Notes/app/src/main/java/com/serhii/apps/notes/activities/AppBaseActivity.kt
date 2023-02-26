@@ -24,7 +24,7 @@ open class AppBaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Enable unsecured screen content settings
-        GoodUtils.enableUnsecureScreenProtection(this)
+        //GoodUtils.enableUnsecureScreenProtection(this)
         // Initialize lifecycle aware components
         lifecycle.addObserver(AppForegroundListener)
         Log.info(TAG, "onCreate() out")
