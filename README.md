@@ -47,7 +47,7 @@ Required tools:
 
 1) NDK verions: 21.4.7075529
 2) Java version: 11
-2) Kotlin version: 1.8
+2) Kotlin version: 1.6
 
 Use gradlew or Android Studio ('Build' menu) to build this application
 
