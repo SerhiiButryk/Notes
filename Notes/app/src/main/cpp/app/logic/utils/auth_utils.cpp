@@ -1,14 +1,17 @@
 #include "auth_utils.h"
 
 #include <map>
+#include <regex>
 
 #include "app/logic/base/env_constants.h"
 #include "storage/system_storage.h"
 #include "utils/algorithms.h"
+#include "utils/log.h"
 
 using namespace MYLIB;
 
-const int MIN_PASSWORD_LENGTH = 6;
+const int MIN_PASSWORD_LENGTH = 6; // Min password length
+const std::string TAG = "AuthUtils";
 
 bool APP::AuthUtils::isUserAccountExists(const std::string& user_name)
 {
@@ -57,6 +60,11 @@ APP::SYSTEM_MESSAGE APP::AuthUtils::checkRules(const std::string &password, cons
         return SYSTEM_MESSAGE::EMPTY_FIELD;
     }
 
+    if (!isEmailValid(email))
+    {
+        return SYSTEM_MESSAGE::EMAIL_INVALID;
+    }
+
     if (check_confirm)
     {
 
@@ -81,4 +89,20 @@ APP::SYSTEM_MESSAGE APP::AuthUtils::checkRules(const std::string &password, cons
     }
 
     return SYSTEM_MESSAGE::NO_ERRORS;
+}
+
+bool APP::AuthUtils::isEmailValid(const std::string& email)
+{
+    // Check if entered text has email pattern
+    const std::regex email_regex(R"(^[\w\.-]+@[\w-]+\.[a-zA-Z]{2,4}$)");
+    std::smatch base_match;
+
+    if (std::regex_match(email, base_match, email_regex))
+    {
+        Log::Info(TAG, "AuthUtils::isEmailValid() passed");
+        return true;
+    }
+
+    Log::Info(TAG, "AuthUtils::isEmailValid() not passed");
+    return false;
 }

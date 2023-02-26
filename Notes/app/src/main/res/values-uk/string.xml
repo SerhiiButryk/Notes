@@ -34,6 +34,7 @@
 
     <string name="title_error">Помилка</string>
     <string name="ms_password_is_short">Пароль короткий або пустий. Будь ласка виберіть пароль довший за 5 символів.</string>
+    <string name="ms_email_is_not_valid">Введена вами електронна адреса є недійсною. Будь ласка спробуйте ще раз.</string>
 
     // Common buttons
     <string name="kbtn_ok">Добре</string>

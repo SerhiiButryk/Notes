@@ -13,9 +13,6 @@ import com.serhii.core.utils.GoodUtils.Companion.formatString
 
 class AlertDialogHelper(private val type: Int, context: Context) {
 
-    // User entered short password
-    private val ALERT_DIALOG_TYPE_PASSWORD_IS_SHORT = -12
-
     var title = ""
         private set
 
@@ -53,9 +50,12 @@ class AlertDialogHelper(private val type: Int, context: Context) {
         } else if (type == DialogHelper.ALERT_DIALOG_TYPE_BACKUP_ERROR) {
             title = context.getString(R.string.title_extract_data)
             message = context.getString(R.string.ms_extract_data)
-        } else if (type == ALERT_DIALOG_TYPE_PASSWORD_IS_SHORT) {
+        } else if (type == AuthResult.ALERT_DIALOG_TYPE_PASSWORD_IS_SHORT.typeId) {
             title = context.getString(R.string.title_error)
             message = context.getString(R.string.ms_password_is_short)
+        } else if (type == AuthResult.EMAIL_INVALID.typeId) {
+            title = context.getString(R.string.title_error)
+            message = context.getString(R.string.ms_email_is_not_valid)
         }
     }
 }

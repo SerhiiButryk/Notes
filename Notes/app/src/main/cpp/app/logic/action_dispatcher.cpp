@@ -39,12 +39,15 @@ namespace APP
             message == SYSTEM_MESSAGE ::PASSWORD_DIFFERS ||
             message == SYSTEM_MESSAGE ::SPACE_CONTAIN ||
             message == SYSTEM_MESSAGE ::UNLOCK_KEY_INVALID ||
-            message == SYSTEM_MESSAGE ::PASSWORD_IS_WEAK)
+            message == SYSTEM_MESSAGE ::PASSWORD_IS_WEAK ||
+            message == SYSTEM_MESSAGE ::EMAIL_INVALID)
         {
             Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnShowDialog \n");
 
             notifyOnShowDialog(static_cast<int>(message));
         }
+
+        Log::Error("ActionDispatcher", "sendEvent() - NO ACTION FOUND\n");
 
     }
 

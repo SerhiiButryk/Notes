@@ -34,13 +34,14 @@
 
     <string name="title_error">Ошибка</string>
     <string name="ms_password_is_short">Пароль короткий или пустой. Пожалуйста, выберите пароль более 5 символов.</string>
+    <string name="ms_email_is_not_valid">Bы ввели неверный адрес электронной почты. Пожалуйста, попробуйте еще раз.</string>
 
     // Common buttons
     <string name="kbtn_ok">Хорошо</string>
     <string name="kbtn_cancel">Отмена</string>
 
     // Login Activity
-    <string name="text_description">Добро пожаловать в приложение для записи заметок. Сохраняй все заметки здесь. Для начала создайте пользователя. Нажмите "Далее", чтобы продолжить.</string>
+    <string name="text_description">Добро пожаловать в приложение для записи заметок. Сохраняй все заметки здесь. Для начала создайте пользователя. Нажмите \"Далее\", чтобы продолжить.</string>
     <string name="btn_create_user">Далее</string>
     <string name="login_btn">Войти</string>
     <string name="create_account_bnt">Готово</string>

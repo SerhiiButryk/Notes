@@ -16,6 +16,7 @@ namespace APP
             static SYSTEM_MESSAGE checkRules(const std::string& password, const std::string& confirm_password,
                                              const std::string& email, bool check_confirm = false);
 
+        private:
+            static bool isEmailValid(const std::string& email);
     };
-
 }

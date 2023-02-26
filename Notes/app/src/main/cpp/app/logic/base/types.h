@@ -2,14 +2,14 @@
 
 namespace APP
 {
-    enum class SYSTEM_EVENT
+    enum class SYSTEM_EVENT : int
     {
         AUTHORIZE = 101,
         REGISTER_ACCOUNT,
         UNLOCK
     };
 
-    enum class SYSTEM_MESSAGE
+    enum class SYSTEM_MESSAGE : int
     {
         EMPTY_FIELD = -1,
         WRONG_PASSWORD = -2,
@@ -33,6 +33,7 @@ namespace APP
         UNLOCK_KEYSTORE = -11,
 
         PASSWORD_IS_WEAK = -12,
+        EMAIL_INVALID = -13,
 
         NO_ERRORS = 1
     };
