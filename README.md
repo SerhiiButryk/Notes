@@ -41,7 +41,7 @@ and it provides simple interface for use.
 - ru (Russia)
 - uk (English)
 
-# Build instraction
+# Build instruction
 
 Required tools:
 
