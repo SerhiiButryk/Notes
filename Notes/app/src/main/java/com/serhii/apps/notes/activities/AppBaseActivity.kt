@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
 import com.serhii.apps.notes.control.AppForegroundListener
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
-import com.serhii.apps.notes.control.idle_lock.InactivityManager
 import com.serhii.core.log.Log
 import com.serhii.core.utils.GoodUtils
 
@@ -19,37 +18,46 @@ import com.serhii.core.utils.GoodUtils
  */
 open class AppBaseActivity : AppCompatActivity() {
 
-    private val TAG = "NotesViewActivity"
+    protected var TAG_BASE = "AppBaseActivity-"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Enable unsecured screen content settings
-        //GoodUtils.enableUnsecureScreenProtection(this)
-        // Initialize lifecycle aware components
-        lifecycle.addObserver(AppForegroundListener)
-        Log.info(TAG, "onCreate() out")
+        // Enable secure screen content settings
+        GoodUtils.enableUnsecureScreenProtection(this)
+        // Do not add lifecycle observer for auth activity
+        if (this !is AuthorizationActivity) {
+            // Initialize lifecycle aware components
+            lifecycle.addObserver(AppForegroundListener)
+        }
+        Log.info(TAG_BASE, "onCreate() out")
     }
 
     override fun onUserInteraction() {
+        Log.info(TAG_BASE, "onUserInteraction()")
         super.onUserInteraction()
-        InactivityManager.onUserInteraction(this)
-        Log.info(TAG, "onUserInteraction() out")
+        IdleLockHandler.onUserInteraction(this)
     }
 
     override fun onResume() {
+        Log.info(TAG_BASE, "onResume() in")
         super.onResume()
-        Log.info(TAG, "onResume() int")
-        // Trigger idle timeout
-        if (!IdleLockHandler.handleInactivityTimeoutReceived(this)) {
-            // If timeout is not triggered then schedule new alarm
-            InactivityManager.scheduleAlarm(this)
-        }
-        Log.info(TAG, "onResume() out")
+        IdleLockHandler.onActivityResumed(this)
+        Log.info(TAG_BASE, "onResume() out")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.info(TAG_BASE, "onStop() out")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.info(TAG_BASE, "onDestroy() out")
     }
 
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
-        Log.info(TAG, "init() finished")
+        Log.info(TAG_BASE, "init() finished")
     }
 
 }

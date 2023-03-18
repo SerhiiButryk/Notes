@@ -28,6 +28,8 @@ class SettingsActivity : AppBaseActivity() {
     private var toolbar: Toolbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        TAG_BASE += TAG
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 

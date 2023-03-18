@@ -5,14 +5,12 @@
 package com.serhii.apps.notes.activities
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.idle_lock.InactivityManager.cancelAlarm
 import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.BlockFragment
@@ -26,12 +24,14 @@ import com.serhii.core.log.Log.Companion.info
 /**
  * Login activity for user authorization
  */
-class AuthorizationActivity : AppCompatActivity() {
+class AuthorizationActivity : AppBaseActivity() {
 
     private var loginViewModel: LoginViewModel? = null
     private lateinit var fragmentManager: FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        TAG_BASE += TAG
+
         info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
@@ -43,9 +43,6 @@ class AuthorizationActivity : AppCompatActivity() {
 
         showLoginFragment(savedInstanceState)
         setupObservers()
-
-        // Cancel inactivity timer as auth activity is already starting.
-        cancelAlarm(this)
 
         info(TAG, "onCreate() OUT")
     }

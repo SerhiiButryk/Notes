@@ -13,7 +13,7 @@ import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.backup.BackupManager.openBackUpFile
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForBackup
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForExtractData
-import com.serhii.apps.notes.control.idle_lock.InactivityManager.updateTimeout
+import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.apps.notes.database.UserNotesDatabase.recordsCount
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showAlertDialog
@@ -78,9 +78,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (idleLockTimeOut != null) {
             idleLockTimeOut.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference, newValue ->
-                    val selectedTime = newValue.toString().toInt()
-                    info(TAG, "onPreferenceChange(), selected idle lock time $selectedTime")
-                    updateTimeout(requireContext())
+                    val selectedTimeMillis = newValue.toString().toLong()
+                    info(TAG, "onPreferenceChange(), selected idle lock time $selectedTimeMillis")
+                    IdleLockHandler.forceRestartTimer(requireContext(), selectedTimeMillis)
                     true
                 }
         }
@@ -145,6 +145,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
     companion object {
-        private const val TAG = "LoginFragment"
+        private const val TAG = "SettingsFragment"
     }
 }

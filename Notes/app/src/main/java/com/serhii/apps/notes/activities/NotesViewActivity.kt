@@ -32,6 +32,8 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     private var notesViewModel: NotesViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        TAG_BASE += TAG
+
         info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_view)
@@ -56,11 +58,6 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         fm.beginTransaction().replace(R.id.main_layout, f, null)
             .setReorderingAllowed(true) // Needed for optimization
             .commit()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        info(TAG, "onStop() OUT")
     }
 
     override fun onDestroy() {

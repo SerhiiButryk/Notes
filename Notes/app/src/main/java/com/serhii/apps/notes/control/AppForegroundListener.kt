@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.serhii.core.log.Log.Companion.info
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Listener for foreground / background transitions.
@@ -15,20 +16,20 @@ import com.serhii.core.log.Log.Companion.info
 object AppForegroundListener : LifecycleObserver {
 
     private const val TAG = "AppForegroundListener"
-    private var isInForeground = false
+    private val isInForeground = AtomicBoolean(false)
 
-    fun isInForeground() = isInForeground
+    fun isInForeground() = isInForeground.get()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onForegroundEntered() {
         info(TAG, "onForegroundEntered()")
-        isInForeground = true
+        isInForeground.set(true)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onForegroundExited() {
         info(TAG, "onForegroundExited()")
-        isInForeground = false
+        isInForeground.set(false)
     }
 
 }

@@ -183,7 +183,7 @@ class LoginFragment : Fragment() {
 
     companion object {
         private const val TAG = "LoginFragment"
-        const val FRAGMENT_TAG = "LoginFragment"
+        const val FRAGMENT_TAG = "LoginFragmentTag"
 
         fun newInstance(): LoginFragment {
             return LoginFragment()
