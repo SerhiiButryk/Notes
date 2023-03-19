@@ -4,21 +4,18 @@
  */
 package com.serhii.apps.notes.activities
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
+import com.serhii.apps.notes.control.background_work.WorkId
+import com.serhii.apps.notes.control.background_work.WorkItem
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.utils.GoodUtils.Companion.showToast
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 
 /**
  * Activity for app settings
@@ -72,7 +69,14 @@ class SettingsActivity : AppBaseActivity() {
         if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
             if (data != null) {
-                extractNotes(data)
+
+                val workItem = WorkItem(WorkId.EXTRACT_DATA_WORK_ID, 0, { ctx, workItem ->
+                    BackupManager.extractNotes(workItem.extraData as Intent, ctx)
+                }, null, null)
+
+                workItem.extraData = data
+
+                BackgroundWorkHandler.putWork(workItem, this)
             } else {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")
@@ -80,7 +84,15 @@ class SettingsActivity : AppBaseActivity() {
         } else if (requestCode == BackupManager.REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES")
             if (data != null) {
-                backupNotes(data)
+
+                val workItem = WorkItem(WorkId.BACKUP_DATA_WORK_ID, 0, { ctx, workItem ->
+                    // Backup data
+                    BackupManager.backupNotes(workItem.extraData as Intent, ctx)
+                }, null, null)
+
+                workItem.extraData = data
+
+                BackgroundWorkHandler.putWork(workItem, this)
             } else {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")
@@ -88,90 +100,20 @@ class SettingsActivity : AppBaseActivity() {
         } else if (requestCode == BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE")
             if (data != null) {
-                restoreNotes(data)
+
+                val workItem = WorkItem(WorkId.RESTORE_DATA_WORK_ID, 0, { ctx, workItem ->
+                    BackupManager.restoreNotes(workItem.extraData as Intent, ctx)
+                }, null, null)
+
+                workItem.extraData = data
+
+                BackgroundWorkHandler.putWork(workItem, this)
             } else {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")
             }
         }
 
-    }
-
-    private fun extractNotes(data: Intent) {
-        val outputStream: OutputStream? = try {
-            contentResolver.openOutputStream(data.data!!)
-        } catch (e: FileNotFoundException) {
-            error(TAG, "extractNotes() error: $e")
-            e.printStackTrace()
-            return
-        }
-
-        val result = BackupManager.saveDataAsPlainText(outputStream, this)
-        if (result) {
-            showToast(this, R.string.result_success)
-        } else {
-            showToast(this, R.string.result_failed)
-        }
-    }
-
-    private fun backupNotes(data: Intent) {
-        info(TAG, "backupNotes() IN")
-        val outputStream: OutputStream? = try {
-            contentResolver.openOutputStream(data.data!!)
-        } catch (e: FileNotFoundException) {
-            error(TAG, "onOkClicked() error: $e")
-            e.printStackTrace()
-            return
-        }
-
-        val result = BackupManager.backupData(outputStream, this)
-        if (result) {
-            showToast(this@SettingsActivity, R.string.result_success)
-        } else {
-            showToast(this@SettingsActivity, R.string.result_failed)
-        }
-    }
-
-    private fun restoreNotes(data: Intent) {
-        info(TAG, "restoreNotes() IN")
-        val json = readBackupFile(data)
-        val result = BackupManager.restoreData(json, this)
-        if (result) {
-            showToast(this@SettingsActivity, R.string.result_success)
-        } else {
-            showToast(this@SettingsActivity, R.string.result_failed)
-        }
-    }
-
-    @SuppressLint("Recycle")
-    private fun readBackupFile(data: Intent): String {
-        val inputStream: InputStream? = try {
-            contentResolver.openInputStream(data.data!!)
-        } catch (e: FileNotFoundException) {
-            error(TAG, "readBackupFile() error: $e")
-            e.printStackTrace()
-            return ""
-        }
-
-        val content = StringBuilder()
-        try {
-            val buffer = ByteArray(inputStream!!.available())
-            while (inputStream.read(buffer) != -1) {
-                content.append(String(buffer))
-            }
-        } catch (e: Exception) {
-            error(TAG, "readBackupFile() exception while reading the file: $e")
-            e.printStackTrace()
-            return ""
-        } finally {
-            try {
-                inputStream!!.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-
-        return content.toString()
     }
 
     companion object {

@@ -14,10 +14,14 @@
     // Light theme
     <color name="colorPrimary">@color/dark_grey</color>
     <color name="colorPrimaryDark">@color/dark_grey</color>
-    <color name="colorAccent">@color/white</color>
+    <color name="colorAccent">@color/blue_light</color>
 
     // Background
     <color name="layout_background">@color/light_grey</color>
+
+    // Text color
+    <color name="appbar_text_color">@color/white</color>
+    <color name="text_color">@color/black</color>
 
     // Buttons
     <color name="login_primary">@color/dark_grey</color>
@@ -43,7 +47,6 @@
 
     <color name="light_grey">#ebebf0</color>
     <color name="span_color">@color/light_grey</color>
-    <color name="text_color">@color/black</color>
 
     <color name="dark_blue">#03A9F4</color>
     <color name="light_blue">#3F51B5</color>

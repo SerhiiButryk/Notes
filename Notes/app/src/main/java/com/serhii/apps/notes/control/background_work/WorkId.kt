@@ -10,4 +10,8 @@ package com.serhii.apps.notes.control.background_work
  */
 object WorkId {
     const val IDLE_LOCK_WORK_ID = 100
+
+    const val BACKUP_DATA_WORK_ID = 101
+    const val EXTRACT_DATA_WORK_ID = 102
+    const val RESTORE_DATA_WORK_ID = 103
 }

@@ -22,11 +22,13 @@ object BackgroundWorkHandler {
     private val workItemsQueue: ArrayDeque<WorkItem> = ArrayDeque()
 
     fun putWork(workItem: WorkItem, context: Context) {
+        Log.info(TAG, "putWork, id = ${workItem.workItemId}")
         scheduleWork(workItem, context)
         workItemsQueue.add(workItem)
     }
 
     fun removeWork(workItemId: Int, context: Context) {
+        Log.info(TAG, "removeWork, id = $workItemId")
         cancelWork(workItemId, context)
         // Remove item for queue
         workItemsQueue.removeIf { it.workItemId == workItemId }
@@ -43,7 +45,7 @@ object BackgroundWorkHandler {
 
         for (item in workItemsQueue) {
 
-            val delayTime = item.timeMillisInFuture
+            val delayTime = item.realTimeMillisInFuture
             val currentTime = SystemClock.elapsedRealtime()
 
             // Check if time is elapsed and if it's true the execute job

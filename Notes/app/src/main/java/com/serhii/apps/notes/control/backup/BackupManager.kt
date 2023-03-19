@@ -4,28 +4,108 @@
  */
 package com.serhii.apps.notes.control.backup
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.serhii.apps.notes.R
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.utils.GoodUtils
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
-import java.lang.ref.WeakReference
 
 object BackupManager {
 
     // View Model is observing changes to this field to get new data
     private val updateDataFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun extractNotes(data: Intent, context: Context) {
+        val outputStream: OutputStream? = try {
+            context.contentResolver.openOutputStream(data.data!!)
+        } catch (e: FileNotFoundException) {
+            error(TAG, "extractNotes() error: $e")
+            e.printStackTrace()
+            return
+        }
+
+        val result = saveDataAsPlainText(outputStream, context)
+        if (result) {
+            GoodUtils.showToast(context, R.string.result_success)
+        } else {
+            GoodUtils.showToast(context, R.string.result_failed)
+        }
+    }
+
+    fun backupNotes(data: Intent, context: Context) {
+        info(TAG, "backupNotes() IN")
+        val outputStream: OutputStream? = try {
+            context.contentResolver.openOutputStream(data.data!!)
+        } catch (e: FileNotFoundException) {
+            error(TAG, "backupNotes() error: $e")
+            e.printStackTrace()
+            return
+        }
+
+        val result = backupData(outputStream, context)
+        if (result) {
+            GoodUtils.showToast(context, R.string.result_success)
+        } else {
+            GoodUtils.showToast(context, R.string.result_failed)
+        }
+    }
+
+    fun restoreNotes(data: Intent, context: Context) {
+        info(TAG, "restoreNotes() IN")
+        val json = readBackupFile(data, context)
+        val result = restoreData(json, context)
+        if (result) {
+            GoodUtils.showToast(context, R.string.result_success)
+        } else {
+            GoodUtils.showToast(context, R.string.result_failed)
+        }
+    }
+
+    @SuppressLint("Recycle")
+    fun readBackupFile(data: Intent, context: Context): String {
+        val inputStream: InputStream? = try {
+            context.contentResolver.openInputStream(data.data!!)
+        } catch (e: FileNotFoundException) {
+            error(TAG, "readBackupFile() error: $e")
+            e.printStackTrace()
+            return ""
+        }
+
+        val content = StringBuilder()
+        try {
+            val buffer = ByteArray(inputStream!!.available())
+            while (inputStream.read(buffer) != -1) {
+                content.append(String(buffer))
+            }
+        } catch (e: Exception) {
+            error(TAG, "readBackupFile() exception while reading the file: $e")
+            e.printStackTrace()
+            return ""
+        } finally {
+            try {
+                inputStream?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+        return content.toString()
+    }
 
     fun getUpdateDataFlagData() : LiveData<Boolean> {
         return updateDataFlag
@@ -55,7 +135,7 @@ object BackupManager {
         activity.startActivityForResult(intent, REQUEST_CODE_OPEN_BACKUP_FILE)
     }
 
-    fun saveDataAsPlainText(outputStream: OutputStream?, context: Context): Boolean {
+    private fun saveDataAsPlainText(outputStream: OutputStream?, context: Context): Boolean {
         info(TAG, "backupDataAsPlainText()")
 
         try {
@@ -89,7 +169,7 @@ object BackupManager {
         return false
     }
 
-    fun backupData(outputStream: OutputStream?, context: Context): Boolean {
+    private fun backupData(outputStream: OutputStream?, context: Context): Boolean {
         info(TAG, "backupDataAsEncryptedText() found records: " + UserNotesDatabase.recordsCount)
 
         if (UserNotesDatabase.recordsCount != 0) {
@@ -130,7 +210,7 @@ object BackupManager {
         return false
     }
 
-    fun restoreData(json: String, context: Context): Boolean {
+    private fun restoreData(json: String, context: Context): Boolean {
         detail(TAG, "restoreData() IN")
 
         val moshi = Moshi.Builder()

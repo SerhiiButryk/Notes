@@ -71,7 +71,7 @@ object IdleLockHandler {
 
         detail(TAG, "getTimeout(), time: $time")
 
-        val workItem = WorkItem(WorkId.IDLE_LOCK_WORK_ID, time, { cxt ->
+        val workItem = WorkItem(WorkId.IDLE_LOCK_WORK_ID, time, { cxt, _ ->
             onLockEventReceived(cxt)
         }, null, null)
 
