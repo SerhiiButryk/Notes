@@ -29,7 +29,7 @@
         android:summary="%s"
         android:entries="@array/preference_idle_lock_list"
         android:entryValues="@array/preference_idle_lock_list_values"
-        android:defaultValue="180000"/>
+        android:defaultValue="@string/preference_idle_lock_time_default"/>
 
     <Preference
         app:iconSpaceReserved="false"
@@ -57,6 +57,16 @@
         android:key="@string/preference_restore_note_key"
         app:title="@string/preference_restore_note_title"
         android:summary="@string/preference_restore_note_decs"/>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/preference_category_title_debug"/>
+
+    <SwitchPreferenceCompat
+        app:iconSpaceReserved="false"
+        android:key="@string/preference_category_key_detail_logs"
+        android:title="@string/preference_category_message_detail_logs"
+        android:defaultValue="true"/>
 
     <PreferenceCategory
         app:iconSpaceReserved="false"

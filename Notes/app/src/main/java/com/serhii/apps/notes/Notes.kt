@@ -6,7 +6,7 @@ package com.serhii.apps.notes
 
 import android.app.Application
 import com.serhii.apps.notes.common.AppDetails
-import com.serhii.apps.notes.database.UserNotesDatabase
+import com.serhii.apps.notes.control.preferences.PreferenceManager
 import com.serhii.core.log.Log
 
 /**
@@ -18,5 +18,7 @@ class Notes : Application() {
         // Init core library logging component
         Log.init()
         Log.tag = AppDetails.APP_LOG_TAG
+        val shouldEnable = PreferenceManager.getDetailLogsEnabledValue(this)
+        Log.enableDetailedLogs(shouldEnable)
     }
 }

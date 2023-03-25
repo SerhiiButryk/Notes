@@ -18,6 +18,7 @@ import com.serhii.apps.notes.database.UserNotesDatabase.recordsCount
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showAlertDialog
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showChangePasswordDialog
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils.Companion.formatString
@@ -127,6 +128,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (restoreNotes != null) {
             restoreNotes.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 openBackUpFile(requireActivity())
+                true
+            }
+        }
+
+        val detailLogsPref = findPreference<Preference>(getString(R.string.preference_category_key_detail_logs))
+        if (detailLogsPref != null) {
+            detailLogsPref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener{ pref, newValue ->
+                Log.enableDetailedLogs(newValue as Boolean)
                 true
             }
         }

@@ -6,6 +6,7 @@
 package com.serhii.apps.notes.control.preferences
 
 import android.content.Context
+import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment
 
 object PreferenceManager {
@@ -25,6 +26,11 @@ object PreferenceManager {
         val preferences = context.getSharedPreferences(preferenceFileName, Context.MODE_PRIVATE)
         // Return default value if pref is not found
         return preferences.getInt(NOTE_DISPLAY_MODE_KEY, NoteViewFragment.DISPLAY_MODE_GRID)
+    }
+
+    fun getDetailLogsEnabledValue(context: Context): Boolean {
+        val preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        return preferences.getBoolean(context.getString(R.string.preference_category_key_detail_logs), false)
     }
 
 }

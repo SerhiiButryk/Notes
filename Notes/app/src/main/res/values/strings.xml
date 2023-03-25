@@ -101,6 +101,10 @@
     <string name="preference_category_title_about">About</string>
     <string name="preference_category_title_backup">Backup and restore</string>
 
+    <string name="preference_category_title_debug">Diagnostics</string>
+    <string name="preference_category_message_detail_logs">Enable detail logs</string>
+    <string name="preference_category_key_detail_logs">detail logs</string>
+
     <string name="preference_login_limit_key">login_limit</string>
     <string name="preference_login_limit_title">Change login limit</string>
     <string name="preference_login_limit_summary">After %s unsuccessful login attempts the app will be blocked</string>

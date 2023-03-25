@@ -45,8 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:background="@android:color/transparent"
-            android:text="@string/kbtn_cancel" />
+            android:textColor="@color/text_color"
+            android:backgroundTint="@color/white"
+            android:text="@string/kbtn_cancel"
+            style="?android:attr/buttonBarButtonStyle" />
 
         <Button
             android:id="@+id/btn_ok"
@@ -54,8 +56,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:textColor="@color/red"
-            android:background="@android:color/transparent"
-            android:text="@string/kbtn_ok" />
+            android:backgroundTint="@color/white"
+            android:text="@string/kbtn_ok"
+            style="?android:attr/buttonBarButtonStyle" />
 
     </LinearLayout>
 
