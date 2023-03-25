@@ -118,6 +118,9 @@
 
     <string name="preference_unlock_note_title">Ключ розблокування</string>
 
+    <string name="preference_category_title_debug">Діагностика</string>
+    <string name="preference_category_message_detail_logs">Включити детальні логи</string>
+
     // Change password dialog
     <string name="hint_new_password">Ведіть новий пароль</string>
     <string name="hint_old_password">Ведіть старий пароль</string>
