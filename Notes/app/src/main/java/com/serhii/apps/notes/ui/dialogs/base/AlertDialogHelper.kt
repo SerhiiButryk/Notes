@@ -36,13 +36,13 @@ class AlertDialogHelper(private val type: Int, context: Context) {
             title = context.getString(R.string.title_empty_field)
             message = context.getString(R.string.ms_empty_field)
         } else if (type == AuthResult.USER_NAME_EXISTS.typeId) {
-            title = context.getString(R.string.title_user_exists)
+            title = context.getString(R.string.title_info)
             message = context.getString(R.string.ms_user_exists)
         } else if (type == AuthResult.PASSWORD_DIFFERS.typeId) {
-            title = context.getString(R.string.title_password_differs)
+            title = context.getString(R.string.title_info)
             message = context.getString(R.string.ms_password_differs)
         } else if (type == AuthResult.SPACE_CONTAIN.typeId) {
-            title = context.getString(R.string.title_space_contain)
+            title = context.getString(R.string.title_info)
             message = context.getString(R.string.ms_space_contain)
         } else if (type == AuthResult.UNLOCK_KEY_INVALID.typeId) {
             title = context.getString(R.string.title_unlock_key_invalid)

@@ -12,17 +12,21 @@ import com.serhii.apps.notes.activities.NotesViewActivity
 import com.serhii.apps.notes.ui.data_model.NoteList
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter
+import com.serhii.apps.notes.utils.TestUtility
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
+/**
+ * UnitTests for testing main app functionality
+ */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class AppTests {
 
     @Test
-    fun test01_Simple_Note_serialize_deserialize() {
-        Log.i(TAG, "test01_Simple_Note_serialize_deserialize() IN")
+    fun test01_Notes_serialize_deserialize() {
+        Log.i(TAG, "test01_Notes_serialize_deserialize() IN")
 
         val noteText = "hello note"
         val noteTitle = "hello title"
@@ -59,12 +63,12 @@ class AppTests {
             Assert.assertTrue("Wrong bool flag", n.isChecked == isChecked)
         }
 
-        Log.i(TAG, "test01_Simple_Note_serialize_deserialize() OUT")
+        Log.i(TAG, "test01_Notes_serialize_deserialize() OUT")
     }
 
     @Test
-    fun test02_NoteModel_empty_data() {
-        Log.i(TAG, "test02_NoteModel_empty_data() IN")
+    fun test02_NoteModel_verify_correct_state_with_empty_data() {
+        Log.i(TAG, "test02_NoteModel_verify_correct_state_with_empty_data() IN")
 
         val adapter = NoteEditorAdapter()
 
@@ -78,28 +82,15 @@ class AppTests {
         Assert.assertTrue("Wrong", noteModel.listNote.isEmpty())
         Assert.assertTrue("Wrong", noteModel.viewType == NoteModel.ONE_NOTE_VIEW_TYPE)
 
-        Log.i(TAG, "test02_NoteModel_empty_data() OUT")
-    }
-
-
-    @Test
-    fun test03_AdapterNote_empty_data() {
-        Log.i(TAG, "test03_AdapterNote_empty_data() IN")
-
-        val adapter = NoteEditorAdapter()
-
-        val noteModel = adapter.getNote()
-        Assert.assertTrue("Note is not empty", noteModel.isEmpty)
-
         val noteList = adapter.getNoteList();
         Assert.assertTrue("List is not empty", noteList.isEmpty())
 
-        Log.i(TAG, "test03_AdapterNote_empty_data() OUT")
+        Log.i(TAG, "test02_NoteModel_verify_correct_state_with_empty_data() OUT")
     }
 
     @Test
-    fun test04_AdapterNote_test_list_data() {
-        Log.i(TAG, "test04_AdapterNote_test_list_data() IN")
+    fun test03_AdapterNote_verify_correct_state_when_data_is_changed() {
+        Log.i(TAG, "test03_AdapterNote_verify_correct_state_when_data_is_changed() IN")
 
         val adapter = NoteEditorAdapter()
 
@@ -166,12 +157,12 @@ class AppTests {
         actualList = adapter.getNoteList()
         Assert.assertTrue("Wrong list", actualList == testList)
 
-        Log.i(TAG, "test04_AdapterNote_test_list_data() OUT")
+        Log.i(TAG, "test03_AdapterNote_verify_correct_state_when_data_is_changed() OUT")
     }
 
     companion object {
         private val TAG: String = AppTests::class.java.simpleName
-        private const val userName: String = "myUser"
+        private const val userName: String = "myemail@gmail.com"
         private const val userPassword: String = "myPassword"
 
         var scenario: ActivityScenario<NotesViewActivity>? = null

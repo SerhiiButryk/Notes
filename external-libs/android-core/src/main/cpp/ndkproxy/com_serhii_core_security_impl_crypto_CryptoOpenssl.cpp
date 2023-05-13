@@ -10,16 +10,13 @@
 
 #include <memory>
 
-#define TESTING 1
-
 using namespace MYLIB;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1encryptSymmetric(JNIEnv *env,
-                                                                                               jobject thiz, jstring jplaintext, jstring jkey, jstring jiv)
+JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1encryptSymmetric(JNIEnv *env, jobject thiz, jstring jplaintext, jstring jkey, jstring jiv)
 {
     Log::Info("JNI", " %s IN", __FUNCTION__ );
 
@@ -33,34 +30,25 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1en
     strncpy((char*) _key, key, KEY_SIZE);
     strncpy((char*) _iv, iv, BLOCK_SIZE);
 
-#ifdef TESTING
-    int result = CryptoUtils::genKey(_key, _iv);
-    if (result != 1) {
-        Log::Error("JNI", " %s failed to gen keys OUT", __FUNCTION__ );
-        return env->NewStringUTF("");
-    }
-#endif
-
     std::string cypherText;
-    result = CryptoUtils::AESEncrypt(_key, _iv, plaintext, cypherText);
+
+    int result = CryptoUtils::AESEncrypt(_key, _iv, plaintext, cypherText);
+
     if (result != 1) {
-        Log::Error("JNI", " %s failed to encrypt OUT", __FUNCTION__ );
+        Log::Error("JNI", "%s failed to encrypt OUT", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string encodedText = Base64::encode((unsigned char*) cypherText.c_str(), cypherText.length());
-    std::string encodedIV = Base64::encode(_key, KEY_SIZE);
-    std::string encodedKey = Base64::encode(_iv, BLOCK_SIZE);
 
-    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+    Log::Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(encodedText.c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env,
-                                                                                               jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv)
+JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env, jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv)
 {
-    Log::Info("JNI", " %s IN", __FUNCTION__ );
+    Log::Info("JNI", "%s IN", __FUNCTION__ );
 
     JString cypherText(env, jcypher_text);
     JString key(env, jkey);
@@ -72,13 +60,15 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1de
 
     std::string plainText;
     std::string cypherTextString = cypherText;
+
     int result = CryptoUtils::AESDecrypt((unsigned char*) decodedKEY.c_str(), (unsigned char*) decodedIV.c_str(), plainText, cypherTextString);
+
     if (result != 1) {
-        Log::Error("JNI", " %s failed to decrypt OUT", __FUNCTION__ );
+        Log::Error("JNI", "%s failed to decrypt OUT", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
-    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+    Log::Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(plainText.c_str());
 }

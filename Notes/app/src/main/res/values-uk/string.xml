@@ -21,10 +21,8 @@
     <string name="title_empty_field">Помилка авторизації</string>
 
     <string name="ms_password_differs">Паролі не збігаються. \nБудь ласка введіть пароль ще раз.</string>
-    <string name="title_password_differs">Повідомлення</string>
 
     <string name="ms_space_contain">Пропуски не дозволяються у паролі. \n.Будь ласка введіть пароль ще раз.</string>
-    <string name="title_space_contain">Повідомлення</string>
 
     <string name="ms_unlock_key_invalid">Ведений ключ не правильний. \nБудь ласка спробуйте знову.</string>
     <string name="title_unlock_key_invalid">Помилка авторизації</string>
@@ -151,6 +149,7 @@
     <string name="result_success">Успіх</string>
     <string name="result_failed">Помилка</string>
     <string name="result_canceled">Відмова</string>
+    <string name="title_info">Повідомлення</string>
 
     <string name="empty_login">Пустий пароль чи ім\'я користувача</string>
     <string name="wrong_pass">Вибачте пароль не правильний. Будь ласка спробуйте ще разю</string>

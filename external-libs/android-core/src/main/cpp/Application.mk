@@ -1,5 +1,4 @@
 # Library application file
-
 # Build type debug or release
 ifeq ($(NDK_DEBUG),1)
     APP_OPTIM := debug

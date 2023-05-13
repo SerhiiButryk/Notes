@@ -6,6 +6,7 @@ package com.serhii.apps.notes
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.serhii.apps.notes.utils.TestUtility
 import com.serhii.core.security.Cipher
 import com.serhii.core.security.Hash
 import com.serhii.core.security.impl.crypto.CryptoError
@@ -18,8 +19,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 /**
- * Unit Tests for
- * @link com.serhii.core.security.Cipher
+ * Unit Tests for [com.serhii.core.security.Cipher] class
  */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

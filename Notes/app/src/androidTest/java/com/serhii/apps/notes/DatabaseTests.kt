@@ -16,10 +16,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 /**
- * Unit Tests for
- * [com.serhii.apps.notes.database.NotesDatabaseProvider]
+ * Unit Tests for [com.serhii.apps.notes.database.NotesDatabaseProvider] class
  */
-
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DatabaseTests {
@@ -34,16 +32,14 @@ class DatabaseTests {
             Log.i(TAG, "onetimeSetup()")
             val context = ApplicationProvider.getApplicationContext<android.content.Context>()
             // Init database
-            val notesDatabase = UserNotesDatabase.getInstance()
-            notesDatabase.init(context)
+            UserNotesDatabase.init(context)
         }
 
         @AfterClass
         @JvmStatic
         fun cleanup() {
             Log.i(TAG, "cleanup()")
-            val notesDatabase = UserNotesDatabase.getInstance()
-            notesDatabase.close()
+            UserNotesDatabase.close()
         }
 
     }
@@ -57,7 +53,7 @@ class DatabaseTests {
     fun tearDown() {
         Log.i(TAG, "tearDown() IN")
 
-        val notesDatabase = UserNotesDatabase.getInstance()
+        val notesDatabase = UserNotesDatabase
 
         // Delete records
         val numberOfRecords = notesDatabase.recordsCount
@@ -81,19 +77,20 @@ class DatabaseTests {
 
         Log.i(TAG, "test01_AddRecord() IN")
 
-        val notesDatabase = UserNotesDatabase.getInstance()
+        val notesDatabase = UserNotesDatabase
         Assert.assertTrue("Database is not empty", notesDatabase.recordsCount == 0)
 
-        val noteText = "test note";
-        val noteTitle = "test note title";
+        val noteText = "test note"
+        val noteTitle = "test note title"
 
         val note = NoteModel(noteText, noteTitle)
 
-        val id = notesDatabase.addRecord(note)
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val id = notesDatabase.addRecord(note, context)
 
         Assert.assertEquals("Note wasn't saved in database", notesDatabase.recordsCount, 1)
 
-        val retrievedNote: NoteModel = notesDatabase.getRecord(id.toString())
+        val retrievedNote: NoteModel = notesDatabase.getRecord(id.toString(), context)
 
         Assert.assertEquals("Note is not correct", retrievedNote.note, noteText)
         Assert.assertEquals("Note title is not correct", retrievedNote.title, noteTitle)
@@ -105,7 +102,7 @@ class DatabaseTests {
     fun test02_EncryptionHelper_decrypt_encrypt() {
         Log.i(TAG, "test02_EncryptionHelper_decrypt_encrypt() IN")
 
-        val notesDatabase = UserNotesDatabase.getInstance()
+        val notesDatabase = UserNotesDatabase
         Assert.assertTrue("Database is not empty", notesDatabase.recordsCount == 0)
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()

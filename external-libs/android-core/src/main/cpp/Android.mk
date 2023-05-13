@@ -7,12 +7,12 @@ LIB_PATH := ../../../libs
 
     include $(CLEAR_VARS)
     LOCAL_MODULE := ssl_static
-    LOCAL_SRC_FILES := $(LIB_PATH)/arch-$(TARGET_ARCH_ABI)/openssl/libssl.a
+    LOCAL_SRC_FILES := $(LIB_PATH)/$(TARGET_ARCH_ABI)/libssl.a
     include $(PREBUILT_STATIC_LIBRARY)
 
     include $(CLEAR_VARS)
     LOCAL_MODULE := crypto_static
-    LOCAL_SRC_FILES := $(LIB_PATH)/arch-$(TARGET_ARCH_ABI)/openssl/libcrypto.a
+    LOCAL_SRC_FILES := $(LIB_PATH)/$(TARGET_ARCH_ABI)/libcrypto.a
     include $(PREBUILT_STATIC_LIBRARY)
 
 # END
@@ -51,7 +51,7 @@ LIB_PATH := ../../../libs
 
     LOCAL_CPPFLAGS += -std=c++17
 
-    # Additional flag to link with log library at load time
+    # Additional flag to link with log library at runtime
     LOCAL_LDLIBS := -llog
 
     LOCAL_SHARED_LIBRARIES := libc++_shared

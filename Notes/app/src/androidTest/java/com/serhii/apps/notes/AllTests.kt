@@ -10,6 +10,9 @@ import org.junit.runners.Suite.SuiteClasses
 import com.serhii.apps.notes.CipherTests
 import com.serhii.apps.notes.DatabaseTests
 
+/**
+ * Suite contains all available tests for the app
+ */
 @RunWith(Suite::class)
 @SuiteClasses(
     CipherTests::class,

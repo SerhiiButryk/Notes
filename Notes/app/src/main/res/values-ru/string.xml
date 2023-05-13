@@ -21,7 +21,6 @@
     <string name="title_empty_field">Ошибка авторизации</string>
 
     <string name="ms_password_differs">Пароли не совпадают. \nПожалуйста, введите пароль еще раз.</string>
-    <string name="title_password_differs">Сообщение</string>
 
     <string name="ms_space_contain">Пропуска не разрешаются в пароле. \n.Пожалуйста, введите пароль еще раз.</string>
     <string name="title_space_contain">Сообщение</string>
@@ -150,7 +149,8 @@
     // Errors / Info
     <string name="result_success">Успех</string>
     <string name="result_failed">Ошибка</string>
-    <string name="result_canceled">Отказ</string>
+    <string name="result_canceled">Отмена</string>
+    <string name="title_info">Сообщение</string>
 
     <string name="empty_login">Пустый пароль или имя пользователя</string>
     <string name="wrong_pass">Простите пароль неправильный. Пожалуйста попробуйте еще раз</string>
