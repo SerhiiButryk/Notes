@@ -37,7 +37,7 @@ and it provides simple interface for use.
 # Supported platforms
 
 - Android version: Android 8 - Android 13
-- Supported ABIs: x86, x86_64, armeabi-v7a
+- Supported ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
 
 # Localization
 
