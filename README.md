@@ -26,7 +26,11 @@ and it provides simple interface for use.
 # Used technologies
 
 - Languages: Java/JNI, Kotlin, C++17
-- Libraries: OpenSSL (1.1.1v), Boost
+- Libraries: 
+1) OpenSSL (1.1.1v) - https://www.openssl.org/source/
+2) Boost - https://www.boost.org/ 
+3) CSCRYPTO - https://www.copperspice.com/docs/cs_crypto/basic_what.html
+
 - Build tools: NDK, Gradle
 - Android conponents/libraries: Jatpack libraries, fragments, view model, SQL database.
 

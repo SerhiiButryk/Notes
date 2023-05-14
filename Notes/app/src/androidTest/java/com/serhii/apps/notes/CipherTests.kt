@@ -13,7 +13,6 @@ import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.security.impl.crypto.Result
 import org.junit.Assert
 import org.junit.FixMethodOrder
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -26,21 +25,20 @@ import org.junit.runners.MethodSorters
 class CipherTests {
 
     /**
-     * Symmetric enc / dec
+     * Symmetric enc / dec short text message
      *
      *  Test for
-     *  @link com.serhii.core.security.Cipher#encryptSymmetricWithKey(String, String, byte[]])
-     *  @link com.serhii.core.security.Cipher#decryptSymmetricWithKey(String, String, byte[]])
+     *  [com.serhii.core.security.Cipher.encryptSymmetric]
+     *  [com.serhii.core.security.Cipher.decryptSymmetric]
      *
      *  1. Test encrypts text using symmetric key
      *  2. Test decrypts text using symmetric key
      *  3. Test verifies expected results
      */
-    @Ignore("OpenSSL is not working because of issues")
     @Test
-    fun test01_encryptDecryptUsingOpenSSL() {
+    fun test01_OpenSSL_encrypt_decrypt() {
 
-       Log.i(TAG, "test01_encryptDecryptUsingOpenSSL() IN")
+       Log.i(TAG, "test01_OpenSSL_encrypt_decrypt() IN")
 
         var cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
 
@@ -65,15 +63,15 @@ class CipherTests {
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
 
-       Log.i(TAG, "test01_encryptDecryptUsingOpenSSL() OUT")
+       Log.i(TAG, "test01_OpenSSL_encrypt_decrypt() OUT")
     }
 
     /**
      * Symmetric enc / dec
      *
      *  Test for
-     *  @link com.serhii.core.security.Cipher#encryptSymmetric(String)
-     *  @link com.serhii.core.security.Cipher#decryptSymmetric(String, byte[]])
+     *  [com.serhii.core.security.Cipher.encryptSymmetric]
+     *  [com.serhii.core.security.Cipher.decryptSymmetric]
      *
      *  1. Test creates 2 key (key A and key B) in crypto provider store
      *  2. Test encrypts / decrypts using key A
@@ -81,9 +79,9 @@ class CipherTests {
      *  4. Test verifies expected results
      */
     @Test
-    fun test02_encryptDecryptUsingSecureStore() {
+    fun test02_AndroidSecureStore_encrypt_decrypt() {
 
-       Log.i(TAG, "test02_encryptDecryptUsingSecureStore() IN")
+       Log.i(TAG, "test02_AndroidSecureStore_encrypt_decrypt() IN")
 
         val cipher = Cipher()
         cipher.createKey(SECRET_KET_TEST_A, false)
@@ -113,13 +111,23 @@ class CipherTests {
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
 
-       Log.i(TAG, "test02_encryptDecryptUsingSecureStore() OUT")
+       Log.i(TAG, "test02_AndroidSecureStore_encrypt_decrypt() OUT")
     }
 
-    @Ignore("OpenSSL is not working because of issues")
+    /**
+     * Symmetric enc / dec long text message
+     *
+     *  Test for
+     *  [com.serhii.core.security.Cipher.encryptSymmetric]
+     *  [com.serhii.core.security.Cipher.decryptSymmetric]
+     *
+     *  1. Test encrypts text using symmetric key
+     *  2. Test decrypts text using symmetric key
+     *  3. Test verifies expected results
+     */
     @Test
-    fun test03_encryptDecryptUsingOpenSSL_LongText() {
-        Log.i(TAG, "test03_encryptDecryptUsingOpenSSL_LongText() IN")
+    fun test03_OpenSSL_encrypt_decrypt() {
+        Log.i(TAG, "test03_OpenSSL_encrypt_decrypt() IN")
 
         var cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
 
@@ -146,12 +154,12 @@ class CipherTests {
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
 
-        Log.i(TAG, "test03_encryptDecryptUsingOpenSSL_LongText() OUT")
+        Log.i(TAG, "test03_OpenSSL_encrypt_decrypt() OUT")
     }
 
     @Test
-    fun test04_encryptDecryptUsingSecureStore_LongText() {
-        Log.i(TAG, "test04_encryptDecryptUsingSecureStore_LongText() IN")
+    fun test04_AndroidSecureStore_encrypt_decrypt_LongText() {
+        Log.i(TAG, "test04_AndroidSecureStore_encrypt_decrypt_LongText() IN")
 
         val cipher = Cipher()
         cipher.createKey(SECRET_KET_TEST_A, false)
@@ -183,21 +191,21 @@ class CipherTests {
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
 
-        Log.i(TAG, "test04_encryptDecryptUsingSecureStore_LongText() OUT")
+        Log.i(TAG, "test04_AndroidSecureStore_encrypt_decrypt_LongText() OUT")
     }
 
     @Test
-    fun test05_doubleKeyCreation() {
-        Log.i(TAG, "test05_doubleKeyCreation() IN")
+    fun test05_double_Key_Creation() {
+        Log.i(TAG, "test05_double_Key_Creation() IN")
         val cipher = Cipher()
         cipher.createKey(SECRET_KET_TEST_C, false)
         cipher.createKey(SECRET_KET_TEST_C, false)
-        Log.i(TAG, "test05_doubleKeyCreation() OUT")
+        Log.i(TAG, "test05_double_Key_Creation() OUT")
     }
 
     @Test
-    fun test06_selectInvalidProvider() {
-        Log.i(TAG, "test06_selectInvalidProvider() IN")
+    fun test06_select_Invalid_Provider() {
+        Log.i(TAG, "test06_select_Invalid_Provider() IN")
 
         var exception: Exception? = null
         var isExceptionThrown = false
@@ -215,12 +223,12 @@ class CipherTests {
         Assert.assertTrue("Exception type is wrong", exception is IllegalArgumentException)
         Assert.assertTrue("Wrong message", exception?.message == "Unknown crypto provider is passed")
 
-        Log.i(TAG, "test06_selectInvalidProvider() IN")
+        Log.i(TAG, "test06_select_Invalid_Provider() IN")
     }
 
     @Test
-    fun test07_hashGeneration() {
-        Log.i(TAG, "test07_hashGeneration() IN")
+    fun test07_hash_MD5() {
+        Log.i(TAG, "test07_hash_MD5() IN")
 
         val message1 = "0123456789"
         val hash = Hash()
@@ -247,11 +255,11 @@ class CipherTests {
 
         Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
 
-        Log.i(TAG, "test07_hashGeneration() OUT")
+        Log.i(TAG, "test07_hash_MD5() OUT")
     }
 
     @Test
-    fun test08_encryptDecryptUsingSecureStore_DefaultKey() {
+    fun test08_AndroidSecureStore_encrypt_decrypt_DefaultKey() {
         Log.i(TAG, "test08_encryptDecryptUsingSecureStore_DefaultKey() IN")
 
         val cipher = Cipher()

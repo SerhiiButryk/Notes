@@ -23,7 +23,6 @@ namespace MYLIB
             /**
              * Detailed logs
              */
-            JNIEXPORT static bool detailedLogsEnabled;
             JNIEXPORT static bool isDetailedLogsEnabled();
             JNIEXPORT static void setIsDetailedLogsEnabled(bool isDetailedLogsEnabled);
 
@@ -63,12 +62,14 @@ namespace MYLIB
 
         private:
 
-            JNIEXPORT static std::string _TAG_APP_;
+            static std::string _TAG_APP_;
 
-            JNIEXPORT static std::mutex _mutex_log_guard; // Protects android log resource
+            static bool detailedLogsEnabled;
+
+            static std::mutex _mutex_log_guard; // Protects android log resource
 
             template<typename T, typename... Args>
-            JNIEXPORT static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {
+            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {
 
                 std::lock_guard guard(_mutex_log_guard);
 
@@ -82,7 +83,7 @@ namespace MYLIB
             }
 
             template<typename T>
-            JNIEXPORT static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg) {
+            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg) {
 
                 std::lock_guard guard(_mutex_log_guard);
 
@@ -94,16 +95,16 @@ namespace MYLIB
                 __android_log_write(LOG_LEVEL, TAG.c_str(), formatter.str().c_str());
             }
 
-            JNIEXPORT static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage);
+            static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage);
 
             template<typename T, typename... Args>
-            JNIEXPORT static const T& getArg(boost::format& f, const T& arg, const Args&... args) {
+            static const T& getArg(boost::format& f, const T& arg, const Args&... args) {
                 f % arg;
                 return getArg(f, args...);
             }
 
             template<typename T>
-            JNIEXPORT static const T& getArg(boost::format& f, const T& arg) {
+            static const T& getArg(boost::format& f, const T& arg) {
                 return arg;
             }
 

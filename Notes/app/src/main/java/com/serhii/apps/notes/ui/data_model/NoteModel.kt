@@ -18,7 +18,7 @@ import org.json.JSONObject
 data class NoteList(var note: String = "", var isChecked:Boolean = false)
 
 data class NoteModel(var note: String = "", var title: String = "",
-                     var time: String = "", var id: String = "",
+                     var time: String = "", var id: String = "" /* Record id of note in the database */,
                      var viewType: Int = ONE_NOTE_VIEW_TYPE,
                      /**
                       * Currently there can be only 1 item in list

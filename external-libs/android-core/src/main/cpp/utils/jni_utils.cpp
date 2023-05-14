@@ -15,6 +15,6 @@ namespace MYLIB
         env->CallVoidMethod(obj, mId);
     }
 
-    JNIEXPORT std::mutex JniUtils::m;
-    JNIEXPORT const std::string JniUtils::TAG = "JniUtils";
+    std::mutex JniUtils::m;
+    const std::string JniUtils::TAG = "JniUtils";
 }

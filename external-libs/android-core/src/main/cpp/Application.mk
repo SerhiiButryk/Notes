@@ -14,3 +14,4 @@ $(info [MY-LOGS] Entering Application.mk file in core module APP_OPTIM=$(APP_OPT
 # APP_ABI := armeabi-v7a x86
 
 APP_STL := c++_static
+APP_CPPFLAGS := -std=c++17

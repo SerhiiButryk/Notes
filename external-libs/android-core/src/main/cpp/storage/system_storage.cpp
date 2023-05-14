@@ -11,7 +11,7 @@ namespace {
 namespace MYLIB
 {
 
-    JNIEXPORT bool SystemStorage::writeData(const std::string& file_name, const std::map<std::string, std::string>& data, bool shouldAppend) const
+    bool SystemStorage::writeData(const std::string& file_name, const std::map<std::string, std::string>& data, bool shouldAppend) const
     {
         FileSystem* fs = FileSystem::getInstance();
 
@@ -108,7 +108,7 @@ namespace MYLIB
         return FileSystem::getInstance()->isExists(file_name);
     }
 
-    JNIEXPORT void SystemStorage::debugPrintAllValues(const std::string& file_name) const
+    void SystemStorage::debugPrintAllValues(const std::string& file_name) const
     {
         if (!doesFileExist(file_name))
         {

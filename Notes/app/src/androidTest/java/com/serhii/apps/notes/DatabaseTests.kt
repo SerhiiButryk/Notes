@@ -47,21 +47,21 @@ class DatabaseTests {
     @Before
     fun setup() {
         Log.i(TAG, "setup()")
+
+        val notesDatabase = UserNotesDatabase
+
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+
+        // Delete records
+        val records = UserNotesDatabase.getRecords(context)
+        for (record in records) {
+            notesDatabase.deleteRecord(record.id)
+        }
     }
 
     @After
     fun tearDown() {
         Log.i(TAG, "tearDown() IN")
-
-        val notesDatabase = UserNotesDatabase
-
-        // Delete records
-        val numberOfRecords = notesDatabase.recordsCount
-        for (i in 0..numberOfRecords) {
-            notesDatabase.deleteRecord(i.toString())
-        }
-
-        Log.i(TAG, "tearDown() is database empty: ${notesDatabase.recordsCount}, OUT")
     }
 
     /**

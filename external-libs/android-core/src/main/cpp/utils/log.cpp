@@ -4,11 +4,11 @@
 
 namespace MYLIB
 {
-    JNIEXPORT std::mutex Log::_mutex_log_guard;
-    JNIEXPORT std::string Log::_TAG_APP_ = "";
-    JNIEXPORT bool Log::detailedLogsEnabled = false;
+    std::mutex Log::_mutex_log_guard;
+    std::string Log::_TAG_APP_ = "";
+    bool Log::detailedLogsEnabled = false;
 
-    JNIEXPORT void Log::log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage) {
+    void Log::log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage) {
 
         std::lock_guard guard(_mutex_log_guard);
 
@@ -24,7 +24,6 @@ namespace MYLIB
 
         log(ANDROID_LOG_INFO, _TAG_APP_, TAG + " " + message);
     }
-
 
     JNIEXPORT void Log::setTag(const std::string& tag) {
 

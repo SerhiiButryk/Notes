@@ -119,7 +119,7 @@ namespace MYLIB
         return true;
     }
 
-    JNIEXPORT bool FileSystem::_copen_f(const std::string& path)
+    bool FileSystem::_copen_f(const std::string& path)
     {
         FILE* _file = nullptr;
         _file = fopen(path.c_str(), "wr");
@@ -134,13 +134,13 @@ namespace MYLIB
         return false;
     }
 
-    JNIEXPORT bool FileSystem::_open_f(const std::string& path, std::fstream& file, std::ios_base::openmode mode)
+    bool FileSystem::_open_f(const std::string& path, std::fstream& file, std::ios_base::openmode mode)
     {
         file.open(path, mode);
         return  file.is_open();
     }
 
-    JNIEXPORT bool FileSystem::_open_f(const std::string& path, std::fstream& file)
+    bool FileSystem::_open_f(const std::string& path, std::fstream& file)
     {
         file.open(path);
         return  file.is_open();
