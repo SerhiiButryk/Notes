@@ -4,8 +4,8 @@
 
 namespace MYLIB
 {
-    std::mutex Log::_mutex_log_guard;
-    std::string Log::_TAG_APP_ = "";
+    JNIEXPORT std::mutex Log::_mutex_log_guard;
+    JNIEXPORT std::string Log::_TAG_APP_ = "";
     bool Log::detailedLogsEnabled = false;
 
     void Log::log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage) {

@@ -69,7 +69,7 @@ class NativeBridge {
             val encIv = encMessage.substring(0, 16)
             val iv = Base64.decode(encIv.toByteArray(), Base64.NO_WRAP)
             val cipher = Cipher()
-            val (message) = cipher.decryptSymmetric(encLimit, iv)
+            val (message) = cipher.decryptSymmetric(encLimit, inputIV = iv)
             // Return result
             return message.toInt()
         }
@@ -108,7 +108,7 @@ class NativeBridge {
             val ivDecoded = Base64.decode(iv.toByteArray(), Base64.NO_WRAP)
             val cipher = Cipher()
             // Return decrypted result
-            return cipher.decryptSymmetric(encMessage, ivDecoded).message
+            return cipher.decryptSymmetric(encMessage, inputIV = ivDecoded).message
         }
 
     // TODO: Check password strength

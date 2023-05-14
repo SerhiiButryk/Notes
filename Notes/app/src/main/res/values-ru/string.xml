@@ -23,7 +23,6 @@
     <string name="ms_password_differs">Пароли не совпадают. \nПожалуйста, введите пароль еще раз.</string>
 
     <string name="ms_space_contain">Пропуска не разрешаются в пароле. \n.Пожалуйста, введите пароль еще раз.</string>
-    <string name="title_space_contain">Сообщение</string>
 
     <string name="ms_unlock_key_invalid">Ведомый ключ неверен. Пожалуйста, попробуйте снова.</string>
     <string name="title_unlock_key_invalid">Ошибка авторизации</string>

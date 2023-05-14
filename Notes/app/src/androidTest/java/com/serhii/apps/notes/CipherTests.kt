@@ -94,7 +94,7 @@ class CipherTests {
         val encMessage: Result = cipher.encryptSymmetric(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
@@ -106,7 +106,7 @@ class CipherTests {
         val encMessage2: Result = cipher.encryptSymmetric(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, encMessage2.iv)
+        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
@@ -173,7 +173,7 @@ class CipherTests {
         val encMessage: Result = cipher.encryptSymmetric(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
@@ -186,7 +186,7 @@ class CipherTests {
         val encMessage2: Result = cipher.encryptSymmetric(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, encMessage2.iv)
+        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
@@ -271,7 +271,7 @@ class CipherTests {
         val encMessage: Result = cipher.encryptSymmetric(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV =  encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)

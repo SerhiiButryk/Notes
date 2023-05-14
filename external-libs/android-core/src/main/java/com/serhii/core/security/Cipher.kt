@@ -28,27 +28,12 @@ class Cipher {
         provider = CoreEngine.configure(this, _provider)
     }
 
-    fun encryptSymmetric(message: String): Result {
-        Log.detail(TAG, "encryptSymmetric(), AA")
-        return provider.encryptSymmetric(message, ByteArray(0))
-    }
-
-    fun decryptSymmetric(message: String, inputIV: ByteArray): Result {
-        Log.detail(TAG, "decryptSymmetric(), BB")
-        return provider.decryptSymmetric(message, inputIV)
-    }
-
-    fun encryptSymmetric(message: String, key: String): Result {
-        Log.detail(TAG, "encryptSymmetricWithKey(), BB 1")
-        return provider.encryptSymmetric(message, ByteArray(0), key)
-    }
-
-    fun encryptSymmetric(message: String, key: String, inputIV: ByteArray): Result {
+    fun encryptSymmetric(message: String, key: String = "", inputIV: ByteArray = ByteArray(0)): Result {
         Log.detail(TAG, "encryptSymmetricWithKey(), BB 2")
         return provider.encryptSymmetric(message, inputIV, key)
     }
 
-    fun decryptSymmetric(message: String, key: String, inputIV: ByteArray): Result {
+    fun decryptSymmetric(message: String, key: String = "", inputIV: ByteArray = ByteArray(0)): Result {
         Log.detail(TAG, "decryptSymmetricWithKey(), BB 3")
         return provider.decryptSymmetric(message, inputIV, key)
     }
