@@ -42,7 +42,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val changePassword = findPreference<Preference>(getString(R.string.preference_change_password_key))
 
-        changePassword?.setOnPreferenceChangeListener{ _, _ ->
+        changePassword?.setOnPreferenceClickListener {
             showChangePasswordDialog(requireActivity())
             true
         }
