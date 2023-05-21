@@ -36,10 +36,9 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1en
     return env->NewStringUTF(cipherText.c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env, jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv)
+JNIEXPORT jbyteArray JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env, jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv)
 {
     Log::Info("JNI", "%s IN", __FUNCTION__ );
-
     JString cipherText(env, jcypher_text);
     JString key(env, jkey);
     JString iv(env, jiv);
@@ -51,9 +50,12 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1de
 
     CryptoUtils::symmetricDecrypt<key_length, iv_length>(cipherText, plainText, key, iv);
 
+    jbyteArray array = env->NewByteArray(plainText.length());
+    env->SetByteArrayRegion(array, 0, plainText.length(),(jbyte*) plainText.c_str());
+
     Log::Info("JNI", "%s OUT", __FUNCTION__ );
 
-    return env->NewStringUTF(plainText.c_str());
+    return array;
 }
 
 #ifdef __cplusplus

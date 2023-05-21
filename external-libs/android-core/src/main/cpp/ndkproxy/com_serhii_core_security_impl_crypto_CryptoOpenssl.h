@@ -9,8 +9,8 @@ extern "C" {
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1encryptSymmetric(JNIEnv *env,
                                                                                                jobject thiz, jstring jplaintext, jstring jkey, jstring jiv);
 
-JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env,
-                                                                                               jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv);
+JNIEXPORT jbyteArray JNICALL Java_com_serhii_core_security_impl_crypto_Openssl__1decryptSymmetric(JNIEnv *env,
+                                                                                                     jobject thiz, jstring jcypher_text, jstring jkey, jstring jiv);
 
 #ifdef __cplusplus
 }

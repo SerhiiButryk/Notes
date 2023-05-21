@@ -153,4 +153,11 @@
 
     <string name="empty_login">Пустий пароль чи ім\'я користувача</string>
     <string name="wrong_pass">Вибачте пароль не правильний. Будь ласка спробуйте ще разю</string>
+
+    // Enter keyword dialog
+    <string name="set_password_dialog_title">Введіть ключове слово для шифрування даних</string>
+    <string name="set_password_dialog_hint_restore">Введіть ключове слово.\nБудь ласка, переконайтеся, що це те саме ключове слово, яке ви використали для резервного копіювання цих нотаток. Інакше ця операція буде невдалою.</string>
+    <string name="set_password_dialog_hint_backup">Ви повинні запам\'ятати його, щоб мати можливість відновити свої дані.</string>
+
+    <string name="info_author">Автор: Сергій Бутрик</string>
 </resources>

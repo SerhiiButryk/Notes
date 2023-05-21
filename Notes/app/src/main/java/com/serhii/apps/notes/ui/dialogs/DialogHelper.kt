@@ -21,8 +21,6 @@ object DialogHelper {
     private const val SPD_DIALOG_TAG = "Set password dialog"
     private const val AL_DIALOG_TAG = "Alert dialog"
 
-    const val ALERT_DIALOG_TYPE_BACKUP_ERROR = 101
-
     @JvmStatic
     fun showChangePasswordDialog(activity: FragmentActivity) {
         val dialog = ChangePasswordDialogUI()
@@ -30,7 +28,7 @@ object DialogHelper {
     }
 
     @JvmStatic
-    fun showDialogWithEnterField(
+    fun showEnterPasswordField(
         activity: FragmentActivity, listener: DialogListener?,
         title: String?, hint: String?) {
 

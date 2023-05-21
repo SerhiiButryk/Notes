@@ -4,18 +4,23 @@
  */
 package com.serhii.apps.notes.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
 import com.serhii.apps.notes.control.background_work.WorkId
 import com.serhii.apps.notes.control.background_work.WorkItem
 import com.serhii.apps.notes.control.backup.BackupManager
+import com.serhii.apps.notes.ui.DialogWithEnterFiled
+import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.security.Hash
 
 /**
  * Activity for app settings
@@ -85,14 +90,30 @@ class SettingsActivity : AppBaseActivity() {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES")
             if (data != null) {
 
-                val workItem = WorkItem(WorkId.BACKUP_DATA_WORK_ID, 0, { ctx, workItem ->
-                    // Backup data
-                    BackupManager.backupNotes(workItem.extraData as Intent, ctx)
-                }, null, null)
+                val title = getString(R.string.set_password_dialog_title)
+                val hint = getString(R.string.set_password_dialog_hint_backup)
 
-                workItem.extraData = data
+                // Ask for keyword
+                DialogHelper.showEnterPasswordField(this, object : DialogWithEnterFiled.DialogListener {
 
-                BackgroundWorkHandler.putWork(workItem, this)
+                    override fun onOkClicked(enteredText: String?, context: Context?) {
+                        if (enteredText != null) {
+
+                            val workItem = WorkItem(WorkId.BACKUP_DATA_WORK_ID, 0, { ctx, workItem ->
+                                // Backup data
+                                BackupManager.backupNotes(workItem.extraData as Intent, enteredText, ctx)
+                            }, null, null)
+
+                            workItem.extraData = data
+
+                            BackgroundWorkHandler.putWork(workItem, context!!)
+                        }
+                    }
+
+                    override fun onCancelClicked(context: Context?) {
+                    }
+                }, title, hint)
+
             } else {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")
@@ -101,13 +122,31 @@ class SettingsActivity : AppBaseActivity() {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE")
             if (data != null) {
 
-                val workItem = WorkItem(WorkId.RESTORE_DATA_WORK_ID, 0, { ctx, workItem ->
-                    BackupManager.restoreNotes(workItem.extraData as Intent, ctx)
-                }, null, null)
+                val title = getString(R.string.set_password_dialog_title)
+                val hint = getString(R.string.set_password_dialog_hint_restore)
 
-                workItem.extraData = data
+                // Ask for keyqord
+                DialogHelper.showEnterPasswordField(this, object : DialogWithEnterFiled.DialogListener {
 
-                BackgroundWorkHandler.putWork(workItem, this)
+                    override fun onOkClicked(enteredText: String?, context: Context?) {
+                        if (enteredText != null) {
+
+                            val workItem = WorkItem(WorkId.RESTORE_DATA_WORK_ID, 0, { ctx, workItem ->
+                                BackupManager.restoreNotes(workItem.extraData as Intent, enteredText, ctx)
+                            }, null, null)
+
+                            workItem.extraData = data
+
+                            BackgroundWorkHandler.putWork(workItem, context!!)
+                        }
+
+                    }
+
+                    override fun onCancelClicked(context: Context?) {
+                    }
+                }, title, hint)
+
+
             } else {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")

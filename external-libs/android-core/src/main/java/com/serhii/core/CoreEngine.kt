@@ -24,6 +24,9 @@ internal object CoreEngine : Components {
     private const val RUNTIME_LIBRARY = "core"
     private const val TAG = "CE"
 
+    private val providerOpenSSL = Openssl()
+    private val providerSecureStore = SecureStore()
+
     override fun configure(hash: Hash) : HashGenerator {
         Log.info(TAG, "configure(), HH $hash")
         return HashAlgorithms()
@@ -31,17 +34,17 @@ internal object CoreEngine : Components {
 
     override fun configure(cipher: Cipher) : CryptoProvider {
         Log.info(TAG, "configure(), CC $cipher")
-        return SecureStore()
+        return providerSecureStore
     }
 
     override fun configure(cipher: Cipher, provider: String) : CryptoProvider {
         Log.info(TAG, "configure(), CC1 $cipher : $provider")
         return when (provider) {
             Cipher.CRYPTO_PROVIDER_ANDROID -> {
-                SecureStore()
+                providerSecureStore
             }
             Cipher.CRYPTO_PROVIDER_OPENSSL -> {
-                Openssl()
+                providerOpenSSL
             }
             else -> {
                 throw IllegalArgumentException("Unknown crypto provider is passed")

@@ -279,6 +279,80 @@ class CipherTests {
         Log.i(TAG, "test08_encryptDecryptUsingSecureStore_DefaultKey() OUT")
     }
 
+    @Test
+    fun test09_Simple_encrypt_decrypt_OpenSSL_short_key() {
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() IN")
+
+        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+
+        val key = "a" // short key
+        val message = "b" // short message
+
+        val result = cipher.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        val cipher2 = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val result2 = cipher2.decrypt(result, key)
+
+        Assert.assertNotNull(result2)
+        Assert.assertTrue(result2.isNotEmpty())
+
+        Assert.assertTrue(result2 == message)
+
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() OUT")
+    }
+
+    @Test
+    fun test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() {
+        Log.i(TAG, "test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() IN")
+
+        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+
+        var key = "a" // short key
+        val message = "b" // short message
+
+        val result = cipher.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        key = "b"
+
+        val cipher2 = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val result2 = cipher2.decrypt(result, key)
+
+        Assert.assertTrue(result2.isEmpty())
+
+        Log.i(TAG, "test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() OUT")
+    }
+
+    @Test
+    fun test09_Simple_encrypt_decrypt_SecureStore_short_key() {
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_SecureStore_short_key() IN")
+
+        val cipher = Cipher()
+
+        val key = "a" // short key
+        val message = "b" // short message
+
+        val result = cipher.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        val cipher2 = Cipher()
+        val result2 = cipher2.decrypt(result, key)
+
+        Assert.assertNotNull(result2)
+        Assert.assertTrue(result2.isNotEmpty())
+
+        Assert.assertTrue(result2 == message)
+
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_SecureStore_short_key() OUT")
+    }
+
     companion object {
         private val TAG: String = CipherTests::class.java.simpleName
 

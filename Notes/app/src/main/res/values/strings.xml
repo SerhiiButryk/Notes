@@ -122,6 +122,7 @@
 
     <string name="preference_about_version_key" translatable="false">about_version</string>
     <string name="preference_about_version_title">Version</string>
+    <string name="preference_about_author" translatable="false">preference_about_author</string>
 
     <string name="preference_idle_lock_timeout_key" translatable="false">idle_lock_time_out</string>
     <string name="preference_idle_lock_timeout_title">Change idle lock</string>
@@ -164,10 +165,10 @@
     <string name="change_password_toast_password_set">Password is set</string>
     <string name="change_password_toast_password_error">Error occurred</string>
 
-    // Set password dialog
-<!-- Not used -->
-<!--    <string name="set_password_dialog_title">Enter your password</string>-->
-<!--    <string name="set_password_dialog_title2">Enter password.\nPlease, make sure that this is the same password as you used to backup this notes. Otherwise this operation will fail.</string>-->
+    // Enter keyword dialog
+    <string name="set_password_dialog_title">Enter a keyword to encrypt your data</string>
+    <string name="set_password_dialog_hint_restore">Enter a keyword.\nPlease, make sure that this is the same keyword as you used to backup this notes. Otherwise this operation will fail.</string>
+    <string name="set_password_dialog_hint_backup">You should remember it to be able to restore your data.</string>
 
     // BlockView
     <string name="block_title">Access is restricted</string>
@@ -194,5 +195,7 @@
 
     <string name="empty_login">Empty username or password</string>
     <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
+
+    <string name="info_author">Author: Serhii Butryk</string>
 
 </resources>

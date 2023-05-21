@@ -7,6 +7,7 @@
 
     <TextView
         android:id="@+id/title_dialog"
+        style="@style/CommonTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -18,11 +19,26 @@
         android:textSize="20sp"
         tools:text="Title" />
 
+    <TextView
+        android:id="@+id/info_dialog"
+        style="@style/CommonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/title_dialog"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        tools:text="Title" />
+
     <EditText
         android:id="@+id/edit_text_field"
+        android:fontFamily="sans-serif"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title_dialog"
+        android:layout_below="@id/info_dialog"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"

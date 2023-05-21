@@ -77,4 +77,9 @@
         android:key="@string/preference_about_version_key"
         android:title="@string/preference_about_version_title"/>
 
+    <Preference
+        app:iconSpaceReserved="false"
+        android:key="@string/preference_about_author"
+        android:title="@string/info_author"/>
+
 </PreferenceScreen>

@@ -6,6 +6,7 @@ package com.serhii.core.security.impl.crypto
 
 import com.serhii.core.CoreEngine.loadNativeLibrary
 import java.lang.RuntimeException
+import java.util.*
 
 /**
  * Class provides OpenSSL interface for crypto operations
@@ -29,7 +30,7 @@ internal class Openssl : CryptoProvider {
         if (decryptedMessage.isEmpty()) {
             resultData = Result(error = CryptoError.UNKNOWN)
         } else {
-            resultData = Result(message = decryptedMessage, iv = inputIV, error = CryptoError.OK)
+            resultData = Result(message = String(decryptedMessage), iv = inputIV, error = CryptoError.OK)
         }
         return resultData
     }
@@ -44,8 +45,13 @@ internal class Openssl : CryptoProvider {
         throw RuntimeException("Illegal operation with the provider")
     }
 
+    // TODO: Replace with openSSL calls
+    fun getRandomString(): String {
+        return UUID.randomUUID().toString()
+    }
+
     private external fun _encryptSymmetric(message: String, key: String, iv: String): String
-    private external fun _decryptSymmetric(message: String, key: String, iv: String): String
+    private external fun _decryptSymmetric(message: String, key: String, iv: String): ByteArray
 
     companion object {
         init {
