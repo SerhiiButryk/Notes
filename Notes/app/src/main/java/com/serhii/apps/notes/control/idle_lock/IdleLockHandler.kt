@@ -29,6 +29,7 @@ object IdleLockHandler {
     private val isInactivityTimeoutReceived = AtomicBoolean(false)
 
     fun onUserInteraction(context: Context) {
+        cancelLockTimeout(context)
         startLockTimeout(context)
     }
 
