@@ -5,6 +5,7 @@
 package com.serhii.apps.notes.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -26,13 +27,15 @@ class DialogWithEnterFiled(private val listener: DialogListener?) : BaseDialogFr
         val title = dialogView.findViewById<TextView>(R.id.title_dialog)
         title.text = bundle!!.getString(EXTRA_TITLE_TEXT)
         val editTextField = dialogView.findViewById<EditText>(R.id.edit_text_field)
-        editTextField.hint = bundle.getString(EXTRA_HINT_TEXT)
         editTextField.requestFocus()
+
+        val info = dialogView.findViewById<TextView>(R.id.info_dialog)
+        info.text = bundle.getString(EXTRA_HINT_TEXT)
 
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
         okButton.setOnClickListener {
             if (listener != null) {
-                listener.onOkClicked(getText(editTextField))
+                listener.onOkClicked(getText(editTextField), context)
                 dismiss()
             }
         }
@@ -43,7 +46,7 @@ class DialogWithEnterFiled(private val listener: DialogListener?) : BaseDialogFr
         editTextField.addTextChangedListener(textChecker)
         val cancelButton = dialogView.findViewById<Button>(R.id.btn_cancel)
         cancelButton.setOnClickListener {
-            listener?.onCancelClicked()
+            listener?.onCancelClicked(context)
             dismiss()
         }
 
@@ -63,8 +66,8 @@ class DialogWithEnterFiled(private val listener: DialogListener?) : BaseDialogFr
     }
 
     interface DialogListener {
-        fun onOkClicked(enteredText: String?)
-        fun onCancelClicked()
+        fun onOkClicked(enteredText: String?, context: Context?)
+        fun onCancelClicked(context: Context?)
     }
 
     companion object {

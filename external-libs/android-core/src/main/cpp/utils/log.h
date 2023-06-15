@@ -62,11 +62,11 @@ namespace MYLIB
 
         private:
 
-            static std::string _TAG_APP_;
+            JNIEXPORT static std::string _TAG_APP_;
 
             static bool detailedLogsEnabled;
 
-            static std::mutex _mutex_log_guard; // Protects android log resource
+            JNIEXPORT static std::mutex _mutex_log_guard; // Protects android log resource
 
             template<typename T, typename... Args>
             static void log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage, const T& arg, const Args&... args) {

@@ -16,6 +16,7 @@ import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.security.Cipher
 import com.serhii.core.utils.GoodUtils
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -47,17 +48,20 @@ object BackupManager {
         }
     }
 
-    fun backupNotes(data: Intent, context: Context) {
+    fun backupNotes(data: Intent, key: String, context: Context) {
         info(TAG, "backupNotes() IN")
         val outputStream: OutputStream? = try {
-            context.contentResolver.openOutputStream(data.data!!)
+            val uri = data.data
+            if (uri != null) {
+                context.contentResolver.openOutputStream(uri)
+            } else null
         } catch (e: FileNotFoundException) {
             error(TAG, "backupNotes() error: $e")
             e.printStackTrace()
             return
         }
 
-        val result = backupData(outputStream, context)
+        val result = backupData(outputStream, key, context)
         if (result) {
             GoodUtils.showToast(context, R.string.result_success)
         } else {
@@ -65,10 +69,10 @@ object BackupManager {
         }
     }
 
-    fun restoreNotes(data: Intent, context: Context) {
+    fun restoreNotes(data: Intent, key: String, context: Context) {
         info(TAG, "restoreNotes() IN")
         val json = readBackupFile(data, context)
-        val result = restoreData(json, context)
+        val result = restoreData(json, key, context)
         if (result) {
             GoodUtils.showToast(context, R.string.result_success)
         } else {
@@ -169,7 +173,7 @@ object BackupManager {
         return false
     }
 
-    private fun backupData(outputStream: OutputStream?, context: Context): Boolean {
+    private fun backupData(outputStream: OutputStream?, key: String, context: Context): Boolean {
         info(TAG, "backupDataAsEncryptedText() found records: " + UserNotesDatabase.recordsCount)
 
         if (UserNotesDatabase.recordsCount != 0) {
@@ -190,8 +194,12 @@ object BackupManager {
 
             val json = jsonAdapter.toJson(backupAdapter)
 
+            // encrypt using keyword
+            val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+            val message = cipher.encrypt(json, key)
+
             try {
-                outputStream?.write(json.toByteArray())
+                outputStream?.write(message.toByteArray())
                 outputStream?.flush()
                 outputStream?.close()
             } catch (e: IOException) {
@@ -210,8 +218,12 @@ object BackupManager {
         return false
     }
 
-    private fun restoreData(json: String, context: Context): Boolean {
+    private fun restoreData(json: String, key: String, context: Context): Boolean {
         detail(TAG, "restoreData() IN")
+
+        // decrypt using keyword
+        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val messageJson = cipher.decrypt(json, key)
 
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -220,7 +232,7 @@ object BackupManager {
         val jsonAdapter: JsonAdapter<BackupAdapter> = moshi.adapter(BackupAdapter::class.java)
 
         val backupAdapter: BackupAdapter? = try {
-            jsonAdapter.fromJson(json)
+            jsonAdapter.fromJson(messageJson)
         } catch (e: IOException) {
             error(TAG, "restoreData() error parsing json content: $e")
             e.printStackTrace()

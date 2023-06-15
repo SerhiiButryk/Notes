@@ -18,6 +18,7 @@ import com.serhii.apps.notes.database.UserNotesDatabase.recordsCount
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showAlertDialog
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showChangePasswordDialog
+import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper.Companion.ALERT_DIALOG_TYPE_BACKUP_ERROR
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
@@ -41,7 +42,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val changePassword = findPreference<Preference>(getString(R.string.preference_change_password_key))
 
-        changePassword?.setOnPreferenceChangeListener{ _, _ ->
+        changePassword?.setOnPreferenceClickListener {
             showChangePasswordDialog(requireActivity())
             true
         }
@@ -111,9 +112,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         if (!isDataAvailable) {
                             return true
                         }
-                        openDirectoryChooserForBackup(
-                            activity!!
-                        )
+                        openDirectoryChooserForBackup(requireActivity())
                         return false
                     }
                 }
@@ -146,7 +145,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         get() {
             // Check if there is data to extract
             if (recordsCount == 0) {
-                showAlertDialog(DialogHelper.ALERT_DIALOG_TYPE_BACKUP_ERROR, requireActivity())
+                showAlertDialog(ALERT_DIALOG_TYPE_BACKUP_ERROR, requireActivity())
                 error(TAG, "isDataAvailable() no data available")
                 return false
             }

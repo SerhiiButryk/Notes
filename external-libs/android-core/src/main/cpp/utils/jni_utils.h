@@ -35,9 +35,9 @@ namespace MYLIB
 
     private:
 
-        static std::mutex m; // Access protection
+        JNIEXPORT static std::mutex m; // Access protection
 
-        static const std::string TAG;
+        JNIEXPORT static const std::string TAG;
 
     };
 

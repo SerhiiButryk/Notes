@@ -81,6 +81,10 @@
         <item name="android:layout_marginRight">@dimen/margin_edges_textview</item>
     </style>
 
+    <style name="CommonTextView">
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
     <style name="LoginInputTextView" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/text_color</item>

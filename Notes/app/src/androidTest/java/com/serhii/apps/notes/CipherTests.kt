@@ -94,7 +94,7 @@ class CipherTests {
         val encMessage: Result = cipher.encryptSymmetric(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
@@ -106,7 +106,7 @@ class CipherTests {
         val encMessage2: Result = cipher.encryptSymmetric(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, encMessage2.iv)
+        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
@@ -173,7 +173,7 @@ class CipherTests {
         val encMessage: Result = cipher.encryptSymmetric(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
@@ -186,7 +186,7 @@ class CipherTests {
         val encMessage2: Result = cipher.encryptSymmetric(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, encMessage2.iv)
+        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
@@ -271,12 +271,86 @@ class CipherTests {
         val encMessage: Result = cipher.encryptSymmetric(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, encMessage.iv)
+        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV =  encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
 
         Log.i(TAG, "test08_encryptDecryptUsingSecureStore_DefaultKey() OUT")
+    }
+
+    @Test
+    fun test09_Simple_encrypt_decrypt_OpenSSL_short_key() {
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() IN")
+
+        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+
+        val key = "a" // short key
+        val message = "b" // short message
+
+        val result = cipher.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        val cipher2 = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val result2 = cipher2.decrypt(result, key)
+
+        Assert.assertNotNull(result2)
+        Assert.assertTrue(result2.isNotEmpty())
+
+        Assert.assertTrue(result2 == message)
+
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() OUT")
+    }
+
+    @Test
+    fun test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() {
+        Log.i(TAG, "test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() IN")
+
+        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+
+        var key = "a" // short key
+        val message = "b" // short message
+
+        val result = cipher.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        key = "b"
+
+        val cipher2 = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val result2 = cipher2.decrypt(result, key)
+
+        Assert.assertTrue(result2.isEmpty())
+
+        Log.i(TAG, "test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() OUT")
+    }
+
+    @Test
+    fun test09_Simple_encrypt_decrypt_SecureStore_short_key() {
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_SecureStore_short_key() IN")
+
+        val cipher = Cipher()
+
+        val key = "a" // short key
+        val message = "b" // short message
+
+        val result = cipher.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        val cipher2 = Cipher()
+        val result2 = cipher2.decrypt(result, key)
+
+        Assert.assertNotNull(result2)
+        Assert.assertTrue(result2.isNotEmpty())
+
+        Assert.assertTrue(result2 == message)
+
+        Log.i(TAG, "test09_Simple_encrypt_decrypt_SecureStore_short_key() OUT")
     }
 
     companion object {

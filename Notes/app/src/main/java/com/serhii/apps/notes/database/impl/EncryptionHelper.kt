@@ -91,7 +91,7 @@ class EncryptionHelper(
         val csk = Cipher()
 
         if (ivNote != null) {
-            val (json) = csk.decryptSymmetric(note, ivNote!!)
+            val (json) = csk.decryptSymmetric(note, inputIV = ivNote!!)
             return fromJson(json)
         }
 

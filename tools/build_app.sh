@@ -22,6 +22,7 @@ MAPPING_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/mapping/relea
 ARTIFACT_FOLDER_NAME="Notes-App"
 MAPPING_FOLDER_NAME="mapping"
 REPORTS_FOLDER_NAME="reports"
+DEBUGDATA_FOLDER_NAME="debugData"
 
 echo ""
 echo "******** Started building *********"
@@ -59,6 +60,7 @@ rm -rf $ARTIFACT_FOLDER_NAME
 mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
 mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
 mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
+mkdir -p $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
 popd 
 
 cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
@@ -66,6 +68,8 @@ cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
 # Copy reports
 cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
 cp -rf -v ${PROJECT_FOLDER}/app/build/spotbugs/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/spotbugs
+
+cp -rf -v ${PROJECT_FOLDER}/app/build/intermediates/ndkBuild/* $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
 
 echo ""
 echo "******** Finished *********"

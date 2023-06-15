@@ -6,6 +6,10 @@ This application is developed for keeping and accessing all your notes securely 
 The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication
 and it provides simple interface for use.
 
+# Get on Google Play
+
+[<img src="https://www.logo.wine/a/logo/Google_Play/Google_Play-Logo.wine.svg" width="400" />](https://play.google.com/store/apps/details?id=com.serhii.apps.notes)
+
 # Features
 
 - Password and biometric authentication

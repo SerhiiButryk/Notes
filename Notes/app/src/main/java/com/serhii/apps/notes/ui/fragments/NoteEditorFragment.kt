@@ -7,6 +7,8 @@ package com.serhii.apps.notes.ui.fragments
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -18,10 +20,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter
+import com.serhii.apps.notes.ui.utils.TextChangeNotifier
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory
 import com.serhii.core.log.Log.Companion.info
@@ -70,6 +74,8 @@ class NoteEditorFragment : Fragment() {
         titleNoteField = view.findViewById(R.id.title_note)
         toolbar = view.findViewById(R.id.toolbar)
         noteTimeFiled = view.findViewById(R.id.date_time_view)
+
+        titleNoteField?.addTextChangedListener(TextChangeNotifier(requireContext()))
 
         val noteList = view.findViewById<RecyclerView>(R.id.note_list)
         noteList.layoutManager = LinearLayoutManager(context)

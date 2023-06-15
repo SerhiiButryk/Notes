@@ -47,7 +47,7 @@ class AlertDialogHelper(private val type: Int, context: Context) {
         } else if (type == AuthResult.UNLOCK_KEY_INVALID.typeId) {
             title = context.getString(R.string.title_unlock_key_invalid)
             message = context.getString(R.string.ms_unlock_key_invalid)
-        } else if (type == DialogHelper.ALERT_DIALOG_TYPE_BACKUP_ERROR) {
+        } else if (type == ALERT_DIALOG_TYPE_BACKUP_ERROR) {
             title = context.getString(R.string.title_extract_data)
             message = context.getString(R.string.ms_extract_data)
         } else if (type == AuthResult.ALERT_DIALOG_TYPE_PASSWORD_IS_SHORT.typeId) {
@@ -57,5 +57,10 @@ class AlertDialogHelper(private val type: Int, context: Context) {
             title = context.getString(R.string.title_error)
             message = context.getString(R.string.ms_email_is_not_valid)
         }
+    }
+
+    companion object {
+        // Errors
+        const val ALERT_DIALOG_TYPE_BACKUP_ERROR = 101
     }
 }

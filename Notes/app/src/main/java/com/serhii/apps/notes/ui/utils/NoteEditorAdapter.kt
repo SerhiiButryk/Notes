@@ -276,6 +276,7 @@ class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
 
     init {
         editView = view.findViewById(R.id.note_text)
+        editView.addTextChangedListener(TextChangeNotifier(editView.context))
     }
 
     override fun bind(noteModel: NoteModel, position: Int) {
@@ -299,6 +300,8 @@ class ListNoteViewHolder(view: View, var callback: UserActionHandler) : NoteView
 
     init {
         editView = view.findViewById(R.id.content_edt)
+        editView.addTextChangedListener(TextChangeNotifier(editView.context))
+
         deleteBtn = view.findViewById(R.id.delete_imv)
         deleteBtn.setOnClickListener {
             callback.onDelete(adapterPosition)
