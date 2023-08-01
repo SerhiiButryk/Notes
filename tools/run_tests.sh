@@ -128,7 +128,7 @@ do
     popd > /dev/null
 
     # Copying reports
-    cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/androidTests/connected/*  ${SCRIPT_RELEVANT_PATH}/../$TEST_RESULT_DIR/$EMULATOR/reports
+    cp -rf ../Notes/app/build/reports/androidTests/connected/*  ../test-results/$EMULATOR/reports
 
     echo ""
     echo "******** Tests are completed *********"
@@ -139,6 +139,9 @@ do
 
     # Stop all running emulators
     ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK_ROOT}/platform-tools/adb -s $line emu kill; done;
+
+    # Wait a little
+    sleep 10
 
 done
 
