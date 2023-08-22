@@ -4,6 +4,8 @@
  */
 package com.serhii.apps.notes.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -15,7 +17,6 @@ import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserFo
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForExtractData
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.apps.notes.database.UserNotesDatabase.recordsCount
-import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showAlertDialog
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showChangePasswordDialog
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper.Companion.ALERT_DIALOG_TYPE_BACKUP_ERROR
@@ -23,6 +24,7 @@ import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils.Companion.formatString
+
 
 /**
  * Fragment with application settings
@@ -137,6 +139,33 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 Log.enableDetailedLogs(newValue as Boolean)
                 true
             }
+        }
+
+        val feedbackPref = findPreference<Preference>(getString(R.string.preference_feedback))
+        if (feedbackPref != null) {
+            feedbackPref.onPreferenceClickListener = Preference.OnPreferenceClickListener { pref ->
+                openEmailClientApp()
+                true
+            }
+        }
+    }
+
+    private fun openEmailClientApp() {
+        // Open email client app for sending feedback
+        val mailto = Uri.parse("mailto:${AppDetails.DEV_EMAIL}?" +
+                "subject=" +
+                getString(R.string.email_feedback_title) +
+                "&body=" +
+                getString(R.string.email_feedback_body)
+        )
+
+        val intent = Intent(Intent.ACTION_SENDTO, mailto)
+
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.error(TAG, "openEmailClientApp() error: $e")
         }
     }
 

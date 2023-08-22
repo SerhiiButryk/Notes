@@ -12,7 +12,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.data_model.NoteModel
+import com.serhii.apps.notes.ui.search.SearchableInfo
 import com.serhii.apps.notes.ui.utils.NoteListAdapter.NoteViewHolder
+import com.serhii.core.utils.GoodUtils
 
 /**
  * Adapter for displaying notes on preview screen
@@ -31,8 +33,8 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
     }
 
     override fun onBindViewHolder(noteViewHolder: NoteViewHolder, i: Int) {
-        noteViewHolder.setTitle(notes[i].title)
-        noteViewHolder.setDescription(notes[i].note)
+        noteViewHolder.setTitle(notes[i].title, notes[i].queryInfo)
+        noteViewHolder.setDescription(notes[i].note, notes[i].queryInfo)
     }
 
     override fun getItemCount(): Int {
@@ -64,12 +66,20 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
             }
         }
 
-        fun setTitle(title: String) {
-            this.title.text = title
+        fun setTitle(title: String, queryInfo: SearchableInfo?) {
+            if (queryInfo != null) {
+                GoodUtils.setTextHighlighting(queryInfo.rangeItemTitle, this.title, title)
+            } else {
+                this.title.text = title
+            }
         }
 
-        fun setDescription(description: String) {
-            this.description.text = description
+        fun setDescription(description: String, queryInfo: SearchableInfo?) {
+             if (queryInfo != null) {
+                GoodUtils.setTextHighlighting(queryInfo.rangeItemNoteText, this.description, description)
+            } else {
+                 this.description.text = description
+            }
         }
 
         interface ClickListener {

@@ -74,6 +74,12 @@
 
     <Preference
         app:iconSpaceReserved="false"
+        android:key="@string/preference_feedback"
+        android:title="@string/preference_feedback_title"
+        android:summary="@string/preference_feedback_message"/>
+
+    <Preference
+        app:iconSpaceReserved="false"
         android:key="@string/preference_about_version_key"
         android:title="@string/preference_about_version_title"/>
 

@@ -56,6 +56,11 @@ class Log {
         fun enableDetailedLogsForDebug() {
             LogImpl.setDetailedLogsForDebug()
         }
+
+        @JvmStatic
+        fun setVersionCode(versionCode: String) {
+            LogImpl.setVersionCode(versionCode)
+        }
     }
 
 }

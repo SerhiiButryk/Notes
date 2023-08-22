@@ -26,10 +26,11 @@ internal object CoreEngine : Components {
 
     private val providerOpenSSL = Openssl()
     private val providerSecureStore = SecureStore()
+    private val hashProvider = HashAlgorithms()
 
     override fun configure(hash: Hash) : HashGenerator {
         Log.info(TAG, "configure(), HH $hash")
-        return HashAlgorithms()
+        return hashProvider;
     }
 
     override fun configure(cipher: Cipher) : CryptoProvider {
@@ -51,6 +52,8 @@ internal object CoreEngine : Components {
             }
         }
     }
+
+    fun getOpenSSLProvider(): Openssl = providerOpenSSL
 
     fun loadNativeLibrary() {
         Log.info(TAG, "loadNativeLibrary() IN")

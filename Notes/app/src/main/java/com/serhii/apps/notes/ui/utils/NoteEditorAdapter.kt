@@ -23,6 +23,7 @@ import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.data_model.NoteList
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.core.log.Log
+import com.serhii.core.utils.GoodUtils
 
 const val TAG = "NoteEditorAdapter"
 
@@ -146,28 +147,28 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
         setDataChanged(noteList)
     }
 
-    fun setNoteData(notes: NoteModel) {
+    fun setNoteData(note: NoteModel) {
 
         val newList = mutableListOf<NoteModel>()
 
         val noteList: MutableList<NoteList> = mutableListOf()
-        if (notes.listNote.isNotEmpty()) {
-            val firstElement = notes.listNote[0]
+        if (note.listNote.isNotEmpty()) {
+            val firstElement = note.listNote[0]
             noteList.add(NoteList(firstElement.note, firstElement.isChecked))
         }
 
-        val noteNew = NoteModel.getCopy(notes, noteList)
+        val noteNew = NoteModel.getCopy(note, noteList)
         newList.add(noteNew)
 
-        for ((index, valueNote) in notes.listNote.withIndex()) {
+        for ((index, valueNote) in note.listNote.withIndex()) {
             // Only care about second and other elements in note list
             if (index > 0) {
                 val noteListCopy: MutableList<NoteList> = mutableListOf()
 
-                val element = notes.listNote[index]
+                val element = note.listNote[index]
                 noteListCopy.add(NoteList(element.note, element.isChecked))
 
-                val noteCopy = NoteModel.getCopy(notes, noteListCopy)
+                val noteCopy = NoteModel.getCopy(note, noteListCopy)
 
                 newList.add(noteCopy)
             }
@@ -280,7 +281,14 @@ class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
     }
 
     override fun bind(noteModel: NoteModel, position: Int) {
+
+        // Reset text in case it has spannable strings
         editView.setText(noteModel.note)
+
+        if (noteModel.queryInfo != null) {
+            GoodUtils.setTextHighlighting(noteModel.queryInfo!!.rangeItemNoteText, editView, noteModel.note)
+        }
+
         // Cache note model associated with this View Holder
         noteSaveHelper.note = noteModel
         editView.removeTextChangedListener(noteSaveHelper)

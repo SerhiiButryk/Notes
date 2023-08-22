@@ -30,7 +30,7 @@ class AuthorizationActivity : AppBaseActivity() {
     private lateinit var fragmentManager: FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        TAG_BASE += TAG
+        setLoggingTagForActivity(TAG)
 
         info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)

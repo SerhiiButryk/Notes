@@ -4,11 +4,12 @@
   ~ Author: Serhii Butryk
   -->
 <resources>
-    <string name="app_name">Заметки</string>
-    <string name="app_name_debug">ЗаметкиДэв</string>
+    <string name="app_name">Блокнот</string>
+    <string name="app_name_debug">БлокнотДев</string>
 
     // NotesView activity
     <string name="ms_no_notes">Нет еще заметки</string>
+    <string name="ms_no_search_results">Ничего не надено. Извините.</string>
 
     // Alter Dialog
     <string name="ms_no_user_account">Ваш аккаунт не найден. \тПожалуйста, создайте аккаунт.</string>
@@ -119,6 +120,12 @@
     <string name="preference_category_title_debug">Диагностика</string>
     <string name="preference_category_message_detail_logs">Включить подробные логи</string>
 
+    <string name="preference_feedback_title" >Обратный отзыв</string>
+    <string name="preference_feedback_message" >Поделитесь своими мыслями, проблемами или идеями для этого приложения</string>
+
+    <string name="email_feedback_title">[NotesApp][Feedback] (Добавьте свой заголовок здесь)]</string>
+    <string name="email_feedback_body">[Нашли проблему ? - Опишите]\n[Имеете идеи ? - Поделитесь ими]\n[Имеете вопрос ? - Задайте]</string>
+
     // Change password dialog
     <string name="hint_new_password">Введите новый пароль</string>
     <string name="hint_old_password">Ведите старый пароль</string>
@@ -160,5 +167,7 @@
     <string name="set_password_dialog_hint_backup">Вы должны запомнить его, чтобы иметь возможность восстановить свои данные.</string>
 
     <string name="info_author">Автор: Сергей Бутрик</string>
+
+    <string name="search_title">Поиск</string>
 
 </resources>

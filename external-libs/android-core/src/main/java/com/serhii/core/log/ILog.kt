@@ -5,8 +5,11 @@
 package com.serhii.core.log
 
 internal interface ILog {
+
     fun info(tag: String, message: String)
     fun detail(tag: String, message: String)
     fun error(tag: String, message: String)
+    fun setVersionCode(versionCode: String)
+
     var tag: String
 }

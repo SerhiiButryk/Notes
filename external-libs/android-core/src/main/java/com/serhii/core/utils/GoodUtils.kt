@@ -5,12 +5,18 @@
 package com.serhii.core.utils
 
 import android.widget.EditText
-import com.serhii.core.utils.GoodUtils
 import android.widget.Toast
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.os.Message
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
+import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
+import androidx.core.text.set
 import com.serhii.core.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,6 +29,8 @@ class GoodUtils {
     companion object {
 
         private const val DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
+
+        private val keyboardHelper = KeyboardHelper()
 
         @JvmStatic
         fun buildMessage(what: Int): Message {
@@ -96,6 +104,26 @@ class GoodUtils {
                 return true
             }
             return false
+        }
+
+        @JvmStatic
+        fun showKeyboard(context: Context, view: View) {
+            keyboardHelper.requestHowKeyboard(context, view)
+        }
+
+        @JvmStatic
+        fun hideKeyboard(context: Context, view: View) {
+            keyboardHelper.requestHideKeyboard(context, view)
+        }
+
+        @JvmStatic
+        fun setTextHighlighting(ranges: List<IntRange>, view: TextView, content: String) {
+            val selection = SpannableString(content)
+            for (range in ranges) {
+                selection[range] = BackgroundColorSpan(Color.YELLOW)
+                selection[range] = ForegroundColorSpan(Color.BLACK)
+            }
+            view.text = selection
         }
     }
 }

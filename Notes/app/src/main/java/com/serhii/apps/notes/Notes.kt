@@ -20,5 +20,6 @@ class Notes : Application() {
         Log.tag = AppDetails.APP_LOG_TAG
         val enabled = PreferenceManager.isDetailLogsEnabled(this)
         Log.enableDetailedLogs(enabled)
+        Log.setVersionCode(BuildConfig.VERSION_NAME)
     }
 }

@@ -4,11 +4,12 @@
   ~ Author: Serhii Butryk
   -->
 <resources>
-    <string name="app_name">Нотатки</string>
-    <string name="app_name_debug">НотаткиДев</string>
+    <string name="app_name">Блокнот</string>
+    <string name="app_name_debug">БлокнотДев</string>
 
     // NotesView activity
     <string name="ms_no_notes">Не має ще щодної нотатки</string>
+    <string name="ms_no_search_results">Нічого не знайдено. Вибачте.</string>
 
     // Alter Dialog
     <string name="ms_no_user_account">Ваш акаунт не знайдений. \nБудь ласка, створіть свій акаунт.</string>
@@ -119,6 +120,12 @@
     <string name="preference_category_title_debug">Діагностика</string>
     <string name="preference_category_message_detail_logs">Включити детальні логи</string>
 
+    <string name="preference_feedback_title" >Зворотній зв\'язок отзыв</string>
+    <string name="preference_feedback_message" >Поділіться своїми думками, проблемами або ідеями для цієї програми</string>
+
+    <string name="email_feedback_title">[NotesApp][Feedback] (Додати свій заголовок тут)]</string>
+    <string name="email_feedback_body">[Знайшли проблему? - Опишіть]\n[Маєте ідеї? - Поділіться ними]\n[Маєте питання? - Задайте]</string>
+
     // Change password dialog
     <string name="hint_new_password">Ведіть новий пароль</string>
     <string name="hint_old_password">Ведіть старий пароль</string>
@@ -160,4 +167,7 @@
     <string name="set_password_dialog_hint_backup">Ви повинні запам\'ятати його, щоб мати можливість відновити свої дані.</string>
 
     <string name="info_author">Автор: Сергій Бутрик</string>
+
+    <string name="search_title">Пошук</string>
+
 </resources>

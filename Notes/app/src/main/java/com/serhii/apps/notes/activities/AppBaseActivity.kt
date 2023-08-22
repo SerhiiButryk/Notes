@@ -55,6 +55,10 @@ open class AppBaseActivity : AppCompatActivity() {
         Log.info(TAG_BASE, "onDestroy() out")
     }
 
+    protected fun setLoggingTagForActivity(tag: String) {
+        TAG_BASE += tag
+    }
+
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
         Log.info(TAG_BASE, "init() finished")
