@@ -124,6 +124,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
 
     fun performSearch(context: Context, query: String, noteForSearch: NoteModel? = null) {
 
+        // Remove extra spaces
+        val searchedText = query.trim()
+
         val noteList: List<NoteModel> = if (noteForSearch != null) {
             listOf(noteForSearch)
         } else {
@@ -135,13 +138,13 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
             val listNote = element.listNote
             val noteTitle = element.title
 
-            val rangeItemTitle = searchAllOccurrences(noteTitle, query)
-            val rangeItemNoteText = searchAllOccurrences(noteText, query)
+            val rangeItemTitle = searchAllOccurrences(noteTitle, searchedText)
+            val rangeItemNoteText = searchAllOccurrences(noteText, searchedText)
 
             element.queryInfo = SearchableInfo(rangeItemTitle, rangeItemNoteText)
 
             val newListWithMatchedText = listNote.filter { listElement ->
-                listElement.note.contains(query)
+                listElement.note.contains(searchedText)
             }
 
             // Check if any item has text which we search

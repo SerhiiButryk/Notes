@@ -11,8 +11,11 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.backup.data.BackupAdapter
+import com.serhii.apps.notes.control.backup.data.NoteAdapter
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
@@ -233,7 +236,7 @@ object BackupManager {
 
         val backupAdapter: BackupAdapter? = try {
             jsonAdapter.fromJson(messageJson)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             error(TAG, "restoreData() error parsing json content: $e")
             e.printStackTrace()
             return false
@@ -261,10 +264,6 @@ object BackupManager {
         }
         return intent
     }
-
-    class BackupAdapter(val notes: List<NoteAdapter>)
-
-    class NoteAdapter(val id: String, val note: String)
 
     private const val TAG = "BackupManager"
     const val REQUEST_CODE_EXTRACT_NOTES = 1

@@ -166,12 +166,12 @@
 
     // Change password dialog
     <string name="hint_new_password">Enter new password</string>
-    <string name="hint_old_password">Enter old password</string>
+    <string name="hint_old_password">Enter your current password</string>
     <string name="change_password_title_dialog">Change your password</string>
 
-    <string name="change_password_toast_not_correct_password">Entered password is not correct</string>
+    <string name="change_password_toast_not_correct_password">Entered current password is not correct</string>
     <string name="change_password_toast_password_set">Password is set</string>
-    <string name="change_password_toast_password_error">Error occurred</string>
+    <string name="change_password_toast_password_error">Error occurred. Sorry.</string>
 
     // Enter keyword dialog
     <string name="set_password_dialog_title">Enter a keyword to encrypt your data</string>

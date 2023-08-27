@@ -123,17 +123,17 @@
     <string name="preference_feedback_title" >Обратный отзыв</string>
     <string name="preference_feedback_message" >Поделитесь своими мыслями, проблемами или идеями для этого приложения</string>
 
-    <string name="email_feedback_title">[NotesApp][Feedback] (Добавьте свой заголовок здесь)]</string>
+    <string name="email_feedback_title">[NotesApp][Feedback] (Добавьте заголовок здесь)]</string>
     <string name="email_feedback_body">[Нашли проблему ? - Опишите]\n[Имеете идеи ? - Поделитесь ими]\n[Имеете вопрос ? - Задайте]</string>
 
     // Change password dialog
     <string name="hint_new_password">Введите новый пароль</string>
-    <string name="hint_old_password">Ведите старый пароль</string>
+    <string name="hint_old_password">Ведите свой текущий пароль</string>
     <string name="change_password_title_dialog">Изменить пароль</string>
 
-    <string name="change_password_toast_not_correct_password">Ведомый пароль неверен</string>
+    <string name="change_password_toast_not_correct_password">Введенный текущий пароль неверен</string>
     <string name="change_password_toast_password_set">Пароль установлен</string>
-    <string name="change_password_toast_password_error">Произошла ошибка</string>
+    <string name="change_password_toast_password_error">Произошла ошибка. Извените.</string>
 
     // BlockView
     <string name="block_title">Доступ ограничен</string>

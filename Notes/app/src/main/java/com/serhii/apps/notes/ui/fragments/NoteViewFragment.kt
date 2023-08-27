@@ -8,11 +8,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,7 +28,6 @@ import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.utils.NoteListAdapter
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory
-import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 
 /**
@@ -43,21 +43,12 @@ class NoteViewFragment : BaseFragment() {
     private lateinit var toolbar: Toolbar
     private lateinit var hintNotesImage: ImageView
     private lateinit var hintNotesText: TextView
-    private var searchView: SearchView? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var isSearchActivate = false
 
     private val observerDataChanged = Observer<List<NoteModel>> { newNotes ->
         info(TAG, "onChanged() new data received, size = $newNotes.size")
-        // We can receive data changes when NoteEditorFragment is opened
-        // In this case we ignore them.
-
-        val currentOrientation = resources.configuration.orientation
-        val isConfigChanged = SCREEN_ORIENTATION_PREVIOUS != currentOrientation
-
-        info(TAG, "onChanged() isConfigChanged = $isConfigChanged")
-
-        // This is a hack to run this code after screen rotation
-        // Should find better fix for this situation
-        if (isFragmentAtTheTop(FRAGMENT_TAG) || isConfigChanged) {
+        mainHandler.post {
             updateUI(newNotes)
         }
     }
@@ -187,18 +178,24 @@ class NoteViewFragment : BaseFragment() {
     }
 
     override fun onSearchStarted(query: String) {
+        // Track SearchView state
+        isSearchActivate = true
+        // Do a search
         notesViewModel.performSearch(requireContext(), query)
     }
 
     override fun onSearchFinished() {
-        // SearchView is closed so update to remove selection
-        notesViewModel.updateData(requireContext())
+        // Track SearchView state
+        isSearchActivate = false
+        // Need to postpone a bit when SearchView state is changed (it is collapsed)
+        mainHandler.post {
+            notesViewModel.updateData(requireContext())
+        }
     }
 
     private fun configureIconAndTextHint(notes: List<NoteModel>) {
-        if (searchView?.isIconified == false // Whether SearchView is expanded
-                && notes.isEmpty()) {
-            // At this point we should "Search text is not found" show image and text
+        if (isSearchActivate && notes.isEmpty()) {
+            // At this point we should show "Searched text is not found" so related image and text
             setVisibilityForHintImageAndText(View.VISIBLE)
 
             hintNotesImage.setImageDrawable(requireContext().getDrawable(R.drawable.ic_search))

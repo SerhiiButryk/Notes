@@ -81,7 +81,7 @@
         <item name="android:layout_marginRight">@dimen/margin_edges_textview</item>
     </style>
 
-    <style name="CommonTextView">
+    <style name="CommonView">
         <item name="android:fontFamily">sans-serif</item>
     </style>
 

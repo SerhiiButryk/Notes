@@ -30,8 +30,13 @@ android {
     buildTypes {
 
         release {
-            minifyEnabled true
-            shrinkResources true
+            // Disabled temporary because of
+            // "java.lang.RuntimeException: Failed to find the generated JsonAdapter class for
+            // class com.serhii.apps.notes.control.backup.data.BackupAdapter" issue
+//            minifyEnabled true
+//            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             // App name

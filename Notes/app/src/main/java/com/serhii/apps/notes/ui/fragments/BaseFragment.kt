@@ -41,6 +41,7 @@ open class BaseFragment : Fragment() {
         searchView = menu.findItem(R.id.search).actionView as SearchView
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
             override fun onQueryTextSubmit(query: String?): Boolean {
 
                 Log.detail("BaseFragment", "onQueryTextSubmit() $query")

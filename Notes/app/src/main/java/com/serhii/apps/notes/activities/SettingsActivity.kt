@@ -14,7 +14,7 @@ import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
 import com.serhii.apps.notes.control.background_work.WorkId
 import com.serhii.apps.notes.control.background_work.WorkItem
 import com.serhii.apps.notes.control.backup.BackupManager
-import com.serhii.apps.notes.ui.DialogWithEnterFiled
+import com.serhii.apps.notes.ui.EnterPasswordDialogUI
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
 import com.serhii.core.log.Log.Companion.error
@@ -92,7 +92,7 @@ class SettingsActivity : AppBaseActivity() {
                 val hint = getString(R.string.set_password_dialog_hint_backup)
 
                 // Ask for keyword
-                DialogHelper.showEnterPasswordField(this, object : DialogWithEnterFiled.DialogListener {
+                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
 
                     override fun onOkClicked(enteredText: String?, context: Context?) {
                         if (enteredText != null) {
@@ -123,8 +123,8 @@ class SettingsActivity : AppBaseActivity() {
                 val title = getString(R.string.set_password_dialog_title)
                 val hint = getString(R.string.set_password_dialog_hint_restore)
 
-                // Ask for keyqord
-                DialogHelper.showEnterPasswordField(this, object : DialogWithEnterFiled.DialogListener {
+                // Ask for keyword
+                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
 
                     override fun onOkClicked(enteredText: String?, context: Context?) {
                         if (enteredText != null) {

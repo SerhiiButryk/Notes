@@ -7,20 +7,16 @@ package com.serhii.apps.notes.ui.fragments
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.*
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
@@ -91,7 +87,7 @@ class NoteEditorFragment : BaseFragment() {
     /**
      * Search results observer callback
      */
-    private val searchResultsDataObserver = Observer<List<NoteModel>> { note ->
+    private val dataChangedObserver = Observer<List<NoteModel>> { note ->
         info(TAG, "onChanged() got search result")
         // Check result and set selection if available
         // We expect list with one element here
@@ -177,7 +173,8 @@ class NoteEditorFragment : BaseFragment() {
         action = requireArguments().getString(ARG_ACTION)
         noteId = requireArguments().getString(ARG_NOTE_ID)
 
-        notesViewModel.getNotes().observe(viewLifecycleOwner, searchResultsDataObserver)
+        notesViewModel.getNotes().observe(viewLifecycleOwner) {
+        }
 
         processArgs()
     }
@@ -227,11 +224,23 @@ class NoteEditorFragment : BaseFragment() {
     }
 
     override fun onSearchStarted(query: String) {
+        if (noteId == null) {
+            Log.error(TAG, "onSearchStarted() noteId == null")
+            return
+        }
+
+        notesViewModel.getNotes().observe(viewLifecycleOwner, dataChangedObserver)
+
         val note = notesViewModel.getNote(noteId!!, requireContext())
         notesViewModel.performSearch(requireContext(), query, note)
     }
 
     override fun onSearchFinished() {
+        if (noteId == null) {
+            Log.error(TAG, "onSearchFinished() noteId == null")
+            return
+        }
+
         // We should reset selection on NotesViewFragment when SearchView is closed
         val note = notesViewModel.getNote(noteId!!, requireContext())
         titleNoteField.setText(note.title)
