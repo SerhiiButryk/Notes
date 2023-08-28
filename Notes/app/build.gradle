@@ -12,7 +12,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../../../notes-app-release-key.jks")
+            storeFile file("test_only.jks")
             storePassword 'password'
             keyAlias 'key0'
             keyPassword 'password'
