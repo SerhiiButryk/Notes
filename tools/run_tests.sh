@@ -115,8 +115,20 @@ do
     echo "Waiting for device to be online"
     echo ""
 
-    # Wait 60 seconds for device to be online
-    sleep 60
+    # Wait while a device is online
+    for i in {1..10}
+    do
+        DEVICE_OFFLINE=$(${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep -w "device" | cut -f 2)
+
+        if [ -z  "$DEVICE_OFFLINE" ]
+        then
+            echo "Waiting..."    
+        else
+            break
+        fi
+
+        sleep 10
+    done
 
     # Run tests
     pushd ${SCRIPT_RELEVANT_PATH}/../Notes/ > /dev/null
@@ -128,7 +140,7 @@ do
     popd > /dev/null
 
     # Copying reports
-    cp -rf ../Notes/app/build/reports/androidTests/connected/*  ../test-results/$EMULATOR/reports
+    cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/androidTests/connected/*  ${SCRIPT_RELEVANT_PATH}/../test-results/$EMULATOR/reports
 
     echo ""
     echo "******** Tests are completed *********"

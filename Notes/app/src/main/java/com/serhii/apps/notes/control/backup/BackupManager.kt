@@ -11,8 +11,6 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.backup.data.BackupAdapter
-import com.serhii.apps.notes.control.backup.data.NoteAdapter
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.core.log.Log
@@ -21,9 +19,6 @@ import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Cipher
 import com.serhii.core.utils.GoodUtils
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
@@ -181,21 +176,7 @@ object BackupManager {
 
         if (UserNotesDatabase.recordsCount != 0) {
             val notes = UserNotesDatabase.getRecords(context)
-            val serializedNotes = mutableListOf<NoteAdapter>()
-
-            for ((index, note) in notes.withIndex()) {
-                serializedNotes.add(NoteAdapter("$index", NoteModel.getJson(note)))
-            }
-
-            val backupAdapter = BackupAdapter(serializedNotes)
-
-            val moshi = Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
-
-            val jsonAdapter = moshi.adapter(BackupAdapter::class.java)
-
-            val json = jsonAdapter.toJson(backupAdapter)
+            val json = NoteModel.convertNoteListToJson(notes)
 
             // encrypt using keyword
             val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
@@ -228,25 +209,10 @@ object BackupManager {
         val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
         val messageJson = cipher.decrypt(json, key)
 
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
-        val jsonAdapter: JsonAdapter<BackupAdapter> = moshi.adapter(BackupAdapter::class.java)
-
-        val backupAdapter: BackupAdapter? = try {
-            jsonAdapter.fromJson(messageJson)
-        } catch (e: Exception) {
-            error(TAG, "restoreData() error parsing json content: $e")
-            e.printStackTrace()
-            return false
-        }
-
-        val notes = backupAdapter!!.notes
+        val notes = NoteModel.convertJsonToNoteList(messageJson)
 
         for (note in notes) {
-            val noteModel: NoteModel = NoteModel.fromJson(note.note)
-            UserNotesDatabase.addRecord(noteModel, context)
+            UserNotesDatabase.addRecord(note, context)
         }
 
         updateDataFlag.value = true

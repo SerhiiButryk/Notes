@@ -31,4 +31,4 @@
 }
 
 # Keep names for classes which we use for json serialization/deserialization
--keepnames class com.serhii.apps.notes.control.backup.data.**  { *; }
+#-keepnames class com.serhii.apps.notes.control.backup.data.**  { *; }

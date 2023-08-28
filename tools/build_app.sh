@@ -16,10 +16,10 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 
-PROJECT_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes"
-APK_FILES_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/apk"
-BUNDLE_FILES_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/bundle"
-MAPPING_FOLDER="${SCRIPT_ABSOLUTE_PATH}/../Notes/app/build/outputs/mapping/release"
+PROJECT_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes"
+APK_FILES_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs/apk"
+BUNDLE_FILES_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs/bundle"
+MAPPING_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs/mapping/release"
 
 ARTIFACT_FOLDER_NAME="Notes-App"
 MAPPING_FOLDER_NAME="mapping"
@@ -27,16 +27,15 @@ REPORTS_FOLDER_NAME="reports"
 DEBUGDATA_FOLDER_NAME="debugData"
 BUNDLDATA_FOLDER_NAME="bundle"
 
-BUILD_APK=true
+BUILD_APK=false
 
 while [ : ]; do
   case "$1" in
     --apk)
-        print_message "Building apk"
+        BUILD_APK=true
         shift
         ;;
     --bundle)
-        print_message "Building bundle"
         BUILD_APK=false
         shift
         ;;
@@ -57,6 +56,8 @@ print_message "******** Started building *********"
 if [ "$BUILD_APK" == true ]
 then 
 
+    print_message "******** Building APK *********"
+
     # Build apk
     pushd ${PROJECT_FOLDER}
     ./gradlew clean assemble
@@ -64,6 +65,8 @@ then
 
 else
 
+    print_message "******** Building Bundle *********"
+    
     # Build app bundle
     pushd ${PROJECT_FOLDER}
     ./gradlew clean bundle
@@ -89,27 +92,27 @@ print_message "******** Copying files *********"
 pushd ${SCRIPT_ABSOLUTE_PATH}/../
 
 # Clear if it exists
-rm -rf $ARTIFACT_FOLDER_NAME
+rm -rf ${SCRIPT_ABSOLUTE_PATH}/$ARTIFACT_FOLDER_NAME
 
 # Create folder for artifacts 
-mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
-mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
-mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
-mkdir -p $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
-mkdir -p $ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
+mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
+mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
+mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
+mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
+mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
 popd 
 
-cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}
-cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${MAPPING_FOLDER_NAME}
+cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${MAPPING_FOLDER_NAME}
 
 if [ "$BUILD_APK" == false ]
 then
-    cp -rf -v ${BUNDLE_FILES_FOLDER}/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${BUNDLDATA_FOLDER_NAME}
+    cp -rf -v ${BUNDLE_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${BUNDLDATA_FOLDER_NAME}
 fi  
 
 # Copy reports
-cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
-cp -rf -v ${PROJECT_FOLDER}/app/build/spotbugs/* ${SCRIPT_ABSOLUTE_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/spotbugs
+cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
+cp -rf -v ${PROJECT_FOLDER}/app/build/spotbugs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/spotbugs
 
 cp -rf -v ${PROJECT_FOLDER}/app/build/intermediates/ndkBuild/* $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
 
