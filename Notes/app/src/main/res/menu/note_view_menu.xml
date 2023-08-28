@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/search"
+        android:title="@string/search_title"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="always"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+
     <item android:id="@+id/settings_item"
         android:title="@string/settings_item"
         app:showAsAction="never"/>
@@ -11,10 +17,5 @@
         android:icon="@drawable/ic_view_grid"
         android:title="@string/action_layout_grid"
         app:showAsAction="ifRoom" />
-
-    <!--TODO: No implemented yet-->
-    <!--    <item android:id="@+id/plans_item"-->
-    <!--        android:title="@string/plans_item"-->
-    <!--        app:showAsAction="never"/>-->
 
 </menu>

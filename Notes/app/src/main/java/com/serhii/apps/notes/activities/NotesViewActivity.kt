@@ -11,7 +11,6 @@ import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
-import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.control.auth.BiometricAuthManager
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment
@@ -32,7 +31,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     private var notesViewModel: NotesViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        TAG_BASE += TAG
+        setLoggingTagForActivity(TAG)
 
         info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)
@@ -55,7 +54,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     private fun addNoteViewFragment() {
         val fm = supportFragmentManager
         val f = NoteViewFragment()
-        fm.beginTransaction().replace(R.id.main_layout, f, null)
+        fm.beginTransaction().replace(R.id.main_layout, f, NoteViewFragment.FRAGMENT_TAG)
             .setReorderingAllowed(true) // Needed for optimization
             .commit()
     }

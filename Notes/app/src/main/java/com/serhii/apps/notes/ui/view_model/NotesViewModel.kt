@@ -14,6 +14,7 @@ import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDisplayMode
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
+import com.serhii.apps.notes.ui.search.SearchableInfo
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.impl.crypto.CryptoError
 
@@ -119,6 +120,65 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         info(TAG, "retrieveData(), load data")
         val data = notesRepository.getAll(context)
         notes.value = data
+    }
+
+    fun performSearch(context: Context, query: String, noteForSearch: NoteModel? = null) {
+
+        // Remove extra spaces
+        val searchedText = query.trim()
+
+        val noteList: List<NoteModel> = if (noteForSearch != null) {
+            listOf(noteForSearch)
+        } else {
+            notesRepository.getAll(context)
+        }
+
+        val newList = noteList.filter { element ->
+            val noteText = element.note
+            val listNote = element.listNote
+            val noteTitle = element.title
+
+            val rangeItemTitle = searchAllOccurrences(noteTitle, searchedText)
+            val rangeItemNoteText = searchAllOccurrences(noteText, searchedText)
+
+            element.queryInfo = SearchableInfo(rangeItemTitle, rangeItemNoteText)
+
+            val newListWithMatchedText = listNote.filter { listElement ->
+                listElement.note.contains(searchedText)
+            }
+
+            // Check if any item has text which we search
+            rangeItemTitle.isNotEmpty() || rangeItemNoteText.isNotEmpty() || newListWithMatchedText.isNotEmpty()
+        }
+
+        info(TAG, "performSearch() got result sz = ${newList.size}")
+
+        notes.value = newList
+    }
+
+    private fun searchAllOccurrences(text: String, search: String): List<IntRange> {
+
+        var start = 0
+        var index = 0
+
+        val listRanges = mutableListOf<IntRange>()
+
+        while (true) {
+            index = text.indexOf(search, start, true)
+
+            if (index == -1)
+                break
+
+            listRanges.add(index..(search.length + index))
+
+            if ((index + search.length - 1) >= text.length) {
+                break
+            }
+
+            start = index + search.length
+        }
+
+        return listRanges
     }
 
     companion object {

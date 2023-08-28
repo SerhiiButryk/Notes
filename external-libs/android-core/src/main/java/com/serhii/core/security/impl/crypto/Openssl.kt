@@ -4,9 +4,10 @@
  */
 package com.serhii.core.security.impl.crypto
 
+import android.util.Base64
 import com.serhii.core.CoreEngine.loadNativeLibrary
 import java.lang.RuntimeException
-import java.util.*
+import java.security.SecureRandom
 
 /**
  * Class provides OpenSSL interface for crypto operations
@@ -47,7 +48,9 @@ internal class Openssl : CryptoProvider {
 
     // TODO: Replace with openSSL calls
     fun getRandomString(): String {
-        return UUID.randomUUID().toString()
+        val byteArray = ByteArray(20)
+        SecureRandom.getInstance("SHA1PRNG").nextBytes(byteArray)
+        return String(Base64.encode(byteArray, Base64.NO_WRAP))
     }
 
     private external fun _encryptSymmetric(message: String, key: String, iv: String): String

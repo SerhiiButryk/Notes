@@ -65,9 +65,9 @@ class EncryptionHelper(
 
         // Retrieve from shared preferences
         val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-        val `val` = preferences.getString(KEY_IV_NOTE, "")
+        val id_ = preferences.getString(KEY_IV_NOTE, "")
 
-        ivNote = Base64.decode(`val`, Base64.NO_WRAP)
+        ivNote = Base64.decode(id_, Base64.NO_WRAP)
     }
 
     fun decrypt(data: Map<Int, String>): List<NoteModel> {

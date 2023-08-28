@@ -19,6 +19,7 @@ import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
+import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
 /**
@@ -61,7 +62,9 @@ class RegisterFragment : Fragment() {
             loginViewModel!!.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION))
         }
 
-        emailField!!.requestFocus()
+        if (emailField!!.requestFocus()) {
+            GoodUtils.showKeyboard(requireContext(), emailField!!)
+        }
 
         confirmPasswordField!!.setOnEditorActionListener(keyEventActionDone)
         return view

@@ -4,6 +4,10 @@
  */
 package com.serhii.apps.notes.ui.data_model
 
+import com.serhii.apps.notes.ui.search.SearchableInfo
+import com.serhii.core.log.Log
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
@@ -12,7 +16,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Classes which represent user note in this application
+ * Classes which represent a note in this application
  */
 
 data class NoteList(var note: String = "", var isChecked:Boolean = false)
@@ -24,6 +28,8 @@ data class NoteModel(var note: String = "", var title: String = "",
                       * Currently there can be only 1 item in list
                       */
                      val listNote: MutableList<NoteList> = mutableListOf()) {
+
+    var queryInfo: SearchableInfo? = null
 
     /*
     * If this note has no user notes
@@ -113,9 +119,50 @@ data class NoteModel(var note: String = "", var title: String = "",
             return NoteModel(note, title, time, id, Integer.parseInt(viewType), resultArray)
         }
 
-        fun getJson(note: NoteModel): String {
+        fun convertNoteListToJson(notes: List<NoteModel>): String {
+
+            val notesJsonObjects = mutableListOf<JsonObject>()
+
+            for (note in notes) {
+                val jsonObject = getJsonObject(note)
+                notesJsonObjects.add(jsonObject)
+            }
 
             val jsonArray = buildJsonArray {
+                for (jsonObject in notesJsonObjects) {
+                    add(jsonObject)
+                }
+            }
+
+            return jsonArray.toString()
+        }
+
+        fun convertJsonToNoteList(json: String): List<NoteModel> {
+
+            val list = mutableListOf<NoteModel>()
+
+            try {
+                val jsonArray = JSONArray(json)
+                for (i in 0 until jsonArray.length()) {
+                    val jsonObject = jsonArray.get(i)
+                    val noteModel = fromJson(jsonObject.toString())
+                    list.add(noteModel)
+                }
+            } catch (e: Exception) {
+                Log.error("NoteModel", "convertJsonToNoteList() failed to convert, error = $e")
+                e.printStackTrace()
+                return emptyList()
+            }
+
+            return list
+        }
+
+        fun getJson(note: NoteModel): String {
+            return getJsonObject(note).toString()
+        }
+
+        private fun getJsonObject(note: NoteModel): JsonObject {
+            val noteListTypeArray = buildJsonArray {
                 for (n in note.listNote) {
                     addJsonObject {
                         put(NOTE_KEY, n.note)
@@ -124,23 +171,28 @@ data class NoteModel(var note: String = "", var title: String = "",
                 }
             }
 
-            val json = buildJsonObject {
+            return buildJsonObject {
                 put(NOTE_KEY, note.note)
                 put(TITLE_KEY, note.title)
                 put(TIME_KEY, note.time)
                 put(ID_KEY, note.id)
                 put(TYPE_KEY, note.viewType)
-                put(NOTE_LIST_KEY, jsonArray)
+                put(NOTE_LIST_KEY, noteListTypeArray)
             }
-
-            return json.toString()
         }
 
-        fun getCopy(note: NoteModel) = NoteModel(note.note, note.title, note.time, note.id,
-            note.viewType, note.listNote)
+        fun getCopy(note: NoteModel): NoteModel {
+            val copyNote = NoteModel(note.note, note.title, note.time, note.id, note.viewType, note.listNote)
+            copyNote.queryInfo = note.queryInfo
+            return copyNote
+        }
 
-        fun getCopy(note: NoteModel, listNote: MutableList<NoteList>) = NoteModel(note.note, note.title, note.time, note.id,
-            note.viewType, listNote)
+        fun getCopy(note: NoteModel, listNote: MutableList<NoteList>): NoteModel {
+            val copyNote = NoteModel(note.note, note.title, note.time, note.id,
+                note.viewType, listNote)
+            copyNote.queryInfo = note.queryInfo
+            return copyNote
+        }
 
         fun create(note: String, title: String, time: String, id: String): NoteModel {
             return NoteModel(note, title, time, id)

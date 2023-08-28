@@ -10,17 +10,15 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
 import com.serhii.apps.notes.control.background_work.WorkId
 import com.serhii.apps.notes.control.background_work.WorkItem
 import com.serhii.apps.notes.control.backup.BackupManager
-import com.serhii.apps.notes.ui.DialogWithEnterFiled
+import com.serhii.apps.notes.ui.EnterPasswordDialogUI
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.Hash
 
 /**
  * Activity for app settings
@@ -30,7 +28,7 @@ class SettingsActivity : AppBaseActivity() {
     private var toolbar: Toolbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        TAG_BASE += TAG
+        setLoggingTagForActivity(TAG)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -94,7 +92,7 @@ class SettingsActivity : AppBaseActivity() {
                 val hint = getString(R.string.set_password_dialog_hint_backup)
 
                 // Ask for keyword
-                DialogHelper.showEnterPasswordField(this, object : DialogWithEnterFiled.DialogListener {
+                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
 
                     override fun onOkClicked(enteredText: String?, context: Context?) {
                         if (enteredText != null) {
@@ -125,8 +123,8 @@ class SettingsActivity : AppBaseActivity() {
                 val title = getString(R.string.set_password_dialog_title)
                 val hint = getString(R.string.set_password_dialog_hint_restore)
 
-                // Ask for keyqord
-                DialogHelper.showEnterPasswordField(this, object : DialogWithEnterFiled.DialogListener {
+                // Ask for keyword
+                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
 
                     override fun onOkClicked(enteredText: String?, context: Context?) {
                         if (enteredText != null) {

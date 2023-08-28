@@ -6,7 +6,7 @@ pipeline {
     agent any 
 
     stages {
-        stage('Build Android App') {
+        stage('Build Android') {
             steps {
                 script {
                     // Go to directory
@@ -19,7 +19,7 @@ pipeline {
         } // end stage 
 
         // Running tests
-        stage('Running tests') {
+        stage('Unit tests') {
             
             steps {
                 script {

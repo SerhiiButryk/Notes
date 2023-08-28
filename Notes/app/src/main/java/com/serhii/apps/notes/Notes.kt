@@ -18,7 +18,8 @@ class Notes : Application() {
         // Init core library logging component
         Log.init()
         Log.tag = AppDetails.APP_LOG_TAG
-        val shouldEnable = PreferenceManager.getDetailLogsEnabledValue(this)
-        Log.enableDetailedLogs(shouldEnable)
+        val enabled = PreferenceManager.isDetailLogsEnabled(this)
+        Log.enableDetailedLogs(enabled)
+        Log.setVersionCode(BuildConfig.VERSION_NAME)
     }
 }

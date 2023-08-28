@@ -12,7 +12,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("test_only.jks")
+            storeFile file("../../../notes-app-release-key.jks")
             storePassword 'password'
             keyAlias 'key0'
             keyPassword 'password'
@@ -117,7 +117,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.1.0'
 
     // JSON library - https://github.com/square/moshi
-    implementation("com.squareup.moshi:moshi-kotlin:1.9.1")
+    // Stopped using as it creates issues for release build
+    // implementation("com.squareup.moshi:moshi-kotlin:1.9.1")
 
     // Kotlin Json lib
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'

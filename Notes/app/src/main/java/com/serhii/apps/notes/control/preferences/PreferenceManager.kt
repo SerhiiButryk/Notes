@@ -28,7 +28,7 @@ object PreferenceManager {
         return preferences.getInt(NOTE_DISPLAY_MODE_KEY, NoteViewFragment.DISPLAY_MODE_GRID)
     }
 
-    fun getDetailLogsEnabledValue(context: Context): Boolean {
+    fun isDetailLogsEnabled(context: Context): Boolean {
         val preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
         return preferences.getBoolean(context.getString(R.string.preference_category_key_detail_logs), false)
     }

@@ -27,6 +27,7 @@ import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Hash
+import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
 /**
@@ -97,7 +98,10 @@ class LoginFragment : Fragment() {
 
             description!!.visibility = View.GONE
 
-            passwordField!!.requestFocus()
+            if (passwordField!!.requestFocus()) {
+                // Show keyboard
+                GoodUtils.showKeyboard(requireContext(), passwordField as View)
+            }
 
             loginButton!!.visibility = View.VISIBLE
             passwordLayout!!.visibility = View.VISIBLE

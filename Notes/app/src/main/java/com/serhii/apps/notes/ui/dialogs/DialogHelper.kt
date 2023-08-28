@@ -11,8 +11,8 @@ import androidx.fragment.app.FragmentActivity
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.ChangePasswordDialogUI
 import com.serhii.apps.notes.ui.ClickListener
-import com.serhii.apps.notes.ui.DialogWithEnterFiled
-import com.serhii.apps.notes.ui.DialogWithEnterFiled.DialogListener
+import com.serhii.apps.notes.ui.EnterPasswordDialogUI
+import com.serhii.apps.notes.ui.EnterPasswordDialogUI.DialogListener
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper
 
 object DialogHelper {
@@ -32,11 +32,11 @@ object DialogHelper {
         activity: FragmentActivity, listener: DialogListener?,
         title: String?, hint: String?) {
 
-        val dialog = DialogWithEnterFiled(listener)
+        val dialog = EnterPasswordDialogUI(listener)
 
         val args = Bundle()
-        args.putString(DialogWithEnterFiled.EXTRA_TITLE_TEXT, title)
-        args.putString(DialogWithEnterFiled.EXTRA_HINT_TEXT, hint)
+        args.putString(EnterPasswordDialogUI.EXTRA_TITLE_TEXT, title)
+        args.putString(EnterPasswordDialogUI.EXTRA_HINT_TEXT, hint)
 
         dialog.arguments = args
         dialog.show(activity.supportFragmentManager, SPD_DIALOG_TAG)

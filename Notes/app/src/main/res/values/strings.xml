@@ -9,6 +9,7 @@
 
     // NotesView activity
     <string name="ms_no_notes">No notes yet</string>
+    <string name="ms_no_search_results">Nothing found. Sorry.</string>
 
     // Alter Dialog
     <string name="ms_no_user_account">This user account is not authorized. \nPlease, authorize your user.</string>
@@ -124,6 +125,13 @@
     <string name="preference_about_version_title">Version</string>
     <string name="preference_about_author" translatable="false">preference_about_author</string>
 
+    <string name="preference_feedback" translatable="false">preference_feedback</string>
+    <string name="preference_feedback_title" >Send a feedback</string>
+    <string name="preference_feedback_message" >Share your thoughts, issues or ideas for this app</string>
+
+    <string name="email_feedback_title">[NotesApp][Feedback] (Put your title here)]</string>
+    <string name="email_feedback_body">[Describe issue]\n[Share your thoughts]\n[Ask questions]</string>
+
     <string name="preference_idle_lock_timeout_key" translatable="false">idle_lock_time_out</string>
     <string name="preference_idle_lock_timeout_title">Change idle lock</string>
 
@@ -158,12 +166,12 @@
 
     // Change password dialog
     <string name="hint_new_password">Enter new password</string>
-    <string name="hint_old_password">Enter old password</string>
+    <string name="hint_old_password">Enter your current password</string>
     <string name="change_password_title_dialog">Change your password</string>
 
-    <string name="change_password_toast_not_correct_password">Entered password is not correct</string>
+    <string name="change_password_toast_not_correct_password">Entered current password is not correct</string>
     <string name="change_password_toast_password_set">Password is set</string>
-    <string name="change_password_toast_password_error">Error occurred</string>
+    <string name="change_password_toast_password_error">Error occurred. Sorry.</string>
 
     // Enter keyword dialog
     <string name="set_password_dialog_title">Enter a keyword to encrypt your data</string>
@@ -197,5 +205,7 @@
     <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
 
     <string name="info_author">Author: Serhii Butryk</string>
+
+    <string name="search_title">Search</string>
 
 </resources>

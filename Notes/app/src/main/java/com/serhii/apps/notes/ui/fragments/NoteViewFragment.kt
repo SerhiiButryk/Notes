@@ -8,12 +8,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,16 +33,25 @@ import com.serhii.core.log.Log.Companion.info
 /**
  * Fragment where user sees list of notes
  */
-class NoteViewFragment : Fragment() {
+class NoteViewFragment : BaseFragment() {
 
-    private var actionButton: FloatingActionButton? = null
-    private var notesRecyclerView: RecyclerView? = null
-    private var notesViewModel: NotesViewModel? = null
-    private var adapter: NoteListAdapter? = null
-    private var interaction: NoteInteraction? = null
-    private var toolbar: Toolbar? = null
-    private var noNotesImage: ImageView? = null
-    private var noNotesText: TextView? = null
+    private lateinit var actionButton: FloatingActionButton
+    private lateinit var notesRecyclerView: RecyclerView
+    private lateinit var notesViewModel: NotesViewModel
+    private lateinit var adapter: NoteListAdapter
+    private lateinit var interaction: NoteInteraction
+    private lateinit var toolbar: Toolbar
+    private lateinit var hintNotesImage: ImageView
+    private lateinit var hintNotesText: TextView
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var isSearchActivate = false
+
+    private val observerDataChanged = Observer<List<NoteModel>> { newNotes ->
+        info(TAG, "onChanged() new data received, size = $newNotes.size")
+        mainHandler.post {
+            updateUI(newNotes)
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,27 +72,10 @@ class NoteViewFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        val v = initView(inflater, container)
-        actionButton!!.setOnClickListener {
-            if (interaction != null) {
-                interaction!!.onOpenNote(null)
-            }
-        }
-
-        adapter = NoteListAdapter(object : NoteListAdapter.NoteViewHolder.ClickListener {
-            override fun onClick(noteModel: NoteModel?) {
-                if (interaction != null) {
-                    interaction!!.onOpenNote(noteModel)
-                }
-            }
-        })
-
-        notesRecyclerView!!.adapter = adapter
-        return v
+        return initView(inflater, container)
     }
 
-    fun initView(inflater: LayoutInflater, container: ViewGroup?): View {
+    private fun initView(inflater: LayoutInflater, container: ViewGroup?): View {
 
         val view = inflater.inflate(R.layout.fragment_notes_view, container, false)
 
@@ -89,8 +83,20 @@ class NoteViewFragment : Fragment() {
         actionButton = view.findViewById(R.id.fab)
         notesRecyclerView = view.findViewById(R.id.note_recycler_view)
         toolbar = view.findViewById(R.id.toolbar)
-        noNotesImage = view.findViewById(R.id.placeholder_imv)
-        noNotesText = view.findViewById(R.id.placeholder_txv)
+        hintNotesImage = view.findViewById(R.id.placeholder_imv)
+        hintNotesText = view.findViewById(R.id.placeholder_txv)
+
+        actionButton.setOnClickListener {
+            interaction.onOpenNote(null)
+        }
+
+        adapter = NoteListAdapter(object : NoteListAdapter.NoteViewHolder.ClickListener {
+            override fun onClick(noteModel: NoteModel?) {
+                interaction.onOpenNote(noteModel)
+            }
+        })
+
+        notesRecyclerView.adapter = adapter
 
         return view
     }
@@ -98,29 +104,16 @@ class NoteViewFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        notesViewModel =
-            ViewModelProvider(requireActivity(), NotesViewModelFactory(requireActivity().application))
+        notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(requireActivity().application))
                 .get(NotesViewModel::class.java)
 
-        notesViewModel!!.getNotes().observe(requireActivity()) { noteModels ->
-            info(TAG, "onChanged() new data received, size = " + noteModels.size)
-            if (!noteModels.isEmpty()) {
-                // Hide "no notes" image and text
-                noNotesImage!!.visibility = View.GONE
-                noNotesText!!.visibility = View.GONE
-            } else {
-                // Show "no notes" image and text
-                noNotesImage!!.visibility = View.VISIBLE
-                noNotesText!!.visibility = View.VISIBLE
-            }
-            adapter!!.setDataChanged(notesViewModel!!.getNotes().value!!)
-        }
+        notesViewModel.getNotes().observe(requireActivity(), observerDataChanged)
 
-        notesViewModel!!.displayMode.observe(requireActivity()) { mode ->
+        notesViewModel.displayMode.observe(requireActivity()) { mode ->
             if (mode == DISPLAY_MODE_LIST) {
-                notesRecyclerView!!.layoutManager = LinearLayoutManager(context)
+                notesRecyclerView.layoutManager = LinearLayoutManager(context)
             } else if (mode == DISPLAY_MODE_GRID) {
-                notesRecyclerView!!.layoutManager = GridLayoutManager(context, NOTES_COLUMN_COUNT)
+                notesRecyclerView.layoutManager = GridLayoutManager(context, NOTES_COLUMN_COUNT)
             }
             saveNoteDisplayMode(requireContext(), mode)
         }
@@ -128,10 +121,22 @@ class NoteViewFragment : Fragment() {
         (activity as AppCompatActivity?)!!.setSupportActionBar(toolbar)
     }
 
+    private fun updateUI(data: List<NoteModel>?) {
+        if (data != null) {
+            configureIconAndTextHint(data)
+            adapter.setDataChanged(data)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        SCREEN_ORIENTATION_PREVIOUS = resources.configuration.orientation
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.note_view_menu, menu)
-        val displayModeItem = menu.findItem(R.id.item_layout)
-        updateDisplayNoteViewIcon(displayModeItem)
+        updateDisplayModeIcon(menu)
+        setupSearchInterface(menu)
     }
 
     @SuppressLint("NonConstantResourceId", "NotifyDataSetChanged")
@@ -142,29 +147,74 @@ class NoteViewFragment : Fragment() {
                 return true
             }
             R.id.item_layout -> {
-                if (notesViewModel!!.displayMode.value == DISPLAY_MODE_GRID) {
-                    notesViewModel!!.setDisplayNoteMode(DISPLAY_MODE_LIST)
+                if (notesViewModel.displayMode.value == DISPLAY_MODE_GRID) {
+                    notesViewModel.setDisplayNoteMode(DISPLAY_MODE_LIST)
                 } else {
-                    notesViewModel!!.setDisplayNoteMode(DISPLAY_MODE_GRID)
+                    notesViewModel.setDisplayNoteMode(DISPLAY_MODE_GRID)
                 }
-                updateDisplayNoteViewIcon(item)
+                updateDisplayModeIcon(item)
                 return true
             }
         }
         return false
     }
 
-    private fun updateDisplayNoteViewIcon(displayModeItem: MenuItem) {
-        val mode = notesViewModel!!.displayMode.value!!
+    private fun updateDisplayModeIcon(menu: Menu) {
+        val displayModeItem = menu.findItem(R.id.item_layout)
+        updateDisplayModeIcon(displayModeItem)
+    }
+
+    private fun updateDisplayModeIcon(menuItem: MenuItem) {
+        val mode = notesViewModel.displayMode.value!!
         if (mode == NoteModel.LIST_NOTE_VIEW_TYPE) {
             // Update icon
-            displayModeItem.setIcon(R.drawable.ic_view_list)
-            displayModeItem.setTitle(R.string.action_convert_to_list)
+            menuItem.setIcon(R.drawable.ic_view_list)
+            menuItem.setTitle(R.string.action_convert_to_list)
         } else if (mode == NoteModel.ONE_NOTE_VIEW_TYPE) {
             // Update icon
-            displayModeItem.setIcon(R.drawable.ic_view_grid)
-            displayModeItem.setTitle(R.string.action_layout_grid)
+            menuItem.setIcon(R.drawable.ic_view_grid)
+            menuItem.setTitle(R.string.action_layout_grid)
         }
+    }
+
+    override fun onSearchStarted(query: String) {
+        // Track SearchView state
+        isSearchActivate = true
+        // Do a search
+        notesViewModel.performSearch(requireContext(), query)
+    }
+
+    override fun onSearchFinished() {
+        // Track SearchView state
+        isSearchActivate = false
+        // Need to postpone a bit when SearchView state is changed (it is collapsed)
+        mainHandler.post {
+            notesViewModel.updateData(requireContext())
+        }
+    }
+
+    private fun configureIconAndTextHint(notes: List<NoteModel>) {
+        if (isSearchActivate && notes.isEmpty()) {
+            // At this point we should show "Searched text is not found" so related image and text
+            setVisibilityForHintImageAndText(View.VISIBLE)
+
+            hintNotesImage.setImageDrawable(requireContext().getDrawable(R.drawable.ic_search))
+            hintNotesText.text = requireContext().getText(R.string.ms_no_search_results)
+        } else if (notes.isNotEmpty()) {
+            // Hide "no notes" image and text
+            setVisibilityForHintImageAndText(View.GONE)
+        } else {
+            // Show "no notes" image and text
+            setVisibilityForHintImageAndText(View.VISIBLE)
+
+            hintNotesImage.setImageDrawable(requireContext().getDrawable(R.drawable.no_notes_icon))
+            hintNotesText.text = requireContext().getText(R.string.ms_no_notes)
+        }
+    }
+
+    private fun setVisibilityForHintImageAndText(visibility: Int) {
+        hintNotesImage.visibility = visibility
+        hintNotesText.visibility = visibility
     }
 
     interface NoteInteraction {
@@ -173,8 +223,10 @@ class NoteViewFragment : Fragment() {
 
     companion object {
         private const val TAG = "NoteViewFragment"
+        const val FRAGMENT_TAG = "NoteViewFragmentTAG"
         const val DISPLAY_MODE_LIST = 1
         const val DISPLAY_MODE_GRID = 2
         private const val NOTES_COLUMN_COUNT = 2
+        private var SCREEN_ORIENTATION_PREVIOUS: Int = 1000
     }
 }

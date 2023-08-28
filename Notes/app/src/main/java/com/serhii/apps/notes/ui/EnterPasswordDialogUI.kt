@@ -16,7 +16,7 @@ import android.widget.TextView
 import com.serhii.apps.notes.R
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
-class DialogWithEnterFiled(private val listener: DialogListener?) : BaseDialogFragment() {
+class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun initView(inflater: LayoutInflater): ViewGroup {
