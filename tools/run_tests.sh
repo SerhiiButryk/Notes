@@ -14,7 +14,7 @@ set -e
 # Tests are not running on Jenkins, because emulator fails to launch on Jenkins.
 if [ "$JENKINS_CONTEXT" = true ]
 then
-    echo "Skipping tests on Jenkins"
+    print_error "Skipping tests on Jenkins"
     exit 0
 fi
 
@@ -25,14 +25,14 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 # Check if env variable is defined
 if [ -z $ANDROID_SDK_ROOT ]
 then
-    echo "ANDROID_SDK_ROOT is undefined, aborting..."
+    print_error "ANDROID_SDK_ROOT is undefined, aborting..."
     exit 1
 fi
 
 # Check if env variable is defined
 if [ -z $ANDROID_CMD_TOOLS ]
 then
-    echo "ANDROID_CMD_TOOLS is undefined, aborting..."
+    print_error "ANDROID_CMD_TOOLS is undefined, aborting..."
     exit 1
 fi
 
@@ -48,7 +48,8 @@ declare -a EMULATOR_APIS=(
         "30"
     )
 
-echo "******** Running tests on API ${EMULATOR_APIS[@]} levels *********"
+echo ""
+print_message "******** Running tests on API ${EMULATOR_APIS[@]} levels *********"
 echo ""
 
 EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
@@ -56,14 +57,12 @@ EMULATOR_LIST=$( $EMULATOR_DIR/emulator -list-avds )
 if [ -z "$EMULATOR_LIST" ]
 then
     
-    echo "No emulators available, creating emulators"
-    echo ""
+    print_message "No emulators available, creating emulators"
 
     # Create amulators
     for API in $"${EMULATOR_APIS[@]}"
     do 
-        echo "Creating emulator Pixel_API_${API}"
-        echo ""
+        print_message "Creating emulator Pixel_API_${API}"
 
         DEVICE_NAME="Pixel_API_$API"
 
@@ -85,13 +84,12 @@ done
 
 if [ ! $emulator_number == "2" ]
 then
-   echo "To run test you need at least 2 emulators available, aborting..."
+   print_error "To run test you need at least 2 emulators available, aborting..."
    exit 1 
 fi
 
-echo "Available $emulator_number emulators:"
-echo $EMULATOR_LIST
-echo ""
+print_message "Available $emulator_number emulators:"
+print_message "$EMULATOR_LIST"
 
 # Delete test results directory
 rm -rf $TEST_RESULT_DIR
@@ -102,18 +100,15 @@ do
     # Create directory for saving test results
     mkdir -p $TEST_RESULT_DIR/$EMULATOR/reports
 
-    echo "******** Starting $EMULATOR emulator *********"
-    echo ""
+    print_message "******** Starting $EMULATOR emulator *********"
 
     # Start emulator from cold start
     # Run this command in background
     $EMULATOR_DIR/emulator -avd $EMULATOR -netdelay none -netspeed full -wipe-data -no-boot-anim -no-cache -logcat-output $TEST_RESULT_DIR/$EMULATOR/adb_logs.txt 2>&1 | tee $TEST_RESULT_DIR/$EMULATOR/Emulator.txt &> /dev/null &
 
-    echo "******** Running tests on $EMULATOR emulator *********"
-    echo ""
+    print_message "******** Running tests on $EMULATOR emulator *********"
 
-    echo "Waiting for device to be online"
-    echo ""
+    print_message "Waiting for device to be online"
 
     # Wait while a device is online
     for i in {1..10}
@@ -142,12 +137,9 @@ do
     # Copying reports
     cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/androidTests/connected/*  ${SCRIPT_RELEVANT_PATH}/../test-results/$EMULATOR/reports
 
-    echo ""
-    echo "******** Tests are completed *********"
-    echo ""
+    print_message "******** Tests are completed *********"
 
-    echo "******** Killing emulator *********"
-    echo ""
+    print_message "******** Killing emulator *********"
 
     # Stop all running emulators
     ${ANDROID_SDK_ROOT}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK_ROOT}/platform-tools/adb -s $line emu kill; done;
@@ -162,17 +154,13 @@ mkdir -p $CODE_COVERAGE_FOLDER_NAME
 # Copy files
 cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/coverage/androidTest/debug/* $CODE_COVERAGE_FOLDER_NAME
 
-echo ""
-
 # Show reports
 for EMULATOR in $EMULATOR_LIST
 do
-    echo "See reports: file://${SCRIPT_ABSOLUTE_PATH}/test-results/$EMULATOR/reports/index.html"
+    print_message "See reports: file://${SCRIPT_ABSOLUTE_PATH}/test-results/$EMULATOR/reports/index.html"
 done
 
 # Show covarage report
-echo "See coverage reports: file://${SCRIPT_ABSOLUTE_PATH}/test-results/codecoverage/index.html"
+print_message "See coverage reports: file://${SCRIPT_ABSOLUTE_PATH}/test-results/codecoverage/connected/index.html"
 
-echo ""
-echo "******** Finished *********"
-echo ""
+print_message "******** Finished *********"

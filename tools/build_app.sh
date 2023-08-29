@@ -43,7 +43,7 @@ while [ : ]; do
   break
 done
 
-print_message "******** Selecting release key building *********"
+print_message "******** Selecting release key *********"
 
 pushd ${PROJECT_FOLDER}/app
 sed 's+test_only.jks+../../../notes-app-release-key.jks+g' build.gradle > build.gradle.cp 
@@ -89,17 +89,17 @@ print_message "******** Finished *********"
 
 print_message "******** Copying files *********"
 
-pushd ${SCRIPT_ABSOLUTE_PATH}/../
+pushd ${SCRIPT_RELEVANT_PATH}/../
 
 # Clear if it exists
-rm -rf ${SCRIPT_ABSOLUTE_PATH}/$ARTIFACT_FOLDER_NAME
+rm -rf ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME
 
 # Create folder for artifacts 
-mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
-mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
-mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
-mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
-mkdir -p ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
+mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
+mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
+mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
+mkdir -p $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
+mkdir -p $ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
 popd 
 
 cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
