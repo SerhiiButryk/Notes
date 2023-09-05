@@ -25,7 +25,7 @@ import com.serhii.core.utils.GoodUtils.Companion.getText
 /**
  * Fragment where user registers itself
  */
-class RegisterFragment : Fragment() {
+class RegistrationFragment : Fragment() {
 
     private var emailField: EditText? = null
     private var titleField: TextView? = null

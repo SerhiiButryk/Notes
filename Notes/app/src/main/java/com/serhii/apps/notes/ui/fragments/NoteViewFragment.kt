@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.activities.NavigationCallback
 import com.serhii.apps.notes.activities.SettingsActivity
 import com.serhii.apps.notes.control.preferences.PreferenceManager.saveNoteDisplayMode
 import com.serhii.apps.notes.ui.data_model.NoteModel
@@ -33,7 +34,7 @@ import com.serhii.core.log.Log.Companion.info
 /**
  * Fragment where user sees list of notes
  */
-class NoteViewFragment : BaseFragment() {
+class NoteViewFragment : BaseFragment(), NavigationCallback {
 
     private lateinit var actionButton: FloatingActionButton
     private lateinit var notesRecyclerView: RecyclerView
@@ -47,7 +48,20 @@ class NoteViewFragment : BaseFragment() {
     private var isSearchActivate = false
 
     private val observerDataChanged = Observer<List<NoteModel>> { newNotes ->
-        info(TAG, "onChanged() new data received, size = $newNotes.size")
+        info(TAG, "onChanged() new data received, size = ${newNotes.size}")
+
+        // In case it has searchable results and SearchView is not active we ignore this
+        if (newNotes.isNotEmpty() && !isSearchActivate) {
+            newNotes.forEach {
+                if (it.queryInfo != null) {
+                    info(TAG, "onChanged() has search info, ignore this as SearchView is not active")
+                    return@Observer
+                }
+            }
+        }
+
+        info(TAG, "onChanged() going to update UI")
+
         mainHandler.post {
             updateUI(newNotes)
         }
@@ -119,6 +133,10 @@ class NoteViewFragment : BaseFragment() {
         }
 
         (activity as AppCompatActivity?)!!.setSupportActionBar(toolbar)
+    }
+
+    override fun onNavigateBack() {
+        // No-op
     }
 
     private fun updateUI(data: List<NoteModel>?) {

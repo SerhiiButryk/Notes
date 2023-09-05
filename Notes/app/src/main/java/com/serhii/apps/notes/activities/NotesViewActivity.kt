@@ -127,6 +127,9 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     }
 
     override fun onBackNavigation() {
+        // Send a notification before we move back
+        notifyAboutBackNavigation()
+
         val fm = supportFragmentManager
         fm.popBackStack()
         // Notify View Model
@@ -134,9 +137,22 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     }
 
     override fun onBackPressed() {
+        // Send a notification before we move back
+        notifyAboutBackNavigation()
+
         super.onBackPressed()
         // Notify View Model
         notesViewModel?.onBackNavigation()
+    }
+
+    private fun notifyAboutBackNavigation() {
+        val fm = supportFragmentManager
+        for (f in fm.fragments) {
+            if (f != null) {
+                val callback = f as? NavigationCallback
+                callback?.onNavigateBack()
+            }
+        }
     }
 
     // This will start auth activity

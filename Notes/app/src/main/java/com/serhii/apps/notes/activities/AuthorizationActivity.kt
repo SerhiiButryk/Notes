@@ -15,7 +15,7 @@ import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.BlockFragment
 import com.serhii.apps.notes.ui.fragments.LoginFragment
-import com.serhii.apps.notes.ui.fragments.RegisterFragment
+import com.serhii.apps.notes.ui.fragments.RegistrationFragment
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.detail
@@ -81,7 +81,7 @@ class AuthorizationActivity : AppBaseActivity() {
             viewmodel.showRegistrationUIFlag.observe(this) { shouldShowFragment ->
                 if (shouldShowFragment) {
                     info(TAG, "addFragment(), adding Registration fragment")
-                    addFragment(RegisterFragment(), RegisterFragment.FRAGMENT_TAG, true)
+                    addFragment(RegistrationFragment(), RegistrationFragment.FRAGMENT_TAG, true)
                 }
             }
         }

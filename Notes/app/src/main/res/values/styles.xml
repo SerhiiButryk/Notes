@@ -35,7 +35,7 @@
 <!--        <item name="colorAccent">@color/blue_accent</item>-->
 <!--    </style>-->
 
-    <style name="NoteEditText">
+    <style name="NoteEditText" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/round_background</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:inputType">textMultiLine|textNoSuggestions</item>
@@ -49,7 +49,7 @@
         <item name="android:focusable">true</item>
     </style>
 
-    <style name="NoteTextView">
+    <style name="NoteTextView" parent="Widget.AppCompat.TextView">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:inputType">text</item>
         <item name="android:maxLines">1</item>
@@ -58,7 +58,7 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-    <style name="LoginButton">
+    <style name="LoginButton" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@color/white</item>
         <item name="android:gravity">center</item>
         <item name="android:visibility">gone</item>
@@ -70,7 +70,7 @@
         <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent</item>
     </style>
 
-    <style name="LoginTextView">
+    <style name="LoginTextView" parent="Widget.AppCompat.TextView">
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">@dimen/title_size_text</item>
@@ -99,7 +99,7 @@
         <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent2</item>
     </style>
 
-    <style name="LoginEditText">
+    <style name="LoginEditText" parent="Widget.AppCompat.EditText">
         <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">18sp</item>
         <!-- See: https://www.generacodice.com/en/articolo/801175/disabling-the-fullscreen-editing-view-for-soft-keyboard-input-in-landscape-->
@@ -109,7 +109,7 @@
         <item name="android:textCursorDrawable">@null</item>
     </style>
 
-    <style name="LoginDescription">
+    <style name="LoginDescription" parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">18sp</item>
         <item name="android:importantForAutofill">no</item>

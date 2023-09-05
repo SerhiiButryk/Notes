@@ -6,6 +6,7 @@
 package com.serhii.apps.notes.ui.fragments
 
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.serhii.apps.notes.R
@@ -14,6 +15,7 @@ import com.serhii.core.log.Log
 open class BaseFragment : Fragment() {
 
     private var searchView: SearchView? = null
+    private var searchActionView: MenuItem? = null
 
     /**
      * This should reliably check when the fragment is shown at the top of the back stack
@@ -38,7 +40,8 @@ open class BaseFragment : Fragment() {
     }
 
     protected fun setupSearchInterface(menu: Menu) {
-        searchView = menu.findItem(R.id.search).actionView as SearchView
+        searchActionView = menu.findItem(R.id.search)
+        searchView = searchActionView?.actionView as? SearchView
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -64,6 +67,10 @@ open class BaseFragment : Fragment() {
             onSearchFinished()
             false
         }
+    }
+
+    fun collapseSearchbar() {
+        searchActionView?.collapseActionView()
     }
 
     open fun onSearchStarted(query: String) {}

@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.activities.NavigationCallback
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
@@ -33,7 +34,7 @@ import com.serhii.core.utils.GoodUtils.Companion.showToast
 /**
  * Fragment where user enters notes
  */
-class NoteEditorFragment : BaseFragment() {
+class NoteEditorFragment : BaseFragment(), NavigationCallback {
 
     private lateinit var titleNoteField: EditText
     private lateinit var noteTimeFiled: TextView
@@ -192,10 +193,18 @@ class NoteEditorFragment : BaseFragment() {
         }
     }
 
+    override fun onNavigateBack() {
+        collapseSearchbar()
+    }
+
     private fun processArgs() {
         if (action == ACTION_NOTE_CREATE) {
             // Display empty note
             noteEditorAdapter.prepareEmptyNote()
+            // Open keyboard
+            if (titleNoteField.requestFocus()) {
+                GoodUtils.showKeyboard(requireContext(), titleNoteField)
+            }
         } else if (action == ACTION_NOTE_OPEN) {
 
             val note = notesViewModel.getNote(noteId!!, requireContext())

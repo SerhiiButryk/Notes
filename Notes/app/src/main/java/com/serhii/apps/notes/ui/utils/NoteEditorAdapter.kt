@@ -33,34 +33,29 @@ const val TAG = "NoteEditorAdapter"
 class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserActionHandler {
 
     /**
-     * This is a type of user list note
+     * This is a type of view with "add new list item" button
      */
     private val ADD_NEW_NOTE_VIEW_TYPE = 101
 
-    private var notesData = mutableListOf<NoteModel>()
-    private var userNotesList = mutableListOf<NoteModel>()
-
-    fun getCurrentList(): MutableList<NoteModel> {
-        return notesData
-    }
+    private var currentDisplayedNotes = mutableListOf<NoteModel>()
 
     /**
-     * Return note data which Recycle View displays
+     * Return a copy of note data which Recycle View displays
      */
     fun getNoteList() : MutableList<NoteModel> {
-        // We need to remove empty note which we creates for displaying 'Add item list' option
-        if (notesData.isNotEmpty()) {
-            // Clear as we are going to add new data
-            userNotesList.clear()
-            // Iterate through data list and gets note
-            for (note in notesData) {
-                if (note.viewType != ADD_NEW_NOTE_VIEW_TYPE)
-                    userNotesList.add(NoteModel.getCopy(note))
+        // We need to remove empty note which we creates for displaying "add new list item" button
+        if (currentDisplayedNotes.isNotEmpty()) {
+            val copyList = mutableListOf<NoteModel>()
+            // Iterate through list and get notes
+            for (note in currentDisplayedNotes) {
+                if (note.viewType != ADD_NEW_NOTE_VIEW_TYPE) {
+                    copyList.add(NoteModel.getCopy(note))
+                }
             }
-            return userNotesList
+            return copyList
         }
         // Else return as it is
-        return notesData
+        return currentDisplayedNotes
     }
 
     /**
@@ -73,23 +68,20 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
         val note = NoteModel()
         val list = getNoteList()
 
-        for (n in list) {
-            if (n.id.isNotEmpty()) {
-                note.id = n.id
+        list.forEach { element ->
+            // If this is first element then copy note text title time and id only one time
+            if (list.first() == element) {
+                val default = { "" }
+                note.id = element.id.ifEmpty(default)
+                note.title = element.title.ifEmpty(default)
+                note.note = element.note.ifEmpty(default)
+                note.time = element.time.ifEmpty(default)
             }
-            if (n.title.isNotEmpty()) {
-                note.title = n.title
-            }
-            if (n.note.isNotEmpty()) {
-                note.note = n.note
-            }
-            if (n.time.isNotEmpty()) {
-                note.time = n.time
-            }
-            note.viewType = n.viewType
-            if (n.listNote.isNotEmpty()) {
-                val text = n.listNote[0].note
-                val isChecked = n.listNote[0].isChecked
+            // This items are copied from each element
+            note.viewType = element.viewType
+            if (element.listNote.isNotEmpty()) {
+                val text = element.listNote[0].note
+                val isChecked = element.listNote[0].isChecked
                 note.putListNote(text, isChecked)
             }
         }
@@ -98,28 +90,33 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
     }
 
     override fun getItemCount() : Int {
-        val viewType = getListType(notesData)
+        val viewType = getListType(currentDisplayedNotes)
         if (viewType == NoteModel.ONE_NOTE_VIEW_TYPE) {
             // We should always have only 1 item displayed
             return 1
         }
-        return notesData.size
+        return currentDisplayedNotes.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : NoteViewHolderBase {
-        Log.info(TAG, "onCreateViewHolder()")
+        Log.info(TAG, "onCreateViewHolder() IN")
 
-        val viewHolder: NoteViewHolderBase
+        val viewHolder = when (viewType) {
 
-        if (viewType == NoteModel.LIST_NOTE_VIEW_TYPE) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_edit_list_note, parent, false)
-            viewHolder = ListNoteViewHolder(view, this)
-        } else if (viewType == ADD_NEW_NOTE_VIEW_TYPE) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_edit_note_add, parent, false)
-            viewHolder = AddNewNoteViewHolder(view, this)
-        } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.editor_note_item, parent, false)
-            viewHolder = SimpleNoteViewHolder(view)
+            NoteModel.LIST_NOTE_VIEW_TYPE -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_edit_list_note, parent, false)
+                ListNoteViewHolder(view, this)
+            }
+
+            ADD_NEW_NOTE_VIEW_TYPE -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_edit_note_add, parent, false)
+                AddNewNoteViewHolder(view, this)
+            }
+
+            else -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.editor_note_item, parent, false)
+                SimpleNoteViewHolder(view)
+            }
         }
 
         return viewHolder
@@ -131,14 +128,16 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (notesData.isEmpty())
+        if (currentDisplayedNotes.isEmpty()) {
             return -1
+        }
+
         val type = getItem(position).viewType
         Log.detail(TAG, "getItemViewType() view type = $type")
         return type
     }
 
-    private fun getItem(position: Int) = notesData[position]
+    private fun getItem(position: Int) = currentDisplayedNotes[position]
 
     fun prepareEmptyNote() {
         // Display empty note
@@ -186,14 +185,14 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
     @SuppressLint("NotifyDataSetChanged")
     private fun setDataChangedForAdd(newData: MutableList<NoteModel>) {
         setData(newData)
-        notifyItemChanged(notesData.size - 1)
+        notifyItemChanged(currentDisplayedNotes.size - 1)
     }
 
     private fun setData(newData: MutableList<NoteModel>) {
         // Add item for 'Add new item' view
         addItemForListViewTypeIfNotFound(newData)
         // Update list
-        notesData = newData
+        currentDisplayedNotes = newData
     }
 
     private fun getListType(list: List<NoteModel>): Int {
@@ -218,7 +217,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
 
     fun transformView() {
 
-        val currentList = notesData
+        val currentList = currentDisplayedNotes
 
         for (note in currentList) {
             // Change view type
@@ -238,18 +237,18 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
     ///////////////////////////////////////////////////////////////////////////
 
     override fun onDelete(position: Int) {
-        notesData.removeAt(position)
-        setDataChanged(notesData)
+        currentDisplayedNotes.removeAt(position)
+        setDataChanged(currentDisplayedNotes)
     }
 
     override fun onAdd() {
         val newNote = NoteModel()
         newNote.viewType = NoteModel.LIST_NOTE_VIEW_TYPE
         // Add item before the last item
-        notesData.add(notesData.lastIndex, newNote)
+        currentDisplayedNotes.add(currentDisplayedNotes.lastIndex, newNote)
         // Add a litter delay before updating list
         // for more smooth behavior
-        Handler(Looper.getMainLooper()).postDelayed({ setDataChangedForAdd(notesData) }, 400)
+        Handler(Looper.getMainLooper()).postDelayed({ setDataChangedForAdd(currentDisplayedNotes) }, 400)
     }
 }
 
