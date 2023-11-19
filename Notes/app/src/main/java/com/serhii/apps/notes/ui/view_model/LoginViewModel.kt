@@ -9,39 +9,37 @@ import androidx.lifecycle.ViewModel
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.auth.base.IAuthorizeService
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.apps.notes.ui.data_model.AuthCredsModel
 
 /**
- * View model for managing authentication data and state.
+ * View model for authentication UI.
  */
 class LoginViewModel : ViewModel() {
 
-    val showRegistrationUIFlag = MutableLiveData(false)
+    val showRegistrationUI = MutableLiveData(false)
 
     val authorizeService: IAuthorizeService
         get() = EventService
 
-    fun setAuthValue(newValue: AuthModel?) {
-        // If data is set then perform correct action
-        if (newValue != null) {
-            when (newValue.authType) {
-                AuthorizeType.AUTH_UNLOCK, AuthorizeType.AUTH_PASSWORD_LOGIN -> // Proceed with Login
-                    authorizeService.onPasswordLogin(newValue)
-                AuthorizeType.AUTH_REGISTRATION ->  // Proceed with User's registration
-                    authorizeService.onRegistration(newValue)
-                AuthorizeType.AUTH_BIOMETRIC_LOGIN ->  // Proceed with Login
-                    authorizeService.onBiometricLogin()
-                else -> {
-                    throw RuntimeException("Unknown auth type")
-                }
+    fun setAuthValue(newValue: AuthCredsModel) {
+        // Select correct action
+        when (newValue.authType) {
+            AuthorizeType.AUTH_UNLOCK, AuthorizeType.AUTH_PASSWORD_LOGIN -> // Proceed with simple login
+                authorizeService.onPasswordLogin(newValue)
+            AuthorizeType.AUTH_REGISTRATION ->  // Proceed with User's registration
+                authorizeService.onRegistration(newValue)
+            AuthorizeType.AUTH_BIOMETRIC_LOGIN ->  // Proceed with simple login
+                authorizeService.onBiometricLogin()
+            else -> {
+                throw RuntimeException("Unknown auth type")
             }
         }
     }
 
-    fun showRegistrationUI() {
-        // Notify observers that action should be performed
-        showRegistrationUIFlag.value = true
-        // Reset flag to notify that activity doesn't need to perform any action
-        showRegistrationUIFlag.value = false
+    fun requestRegistrationUI() {
+        // Notify observers that we need to show an activity
+        showRegistrationUI.value = true
+        // Reset flag
+        showRegistrationUI.value = false
     }
 }

@@ -14,33 +14,29 @@ import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Cipher
 import com.serhii.core.security.impl.crypto.CryptoError
 
-class EncryptionHelper(
-    // Application context
-    private val context: Context
-) {
+class EncryptionHelper {
+
     private var ivNote: ByteArray? = null
+    private var lastError = CryptoError.OK
 
-    var lastError = CryptoError.OK
-        private set
-
-    fun encrypt(noteModel: NoteModel?): String {
+    fun encrypt(noteModel: NoteModel): String {
         info(TAG, "encrypt() in")
         resetErrors()
         val csk = Cipher()
-        val json = getJson(noteModel!!)
+        val json = getJson(noteModel)
         val (message, iv) = csk.encryptSymmetric(json)
         ivNote = iv
         return message
     }
 
-    fun decrypt(note: String, index: Int): NoteModel {
+    fun decrypt(note: String, index: Int, context: Context): NoteModel {
         info(TAG, "decrypt() with index = $index, in")
         resetErrors()
-        retrieveMetaData(index)
+        retrieveMetaData(context, index)
         return decryptInternal(note)
     }
 
-    fun saveMetaData(id: Int) {
+    fun saveMetaData(context: Context, id: Int) {
         info(TAG, "saveMetaData() index $id, in")
         val fileName = IV_DATA_FILE + id
 
@@ -59,7 +55,7 @@ class EncryptionHelper(
         info(TAG, "saveMetaData() out")
     }
 
-    private fun retrieveMetaData(id: Int) {
+    private fun retrieveMetaData(context: Context, id: Int) {
         info(TAG, "retrieveMetaData() index $id")
         val fileName = IV_DATA_FILE + id
 
@@ -70,20 +66,18 @@ class EncryptionHelper(
         ivNote = Base64.decode(id_, Base64.NO_WRAP)
     }
 
-    fun decrypt(data: Map<Int, String>): List<NoteModel> {
+    fun decrypt(data: Map<Int, String>, context: Context): List<NoteModel> {
         resetErrors()
         val noteDec: MutableList<NoteModel> = ArrayList()
         for ((key, value) in data) {
             info(TAG, "decryptData() index $key")
-            val noteModel = decrypt(value, key)
-            if (noteModel != null) {
-                noteDec.add(noteModel)
-            }
+            val noteModel = decrypt(value, key, context)
+            noteDec.add(noteModel)
         }
         return noteDec
     }
 
-    fun resetErrors() {
+    private fun resetErrors() {
         lastError = CryptoError.OK
     }
 

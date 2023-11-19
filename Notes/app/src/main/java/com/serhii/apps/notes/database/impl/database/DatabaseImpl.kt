@@ -36,7 +36,7 @@ abstract class DatabaseImpl {
         return ""
     }
 
-    open val recordsImpl: Map<Int, String>
+    open val records: Map<Int, String>
         get() {
             checkIfInitialized()
             return emptyMap()
@@ -46,7 +46,7 @@ abstract class DatabaseImpl {
         checkIfInitialized()
     }
 
-    open val recordsCountImpl: Int
+    open val recordsCount: Int
         get() {
             checkIfInitialized()
             return 0

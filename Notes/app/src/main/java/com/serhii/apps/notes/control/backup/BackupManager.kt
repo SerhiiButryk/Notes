@@ -13,7 +13,6 @@ import androidx.lifecycle.MutableLiveData
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
@@ -26,8 +25,8 @@ import java.io.OutputStream
 
 object BackupManager {
 
-    // View Model is observing changes to this field to get new data
-    private val updateDataFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    // View Model is observing changes to this field to know when to get new data
+    private val noteShouldBeUpdated: MutableLiveData<Boolean> = MutableLiveData(false)
 
     fun extractNotes(data: Intent, context: Context) {
         val outputStream: OutputStream? = try {
@@ -110,11 +109,11 @@ object BackupManager {
     }
 
     fun getUpdateDataFlagData() : LiveData<Boolean> {
-        return updateDataFlag
+        return noteShouldBeUpdated
     }
 
     fun dataUpdated() {
-        updateDataFlag.value = false
+        noteShouldBeUpdated.value = false
     }
 
     fun openDirectoryChooserForExtractData(activity: Activity) {
@@ -215,7 +214,7 @@ object BackupManager {
             UserNotesDatabase.addRecord(note, context)
         }
 
-        updateDataFlag.value = true
+        noteShouldBeUpdated.value = true
 
         return true
     }

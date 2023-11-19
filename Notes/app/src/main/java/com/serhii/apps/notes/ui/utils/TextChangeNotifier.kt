@@ -21,8 +21,9 @@ class TextChangeNotifier(val context: Context) : TextWatcher {
     }
 
     override fun afterTextChanged(p0: Editable?) {
-        // Issue: App gets locked if user interacts with it by typing some text in Edit field
-        // We should reset inactivity timer if user has just entered a text
+        // Issue description:
+        // App gets locked if user interacts with it by typing some text in Edit field
+        // We should reset inactivity timer if user has entered a text in Edit fields
         IdleLockHandler.onUserInteraction(context)
     }
 }

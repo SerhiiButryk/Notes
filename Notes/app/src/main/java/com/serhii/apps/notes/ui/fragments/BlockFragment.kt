@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.apps.notes.ui.data_model.AuthCredsModel
 import com.serhii.apps.notes.ui.utils.TextChecker
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.security.Hash
@@ -74,7 +74,7 @@ class BlockFragment : Fragment() {
 
     private fun unlockApplication() {
         val hash = Hash()
-        val authModel = AuthModel("", hash.hashMD5(getText(accessKeyField)), "", AuthorizeType.AUTH_UNLOCK)
+        val authModel = AuthCredsModel("", hash.hashMD5(getText(accessKeyField)), "", AuthorizeType.AUTH_UNLOCK)
         // For safety
         accessKeyField.setText("")
         // Set data

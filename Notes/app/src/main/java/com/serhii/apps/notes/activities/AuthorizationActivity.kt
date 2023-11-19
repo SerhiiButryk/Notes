@@ -78,7 +78,7 @@ class AuthorizationActivity : AppBaseActivity() {
     private fun setupObservers() {
         // Observer changes
         loginViewModel?.let { viewmodel ->
-            viewmodel.showRegistrationUIFlag.observe(this) { shouldShowFragment ->
+            viewmodel.showRegistrationUI.observe(this) { shouldShowFragment ->
                 if (shouldShowFragment) {
                     info(TAG, "addFragment(), adding Registration fragment")
                     addFragment(RegistrationFragment(), RegistrationFragment.FRAGMENT_TAG, true)

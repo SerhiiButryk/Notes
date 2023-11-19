@@ -11,7 +11,7 @@ import com.serhii.core.log.Log.Companion.info
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Listener for foreground / background transitions.
+ * A listener for foreground/background transitions in the app.
  */
 object AppForegroundListener : LifecycleObserver {
 

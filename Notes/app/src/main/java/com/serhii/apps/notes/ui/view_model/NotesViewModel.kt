@@ -10,10 +10,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.control.backup.BackupManager
-import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDisplayMode
+import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDisplayModePref
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
+import com.serhii.apps.notes.ui.repository.NotesRepository
+import com.serhii.apps.notes.ui.repository.DataChangedListener
 import com.serhii.apps.notes.ui.search.SearchableInfo
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.impl.crypto.CryptoError
@@ -22,23 +26,24 @@ import com.serhii.core.security.impl.crypto.CryptoError
  * View model for managing UI data for User notes
  *
  * Responsibilities:
- * 1) Save data to Database
- * 2) Get latest data from Database
+ * 1) Save data to a database
+ * 2) Get latest data from a database
  * 3) Survive data during config changes
- * 3) Close Database when User is done with notes
+ * 3) Clean up data when it si not needed
  */
-class NotesViewModel(application: Application) : AndroidViewModel(application), NotifyUpdateData {
+class NotesViewModel(application: Application) : AndroidViewModel(application), DataChangedListener {
 
     private val notes = MutableLiveData<List<NoteModel>>()
     private val errorState = MutableLiveData<CryptoError>()
     private val displayNoteMode = MutableLiveData<Int>()
+    fun getDisplayNoteMode(): LiveData<Int> = displayNoteMode
 
     var cachedUserNotes: List<NoteModel>? = null
         private set
 
     private val notesRepository: NotesRepository = NotesRepository(this)
 
-    private val backDataObserver: Observer<Boolean> =
+    private val backupDataObserver: Observer<Boolean> =
         Observer<Boolean> { shouldUpdateData ->
             if (shouldUpdateData != null && shouldUpdateData) {
                 info(TAG, "onChanged() $shouldUpdateData IN")
@@ -54,11 +59,11 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         errorState.value = CryptoError.OK
         notes.value = ArrayList()
 
-        val mode = getNoteDisplayMode(application.applicationContext)
+        val mode = getNoteDisplayModePref(application.applicationContext)
         displayNoteMode.value = mode
 
         // Subscribe for data updates from backup manager
-        BackupManager.getUpdateDataFlagData().observeForever(backDataObserver)
+        BackupManager.getUpdateDataFlagData().observeForever(backupDataObserver)
 
         info(TAG, "NotesViewModel(), initialization is finished")
     }
@@ -66,16 +71,13 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     override fun onCleared() {
         super.onCleared()
         notesRepository.close()
-        BackupManager.getUpdateDataFlagData().removeObserver(backDataObserver)
+        BackupManager.getUpdateDataFlagData().removeObserver(backupDataObserver)
         info(TAG, "onCleared(), clean up is finished")
     }
 
     fun getNotes(): LiveData<List<NoteModel>> {
         return notes
     }
-
-    val errorStateData: LiveData<CryptoError>
-        get() = errorState
 
     fun resetErrorState() { /* no-op */
     }
@@ -88,9 +90,6 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         // Clear cached data. Not need it anymore.
         cachedUserNotes = null
     }
-
-    val displayMode: LiveData<Int>
-        get() = displayNoteMode
 
     fun setDisplayNoteMode(newMode: Int) {
         displayNoteMode.value = newMode
@@ -122,6 +121,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         notes.value = data
     }
 
+    // TODO: Simplify this
     fun performSearch(context: Context, query: String, noteForSearch: NoteModel? = null) {
 
         // Remove extra spaces
@@ -156,6 +156,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         notes.value = newList
     }
 
+    // TODO: Simplify this
     private fun searchAllOccurrences(text: String, search: String): List<IntRange> {
 
         var start = 0
@@ -179,6 +180,24 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         }
 
         return listRanges
+    }
+
+    /**
+     * ViewModel factory for [com.serhii.apps.notes.ui.view_model.NotesViewModel] class
+     * TODO: Actually this doesn't do anything usefully, maybe remove ?
+     */
+    class NotesViewModelFactory(application: Application) : ViewModelProvider.AndroidViewModelFactory(application) {
+
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            info(TAG, "create(), IN")
+            val viewModel = super.create(modelClass)
+            info(TAG, "create(), created: $viewModel")
+            return viewModel
+        }
+
+        companion object {
+            private const val TAG = "NotesViewModelFactory"
+        }
     }
 
     companion object {

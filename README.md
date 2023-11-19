@@ -12,13 +12,13 @@ and it provides simple interface for use.
 
 # Features
 
-- Password and biometric authentication
+- User authentication
 - Basic text editing
 - Limitation of user login attempts
-- Application inactivity lock (idle lock timeout)
-- Application block (after login attempts are exceeded)
-- Secure information storage
+- Application inactivity lock (UI app lock after a timeout)
+- Secure data storage
 - Backup/restore support
+- A search across all your notes
 
 # Repository structure
 
@@ -29,8 +29,10 @@ and it provides simple interface for use.
 
 # Used technologies
 
-- Languages: Java/JNI, Kotlin, C++17
+- Languages: Kotlin, JNI, C++17
+
 - Libraries: 
+
 1) OpenSSL (1.1.1v) - https://www.openssl.org/source/
 2) Boost - https://www.boost.org/ 
 3) CSCRYPTO - https://www.copperspice.com/docs/cs_crypto/basic_what.html
@@ -43,13 +45,13 @@ and it provides simple interface for use.
 - Android version: Android 8 - Android 13
 - Supported ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
 
-# Localization
+# Localization support
 
 - ua (Ukraine)
 - ru (Russia)
 - uk (English)
 
-# Build instruction
+# Build instructions
 
 Required tools:
 
@@ -59,7 +61,7 @@ Required tools:
 
 Use gradlew or Android Studio ('Build' menu) to build this application
 
-# Tests
+# Unit Tests
 
 Find tests under 'Notes/app/src/androidTest' folder.
 
@@ -71,6 +73,6 @@ Find tests under 'Notes/app/src/androidTest' folder.
 <img src="images/Screenshot_7.png" height="420" width="220"> <img src="images/Screenshot_8.png" height="420" width="220">
 <img src="images/Screenshot_9.png" height="420" width="220">
 
-# Contacts
+# Contacts or questions
 
-Reach out to me for questions, help or collaboration - sergeybutr@gmail.com.
+Reach out to me: sergeybutr@gmail.com.

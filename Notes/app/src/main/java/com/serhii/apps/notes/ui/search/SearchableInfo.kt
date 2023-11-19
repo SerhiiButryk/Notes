@@ -5,5 +5,5 @@
 
 package com.serhii.apps.notes.ui.search
 
-data class SearchableInfo(val rangeItemTitle: List<IntRange>,
-                            val rangeItemNoteText: List<IntRange>)
+data class SearchableInfo(val rangeForNoteTitle: List<IntRange>,
+                          val rangeForNoteText: List<IntRange>)

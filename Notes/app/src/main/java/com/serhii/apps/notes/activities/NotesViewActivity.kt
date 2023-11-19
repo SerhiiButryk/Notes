@@ -18,9 +18,7 @@ import com.serhii.apps.notes.ui.fragments.NoteEditorFragment.EditorNoteInteracti
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment.NoteInteraction
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
-import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.utils.GoodUtils.Companion.getFilePath
 
 /**
@@ -82,20 +80,21 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         val nativeBridge = NativeBridge()
         nativeBridge.resetLoginLimitLeft(this)
 
-        notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application)).get(NotesViewModel::class.java)
+        notesViewModel = ViewModelProvider(this).get(NotesViewModel::class.java)
 
-        notesViewModel?.errorStateData?.observe(this) { cryptoError ->
-            if (cryptoError === CryptoError.USER_NOT_AUTHORIZED) {
-                // Request KeyStore Unlock
-                info(TAG, "onChanged() request keystore unlock")
-                BiometricAuthManager.requestUnlockActivity(this@NotesViewActivity)
-            }
-        }
+// Stopped listening to error state updates
+//        notesViewModel?.errorStateData?.observe(this) { cryptoError ->
+//            if (cryptoError === CryptoError.USER_NOT_AUTHORIZED) {
+//                // Request KeyStore Unlock
+//                info(TAG, "onChanged() request keystore unlock")
+//                BiometricAuthManager.requestUnlockActivity(this@NotesViewActivity)
+//            }
+//        }
 
         notesViewModel?.updateData(this)
     }
 
-    override fun onOpenNote(noteModel: NoteModel?) {
+    override fun onOpenNote(note: NoteModel?) {
         info(TAG, "onOpenNote()")
 
         val fm = supportFragmentManager
@@ -105,12 +104,12 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         }
 
         val args = Bundle()
-        if (noteModel == null) {
+        if (note == null) {
             // Handle add note button click
             args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_CREATE)
         } else {
             // Handle open note button click
-            args.putString(NoteEditorFragment.ARG_NOTE_ID, noteModel.id)
+            args.putString(NoteEditorFragment.ARG_NOTE_ID, note.id)
             args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_OPEN)
         }
 

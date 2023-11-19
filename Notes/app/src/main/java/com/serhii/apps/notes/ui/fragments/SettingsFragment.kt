@@ -150,6 +150,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    // TODO: Show a toast or something when there is app which can handle this action
     private fun openEmailClientApp() {
         // Open email client app for sending feedback
         val mailto = Uri.parse("mailto:${AppDetails.DEV_EMAIL}?" +

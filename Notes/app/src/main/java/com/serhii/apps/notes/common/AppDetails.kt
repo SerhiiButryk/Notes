@@ -6,6 +6,7 @@ package com.serhii.apps.notes.common
 
 import com.serhii.apps.notes.BuildConfig
 
+// Global constants for this app
 object AppDetails {
     const val RUNTIME_LIBRARY = "rabbit"
     const val VERSION_LIBRARY = BuildConfig.VERSION_NAME

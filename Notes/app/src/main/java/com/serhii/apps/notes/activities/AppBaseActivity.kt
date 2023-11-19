@@ -18,7 +18,7 @@ import com.serhii.core.utils.GoodUtils
  */
 open class AppBaseActivity : AppCompatActivity() {
 
-    protected var TAG_BASE = "AppBaseActivity-"
+    private var TAG_BASE = "AppBaseActivity-"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ open class AppBaseActivity : AppCompatActivity() {
             // Initialize lifecycle aware components
             lifecycle.addObserver(AppForegroundListener)
         }
-        Log.info(TAG_BASE, "onCreate() out")
+        Log.info(TAG_BASE, "onCreate()")
     }
 
     override fun onUserInteraction() {
@@ -39,20 +39,19 @@ open class AppBaseActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        Log.info(TAG_BASE, "onResume() in")
         super.onResume()
         IdleLockHandler.onActivityResumed(this)
-        Log.info(TAG_BASE, "onResume() out")
+        Log.info(TAG_BASE, "onResume()")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.info(TAG_BASE, "onStop() out")
+        Log.info(TAG_BASE, "onStop()")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.info(TAG_BASE, "onDestroy() out")
+        Log.info(TAG_BASE, "onDestroy()")
     }
 
     protected fun setLoggingTagForActivity(tag: String) {
@@ -61,7 +60,12 @@ open class AppBaseActivity : AppCompatActivity() {
 
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
-        Log.info(TAG_BASE, "init() finished")
+        Log.info(TAG_BASE, "init()")
+    }
+
+    // A callback to an activity from a fragment
+    interface NavigationCallback {
+        fun onNavigateBack()
     }
 
 }

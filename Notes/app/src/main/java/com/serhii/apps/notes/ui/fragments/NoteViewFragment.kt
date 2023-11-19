@@ -22,19 +22,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.activities.NavigationCallback
+import com.serhii.apps.notes.activities.AppBaseActivity
 import com.serhii.apps.notes.activities.SettingsActivity
-import com.serhii.apps.notes.control.preferences.PreferenceManager.saveNoteDisplayMode
+import com.serhii.apps.notes.control.preferences.PreferenceManager.saveNoteDisplayModePref
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.utils.NoteListAdapter
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
-import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory
 import com.serhii.core.log.Log.Companion.info
 
 /**
  * Fragment where user sees list of notes
  */
-class NoteViewFragment : BaseFragment(), NavigationCallback {
+class NoteViewFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
 
     private lateinit var actionButton: FloatingActionButton
     private lateinit var notesRecyclerView: RecyclerView
@@ -118,18 +117,17 @@ class NoteViewFragment : BaseFragment(), NavigationCallback {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(requireActivity().application))
-                .get(NotesViewModel::class.java)
+        notesViewModel = ViewModelProvider(this).get(NotesViewModel::class.java)
 
         notesViewModel.getNotes().observe(requireActivity(), observerDataChanged)
 
-        notesViewModel.displayMode.observe(requireActivity()) { mode ->
+        notesViewModel.getDisplayNoteMode().observe(requireActivity()) { mode ->
             if (mode == DISPLAY_MODE_LIST) {
                 notesRecyclerView.layoutManager = LinearLayoutManager(context)
             } else if (mode == DISPLAY_MODE_GRID) {
                 notesRecyclerView.layoutManager = GridLayoutManager(context, NOTES_COLUMN_COUNT)
             }
-            saveNoteDisplayMode(requireContext(), mode)
+            saveNoteDisplayModePref(requireContext(), mode)
         }
 
         (activity as AppCompatActivity?)!!.setSupportActionBar(toolbar)
@@ -165,7 +163,7 @@ class NoteViewFragment : BaseFragment(), NavigationCallback {
                 return true
             }
             R.id.item_layout -> {
-                if (notesViewModel.displayMode.value == DISPLAY_MODE_GRID) {
+                if (notesViewModel.getDisplayNoteMode().value == DISPLAY_MODE_GRID) {
                     notesViewModel.setDisplayNoteMode(DISPLAY_MODE_LIST)
                 } else {
                     notesViewModel.setDisplayNoteMode(DISPLAY_MODE_GRID)
@@ -183,7 +181,7 @@ class NoteViewFragment : BaseFragment(), NavigationCallback {
     }
 
     private fun updateDisplayModeIcon(menuItem: MenuItem) {
-        val mode = notesViewModel.displayMode.value!!
+        val mode = notesViewModel.getDisplayNoteMode().value
         if (mode == NoteModel.LIST_NOTE_VIEW_TYPE) {
             // Update icon
             menuItem.setIcon(R.drawable.ic_view_list)

@@ -17,14 +17,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.activities.NavigationCallback
+import com.serhii.apps.notes.activities.AppBaseActivity
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter
 import com.serhii.apps.notes.ui.utils.TextChangeNotifier
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
-import com.serhii.apps.notes.ui.view_model.NotesViewModelFactory
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils
@@ -34,7 +33,7 @@ import com.serhii.core.utils.GoodUtils.Companion.showToast
 /**
  * Fragment where user enters notes
  */
-class NoteEditorFragment : BaseFragment(), NavigationCallback {
+class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
 
     private lateinit var titleNoteField: EditText
     private lateinit var noteTimeFiled: TextView
@@ -52,7 +51,7 @@ class NoteEditorFragment : BaseFragment(), NavigationCallback {
 
         override fun onOkClicked() {
 
-            val noteModelList: List<NoteModel> = noteEditorAdapter.getCurrentList()
+            val noteModelList: List<NoteModel> = noteEditorAdapter.currentDisplayedNotes
             var isEmpty = true
 
             for (noteModel in noteModelList) {
@@ -99,7 +98,7 @@ class NoteEditorFragment : BaseFragment(), NavigationCallback {
 
             // Set selection for the title
             if (note[0].queryInfo != null) {
-                GoodUtils.setTextHighlighting(note[0].queryInfo!!.rangeItemTitle, titleNoteField, note[0].title)
+                GoodUtils.setTextHighlighting(note[0].queryInfo!!.rangeForNoteTitle, titleNoteField, note[0].title)
             }
 
             // Set selection for other notes
@@ -167,9 +166,7 @@ class NoteEditorFragment : BaseFragment(), NavigationCallback {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        notesViewModel =
-            ViewModelProvider(requireActivity(), NotesViewModelFactory(requireActivity().application))
-                .get(NotesViewModel::class.java)
+        notesViewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
 
         action = requireArguments().getString(ARG_ACTION)
         noteId = requireArguments().getString(ARG_NOTE_ID)

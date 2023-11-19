@@ -7,7 +7,7 @@ package com.serhii.apps.notes.control.auth
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
 import com.serhii.apps.notes.control.auth.types.RequestType
-import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.apps.notes.ui.data_model.AuthCredsModel
 import com.serhii.core.security.Hash
 
 /**
@@ -15,12 +15,12 @@ import com.serhii.core.security.Hash
  */
 class AuthManager {
 
-    fun handleRequest(type: RequestType, data: AuthModel?) {
-        if (type == RequestType.REQ_AUTHORIZE && data != null && data.authType == AuthorizeType.AUTH_UNLOCK) {
+    fun handleRequest(type: RequestType, data: AuthCredsModel) {
+        if (type == RequestType.REQ_AUTHORIZE && data.authType == AuthorizeType.AUTH_UNLOCK) {
             requestUnlock(data.password, Hash().hashMD5(NativeBridge().unlockKey))
-        } else if (type == RequestType.REQ_AUTHORIZE && data != null) {
+        } else if (type == RequestType.REQ_AUTHORIZE) {
             requestAuthorization(data.password, data.email)
-        } else if (type == RequestType.REQ_REGISTER && data != null) {
+        } else if (type == RequestType.REQ_REGISTER) {
             /*
                 Entered credentials will be checked on the native side
                 It will make a decision about the next step

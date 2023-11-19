@@ -96,9 +96,9 @@ object NotesDatabaseIml : DatabaseImpl() {
     }
 
     @get:SuppressLint("Range", "Recycle")
-    override val recordsImpl: Map<Int, String>
+    override val records: Map<Int, String>
         get() {
-            super.recordsImpl
+            super.records
 
             val data: MutableMap<Int, String> = HashMap()
 
@@ -124,7 +124,7 @@ object NotesDatabaseIml : DatabaseImpl() {
         initialized = false
     }
 
-    override val recordsCountImpl: Int
+    override val recordsCount: Int
         get() {
             val count = DatabaseUtils.queryNumEntries(databaseRead, UserNotesEntry.TABLE_NAME)
             info(TAG, "getRecordsCount(), count = $count")

@@ -11,7 +11,7 @@ import android.text.TextUtils
 import android.widget.Button
 
 /**
- * Helper class for enabling button if text has changed
+ * Helper class for enabling button if a text has changed
  */
 class TextChecker(private val controlField: EditText, private val controlButton: Button) : TextWatcher {
 
@@ -20,7 +20,7 @@ class TextChecker(private val controlField: EditText, private val controlButton:
     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
     override fun afterTextChanged(s: Editable) {
-        val enable = !TextUtils.isEmpty(controlField.text)
+        val enable = controlField.text.toString().isNotEmpty()
         controlButton.isEnabled = enable
     }
 

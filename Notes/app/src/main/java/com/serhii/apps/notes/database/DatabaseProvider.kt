@@ -6,14 +6,14 @@ package com.serhii.apps.notes.database
 
 import android.content.Context
 
-interface NotesDatabase<T> {
+interface DatabaseProvider<T> {
+    val recordsCount: Int
     fun init(context: Context)
     fun clear()
-    fun addRecord(uiData: T, context: Context): Int
+    fun addRecord(data: T, context: Context): Int
     fun deleteRecord(id: String): Boolean
-    fun updateRecord(id: String, uiData: T, context: Context): Boolean
+    fun updateRecord(id: String, data: T, context: Context): Boolean
     fun getRecord(id: String, context: Context): T
     fun getRecords(context: Context): List<T>
-    val recordsCount: Int
     fun close()
 }

@@ -10,12 +10,12 @@ import com.serhii.apps.notes.control.preferences.PreferenceManager
 import com.serhii.core.log.Log
 
 /**
- * Application class which performs initialization of app components
+ * Application class. This is the place fot initialization of app components
  */
 class Notes : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Init core library logging component
+        // Setup global app settings
         Log.init()
         Log.tag = AppDetails.APP_LOG_TAG
         val enabled = PreferenceManager.isDetailLogsEnabled(this)

@@ -68,7 +68,7 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
 
         fun setTitle(title: String, queryInfo: SearchableInfo?) {
             if (queryInfo != null) {
-                GoodUtils.setTextHighlighting(queryInfo.rangeItemTitle, this.title, title)
+                GoodUtils.setTextHighlighting(queryInfo.rangeForNoteTitle, this.title, title)
             } else {
                 this.title.text = title
             }
@@ -76,7 +76,7 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
 
         fun setDescription(description: String, queryInfo: SearchableInfo?) {
              if (queryInfo != null) {
-                GoodUtils.setTextHighlighting(queryInfo.rangeItemNoteText, this.description, description)
+                GoodUtils.setTextHighlighting(queryInfo.rangeForNoteText, this.description, description)
             } else {
                  this.description.text = description
             }

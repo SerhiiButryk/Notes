@@ -37,7 +37,7 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
      */
     private val ADD_NEW_NOTE_VIEW_TYPE = 101
 
-    private var currentDisplayedNotes = mutableListOf<NoteModel>()
+    var currentDisplayedNotes = mutableListOf<NoteModel>()
 
     /**
      * Return a copy of note data which Recycle View displays
@@ -285,7 +285,7 @@ class SimpleNoteViewHolder(view: View) : NoteViewHolderBase(view) {
         editView.setText(noteModel.note)
 
         if (noteModel.queryInfo != null) {
-            GoodUtils.setTextHighlighting(noteModel.queryInfo!!.rangeItemNoteText, editView, noteModel.note)
+            GoodUtils.setTextHighlighting(noteModel.queryInfo!!.rangeForNoteText, editView, noteModel.note)
         }
 
         // Cache note model associated with this View Holder

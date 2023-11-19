@@ -14,15 +14,17 @@ import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils.Companion.currentTimeToString
 
 /**
- * Singleton implementation for user notes database.
- * Also this class adds encryption layer for note data.
+ * This is a access point into User's notes database.
+ * Also this class adds an encryption layer for data storage.
  */
-object UserNotesDatabase : NotesDatabase<NoteModel> {
+object UserNotesDatabase : DatabaseProvider<NoteModel> {
 
     private val impl: DatabaseImpl
     private const val TAG = "UserNotesDatabase"
+    private val encryptionHelper = EncryptionHelper()
 
     init {
+        // Set an implementation class
         impl = NotesDatabaseIml
     }
 
@@ -34,9 +36,9 @@ object UserNotesDatabase : NotesDatabase<NoteModel> {
         impl.clearDatabaseImpl()
     }
 
-    override fun addRecord(uiData: NoteModel, context: Context): Int {
-        // Set last saved time for note
-        uiData.time = currentTimeToString()
+    override fun addRecord(data: NoteModel, context: Context): Int {
+        // Save the saving time for note
+        data.time = currentTimeToString()
 
         // Create and insert empty string before real data
         // This is a workaround to know row id beforehand
@@ -45,19 +47,21 @@ object UserNotesDatabase : NotesDatabase<NoteModel> {
             error(TAG, "addRecord(), failed to add empty record, returned index -1")
             return -1
         }
+
         val rowId = index.toString()
-        uiData.id = rowId
+        data.id = rowId
 
-        val encryptionHelper = EncryptionHelper(context)
-
-        val noteEnc = encryptionHelper.encrypt(uiData)
+        val noteEnc = encryptionHelper.encrypt(data)
         val result = impl.updateRecordImpl(rowId, noteEnc)
+
         info(TAG, "addRecord(), added new note with index = $index")
+
         if (result) {
-            encryptionHelper.saveMetaData(index)
+            encryptionHelper.saveMetaData(context, index)
         } else {
             error(TAG, "addRecord(), failed to add new record, returned index -1")
         }
+
         return index
     }
 
@@ -68,33 +72,30 @@ object UserNotesDatabase : NotesDatabase<NoteModel> {
     }
 
     override fun updateRecord(id: String, newData: NoteModel, context: Context): Boolean {
-        // Set last saved time for note
+        // Save the saving time for note
         newData.time = currentTimeToString()
-        // Set note id
         newData.id = id
-        val encryptionHelper = EncryptionHelper(context)
+
         val noteEnc = encryptionHelper.encrypt(newData)
         // Save meta data
-        if (noteEnc != null && noteEnc.isNotEmpty()) {
-            encryptionHelper.saveMetaData(id.toInt())
+        if (noteEnc.isNotEmpty()) {
+            encryptionHelper.saveMetaData(context, id.toInt())
         }
         return impl.updateRecordImpl(id, noteEnc)
     }
 
     override fun getRecord(id: String, context: Context): NoteModel {
         val data = impl.getRecordImpl(id)
-        val encryptionHelper = EncryptionHelper(context)
-        return encryptionHelper.decrypt(data, Integer.valueOf(id))
+        return encryptionHelper.decrypt(data, Integer.valueOf(id), context)
     }
 
     override fun getRecords(context: Context): List<NoteModel> {
-        val data = impl.recordsImpl
-        val encryptionHelper = EncryptionHelper(context)
-        return encryptionHelper.decrypt(data)
+        val data = impl.records
+        return encryptionHelper.decrypt(data, context)
     }
 
     override val recordsCount: Int
-        get() = impl.recordsCountImpl
+        get() = impl.recordsCount
 
     override fun close() {
         impl.closeImpl()

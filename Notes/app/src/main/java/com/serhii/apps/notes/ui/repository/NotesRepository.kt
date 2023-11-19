@@ -1,19 +1,19 @@
 /*
- * Copyright 2022. Happy coding ! :)
+ * Copyright 2023. Happy coding ! :)
  * Author: Serhii Butryk
  */
 
-package com.serhii.apps.notes.ui.view_model
+package com.serhii.apps.notes.ui.repository
 
 import android.content.Context
-import com.serhii.apps.notes.database.NotesDatabase
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 
 /**
- * Encapsulates logic related to retrieving data from database provider
+ * The class is an entry point to a database in the app
+ * Encapsulates logic related to retrieving data from a database provider
  */
-class NotesRepository(private val callback: NotifyUpdateData) {
+class NotesRepository(private val callback: DataChangedListener) {
 
     fun close() {
         UserNotesDatabase.close()
@@ -34,7 +34,6 @@ class NotesRepository(private val callback: NotifyUpdateData) {
             callback.updateData(context)
             return true
         }
-
         // Failed to save data
         return false
     }
@@ -58,8 +57,8 @@ class NotesRepository(private val callback: NotifyUpdateData) {
 }
 
 /**
- * Interface for notifying View Model that data has changed recently
+ * Interface for notifying View Model that data has been changed
  */
-interface NotifyUpdateData {
+interface DataChangedListener {
     fun updateData(context: Context)
 }

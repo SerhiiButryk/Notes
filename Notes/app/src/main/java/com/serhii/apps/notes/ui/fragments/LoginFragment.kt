@@ -23,7 +23,7 @@ import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.BiometricAuthManager
 import com.serhii.apps.notes.control.auth.BiometricAuthManager.OnAuthenticateListener
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.apps.notes.ui.data_model.AuthCredsModel
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Hash
@@ -131,7 +131,7 @@ class LoginFragment : Fragment() {
         })
 
         titleLabel!!.text = getString(R.string.title_login)
-        registerAccountBtn!!.setOnClickListener { loginViewModel!!.showRegistrationUI() }
+        registerAccountBtn!!.setOnClickListener { loginViewModel!!.requestRegistrationUI() }
 
         loginButton!!.setOnClickListener(View.OnClickListener {
             if (getText(passwordField!!).isEmpty() || getText(emailField!!).isEmpty()) {
@@ -169,9 +169,9 @@ class LoginFragment : Fragment() {
         return view
     }
 
-    private fun createModel(type: AuthorizeType): AuthModel {
+    private fun createModel(type: AuthorizeType): AuthCredsModel {
         val hash = Hash()
-        val authModel = AuthModel(
+        val authModel = AuthCredsModel(
             getText(emailField!!),
             hash.hashMD5(getText(passwordField!!)),
             "", type
@@ -181,8 +181,8 @@ class LoginFragment : Fragment() {
         return authModel
     }
 
-    private fun createEmptyModel(type: AuthorizeType): AuthModel {
-        return AuthModel("", "", "", type)
+    private fun createEmptyModel(type: AuthorizeType): AuthCredsModel {
+        return AuthCredsModel("", "", "", type)
     }
 
     companion object {
