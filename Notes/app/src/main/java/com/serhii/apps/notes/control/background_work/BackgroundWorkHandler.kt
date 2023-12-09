@@ -14,6 +14,7 @@ import com.serhii.core.log.Log
 
 /**
  * Class which manages background work in application
+ * TODO: Replace with coroutines
  */
 object BackgroundWorkHandler {
 
@@ -22,13 +23,13 @@ object BackgroundWorkHandler {
     private val workItemsQueue: ArrayDeque<WorkItem> = ArrayDeque()
 
     fun putWork(workItem: WorkItem, context: Context) {
-        Log.info(TAG, "putWork, id = ${workItem.workItemId}")
+        Log.detail(TAG, "putWork, id = ${workItem.workItemId}")
         scheduleWork(workItem, context)
         workItemsQueue.add(workItem)
     }
 
     fun removeWork(workItemId: Int, context: Context) {
-        Log.info(TAG, "removeWork, id = $workItemId")
+        Log.detail(TAG, "removeWork, id = $workItemId")
         cancelWork(workItemId, context)
         // Remove item for queue
         workItemsQueue.removeIf { it.workItemId == workItemId }
@@ -39,7 +40,7 @@ object BackgroundWorkHandler {
     }
 
     fun processWork(context: Context) {
-        Log.info(TAG, "processWork, sz = ${workItemsQueue.size} in")
+        Log.detail(TAG, "processWork, sz = ${workItemsQueue.size} in")
 
         val completedWorkItems = mutableListOf<WorkItem>()
 
@@ -50,12 +51,12 @@ object BackgroundWorkHandler {
 
             // Check if time is elapsed and if it's true the execute job
             if ((delayTime - currentTime) <= 0) {
-                Log.info(WorkItem.TAG, "processWork, time for = ${item.workItemId} is elapsed")
+                Log.detail(WorkItem.TAG, "processWork, time for = ${item.workItemId} is elapsed")
                 item.onWorkStarted(context)
 
                 completedWorkItems.add(item)
             } else {
-                Log.info(WorkItem.TAG, "processWork, time for = ${item.workItemId} is not elapsed")
+                Log.detail(WorkItem.TAG, "processWork, time for = ${item.workItemId} is not elapsed")
             }
         }
 
@@ -64,7 +65,7 @@ object BackgroundWorkHandler {
             workItemsQueue.remove(item)
         }
 
-        Log.info(TAG, "processWork, sz = ${workItemsQueue.size} out")
+        Log.detail(TAG, "processWork, sz = ${workItemsQueue.size} out")
     }
 
     private fun scheduleWork(workItem: WorkItem, context: Context) {
@@ -78,7 +79,7 @@ object BackgroundWorkHandler {
 
         val resultCode = scheduler.schedule(info)
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
-            Log.info(TAG, "scheduleWork(), success")
+            Log.detail(TAG, "scheduleWork(), success")
         } else {
             Log.error(TAG, "scheduleWork(), failed")
         }

@@ -5,9 +5,8 @@
 package com.serhii.apps.notes.activities
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.NativeBridge
@@ -26,8 +25,7 @@ import com.serhii.core.log.Log.Companion.info
  */
 class AuthorizationActivity : AppBaseActivity() {
 
-    private var loginViewModel: LoginViewModel? = null
-    private lateinit var fragmentManager: FragmentManager
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setLoggingTagForActivity(TAG)
@@ -37,10 +35,6 @@ class AuthorizationActivity : AppBaseActivity() {
         setContentView(R.layout.activity_authorization)
 
         initNative()
-
-        fragmentManager = supportFragmentManager
-        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
-
         showLoginFragment(savedInstanceState)
         setupObservers()
 
@@ -51,7 +45,7 @@ class AuthorizationActivity : AppBaseActivity() {
         info(TAG, "onBackPressed()")
         // When Registration fragment is displayed, back stack has 1 entry.
         // In this case, allow to go back. Otherwise if back stack doesn't have entries,
-        // then move app to background.
+        // then move app to the background.
         if (fragmentManager.backStackEntryCount == 1) {
             super.onBackPressed()
         } else {
@@ -77,22 +71,20 @@ class AuthorizationActivity : AppBaseActivity() {
 
     private fun setupObservers() {
         // Observer changes
-        loginViewModel?.let { viewmodel ->
-            viewmodel.showRegistrationUI.observe(this) { shouldShowFragment ->
-                if (shouldShowFragment) {
-                    info(TAG, "addFragment(), adding Registration fragment")
-                    addFragment(RegistrationFragment(), RegistrationFragment.FRAGMENT_TAG, true)
-                }
+        loginViewModel.showRegistrationUI.observe(this) { shouldShowFragment ->
+            if (shouldShowFragment) {
+                info(TAG, "addFragment(), adding Registration fragment")
+                addFragment(RegistrationFragment(), RegistrationFragment.FRAGMENT_TAG, true)
             }
         }
     }
 
     private fun addFragment(fragment: Fragment, tag: String, shouldSave: Boolean) {
-        if (fragmentManager.findFragmentByTag(tag) != null) {
+        if (supportFragmentManager.findFragmentByTag(tag) != null) {
             info(TAG, "addFragment(), fragment $tag is already opened, return")
             return
         }
-        val transaction = fragmentManager.beginTransaction()
+        val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.main_layout, fragment, tag)
         transaction.setReorderingAllowed(true) // Needed for optimization
         if (shouldSave) {
@@ -117,11 +109,11 @@ class AuthorizationActivity : AppBaseActivity() {
         info(TAG, "userRegistered() IN")
         // Close Registration UI
         onBackPressed()
-        val loginFragment = fragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
+        val loginFragment = supportFragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
         if (loginFragment != null) {
             loginFragment.onUserAccountCreated()
-            val authorizeService = loginViewModel?.authorizeService
-            authorizeService?.onUserRegistered(this)
+            val authorizeService = loginViewModel.authorizeService
+            authorizeService.onUserRegistered(this)
         } else {
             Log.error(TAG, "userRegistered(), loginFragment is null")
         }
@@ -158,9 +150,9 @@ class AuthorizationActivity : AppBaseActivity() {
     }
 
     private fun clearFragmentStack() {
-        val count = fragmentManager.backStackEntryCount
+        val count = supportFragmentManager.backStackEntryCount
         for (i in 0 until count) {
-            fragmentManager.popBackStack()
+            supportFragmentManager.popBackStack()
         }
     }
 

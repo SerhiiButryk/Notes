@@ -26,7 +26,7 @@ class WorkItem(
     var extraData: Any? = null
 
     fun onWorkStarted(context: Context) {
-        Log.info(TAG, "onWorkStarted, id = $workItemId in")
+        Log.detail(TAG, "onWorkStarted, id = $workItemId in")
         // Run work
         workCallback(context, this)
         // Notify client if can
@@ -38,7 +38,7 @@ class WorkItem(
                 // If handler == null
                 ?: completionListener.notifyWorkCompleted(workItemId)
         }
-        Log.info(TAG, "onWorkStarted, id = $workItemId in")
+        Log.detail(TAG, "onWorkStarted, id = $workItemId in")
     }
 
     companion object {

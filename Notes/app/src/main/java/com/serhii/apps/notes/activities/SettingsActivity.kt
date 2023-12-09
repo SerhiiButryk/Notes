@@ -4,21 +4,28 @@
  */
 package com.serhii.apps.notes.activities
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
 import com.serhii.apps.notes.control.background_work.WorkId
 import com.serhii.apps.notes.control.background_work.WorkItem
 import com.serhii.apps.notes.control.backup.BackupManager
+import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.EnterPasswordDialogUI
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
+import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import kotlinx.coroutines.launch
+import java.io.FileNotFoundException
+import java.io.OutputStream
 
 /**
  * Activity for app settings
@@ -66,6 +73,7 @@ class SettingsActivity : AppBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("Recycle")
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -73,13 +81,23 @@ class SettingsActivity : AppBaseActivity() {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
             if (data != null) {
 
-                val workItem = WorkItem(WorkId.EXTRACT_DATA_WORK_ID, 0, { ctx, workItem ->
-                    BackupManager.extractNotes(workItem.extraData as Intent, ctx)
-                }, null, null)
+                val outputStream: OutputStream? = try {
+                    contentResolver.openOutputStream(data.data!!)
+                } catch (e: FileNotFoundException) {
+                    error(TAG, "onActivityResult() failed to get output stream, error: $e")
+                    e.printStackTrace()
+                    return
+                }
 
-                workItem.extraData = data
-
-                BackgroundWorkHandler.putWork(workItem, this)
+                // Start backup
+                lifecycleScope.launch(NotesViewModel.defaultDispatcher) {
+                    if (UserNotesDatabase.recordsCount != 0) {
+                        val notes = UserNotesDatabase.getRecords(baseContext)
+                        BackupManager.extractNotes(baseContext, outputStream, notes)
+                    } else {
+                        info(TAG, "onActivityResult() no data")
+                    }
+                }
             } else {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")

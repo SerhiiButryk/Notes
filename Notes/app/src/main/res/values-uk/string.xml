@@ -12,26 +12,27 @@
     <string name="ms_no_search_results">Нічого не знайдено. Вибачте.</string>
 
     // Alter Dialog
-    <string name="ms_no_user_account">Ваш акаунт не знайдений. \nБудь ласка, створіть свій акаунт.</string>
+    <string name="ms_no_user_account">Ваш акаунт не знайдений. \nБудь ласка, створіть акаунт.</string>
     <string name="title_no_user_account">Помилка авторизації</string>
 
-    <string name="ms_wrong_password">Пароль не правильний. У вас лишилося %s спроб.</string>
+    <string name="ms_wrong_password">Пароль неправильний. У вас лишилося %s спроби.</string>
     <string name="title_wrong_password">Помилка авторизації</string>
 
     <string name="ms_empty_field">Порожній пароль чи ім\'я користувача. \nБудь ласка спробуйте ще раз.</string>
     <string name="title_empty_field">Помилка авторизації</string>
 
-    <string name="ms_password_differs">Паролі не збігаються. \nБудь ласка введіть пароль ще раз.</string>
+    <string name="ms_password_differs">Паролі не збігаються. \nБудь ласка уведіть пароль ще раз.</string>
 
-    <string name="ms_space_contain">Пропуски не дозволяються у паролі. \n.Будь ласка введіть пароль ще раз.</string>
+    <string name="ms_space_contain">Пропуски не дозволяються у паролі. \n.Будь ласка уведіть пароль ще раз.</string>
 
-    <string name="ms_unlock_key_invalid">Ведений ключ не правильний. \nБудь ласка спробуйте знову.</string>
+    <string name="ms_unlock_key_invalid">Введений ключ не правильний. \nБудь ласка спробуйте знову.</string>
     <string name="title_unlock_key_invalid">Помилка авторизації</string>
 
     <string name="ms_extract_data">Не має доступних даних.</string>
     <string name="title_extract_data">Помилка</string>
 
     <string name="title_error">Помилка</string>
+    // TODO: Remove a hardcoded number
     <string name="ms_password_is_short">Пароль короткий або пустий. Будь ласка виберіть пароль довший за 5 символів.</string>
     <string name="ms_email_is_not_valid">Введена вами електронна адреса є недійсною. Будь ласка спробуйте ще раз.</string>
 
@@ -46,9 +47,9 @@
     <string name="create_account_bnt">Далі</string>
     <string name="usr_psw">Пароль користувача</string>
     <string name="usr_email">Електронна пошта користувача</string>
-    <string name="usr_new_psw">Ведіть пароль</string>
+    <string name="usr_new_psw">Уведіть пароль</string>
     <string name="usr_approve_new_psw">Повторіть пароль</string>
-    <string name="usr_new_email">Ведіть пошту</string>
+    <string name="usr_new_email">Уведіть пошту</string>
     <string name="title_login">Вітаєм</string>
     <string name="title_reg">Реєстрація</string>
     <string name="login_with_biometric">Війти через біометрику</string>
@@ -60,10 +61,10 @@
     <string name="empty_string"> </string>
 
     // NoteEditor
-    <string name="title_note">Ведіть заготовок нотатки</string>
-    <string name="body_note">Почніть водити нотатку</string>
-    <string name="time_date_label">Час останнього оновлення: %s</string>
-    <string name="title_toolbar">Редактор нотаток</string>
+    <string name="title_note">Уведіть заготовок нотатки</string>
+    <string name="body_note">Почніть свою нотатку</string>
+    <string name="time_date_label">Оновлено: %s</string>
+    <string name="title_toolbar">Нотатка</string>
 
     <string name="toast_action_message">Нотатка збережена</string>
     <string name="toast_action_deleted_message">Нотатка видалена</string>
@@ -127,8 +128,8 @@
     <string name="email_feedback_body">[Знайшли проблему ? - Опишіть]\n[Маєте ідеї ? - Поділіться ними]\n[Маєте питання ? - Задайте]</string>
 
     // Change password dialog
-    <string name="hint_new_password">Ведіть новий пароль</string>
-    <string name="hint_old_password">Ведіть ваш поточний пароль</string>
+    <string name="hint_new_password">Уведіть новий пароль</string>
+    <string name="hint_old_password">Уведіть ваш поточний пароль</string>
     <string name="change_password_title_dialog">Змінити пароль</string>
 
     <string name="change_password_toast_not_correct_password">Ведений поточний пароль не правильний</string>
@@ -141,8 +142,8 @@
     <string name="block_hint">Ключ розблокування</string>
 
     // Biometric prompt
-    <string name="biometric_prompt_title">Війти через біометрику</string>
-    <string name="biometric_prompt_subtitle">Війдіть через біометричний ключ</string>
+    <string name="biometric_prompt_title">Увійти через біометрику</string>
+    <string name="biometric_prompt_subtitle">Увійдіть через біометричний ключ</string>
 
     // Confirm dialog
     <string name="confirm_dialog_delete_note_title">Видалити нотаку</string>
@@ -162,12 +163,17 @@
     <string name="wrong_pass">Вибачте пароль не правильний. Будь ласка спробуйте ще разю</string>
 
     // Enter keyword dialog
-    <string name="set_password_dialog_title">Введіть ключове слово для шифрування даних</string>
-    <string name="set_password_dialog_hint_restore">Введіть ключове слово.\nБудь ласка, переконайтеся, що це те саме ключове слово, яке ви використали для резервного копіювання цих нотаток. Інакше ця операція буде невдалою.</string>
+    <string name="set_password_dialog_title">Уведіть ключове слово для шифрування даних</string>
+    <string name="set_password_dialog_hint_restore">Уведіть ключове слово.\nБудь ласка, переконайтеся, що це те саме ключове слово, яке ви використали для резервного копіювання цих нотаток. Інакше ця операція буде невдалою.</string>
     <string name="set_password_dialog_hint_backup">Ви повинні запам\'ятати його, щоб мати можливість відновити свої дані.</string>
 
     <string name="info_author">Автор: Сергій Бутрик</string>
 
     <string name="search_title">Пошук</string>
+
+    <string name="action_convert_to_list">Змінити вигляд</string>
+    <string name="message_email_app_not_found">Вибачте додаток пошти відсутній. Не можливо виконати цю дію.</string>
+
+    <string name="save_note_in_file">Зберегти у файл</string>
 
 </resources>

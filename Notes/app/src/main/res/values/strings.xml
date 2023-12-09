@@ -64,7 +64,7 @@
     // NoteEditor
     <string name="title_note">Enter your note title</string>
     <string name="body_note">Start typing your note</string>
-    <string name="time_date_label">Last update time: %s</string>
+    <string name="time_date_label">Updated: %s</string>
     <string name="title_toolbar">Note editor</string>
 
     <string name="toast_action_message">Note is saved</string>
@@ -84,7 +84,7 @@
     <string name="save_note_item">Save note</string>
     <string name="clear_note_item">Clear note</string>
     <string name="settings_item">Settings</string>
-    <string name="action_convert_to_list" translatable="false">Convert to list</string>
+    <string name="action_convert_to_list">Change mode</string>
     <string name="action_layout_grid" translatable="false">Convert to grid</string>
     <string name="action_layout_list" translatable="false">Convert to list</string>
 
@@ -207,5 +207,8 @@
     <string name="info_author">Author: Serhii Butryk</string>
 
     <string name="search_title">Search</string>
+    <string name="message_email_app_not_found">К сожалению, у вас нет приложения почты. Невозможно выполнить это действие.</string>
+
+    <string name="save_note_in_file">Extract this note</string>
 
 </resources>

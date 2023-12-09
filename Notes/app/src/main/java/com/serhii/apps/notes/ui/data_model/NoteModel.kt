@@ -4,9 +4,8 @@
  */
 package com.serhii.apps.notes.ui.data_model
 
-import com.serhii.apps.notes.ui.search.SearchableInfo
+import com.serhii.apps.notes.ui.search.SearchInfo
 import com.serhii.core.log.Log
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -29,7 +28,7 @@ data class NoteModel(var note: String = "", var title: String = "",
                       */
                      val listNote: MutableList<NoteList> = mutableListOf()) {
 
-    var queryInfo: SearchableInfo? = null
+    var queryInfo: SearchInfo? = null
 
     /*
     * If this note has no user notes

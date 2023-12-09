@@ -18,6 +18,8 @@ import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Cipher
 import com.serhii.core.utils.GoodUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
@@ -28,20 +30,16 @@ object BackupManager {
     // View Model is observing changes to this field to know when to get new data
     private val noteShouldBeUpdated: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun extractNotes(data: Intent, context: Context) {
-        val outputStream: OutputStream? = try {
-            context.contentResolver.openOutputStream(data.data!!)
-        } catch (e: FileNotFoundException) {
-            error(TAG, "extractNotes() error: $e")
-            e.printStackTrace()
-            return
-        }
-
-        val result = saveDataAsPlainText(outputStream, context)
-        if (result) {
-            GoodUtils.showToast(context, R.string.result_success)
-        } else {
-            GoodUtils.showToast(context, R.string.result_failed)
+    suspend fun extractNotes(context: Context, outputStream: OutputStream?, notes: List<NoteModel>) {
+        info(TAG, "extractNotes()")
+        val result = saveDataAsPlainText(outputStream, notes)
+        // Show toast
+        withContext(Dispatchers.Main) {
+            if (result) {
+                GoodUtils.showToast(context, R.string.result_success)
+            } else {
+                GoodUtils.showToast(context, R.string.result_failed)
+            }
         }
     }
 
@@ -112,7 +110,7 @@ object BackupManager {
         return noteShouldBeUpdated
     }
 
-    fun dataUpdated() {
+    fun onDataUpdated() {
         noteShouldBeUpdated.value = false
     }
 
@@ -136,13 +134,10 @@ object BackupManager {
         activity.startActivityForResult(intent, REQUEST_CODE_OPEN_BACKUP_FILE)
     }
 
-    private fun saveDataAsPlainText(outputStream: OutputStream?, context: Context): Boolean {
-        info(TAG, "backupDataAsPlainText()")
-
+    private fun saveDataAsPlainText(outputStream: OutputStream?, notes: List<NoteModel>): Boolean {
+        info(TAG, "saveDataAsPlainText()")
         try {
-
-            if (UserNotesDatabase.recordsCount != 0) {
-                val notes = UserNotesDatabase.getRecords(context)
+            if (notes.isNotEmpty()) {
                 val builder = StringBuilder()
                 for (note in notes) {
                     builder.append("\n")
@@ -156,17 +151,18 @@ object BackupManager {
                     outputStream?.write(data.toByteArray())
                     outputStream?.flush()
                     outputStream?.close()
-                    info(TAG, "backupDataAsPlainText() backup is finished")
+                    info(TAG, "saveDataAsPlainText() done")
                     return true
+                } else {
+                    info(TAG, "saveDataAsPlainText() empty data")
                 }
             } else {
-                info(TAG, "backupDataAsPlainText() database is empty")
+                info(TAG, "saveDataAsPlainText() empty note list")
             }
         } catch (e: Exception) {
-            error(TAG, "backupDataAsPlainText() exception: $e")
+            error(TAG, "saveDataAsPlainText() error: $e")
             e.printStackTrace()
         }
-
         return false
     }
 

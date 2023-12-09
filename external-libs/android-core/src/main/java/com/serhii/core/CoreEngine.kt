@@ -34,12 +34,12 @@ internal object CoreEngine : Components {
     }
 
     override fun configure(cipher: Cipher) : CryptoProvider {
-        Log.info(TAG, "configure(), CC $cipher")
+        Log.info(TAG, "configure(), CC")
         return providerSecureStore
     }
 
     override fun configure(cipher: Cipher, provider: String) : CryptoProvider {
-        Log.info(TAG, "configure(), CC1 $cipher : $provider")
+        Log.info(TAG, "configure(), CC1")
         return when (provider) {
             Cipher.CRYPTO_PROVIDER_ANDROID -> {
                 providerSecureStore

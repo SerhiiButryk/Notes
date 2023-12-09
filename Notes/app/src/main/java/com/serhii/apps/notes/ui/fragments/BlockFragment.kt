@@ -13,12 +13,14 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
 import com.serhii.apps.notes.ui.data_model.AuthCredsModel
 import com.serhii.apps.notes.ui.utils.TextChecker
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
+import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.security.Hash
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
@@ -28,7 +30,6 @@ import com.serhii.core.utils.GoodUtils.Companion.getText
 class BlockFragment : Fragment() {
 
     private lateinit var accessKeyField: EditText
-    private lateinit var loginViewModel: LoginViewModel
 
     private val keyEventActionDone = OnEditorActionListener { v, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -36,12 +37,6 @@ class BlockFragment : Fragment() {
             return@OnEditorActionListener true
         }
         false
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        // Retrieve an instance of ViewModel
-        loginViewModel = ViewModelProvider(requireActivity()).get(LoginViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -77,8 +72,11 @@ class BlockFragment : Fragment() {
         val authModel = AuthCredsModel("", hash.hashMD5(getText(accessKeyField)), "", AuthorizeType.AUTH_UNLOCK)
         // For safety
         accessKeyField.setText("")
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in AuthorizationActivity.
+        val viewModel: LoginViewModel by viewModels ({ requireActivity() })
         // Set data
-        loginViewModel.setAuthValue(authModel)
+        viewModel.setAuthValue(authModel)
     }
 
     companion object {

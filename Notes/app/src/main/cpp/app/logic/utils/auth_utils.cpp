@@ -93,7 +93,7 @@ APP::SYSTEM_MESSAGE APP::AuthUtils::checkRules(const std::string &password, cons
 
 bool APP::AuthUtils::isEmailValid(const std::string& email)
 {
-    // Check if entered text has email pattern
+    // Check if the entered text has correct email pattern
     const std::regex email_regex(R"(^[\w\.-]+@[\w-]+\.[a-zA-Z]{2,4}$)");
     std::smatch base_match;
 

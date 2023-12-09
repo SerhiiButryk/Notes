@@ -10,6 +10,7 @@ import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.data_model.NoteModel.Companion.fromJson
 import com.serhii.apps.notes.ui.data_model.NoteModel.Companion.getJson
 import com.serhii.core.log.Log
+import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Cipher
 import com.serhii.core.security.impl.crypto.CryptoError
@@ -20,7 +21,7 @@ class EncryptionHelper {
     private var lastError = CryptoError.OK
 
     fun encrypt(noteModel: NoteModel): String {
-        info(TAG, "encrypt() in")
+        detail(TAG, "encrypt() in")
         resetErrors()
         val csk = Cipher()
         val json = getJson(noteModel)
@@ -30,14 +31,14 @@ class EncryptionHelper {
     }
 
     fun decrypt(note: String, index: Int, context: Context): NoteModel {
-        info(TAG, "decrypt() with index = $index, in")
+        detail(TAG, "decrypt() with index = $index, in")
         resetErrors()
         retrieveMetaData(context, index)
         return decryptInternal(note)
     }
 
     fun saveMetaData(context: Context, id: Int) {
-        info(TAG, "saveMetaData() index $id, in")
+        detail(TAG, "saveMetaData() index $id, in")
         val fileName = IV_DATA_FILE + id
 
         // Save to shared preferences
@@ -52,11 +53,11 @@ class EncryptionHelper {
         edit.putString(KEY_IV_NOTE, String(Base64.encode(ivNote, Base64.NO_WRAP)))
         edit.apply()
 
-        info(TAG, "saveMetaData() out")
+        detail(TAG, "saveMetaData() out")
     }
 
     private fun retrieveMetaData(context: Context, id: Int) {
-        info(TAG, "retrieveMetaData() index $id")
+        detail(TAG, "retrieveMetaData() index $id")
         val fileName = IV_DATA_FILE + id
 
         // Retrieve from shared preferences
@@ -70,7 +71,7 @@ class EncryptionHelper {
         resetErrors()
         val noteDec: MutableList<NoteModel> = ArrayList()
         for ((key, value) in data) {
-            info(TAG, "decryptData() index $key")
+            detail(TAG, "decryptData() index $key")
             val noteModel = decrypt(value, key, context)
             noteDec.add(noteModel)
         }

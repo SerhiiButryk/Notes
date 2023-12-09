@@ -16,6 +16,7 @@
         android:fontFamily="sans-serif-condensed"
         android:maxLines="2"
         android:textColor="@color/text_color"
+        android:textStyle="bold"
         android:textSize="@dimen/text_size_middle"
         tools:text="Title" />
 

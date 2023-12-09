@@ -15,7 +15,7 @@ import com.serhii.core.log.Log
 class BackgroundWorkService : JobService() {
 
     override fun onStartJob(p0: JobParameters?): Boolean {
-        Log.info(TAG, "onStartJob, in")
+        Log.detail(TAG, "onStartJob, in")
 
         BackgroundWorkHandler.processWork(this)
 
@@ -24,7 +24,7 @@ class BackgroundWorkService : JobService() {
     }
 
     override fun onStopJob(p0: JobParameters?): Boolean {
-        Log.info(TAG, "onStopJob, in")
+        Log.detail(TAG, "onStopJob, in")
         // Do not reschedule this work
         return false
     }

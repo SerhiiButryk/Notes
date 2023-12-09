@@ -61,8 +61,8 @@
 
     // NoteEditor
     <string name="title_note">Ведите заготовки заметки</string>
-    <string name="body_note">Начните водить заметку</string>
-    <string name="time_date_label">Время последнего обновления: %s</string>
+    <string name="body_note">Начните новою заметку</string>
+    <string name="time_date_label">Обновлено: %s</string>
     <string name="title_toolbar">Редактор заметок</string>
 
     <string name="toast_action_message">Заметка сохранена</string>
@@ -169,5 +169,10 @@
     <string name="info_author">Автор: Сергей Бутрик</string>
 
     <string name="search_title">Поиск</string>
+
+    <string name="action_convert_to_list">Изменить формат</string>
+    <string name="message_email_app_not_found">, you don\'t have email app. Cannot complete this action.</string>
+
+    <string name="save_note_in_file">Сохранить как файл</string>
 
 </resources>

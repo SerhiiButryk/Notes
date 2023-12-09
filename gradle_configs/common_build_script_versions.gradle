@@ -2,6 +2,6 @@
 // Author: Serhii Butryk
 
 // Kotlin version used by project
-ext.kotlin_version = '1.6.0'
-// GP version used by prject
+ext.kotlin_version = '1.8.0'
+// GP version used by project
 ext.gradle_plugin_version = '7.3.0'

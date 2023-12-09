@@ -12,12 +12,13 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.activities.AppBaseActivity
+import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
@@ -38,11 +39,12 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
     private lateinit var titleNoteField: EditText
     private lateinit var noteTimeFiled: TextView
     private lateinit var toolbar: Toolbar
-    private lateinit var notesViewModel: NotesViewModel
     private lateinit var interaction: EditorNoteInteraction
     private var action: String? = null
     private var noteId: String? = null
     private val noteEditorAdapter = NoteEditorAdapter()
+
+    fun getNoteId() = noteId
 
     /**
      * Dialog callback
@@ -87,20 +89,17 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
     /**
      * Search results observer callback
      */
-    private val dataChangedObserver = Observer<List<NoteModel>> { note ->
+    private val searchObserver = Observer<List<NoteModel>> { note ->
         info(TAG, "onChanged() got search result")
         // Check result and set selection if available
         // We expect list with one element here
         if (note.size == 1) {
-
-            // Reset text in case it has spannable strings
+            // Reset text in case it had spannable text
             titleNoteField.setText(note[0].title)
-
             // Set selection for the title
             if (note[0].queryInfo != null) {
                 GoodUtils.setTextHighlighting(note[0].queryInfo!!.rangeForNoteTitle, titleNoteField, note[0].title)
             }
-
             // Set selection for other notes
             noteEditorAdapter.setNoteData(note[0])
         } else {
@@ -165,26 +164,26 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        notesViewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
-
         action = requireArguments().getString(ARG_ACTION)
         noteId = requireArguments().getString(ARG_NOTE_ID)
-
-        notesViewModel.getNotes().observe(viewLifecycleOwner) {
-        }
 
         processArgs()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        notesViewModel.cacheUserNote(noteEditorAdapter.getNoteList())
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in NotesViewActivity.
+        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+        viewModel.cacheUserNote(noteEditorAdapter.getNoteList())
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        val cachedList = notesViewModel.cachedUserNotes
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in NotesViewActivity.
+        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+        val cachedList = viewModel.cachedUserNotes
         if (cachedList != null) {
             noteEditorAdapter.setDataChanged(cachedList.toMutableList())
         }
@@ -203,8 +202,11 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
                 GoodUtils.showKeyboard(requireContext(), titleNoteField)
             }
         } else if (action == ACTION_NOTE_OPEN) {
+            // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+            // of VM here. This will not be the same as we get in NotesViewActivity.
+            val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
-            val note = notesViewModel.getNote(noteId!!, requireContext())
+            val note = viewModel.getNote(noteId!!, requireContext())
 
             // Set note title
             titleNoteField.setText(note.title)
@@ -230,27 +232,42 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
     }
 
     override fun onSearchStarted(query: String) {
+        Log.info(TAG, "onSearchStarted()")
         if (noteId == null) {
             Log.error(TAG, "onSearchStarted() noteId == null")
             return
         }
 
-        notesViewModel.getNotes().observe(viewLifecycleOwner, dataChangedObserver)
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in NotesViewActivity.
+        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
-        val note = notesViewModel.getNote(noteId!!, requireContext())
-        notesViewModel.performSearch(requireContext(), query, note)
+        // Start observing data change events for this search
+        viewModel.getSearchResults().removeObserver(searchObserver)
+        viewModel.getSearchResults().observe(viewLifecycleOwner, searchObserver)
+
+        val note = viewModel.getNote(noteId!!, requireContext())
+        viewModel.performSearch(requireContext(), query, note)
     }
 
     override fun onSearchFinished() {
+        Log.info(TAG, "onSearchFinished()")
         if (noteId == null) {
-            Log.error(TAG, "onSearchFinished() noteId == null")
+            Log.error(TAG, "onSearchFinished() unexpected error, noteId == null")
             return
         }
 
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in NotesViewActivity.
+        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+
         // We should reset selection on NotesViewFragment when SearchView is closed
-        val note = notesViewModel.getNote(noteId!!, requireContext())
+        val note = viewModel.getNote(noteId!!, requireContext())
         titleNoteField.setText(note.title)
         noteEditorAdapter.setNoteData(note)
+
+        // Remove observer for this search
+        viewModel.getSearchResults().removeObserver(searchObserver)
     }
 
     @SuppressLint("NonConstantResourceId") // Suppress "Checks use of resource IDs in places requiring constants." warning
@@ -310,6 +327,13 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
                 noteEditorAdapter.transformView()
                 return true
             }
+            R.id.save_note_in_file -> {
+                /**
+                 * Save a note to a file
+                 */
+                BackupManager.openDirectoryChooserForExtractData(requireActivity())
+                return true
+            }
         }
         return false
     }
@@ -323,12 +347,16 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
             return
         }
 
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in NotesViewActivity.
+        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+
         val result: Boolean = if (action == ACTION_NOTE_OPEN) {
             info(TAG, "saveUserNote() updated note")
-            notesViewModel.updateNote(noteId!!, notes, requireContext())
+            viewModel.updateNote(noteId!!, notes, requireContext())
         } else {
             info(TAG, "saveUserNote() add new note")
-            notesViewModel.addNote(notes, requireContext())
+            viewModel.addNote(notes, requireContext())
         }
 
         /*
@@ -346,8 +374,12 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
             return
         }
 
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in NotesViewActivity.
+        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+
         // Delete if this note already exists
-        if (noteId != null && notesViewModel.deleteNote(noteId!!, requireContext())) {
+        if (noteId != null && viewModel.deleteNote(noteId!!, requireContext())) {
             showToast(requireContext(), R.string.toast_action_deleted_message)
             interaction.onDeleteNote()
         } else {

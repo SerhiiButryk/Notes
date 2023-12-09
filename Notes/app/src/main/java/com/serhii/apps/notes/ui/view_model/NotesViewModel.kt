@@ -10,32 +10,39 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDisplayModePref
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.repository.NotesRepository
 import com.serhii.apps.notes.ui.repository.DataChangedListener
-import com.serhii.apps.notes.ui.search.SearchableInfo
+import com.serhii.apps.notes.ui.search.SearchInfo
+import com.serhii.apps.notes.ui.search.search
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.impl.crypto.CryptoError
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
- * View model for managing UI data for User notes
+ * View model for managing UI data of user's notes
  *
  * Responsibilities:
  * 1) Save data to a database
  * 2) Get latest data from a database
- * 3) Survive data during config changes
- * 3) Clean up data when it si not needed
+ * 3) Hold data during config changes
+ * 4) Access and update the UI data
  */
 class NotesViewModel(application: Application) : AndroidViewModel(application), DataChangedListener {
-
+    // User's notes list
     private val notes = MutableLiveData<List<NoteModel>>()
+    // This is the result of a text search in user's note items
+    private val searchResults = MutableLiveData<List<NoteModel>>()
     private val errorState = MutableLiveData<CryptoError>()
     private val displayNoteMode = MutableLiveData<Int>()
+
     fun getDisplayNoteMode(): LiveData<Int> = displayNoteMode
 
     var cachedUserNotes: List<NoteModel>? = null
@@ -44,11 +51,11 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     private val notesRepository: NotesRepository = NotesRepository(this)
 
     private val backupDataObserver: Observer<Boolean> =
-        Observer<Boolean> { shouldUpdateData ->
-            if (shouldUpdateData != null && shouldUpdateData) {
-                info(TAG, "onChanged() $shouldUpdateData IN")
-                updateData(getApplication())
-                BackupManager.dataUpdated()
+        Observer { shouldUpdateData ->
+            if (shouldUpdateData) {
+                info(TAG, "onChanged() got data change event, retrieving new data")
+                updateData(application)
+                BackupManager.onDataUpdated()
             }
         }
 
@@ -87,7 +94,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     fun onBackNavigation() {
-        // Clear cached data. Not need it anymore.
+        // Clear cached data. Don't need it anymore.
         cachedUserNotes = null
     }
 
@@ -116,91 +123,31 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     override fun updateData(context: Context) {
-        info(TAG, "retrieveData(), load data")
+        info(TAG, "updateData(), get all records")
         val data = notesRepository.getAll(context)
         notes.value = data
     }
 
-    // TODO: Simplify this
+    fun getSearchResults(): LiveData<List<NoteModel>> {
+        return searchResults
+    }
+
     fun performSearch(context: Context, query: String, noteForSearch: NoteModel? = null) {
-
-        // Remove extra spaces
-        val searchedText = query.trim()
-
-        val noteList: List<NoteModel> = if (noteForSearch != null) {
+        Log.info(message = "performSearch()")
+        val noteForSearchList: List<NoteModel> = if (noteForSearch != null) {
             listOf(noteForSearch)
         } else {
             notesRepository.getAll(context)
         }
-
-        val newList = noteList.filter { element ->
-            val noteText = element.note
-            val listNote = element.listNote
-            val noteTitle = element.title
-
-            val rangeItemTitle = searchAllOccurrences(noteTitle, searchedText)
-            val rangeItemNoteText = searchAllOccurrences(noteText, searchedText)
-
-            element.queryInfo = SearchableInfo(rangeItemTitle, rangeItemNoteText)
-
-            val newListWithMatchedText = listNote.filter { listElement ->
-                listElement.note.contains(searchedText)
-            }
-
-            // Check if any item has text which we search
-            rangeItemTitle.isNotEmpty() || rangeItemNoteText.isNotEmpty() || newListWithMatchedText.isNotEmpty()
-        }
-
-        info(TAG, "performSearch() got result sz = ${newList.size}")
-
-        notes.value = newList
-    }
-
-    // TODO: Simplify this
-    private fun searchAllOccurrences(text: String, search: String): List<IntRange> {
-
-        var start = 0
-        var index = 0
-
-        val listRanges = mutableListOf<IntRange>()
-
-        while (true) {
-            index = text.indexOf(search, start, true)
-
-            if (index == -1)
-                break
-
-            listRanges.add(index..(search.length + index))
-
-            if ((index + search.length - 1) >= text.length) {
-                break
-            }
-
-            start = index + search.length
-        }
-
-        return listRanges
-    }
-
-    /**
-     * ViewModel factory for [com.serhii.apps.notes.ui.view_model.NotesViewModel] class
-     * TODO: Actually this doesn't do anything usefully, maybe remove ?
-     */
-    class NotesViewModelFactory(application: Application) : ViewModelProvider.AndroidViewModelFactory(application) {
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            info(TAG, "create(), IN")
-            val viewModel = super.create(modelClass)
-            info(TAG, "create(), created: $viewModel")
-            return viewModel
-        }
-
-        companion object {
-            private const val TAG = "NotesViewModelFactory"
+        // Start a search
+        viewModelScope.launch(defaultDispatcher + CoroutineName("NoteSearch")) {
+            search(query, noteForSearchList, searchResults)
         }
     }
 
     companion object {
         private const val TAG = "NotesViewModel"
+        // For coroutines
+        val defaultDispatcher = Dispatchers.Default;
     }
 }

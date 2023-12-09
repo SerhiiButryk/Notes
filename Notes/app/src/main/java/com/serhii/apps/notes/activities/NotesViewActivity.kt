@@ -6,27 +6,39 @@ package com.serhii.apps.notes.activities
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
 import com.serhii.apps.notes.control.auth.BiometricAuthManager
+import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
+import com.serhii.apps.notes.control.background_work.WorkId
+import com.serhii.apps.notes.control.background_work.WorkItem
+import com.serhii.apps.notes.control.backup.BackupManager
+import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment.EditorNoteInteraction
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment.NoteInteraction
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils.Companion.getFilePath
+import kotlinx.coroutines.launch
+import java.io.FileNotFoundException
+import java.io.OutputStream
 
 /**
  * Activity which displays user note list
  */
 class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, EditorNoteInteraction {
 
-    private var notesViewModel: NotesViewModel? = null
+    private val notesViewModel: NotesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setLoggingTagForActivity(TAG)
@@ -64,11 +76,50 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
-            info(TAG, "onActivityResult(), reload data")
-            notesViewModel?.resetErrorState()
-            notesViewModel?.updateData(this)
+// Stopped responding to this changes
+//        if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
+//            info(TAG, "onActivityResult(), reload data")
+//            notesViewModel.resetErrorState()
+//            notesViewModel.updateData(this)
+//        }
+
+        if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
+            info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
+            if (data != null) {
+
+                val noteId = getNoteId()
+                if (noteId.isNullOrEmpty()) {
+                    info(TAG, "onActivityResult() empty noteId, return")
+                    return
+                }
+
+                val outputStream: OutputStream? = try {
+                    contentResolver.openOutputStream(data.data!!)
+                } catch (e: FileNotFoundException) {
+                    Log.error(TAG, "onActivityResult() failed to get output stream, error: $e")
+                    e.printStackTrace()
+                    return
+                }
+
+                // Start an extract
+                lifecycleScope.launch(NotesViewModel.defaultDispatcher) {
+                    val note = UserNotesDatabase.getRecord(noteId, baseContext)
+                    BackupManager.extractNotes(baseContext, outputStream, listOf(note))
+                }
+            } else {
+                // Should not happen
+                Log.error(TAG, "onActivityResult() data is null")
+            }
         }
+    }
+
+    private fun getNoteId(): String? {
+        val fm = supportFragmentManager
+        val f = fm.findFragmentByTag(NoteEditorFragment.FRAGMENT_TAG) as? NoteEditorFragment
+        if (f != null) {
+            return f.getNoteId()
+        }
+        return ""
     }
 
     /**
@@ -80,8 +131,6 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         val nativeBridge = NativeBridge()
         nativeBridge.resetLoginLimitLeft(this)
 
-        notesViewModel = ViewModelProvider(this).get(NotesViewModel::class.java)
-
 // Stopped listening to error state updates
 //        notesViewModel?.errorStateData?.observe(this) { cryptoError ->
 //            if (cryptoError === CryptoError.USER_NOT_AUTHORIZED) {
@@ -91,7 +140,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
 //            }
 //        }
 
-        notesViewModel?.updateData(this)
+        notesViewModel.updateData(this)
     }
 
     override fun onOpenNote(note: NoteModel?) {
@@ -132,7 +181,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         val fm = supportFragmentManager
         fm.popBackStack()
         // Notify View Model
-        notesViewModel?.onBackNavigation()
+        notesViewModel.onBackNavigation()
     }
 
     override fun onBackPressed() {
@@ -141,7 +190,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
 
         super.onBackPressed()
         // Notify View Model
-        notesViewModel?.onBackNavigation()
+        notesViewModel.onBackNavigation()
     }
 
     private fun notifyAboutBackNavigation() {

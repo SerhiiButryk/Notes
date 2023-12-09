@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.apps.notes.ui.search.SearchableInfo
+import com.serhii.apps.notes.ui.search.SearchInfo
 import com.serhii.apps.notes.ui.utils.NoteListAdapter.NoteViewHolder
 import com.serhii.core.utils.GoodUtils
 
@@ -42,7 +42,7 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setDataChanged(noteModels: List<NoteModel>) {
+    fun updateData(noteModels: List<NoteModel>) {
         notes = noteModels
         notifyDataSetChanged()
     }
@@ -66,7 +66,7 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
             }
         }
 
-        fun setTitle(title: String, queryInfo: SearchableInfo?) {
+        fun setTitle(title: String, queryInfo: SearchInfo?) {
             if (queryInfo != null) {
                 GoodUtils.setTextHighlighting(queryInfo.rangeForNoteTitle, this.title, title)
             } else {
@@ -74,7 +74,7 @@ class NoteListAdapter(private val clickListener: NoteViewHolder.ClickListener) :
             }
         }
 
-        fun setDescription(description: String, queryInfo: SearchableInfo?) {
+        fun setDescription(description: String, queryInfo: SearchInfo?) {
              if (queryInfo != null) {
                 GoodUtils.setTextHighlighting(queryInfo.rangeForNoteText, this.description, description)
             } else {

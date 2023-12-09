@@ -19,17 +19,17 @@ class Log {
         }
 
         @JvmStatic
-        fun info(tag: String, message: String) {
+        fun info(tag: String = "", message: String) {
             LogImpl.info(tag, message)
         }
 
         @JvmStatic
-        fun detail(tag: String, message: String) {
+        fun detail(tag: String = "", message: String) {
             LogImpl.detail(tag, message)
         }
 
         @JvmStatic
-        fun error(tag: String, message: String) {
+        fun error(tag: String = "", message: String) {
             LogImpl.error(tag, message)
         }
 

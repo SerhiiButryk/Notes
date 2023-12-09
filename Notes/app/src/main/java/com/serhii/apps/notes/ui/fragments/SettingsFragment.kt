@@ -4,6 +4,7 @@
  */
 package com.serhii.apps.notes.ui.fragments
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper.Companion.ALERT_D
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.formatString
 
 
@@ -150,7 +152,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    // TODO: Show a toast or something when there is app which can handle this action
     private fun openEmailClientApp() {
         // Open email client app for sending feedback
         val mailto = Uri.parse("mailto:${AppDetails.DEV_EMAIL}?" +
@@ -164,6 +165,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         try {
             startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            GoodUtils.showToast(requireContext(), R.string.message_email_app_not_found)
+            e.printStackTrace()
+            Log.error(TAG, "openEmailClientApp() email client is absent")
         } catch (e: Exception) {
             e.printStackTrace()
             Log.error(TAG, "openEmailClientApp() error: $e")
