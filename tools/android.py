@@ -14,7 +14,10 @@ import inspect
 DEBUG_MODE = False
 
 # Predefined shell commands
+
 android_text_input_command = ["adb", "shell", "input", "text"]
+android_zipalign_command = ["zipalign", "-p", "-f", "-v"]
+android_apksigner_command = []
 
 # ********** METHODS **************
 
@@ -93,12 +96,25 @@ def logM(message):
 
 # 1. Process arguments
 input, android_text_input_args_found = getValueForArg(["-i", "-input"])
+apk_name, android_apk_name_args_found = getValueForArg(["-apk"])
 
 # 2. Execute selected command 
 if android_text_input_args_found:
     logI("Entering text with adb")
     android_text_input_command.append(input)
     runShellCommand(android_text_input_command)
+elif android_apk_name_args_found:
+    
+    # Steps to resign app:
+
+    # 1. Unzip.
+    # 2. Modify if neccessary.
+    # 3. Remove META-INF
+    # 4. Zip
+    # 5. Run zipalign
+    # 6. Sign with selected keystore  
+    
+    print("Not implemented")
 else:
     logE("Sorry, cannot execute this command. Please, make sure that the arguments are correct.\n")
     showHelp()
