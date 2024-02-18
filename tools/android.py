@@ -3,72 +3,99 @@
 import subprocess
 import sys
 import inspect
+import os
 
 # 
 # Utility script for Android
-# v1.0.0 
 #
 
-# ********** CONSTANTS **************
-
-DEBUG_MODE = False
-
-# Predefined shell commands
-
-android_text_input_command = ["adb", "shell", "input", "text"]
-android_zipalign_command = ["zipalign", "-p", "-f", "-v"]
-android_apksigner_command = []
-
-# ********** METHODS **************
-
-# A method to show a hepl for this script
-def showHelp():
-    logI("Help for Android utility script:\n")
+# 
+# A HELP 
+# 
+def printHelp():
     logI("Usage: ./android.py [args...]\n")
 
-    logM("-i, -input [text]"); logI(" - Enter a text in the focused view on the screen\n")
-    logM("Example:"); logI(" ./android.py -i \"Some text\"\n")
+    logI(Green("-i, -input [text]") + " - Enters a text in the focused view on the screen\n");
+    logI("Example: ./android.py -i \"Some text\"\n");
 
-# Find an arument for selected argument list
-# Retruns the first found value or "" if nothing is found     
-def getValueForArg(provided_args):
+    logI(Green("-top-activity") + " - Prints current top activity\n");
+    logI("Example: ./android.py -top-activity\n");
 
-   found = False
+    logI(Green("-resign-apk") + " - Resigns apk with default keystore\n");
+    logI("Example: ./android.py -resign-apk app_name.apk\n");
+
+    logI(Green("-info") + " - Prints info about connected device\n");
+    logI("Example: ./android.py -info\n");
+
+    logI(Green("-enter-creads") + " - Enters the next 2 strings in the 2 text fileds if has focus\n");
+    logI("Example: ./android.py -enter-creads email:password\n");
+
+# 
+# CONSTANTS and shell commands
+# 
+
+KEY_STORE_PATH = "/Users/sbutr/.android/debug.keystore"
+BUILD_TOOLS = "/Users/sbutr/Library/Android/sdk/build-tools/34.0.0/"
+KEY_PASS="android"
+KEY_ALIAS="androiddebugkey"
+DEBUG_MODE = False
+
+android_text_input_command = ["adb", "shell", "input", "text"]
+android_top_activity_command = ["adb", "shell", "dumpsys", "activity", "|", "grep", "mCurrentFocus=Window"]
+android_zipalign_command = ["zipalign", "-p", "-f", "-v"]
+
+#
+#  Functions
+# 
+
+# Check if argumnets were passed and get the next a value if found
+def hasCommand(args_list):
    value = ""
-
-   for arg in sys.argv:
-
-        if found:
-            value = arg    
-            break
-
-        for elem in provided_args:
-            
-            if elem == arg:
-                found = True
-                break
-
-   return (value, found)
+   found = False
+   # Iterate over a list of arguments starting from 1 element
+   for index, arg in enumerate(sys.argv[1:]):    
+    for elem in args_list:
+        if elem == arg:
+            # If it has the next argument, then get it
+            if (index + 1) < len(sys.argv[1:]):
+                value = sys.argv[index+2]
+            # An arg is found
+            return (value, True)
+   # An arg is not found     
+   return (value, found) 
    
 # Executes shell command   
-def runShellCommand(args):
-    logM("Executing command: " + str(args) + "\n")
-    result = subprocess.run(args)
-    logM("Done. Code: " + str(result.returncode) + "\n")
+def runCommand(command):
+    runCommandInternal(command, False)
+
+# Executes shell command
+def runCommandWithLogs(command):
+    runCommandInternal(command, True)
+
+# Executes shell command
+def runCommandInternal(command, printLogs):
+    if printLogs:
+        logI(Green("Executing command: " + str(command) + "\n"))
+    result = subprocess.run(command)
+    if printLogs:
+        logI(Green("Done. Code: " + str(result.returncode) + "\n")) 
+
+def logI(message):
+    logInternal(0, message)
+
+def logE(message):
+    logInternal(1, message)
 
 def logInternal(level, message):
 
     formatted = ""
 
-    def getRed(mes): return "\033[91m {}\033[00m" .format(mes)
-    def getGreen(mes): return "\033[92m {}\033[00m" .format(mes)
-
     if level == 1:
         # Error formatting
-        formatted = getRed(message)
+        formatted = Red(message)
     elif level == 2:        
         # Main formatting
-        formatted = getGreen(message)  
+        formatted = Green(message)  
     else:
         # No formatting
         formatted = message      
@@ -80,43 +107,123 @@ def logInternal(level, message):
     else:
         print(formatted, end="")
 
-# Log info messages
-def logI(message):
-    logInternal(0, message)
+def Red(mes): return "\033[91m {}\033[00m" .format(mes)
+def Green(mes): return "\033[92m {}\033[00m" .format(mes)
 
-# Log error messages
-def logE(message):
-    logInternal(1, message)
+# 
+# Start  
+# 
 
-# Log main messages
-def logM(message):
-    logInternal(2, message)
+# Parse arguments and run commands
 
-# ********** START **************
+TEXT, COMMAND_ENTER_TEXT = hasCommand(["-i", "-input"])
 
-# 1. Process arguments
-input, android_text_input_args_found = getValueForArg(["-i", "-input"])
-apk_name, android_apk_name_args_found = getValueForArg(["-apk"])
+if COMMAND_ENTER_TEXT:
+    logI("Entering text:\n")
+    android_text_input_command.append(TEXT)
+    runCommandWithLogs(android_text_input_command)
+    # End the program
+    sys.exit()
 
-# 2. Execute selected command 
-if android_text_input_args_found:
-    logI("Entering text with adb")
-    android_text_input_command.append(input)
-    runShellCommand(android_text_input_command)
-elif android_apk_name_args_found:
+_, COMMAND_SHOW_TOP_ACTIVITY = hasCommand(["-top-activity"])
+
+if COMMAND_SHOW_TOP_ACTIVITY:
+    logI("Top activity:\n")
+    runCommand(android_top_activity_command)
+    # End the program
+    sys.exit()
+
+_, COMMAND_DEVICE_INFO = hasCommand(["-info"])
+
+# Extend if neccessary
+if COMMAND_DEVICE_INFO:
+
+    logI(Green("Release version:\n"))   
+    runCommand(["adb", "shell", "getprop", "ro.build.version.release"])
+
+    logI(Green("Release or code name version:\n"))
+    runCommand(["adb", "shell", "getprop", "ro.build.version.release_or_codename"])
+
+    logI(Green("Build ID:\n"))   
+    runCommand(["adb", "shell", "getprop", "ro.build.id"])
+
+    logI(Green("Manufacturer:\n"))   
+    runCommand(["adb", "shell", "getprop", "ro.product.manufacturer"])
+
+    logI(Green("Device model:\n"))   
+    runCommand(["adb", "shell", "getprop", "ro.product.model"])
+
+    logI(Green("Supported ABI list:\n"))
+    runCommand(["adb", "shell", "getprop", "ro.product.cpu.abilist"])
+
+    logI(Green("SDK version:\n"))   
+    runCommand(["adb", "shell", "getprop", "ro.build.version.sdk"])
+
+    # End the program
+    sys.exit()
+
+TEXT, COMMAND_ENTER_CREDENTIALS = hasCommand(["-enter-creads"])
+
+if COMMAND_ENTER_CREDENTIALS:
+
+    strings = TEXT.split(':')
+
+    logI("Entering text:\n")
+
+    runCommand(["adb", "shell", "input", "text", strings[0]])
+    runCommand(["adb", "shell", "input", "keyevent", "66"])
+    runCommand(["adb", "shell", "input", "text", strings[1]])
+    runCommand(["adb", "shell", "input", "keyevent", "66"])
+
+    # End the program
+    sys.exit()
+
+APK_NAME, COMMAND_RESIGN_APK = hasCommand(["-resign-apk"])
+
+if COMMAND_RESIGN_APK and APK_NAME:
     
     # Steps to resign app:
-
     # 1. Unzip.
     # 2. Modify if neccessary.
     # 3. Remove META-INF
     # 4. Zip
     # 5. Run zipalign
-    # 6. Sign with selected keystore  
+    # 6. Resign with selected keystore  
     
-    print("Not implemented")
-else:
-    logE("Sorry, cannot execute this command. Please, make sure that the arguments are correct.\n")
-    showHelp()
+    print("Unzipping...")
 
-# ********** END **************
+    # Make temp dir
+    runCommand(["rm", "-rf", "temp"])
+    runCommand(["mkdir", "temp"])
+
+    # Unzip
+    runCommand(["unzip", "-q", APK_NAME, "-d", "temp"])
+
+    # Remove META-INF/
+    runCommand(["rm", "-rf", "temp/META-INF"])
+
+    print("Zipping...")
+
+    # Zip
+    os.chdir("temp")
+    runCommand(["zip", "-q", "-0", "-r", "../temp.apk", ".", "-i", "*"])
+    os.chdir("..")
+
+    print("Signing...")
+
+    # Zipalign
+    runCommand([BUILD_TOOLS + "zipalign", "-p", "-f", "4", "temp.apk", "out.apk"])
+
+    # Sign
+    runCommand([BUILD_TOOLS + "apksigner", "sign", "--ks", KEY_STORE_PATH, "--ks-pass", "pass:" + KEY_PASS, "--ks-key-alias", KEY_ALIAS, "out.apk"])
+
+    print("Done")
+
+    # End the program
+    sys.exit()
+
+# Looks like provided args are incorrect, so show a help
+logE("Sorry, cannot execute this command. Please, make sure that the arguments are correct.\n")
+printHelp()
+
+# End 
