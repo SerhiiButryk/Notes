@@ -9,14 +9,15 @@ import android.util.Base64
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
-import com.serhii.core.security.Cipher
+import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
-import java.util.*
 
 /**
- * Global point for underling C++ functionality and APIs
+ * Global point for access to C++ layer
  */
-class NativeBridge {
+object NativeBridge {
+
+    val crypto = Crypto()
 
     val userName: String
         get() = _getUserName()
@@ -25,9 +26,9 @@ class NativeBridge {
         return _verifyPassword(_getUserName(), passwordHash)
     }
 
-    fun setNewPassword(password: String?): Boolean {
+    fun setNewPassword(password: String): Boolean {
         val hash = Hash()
-        return _setNewPassword(hash.hashMD5(password!!))
+        return _setNewPassword(hash.hashMD5(password))
     }
 
     fun executeBlockApp() {
@@ -40,12 +41,7 @@ class NativeBridge {
     fun setLoginLimitFromDefault(context: Context) {
         // Get limit value from prefs
         val limit = getLockLimit(context)
-        setLimitAndEnc(limit!!.toInt())
-    }
-
-    private fun setLimitAndEnc(value: Int) {
-        val cipher = Cipher()
-        val encMessage = cipher.encrypt(value.toString())
+        val encMessage = crypto.encrypt(limit.toString())
         // Set enc data
         _setLimitLeft(encMessage)
     }
@@ -57,14 +53,19 @@ class NativeBridge {
     var limitLeft: Int
         get() {
             val encMessage = _getLimitLeft()
-            val cipher = Cipher()
-            val message = cipher.decrypt(encMessage)
+            val message = crypto.decrypt(encMessage)
             // Return result
             return message.toInt()
         }
-        set(value) {
-            setLimitAndEnc(value)
+        private set(value) {
+            val encMessage = crypto.encrypt(value.toString())
+            // Set enc data
+            _setLimitLeft(encMessage)
         }
+
+    fun updateLimit(value: Int) {
+        limitLeft = value
+    }
 
     fun getLockLimit(context: Context): String? {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -73,25 +74,19 @@ class NativeBridge {
     }
 
     fun createUnlockKey() {
-        val cipher = Cipher()
         // Take the first 8 characters
-        val randomString = cipher.getRandomString().substring(0 .. 7)
-        val encMessage = cipher.encrypt(randomString)
+        val randomString = crypto.getRandomValue(8)
+        val encodedString = Base64.encode(randomString, Base64.NO_WRAP)
+        val encMessage = crypto.encrypt(String(encodedString))
         _setUnlockKey(encMessage)
     }
 
     val unlockKey: String
         get() {
             val unlockKey = _getUnlockKey()
-            val cipher = Cipher()
             // Return decrypted result
-            return cipher.decrypt(unlockKey)
+            return crypto.decrypt(unlockKey)
         }
-
-    // TODO: Check password strength
-    fun checkPasswordRequirements(password: String?): Boolean {
-        return !(password == null || password.isEmpty())
-    }
 
     private external fun _getUserName(): String
     private external fun _verifyPassword(userName: String, password: String): Boolean

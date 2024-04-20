@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
@@ -37,15 +38,14 @@ class ChangePasswordDialogUI : BaseDialogFragment() {
 
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
         okButton.setOnClickListener { // Check entered password
-            val nativeBridge = NativeBridge()
-            val success = nativeBridge.verifyPassword(getText(oldPassword))
+            val success = NativeBridge.verifyPassword(getText(oldPassword))
             if (!success) {
                 Toast.makeText(requireContext().applicationContext,
                     getString(R.string.change_password_toast_not_correct_password),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                val result = nativeBridge.setNewPassword(getText(newPassword))
+                val result = EventService.onChangePassword(getText(newPassword))
                 if (result) {
                     Toast.makeText(requireContext().applicationContext,
                         getString(R.string.change_password_toast_password_set), Toast.LENGTH_LONG

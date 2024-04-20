@@ -7,7 +7,6 @@ package com.serhii.core.security.impl.crypto
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
-import android.telephony.mbms.MbmsErrors
 import android.util.Base64
 import com.serhii.core.log.Log
 import java.io.IOException
@@ -19,7 +18,10 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-internal class SecureStore : CryptoProvider {
+/**
+ * Class provides Android keystore interface for crypto operations
+ */
+internal class AndroidSecureStore : BaseProvider() {
 
     private val keyStore: KeyStore
     private var selectedKey: String? = null
@@ -36,7 +38,7 @@ internal class SecureStore : CryptoProvider {
         init(key, timeOutSeconds, authRequired)
     }
 
-    override fun encryptSymmetric(message: String, inputIV: ByteArray, key: String?): Result {
+    override fun encryptSymmetric(message: String, inputIV: String, key: String): Result {
         // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No secret key is selected for cryptographic operation" }
         try {
@@ -46,7 +48,10 @@ internal class SecureStore : CryptoProvider {
             val _iv = encryptionCipher.iv
             val encryptedText =
                 encryptionCipher.doFinal(message.toByteArray(StandardCharsets.UTF_8))
-            return Result(String(Base64.encode(encryptedText, Base64.NO_WRAP)), _iv, CryptoError.OK)
+            return Result(
+                String(Base64.encode(encryptedText, Base64.NO_WRAP)),
+                String(Base64.encode(_iv, Base64.NO_WRAP)),
+                CryptoError.OK)
         } catch (e: UserNotAuthenticatedException) {
             Log.error(TAG, "user not authenticated exception: $e")
             e.printStackTrace()
@@ -58,13 +63,14 @@ internal class SecureStore : CryptoProvider {
         return Result(error = CryptoError.UNKNOWN)
     }
 
-    override fun decryptSymmetric(message: String, inputIV: ByteArray, key: String?): Result {
+    override fun decryptSymmetric(message: String, inputIV: String, key: String): Result {
         // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No secret key is selected for cryptographic operation" }
         try {
             val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
             val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
-            val spec = GCMParameterSpec(128, inputIV)
+            val iv = Base64.decode(inputIV.toByteArray(), Base64.NO_WRAP)
+            val spec = GCMParameterSpec(128, iv)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
             val textToDecrypt = message.toByteArray()
             val text = cipher.doFinal(Base64.decode(textToDecrypt, Base64.NO_WRAP))
@@ -145,6 +151,42 @@ internal class SecureStore : CryptoProvider {
         return false
     }
 
+    private fun createKeyForBiometricAuth(): Boolean {
+
+        val key = DEFAULT_KEY_FOR_BIOMETRIC
+
+        if (isSecretKeyExists(key)) {
+            Log.detail(TAG, "createKeyForBiometricAuth(): exists, return")
+            return true
+        }
+
+        val keySpecs = KeyGenParameterSpec.Builder(
+            key,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+            .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+            .setUserAuthenticationRequired(true)
+            // Invalidate the keys if the user has registered a new biometric
+            // credential, such as a new fingerprint. Can call this method only
+            // on Android 7.0 (API level 24) or higher. The variable
+            // "invalidatedByBiometricEnrollment" is true by default.
+            .setInvalidatedByBiometricEnrollment(true)
+            .build()
+
+        val keyGenerator = getKeyGenerator(KeyProperties.KEY_ALGORITHM_AES)
+
+        var result = false
+        if (keyGenerator != null) {
+            result = genSecretKey(keyGenerator, keySpecs)
+        }
+
+        if (!result) {
+            Log.error(TAG, "createKeyForBiometricAuth(): failed to gen key")
+        }
+
+        return result
+    }
+
     private fun initKeyStore(): KeyStore {
         try {
             return KeyStore.getInstance("AndroidKeyStore")
@@ -184,10 +226,28 @@ internal class SecureStore : CryptoProvider {
         return true
     }
 
+    override fun type(): String = com.serhii.core.security.Crypto.CRYPTO_PROVIDER_ANDROID
+
+    fun getSecretKeyForBiometricAuthOrCreate(): SecretKey? {
+
+        if (!isSecretKeyExists(DEFAULT_KEY_FOR_BIOMETRIC)) {
+            createKeyForBiometricAuth()
+        }
+
+        return keyStore.getKey(DEFAULT_KEY_FOR_BIOMETRIC, null) as? SecretKey
+    }
+
+    fun getCipherForBiometricAuth(): Cipher {
+        return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
+                + KeyProperties.BLOCK_MODE_CBC + "/"
+                + KeyProperties.ENCRYPTION_PADDING_PKCS7)
+    }
+
     companion object {
         private const val TAG = "SecureStore"
         private const val SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding"
         private const val DEFAULT_KEY = "Default-key-160375068"
+        private const val DEFAULT_KEY_FOR_BIOMETRIC = "Default-key-43294023"
     }
 
     init {
@@ -195,7 +255,7 @@ internal class SecureStore : CryptoProvider {
         val success = load(keyStore)
         createKey(DEFAULT_KEY, 0, false)
         selectKey(DEFAULT_KEY)
-        Log.detail(TAG, "SecureStore(): is key store loaded $success")
+        Log.detail(TAG, "init(): key store loaded '$success'")
     }
 
 }

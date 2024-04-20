@@ -15,25 +15,24 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.textfield.TextInputLayout
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.auth.BiometricAuthManager
-import com.serhii.apps.notes.control.auth.BiometricAuthManager.OnAuthenticateListener
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.apps.notes.ui.data_model.AuthCredsModel
+import com.serhii.apps.notes.ui.data_model.createModel
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
-import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.Hash
+import com.serhii.core.log.Log
+import com.serhii.core.security.BiometricAuthenticator
+import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
+import javax.crypto.Cipher
 
 /**
  * Fragment where user enters login creds
  */
-class LoginFragment : Fragment() {
+class LoginFragment : BaseFragment(TAG) {
     
     private lateinit var emailField: EditText
     private lateinit var passwordField: EditText
@@ -44,9 +43,8 @@ class LoginFragment : Fragment() {
     private lateinit var emailLayout: TextInputLayout
     private lateinit var passwordLayout: TextInputLayout
     private lateinit var description: TextView
-    private val biometricAuthManager = BiometricAuthManager()
-    private var isFingerprintAvailable = false
-    private val nativeBridge = NativeBridge()
+
+    private var biometricAuthManager: BiometricAuthenticator? = null
 
     private val keyEventActionDone = OnEditorActionListener { v, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -58,17 +56,48 @@ class LoginFragment : Fragment() {
             // of VM here. This will not be the same as we get in AuthorizationActivity.
             val viewModel: LoginViewModel by viewModels ({ requireActivity() })
             // Set data
-            viewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN))
+            val authModel = createModel(
+                GoodUtils.getText(emailField),
+                GoodUtils.getText(passwordField),
+                AuthorizeType.AUTH_PASSWORD_LOGIN)
+
+            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+
+            // For safety
+            passwordField.setText("")
             return@OnEditorActionListener true
         }
         false
     }
 
+    private val authListener = object : BiometricAuthenticator.Listener {
+
+        override fun onSuccess(cipher: Cipher) {
+            Log.info(TAG, "BiometricAuthenticator::onSuccess()")
+
+            // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+            // of VM here. This will not be the same as we get in AuthorizationActivity.
+            val viewModel: LoginViewModel by viewModels ({ requireActivity() })
+
+            val authModel = createModel(cipher, AuthorizeType.AUTH_BIOMETRIC_LOGIN)
+            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+        }
+
+        override fun onFailure() {
+            Log.info(TAG, "BiometricAuthenticator::onFailure()")
+            GoodUtils.showToast(requireContext(), R.string.biometric_toast_message)
+        }
+    }
+
     override fun onAttach(context: Context) {
+        Log.info(TAG, "onAttach()")
         super.onAttach(context)
-        if (biometricAuthManager.canAuthenticate(context) && biometricAuthManager.hasFingerPrint(context)) {
-            biometricAuthManager.initBiometricSettings(context, this)
-            isFingerprintAvailable = true
+        if (BiometricAuthenticator.biometricsAvailable(context)) {
+            biometricAuthManager = BiometricAuthenticator()
+            biometricAuthManager?.init(context, this,
+            getString(R.string.biometric_prompt_title),
+            getString(R.string.biometric_prompt_subtitle),
+            getString(android.R.string.cancel))
         }
     }
 
@@ -77,14 +106,14 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        info(TAG, "onCreateView()")
+        Log.info(TAG, "onCreateView()")
         val view = initView(inflater, container)
-        val userName = nativeBridge.userName
+        val userName = NativeBridge.userName
 
-        // If user name is not empty then user is already registered.
+        // If user name is not empty then user has already registered.
         // Otherwise, we should ask for registration.
         if (userName.isNotEmpty()) {
-            info(TAG, "onCreateView() user exists")
+            Log.info(TAG, "onCreateView() user exists")
 
             emailField.setText(userName)
             registerAccountBtn.visibility = View.GONE
@@ -100,13 +129,14 @@ class LoginFragment : Fragment() {
             passwordLayout.visibility = View.VISIBLE
             emailLayout.visibility = View.VISIBLE
 
-            if (isFingerprintAvailable) {
-                fingerprintBtn.visibility = View.VISIBLE
+            fingerprintBtn.visibility = if (biometricAuthManager != null
+                && biometricAuthManager!!.isReady()) {
+                 View.VISIBLE
             } else {
-                fingerprintBtn.visibility = View.GONE
+                View.GONE
             }
         } else {
-            info(TAG, "onCreateView() user doesn't exist")
+            Log.info(TAG, "onCreateView() user doesn't exist")
 
             registerAccountBtn.visibility = View.VISIBLE
             description.visibility = View.VISIBLE
@@ -114,17 +144,7 @@ class LoginFragment : Fragment() {
             emailLayout.visibility = View.GONE
         }
 
-        fingerprintBtn.setOnClickListener { biometricAuthManager.authenticate() }
-
-        biometricAuthManager.setOnAuthenticateSuccess(object : OnAuthenticateListener {
-            override fun onSuccess() {
-                // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-                // of VM here. This will not be the same as we get in AuthorizationActivity.
-                val viewModel: LoginViewModel by viewModels ({ requireActivity() })
-                // Set data
-                viewModel.setAuthValue(createEmptyModel(AuthorizeType.AUTH_BIOMETRIC_LOGIN))
-            }
-        })
+        fingerprintBtn.setOnClickListener { biometricAuthManager?.authenticate(authListener) }
 
         // We should specify ViewModelStoreOwner, because otherwise we get a different instance
         // of VM here. This will not be the same as we get in AuthorizationActivity.
@@ -140,7 +160,15 @@ class LoginFragment : Fragment() {
             }
 
             // Set data
-            viewModel.setAuthValue(createModel(AuthorizeType.AUTH_PASSWORD_LOGIN))
+            val authModel = createModel(
+                GoodUtils.getText(emailField),
+                GoodUtils.getText(passwordField),
+                AuthorizeType.AUTH_PASSWORD_LOGIN)
+
+            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+
+            // For safety
+            passwordField.setText("")
         })
 
         passwordField.setOnEditorActionListener(keyEventActionDone)
@@ -150,7 +178,7 @@ class LoginFragment : Fragment() {
     fun onUserAccountCreated() {
         registerAccountBtn.visibility = View.GONE
         description.visibility = View.GONE
-        emailField.setText(nativeBridge.userName)
+        emailField.setText(NativeBridge.userName)
         passwordField.requestFocus()
     }
 
@@ -167,22 +195,6 @@ class LoginFragment : Fragment() {
         emailLayout = view.findViewById(R.id.email_layout)
         passwordLayout = view.findViewById(R.id.password_layout)
         return view
-    }
-
-    private fun createModel(type: AuthorizeType): AuthCredsModel {
-        val hash = Hash()
-        val authModel = AuthCredsModel(
-            getText(emailField),
-            hash.hashMD5(getText(passwordField)),
-            "", type
-        )
-        // For safety
-        passwordField.setText("")
-        return authModel
-    }
-
-    private fun createEmptyModel(type: AuthorizeType): AuthCredsModel {
-        return AuthCredsModel("", "", "", type)
     }
 
     companion object {

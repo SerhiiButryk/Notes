@@ -12,22 +12,19 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView.OnEditorActionListener
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.apps.notes.ui.data_model.AuthCredsModel
+import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.apps.notes.ui.utils.TextChecker
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
-import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.security.Hash
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
 /**
  * Fragment which block application
  */
-class BlockFragment : Fragment() {
+class BlockFragment : BaseFragment("BlockFragment") {
 
     private lateinit var accessKeyField: EditText
 
@@ -68,15 +65,14 @@ class BlockFragment : Fragment() {
     }
 
     private fun unlockApplication() {
-        val hash = Hash()
-        val authModel = AuthCredsModel("", hash.hashMD5(getText(accessKeyField)), "", AuthorizeType.AUTH_UNLOCK)
+        val authModel = AuthModel("", getText(accessKeyField), "", AuthorizeType.AUTH_UNLOCK)
         // For safety
         accessKeyField.setText("")
         // We should specify ViewModelStoreOwner, because otherwise we get a different instance
         // of VM here. This will not be the same as we get in AuthorizationActivity.
         val viewModel: LoginViewModel by viewModels ({ requireActivity() })
-        // Set data
-        viewModel.setAuthValue(authModel)
+
+        viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
     }
 
     companion object {

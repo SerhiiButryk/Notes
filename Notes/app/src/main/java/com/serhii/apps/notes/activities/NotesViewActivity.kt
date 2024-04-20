@@ -12,9 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
+import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
-import com.serhii.apps.notes.control.auth.BiometricAuthManager
 import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
 import com.serhii.apps.notes.control.background_work.WorkId
 import com.serhii.apps.notes.control.background_work.WorkItem
@@ -41,9 +41,9 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     private val notesViewModel: NotesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        info(TAG, "onCreate()")
         setLoggingTagForActivity(TAG)
 
-        info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_view)
 
@@ -57,8 +57,6 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
 
         // Start authorization process.
         authorizeUser(savedInstanceState)
-
-        info(TAG, "onCreate() OUT")
     }
 
     private fun addNoteViewFragment() {
@@ -70,18 +68,12 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     }
 
     override fun onDestroy() {
+        info(TAG, "onDestroy()")
         super.onDestroy()
-        info(TAG, "onDestroy() OUT")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-// Stopped responding to this changes
-//        if (BiometricAuthManager.isUnlockActivityResult(requestCode, resultCode)) {
-//            info(TAG, "onActivityResult(), reload data")
-//            notesViewModel.resetErrorState()
-//            notesViewModel.updateData(this)
-//        }
 
         if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
             info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
@@ -103,7 +95,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
 
                 // Start an extract
                 lifecycleScope.launch(NotesViewModel.defaultDispatcher) {
-                    val note = UserNotesDatabase.getRecord(noteId, baseContext)
+                    val note = UserNotesDatabase.getRecord(noteId)
                     BackupManager.extractNotes(baseContext, outputStream, listOf(note))
                 }
             } else {
@@ -126,21 +118,8 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
      * Called when user is authorized
      */
     override fun onUserAuthorized() {
-        info(TAG, "onAuthorize(), user is authorized")
-
-        val nativeBridge = NativeBridge()
-        nativeBridge.resetLoginLimitLeft(this)
-
-// Stopped listening to error state updates
-//        notesViewModel?.errorStateData?.observe(this) { cryptoError ->
-//            if (cryptoError === CryptoError.USER_NOT_AUTHORIZED) {
-//                // Request KeyStore Unlock
-//                info(TAG, "onChanged() request keystore unlock")
-//                BiometricAuthManager.requestUnlockActivity(this@NotesViewActivity)
-//            }
-//        }
-
-        notesViewModel.updateData(this)
+        info(TAG, "onUserAuthorized()")
+        notesViewModel.updateData()
     }
 
     override fun onOpenNote(note: NoteModel?) {

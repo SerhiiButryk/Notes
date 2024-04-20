@@ -16,7 +16,7 @@ import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.core.log.Log.Companion.detail
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.Cipher
+import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -170,11 +170,11 @@ object BackupManager {
         info(TAG, "backupDataAsEncryptedText() found records: " + UserNotesDatabase.recordsCount)
 
         if (UserNotesDatabase.recordsCount != 0) {
-            val notes = UserNotesDatabase.getRecords(context)
+            val notes = UserNotesDatabase.getRecords()
             val json = NoteModel.convertNoteListToJson(notes)
 
             // encrypt using keyword
-            val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+            val cipher = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
             val message = cipher.encrypt(json, key)
 
             try {
@@ -201,13 +201,13 @@ object BackupManager {
         detail(TAG, "restoreData() IN")
 
         // decrypt using keyword
-        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val cipher = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
         val messageJson = cipher.decrypt(json, key)
 
         val notes = NoteModel.convertJsonToNoteList(messageJson)
 
         for (note in notes) {
-            UserNotesDatabase.addRecord(note, context)
+            UserNotesDatabase.addRecord(note)
         }
 
         noteShouldBeUpdated.value = true

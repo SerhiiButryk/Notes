@@ -108,7 +108,7 @@ class GoodUtils {
 
         @JvmStatic
         fun showKeyboard(context: Context, view: View) {
-            keyboardHelper.requestHowKeyboard(context, view)
+            keyboardHelper.requestShowKeyboard(context, view)
         }
 
         @JvmStatic

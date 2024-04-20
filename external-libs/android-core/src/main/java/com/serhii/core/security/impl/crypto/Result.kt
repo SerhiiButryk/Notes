@@ -5,7 +5,7 @@
 package com.serhii.core.security.impl.crypto
 
 data class Result(val message: String = "",
-                  val iv: ByteArray = ByteArray(0),
+                  val iv: String = "",
                   val error: CryptoError = CryptoError.UNKNOWN) {
 
     val isResultAvailable: Boolean
@@ -33,9 +33,8 @@ data class Result(val message: String = "",
     // Implemented for usage in Kotlin collections
     override fun hashCode(): Int {
         var result = message.hashCode()
-        result = 31 * result + iv.contentHashCode()
+        result = 31 * result + iv.hashCode()
         result = 31 * result + error.hashCode()
-        result = 31 * result + isResultAvailable.hashCode()
         return result
     }
 

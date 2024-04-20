@@ -5,6 +5,9 @@
 package com.serhii.apps.notes.ui.fragments
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,13 +15,14 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
+import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.backup.BackupManager.openBackUpFile
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForBackup
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForExtractData
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.apps.notes.database.UserNotesDatabase.recordsCount
-import com.serhii.apps.notes.ui.dialogs.DialogHelper.showAlertDialog
+import com.serhii.apps.notes.ui.dialogs.DialogHelper.showDialog
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showChangePasswordDialog
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper.Companion.ALERT_DIALOG_TYPE_BACKUP_ERROR
 import com.serhii.core.log.Log
@@ -34,8 +38,6 @@ import com.serhii.core.utils.GoodUtils.Companion.formatString
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var loginAttempts: Preference
-
-    private val nativeBridge = NativeBridge()
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         setPreferencesFromResource(R.xml.preferences, s)
@@ -57,7 +59,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         loginAttempts.summary = formatString(getString(R.string.preference_login_limit_summary),
-            nativeBridge.getLockLimit(requireContext()))
+            NativeBridge.getLockLimit(requireContext()))
 
         loginAttempts.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _, newValue ->
@@ -69,7 +71,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 loginAttempts.summary =
                     formatString(getString(R.string.preference_login_limit_summary), selectedValue)
 
-                nativeBridge.limitLeft = selectedValue
+                EventService.onChangeLoginLimit(selectedValue)
 
                 true
             }
@@ -124,7 +126,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val unlockNote = findPreference<Preference>(getString(R.string.preference_unlock_note_key))
         if (unlockNote != null) {
-            unlockNote.summary = nativeBridge.unlockKey
+            unlockNote.summary = NativeBridge.unlockKey
+            // Put the string to clipboard on User click
+            unlockNote.setOnPreferenceClickListener {
+                val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE)
+                        as ClipboardManager
+                clipboardManager.setPrimaryClip(ClipData.newPlainText("", unlockNote.summary))
+                GoodUtils.showToast(requireContext(), R.string.toast_unlock_key_copied)
+                true
+            }
         }
 
         val restoreNotes = findPreference<Preference>(getString(R.string.preference_restore_note_key))
@@ -180,7 +190,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         get() {
             // Check if there is data to extract
             if (recordsCount == 0) {
-                showAlertDialog(ALERT_DIALOG_TYPE_BACKUP_ERROR, requireActivity())
+                showDialog(ALERT_DIALOG_TYPE_BACKUP_ERROR, requireActivity())
                 error(TAG, "isDataAvailable() no data available")
                 return false
             }

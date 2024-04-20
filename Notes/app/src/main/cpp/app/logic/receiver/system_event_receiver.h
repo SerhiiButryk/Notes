@@ -23,7 +23,7 @@ namespace APP
         public:
             static SystemEventReceiver* getInstance();
 
-            void forward(const Event<SYSTEM_EVENT>& event);
+            bool forward(const Event<SYSTEM_EVENT>& event);
 
             void addReceiver(EventHandlerBase<SYSTEM_EVENT>* receiver);
 

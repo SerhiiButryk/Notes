@@ -34,7 +34,7 @@ import com.serhii.core.log.Log.Companion.info
 /**
  * Fragment where user sees list of notes
  */
-class NoteViewFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
+class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
 
     private lateinit var actionButton: FloatingActionButton
     private lateinit var notesRecyclerView: RecyclerView
@@ -204,7 +204,7 @@ class NoteViewFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
         viewModel.getSearchResults().removeObserver(searchObserver)
         viewModel.getSearchResults().observe(viewLifecycleOwner, searchObserver)
         // Do a search
-        viewModel.performSearch(requireContext(), query)
+        viewModel.performSearch(query)
     }
 
     override fun onSearchFinished() {
@@ -215,7 +215,7 @@ class NoteViewFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
         // Start observing data change events for this search
         notesViewModel.getSearchResults().removeObserver(searchObserver)
         // Update data
-        notesViewModel.updateData(requireContext())
+        notesViewModel.updateData()
     }
 
     private fun updateIconAndTextHint(notes: List<NoteModel>, isSearch: Boolean = false) {

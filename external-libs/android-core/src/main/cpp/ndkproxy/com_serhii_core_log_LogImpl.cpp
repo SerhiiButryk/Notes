@@ -7,6 +7,26 @@
 extern "C" {
 #endif
 
+bool isDebug(JNIEnv *env) {
+
+    jclass cls = env->FindClass("com/serhii/apps/notes/BuildConfig");
+
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        return false;
+    }
+
+    if (cls) {
+        jfieldID fid = env->GetStaticFieldID(cls, "DEBUG", "Z");
+        if (fid) {
+            jboolean res = env->GetStaticBooleanField(cls, fid);
+            return res;
+        }
+    }
+
+    return false;
+}
+
 JNIEXPORT void JNICALL Java_com_serhii_core_log_LogImpl__1setTag(JNIEnv* env, jobject, jstring jtag)
 {
     MYLIB::JString strTag(env, jtag);
@@ -15,26 +35,23 @@ JNIEXPORT void JNICALL Java_com_serhii_core_log_LogImpl__1setTag(JNIEnv* env, jo
 
 JNIEXPORT void JNICALL Java_com_serhii_core_log_LogImpl__1setDetailLog(JNIEnv *env, jobject thiz, jboolean enable)
 {
-    MYLIB::Log::setIsDetailedLogsEnabled(enable);
+    if (isDebug(env)) {
+        MYLIB::Log::setDetailedLogsEnabled(true);
+    } else {
+        MYLIB::Log::setDetailedLogsEnabled(enable);
+    }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_serhii_core_log_LogImpl__1getDetailLog(JNIEnv *env, jobject thiz)
+JNIEXPORT jboolean JNICALL Java_com_serhii_core_log_LogImpl__1isDetailLogEnabled(JNIEnv *env, jobject thiz)
 {
     return MYLIB::Log::isDetailedLogsEnabled();
 }
 
 JNIEXPORT void JNICALL
-Java_com_serhii_core_log_LogImpl__1enableDetailLogForDebug(JNIEnv *env, jobject thiz)
+Java_com_serhii_core_log_LogImpl__1enableDetailLogIfDebug(JNIEnv *env, jobject thiz)
 {
-    jclass cls = env->FindClass("com/serhii/apps/notes/BuildConfig");
-    if (cls) {
-        jfieldID fid = env->GetStaticFieldID(cls, "DEBUG", "Z");
-        if (fid) {
-            jboolean res = env->GetStaticBooleanField(cls, fid);
-            if (res) {
-                MYLIB::Log::setIsDetailedLogsEnabled(true);
-            }
-        }
+    if (isDebug(env)) {
+        MYLIB::Log::setDetailedLogsEnabled(true);
     }
 }
 

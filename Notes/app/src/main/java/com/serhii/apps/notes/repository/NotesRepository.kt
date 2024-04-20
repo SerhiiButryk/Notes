@@ -1,11 +1,10 @@
 /*
- * Copyright 2023. Happy coding ! :)
+ * Copyright 2024. Happy coding ! :)
  * Author: Serhii Butryk
  */
 
-package com.serhii.apps.notes.ui.repository
+package com.serhii.apps.notes.repository
 
-import android.content.Context
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 
@@ -19,39 +18,39 @@ class NotesRepository(private val callback: DataChangedListener) {
         UserNotesDatabase.close()
     }
 
-    fun delete(index: String, context: Context): Boolean {
+    fun delete(index: String): Boolean {
         val result = UserNotesDatabase.deleteRecord(index)
         if (result) {
-            callback.updateData(context)
+            callback.updateData()
         }
         return result
     }
 
-    fun add(noteModel: NoteModel, context: Context): Boolean {
+    fun add(noteModel: NoteModel): Boolean {
         // Save data in database
-        val result = UserNotesDatabase.addRecord(noteModel, context)
+        val result = UserNotesDatabase.addRecord(noteModel)
         if (result != -1 && result != 0) {
-            callback.updateData(context)
+            callback.updateData()
             return true
         }
         // Failed to save data
         return false
     }
 
-    fun update(index: String, noteModel: NoteModel, context: Context): Boolean {
-        val result = UserNotesDatabase.updateRecord(index, noteModel, context)
+    fun update(index: String, noteModel: NoteModel): Boolean {
+        val result = UserNotesDatabase.updateRecord(index, noteModel)
         if (result) {
-            callback.updateData(context)
+            callback.updateData()
         }
         return result
     }
 
-    fun get(index: String, context: Context): NoteModel {
-        return UserNotesDatabase.getRecord(index, context)
+    fun get(index: String): NoteModel {
+        return UserNotesDatabase.getRecord(index)
     }
 
-    fun getAll(context: Context): List<NoteModel> {
-        return UserNotesDatabase.getRecords(context)
+    fun getAll(): List<NoteModel> {
+        return UserNotesDatabase.getRecords()
     }
 
 }
@@ -60,5 +59,5 @@ class NotesRepository(private val callback: DataChangedListener) {
  * Interface for notifying View Model that data has been changed
  */
 interface DataChangedListener {
-    fun updateData(context: Context)
+    fun updateData()
 }

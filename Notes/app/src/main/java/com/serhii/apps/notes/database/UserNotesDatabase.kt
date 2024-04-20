@@ -5,23 +5,25 @@
 package com.serhii.apps.notes.database
 
 import android.content.Context
-import com.serhii.apps.notes.database.impl.EncryptionHelper
 import com.serhii.apps.notes.database.impl.NotesDatabaseIml
 import com.serhii.apps.notes.database.impl.database.DatabaseImpl
 import com.serhii.apps.notes.ui.data_model.NoteModel
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils.Companion.currentTimeToString
 
 /**
- * This is a access point into User's notes database.
- * Also this class adds an encryption layer for data storage.
+ * This is an access point into application notes database.
+ * This class adds an encryption layer into the database.
  */
 object UserNotesDatabase : DatabaseProvider<NoteModel> {
 
-    private val impl: DatabaseImpl
     private const val TAG = "UserNotesDatabase"
-    private val encryptionHelper = EncryptionHelper()
+
+    private val impl: DatabaseImpl
+    private val crypto = Crypto()
 
     init {
         // Set an implementation class
@@ -36,7 +38,7 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
         impl.clearDatabaseImpl()
     }
 
-    override fun addRecord(data: NoteModel, context: Context): Int {
+    override fun addRecord(data: NoteModel): Int {
         // Save the saving time for note
         data.time = currentTimeToString()
 
@@ -51,16 +53,11 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
         val rowId = index.toString()
         data.id = rowId
 
-        val noteEnc = encryptionHelper.encrypt(data)
-        val result = impl.updateRecordImpl(rowId, noteEnc)
+        val noteEnc = encrypt(data)
+
+        impl.updateRecordImpl(rowId, noteEnc)
 
         info(TAG, "addRecord(), added new note with index = $index")
-
-        if (result) {
-            encryptionHelper.saveMetaData(context, index)
-        } else {
-            error(TAG, "addRecord(), failed to add new record, returned index -1")
-        }
 
         return index
     }
@@ -71,27 +68,25 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
         return success
     }
 
-    override fun updateRecord(id: String, newData: NoteModel, context: Context): Boolean {
+    override fun updateRecord(id: String, data: NoteModel): Boolean {
         // Save the saving time for note
-        newData.time = currentTimeToString()
-        newData.id = id
+        data.time = currentTimeToString()
+        data.id = id
 
-        val noteEnc = encryptionHelper.encrypt(newData)
-        // Save meta data
-        if (noteEnc.isNotEmpty()) {
-            encryptionHelper.saveMetaData(context, id.toInt())
-        }
+        val noteEnc = encrypt(data)
+
         return impl.updateRecordImpl(id, noteEnc)
     }
 
-    override fun getRecord(id: String, context: Context): NoteModel {
+    override fun getRecord(id: String): NoteModel {
         val data = impl.getRecordImpl(id)
-        return encryptionHelper.decrypt(data, Integer.valueOf(id), context)
+        return decrypt(data)
     }
 
-    override fun getRecords(context: Context): List<NoteModel> {
+    override fun getRecords(): List<NoteModel> {
         val data = impl.records
-        return encryptionHelper.decrypt(data, context)
+        Log.detail(TAG, "getRecords() size = ${data.size}")
+        return decrypt(data)
     }
 
     override val recordsCount: Int
@@ -99,5 +94,27 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
 
     override fun close() {
         impl.closeImpl()
+    }
+
+    private fun encrypt(noteModel: NoteModel): String {
+        Log.detail(TAG, "encrypt()")
+        val json = NoteModel.getJson(noteModel)
+        return crypto.encrypt(json)
+    }
+
+    private fun decrypt(note: String): NoteModel {
+        Log.detail(TAG, "decrypt()")
+        val json = crypto.decrypt(note)
+        return NoteModel.fromJson(json)
+    }
+
+    private fun decrypt(data: Map<Int, String>): List<NoteModel> {
+        val noteDec: MutableList<NoteModel> = ArrayList()
+        for ((key, value) in data) {
+            Log.detail(TAG, "decrypt() index $key")
+            val noteModel = decrypt(value)
+            noteDec.add(noteModel)
+        }
+        return noteDec
     }
 }

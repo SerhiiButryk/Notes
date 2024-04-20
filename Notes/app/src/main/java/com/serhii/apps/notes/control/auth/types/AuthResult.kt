@@ -16,5 +16,6 @@ enum class AuthResult(var typeId: Int, var typeName: String) {
     // User entered short password
     ALERT_DIALOG_TYPE_PASSWORD_IS_SHORT(-12, "ALERT_DIALOG_TYPE_PASSWORD_IS_SHORT"),
     // User entered email not in form of 'username@email.com'
-    EMAIL_INVALID(-13, "EMAIL_INVALID");
+    EMAIL_INVALID(-13, "EMAIL_INVALID"),
+    BIOMETRIC_CANCELED_OR_FAILED(-14, "BIOMETRIC_CANCELED_OR_FAILED");
 }

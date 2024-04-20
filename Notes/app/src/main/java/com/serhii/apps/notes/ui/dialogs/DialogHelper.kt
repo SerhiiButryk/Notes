@@ -54,11 +54,11 @@ object DialogHelper {
 
         val alertDialog = com.serhii.apps.notes.ui.AlertDialog(object : ClickListener {
             override fun onConfirm() {
-                callback?.onOkClicked()
+                callback?.onOk()
             }
 
             override fun onCancel() {
-                callback?.onCancelClicked()
+                callback?.onCancel()
             }
         }, titleString, messageString)
 
@@ -66,7 +66,7 @@ object DialogHelper {
     }
 
     @JvmStatic
-    fun showAlertDialog(type: Int, context: Context) {
+    fun showDialog(type: Int, context: Context) {
         val dialog = AlertDialogHelper(type, context)
         val builder = AlertDialog.Builder(context)
         builder.setPositiveButton(context.resources.getString(R.string.kbtn_ok)) { _, _ -> }

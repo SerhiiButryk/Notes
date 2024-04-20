@@ -31,7 +31,7 @@ internal class KeyboardHelper {
         }
     }
 
-    fun requestHowKeyboard(context: Context, view: View) {
+    fun requestShowKeyboard(context: Context, view: View) {
 
         if (imm == null) {
             imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

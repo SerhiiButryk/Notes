@@ -92,7 +92,7 @@ class SettingsActivity : AppBaseActivity() {
                 // Start backup
                 lifecycleScope.launch(NotesViewModel.defaultDispatcher) {
                     if (UserNotesDatabase.recordsCount != 0) {
-                        val notes = UserNotesDatabase.getRecords(baseContext)
+                        val notes = UserNotesDatabase.getRecords()
                         BackupManager.extractNotes(baseContext, outputStream, notes)
                     } else {
                         info(TAG, "onActivityResult() no data")

@@ -15,9 +15,8 @@ import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDisplayModePref
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.apps.notes.ui.repository.NotesRepository
-import com.serhii.apps.notes.ui.repository.DataChangedListener
-import com.serhii.apps.notes.ui.search.SearchInfo
+import com.serhii.apps.notes.repository.NotesRepository
+import com.serhii.apps.notes.repository.DataChangedListener
 import com.serhii.apps.notes.ui.search.search
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
@@ -27,20 +26,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * View model for managing UI data of user's notes
+ * View model for managing UI state of NotesViewActivity
  *
  * Responsibilities:
- * 1) Save data to a database
- * 2) Get latest data from a database
- * 3) Hold data during config changes
- * 4) Access and update the UI data
+ * 1) Save/Retrieve data to a database
+ * 2) Hold data during config changes
+ * 3) Access and update the UI state
  */
 class NotesViewModel(application: Application) : AndroidViewModel(application), DataChangedListener {
+
     // User's notes list
     private val notes = MutableLiveData<List<NoteModel>>()
+
     // This is the result of a text search in user's note items
     private val searchResults = MutableLiveData<List<NoteModel>>()
-    private val errorState = MutableLiveData<CryptoError>()
+
     private val displayNoteMode = MutableLiveData<Int>()
 
     fun getDisplayNoteMode(): LiveData<Int> = displayNoteMode
@@ -54,7 +54,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         Observer { shouldUpdateData ->
             if (shouldUpdateData) {
                 info(TAG, "onChanged() got data change event, retrieving new data")
-                updateData(application)
+                updateData()
                 BackupManager.onDataUpdated()
             }
         }
@@ -63,30 +63,26 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         // Init database
         UserNotesDatabase.init(application)
 
-        errorState.value = CryptoError.OK
         notes.value = ArrayList()
 
         val mode = getNoteDisplayModePref(application.applicationContext)
         displayNoteMode.value = mode
 
-        // Subscribe for data updates from backup manager
+        // Subscribe for updates from backup manager
         BackupManager.getUpdateDataFlagData().observeForever(backupDataObserver)
 
-        info(TAG, "NotesViewModel(), initialization is finished")
+        info(TAG, "NotesViewModel(), instance is created")
     }
 
     override fun onCleared() {
         super.onCleared()
         notesRepository.close()
         BackupManager.getUpdateDataFlagData().removeObserver(backupDataObserver)
-        info(TAG, "onCleared(), clean up is finished")
+        info(TAG, "onCleared()")
     }
 
     fun getNotes(): LiveData<List<NoteModel>> {
         return notes
-    }
-
-    fun resetErrorState() { /* no-op */
     }
 
     fun cacheUserNote(userListCached: List<NoteModel>?) {
@@ -94,7 +90,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     fun onBackNavigation() {
-        // Clear cached data. Don't need it anymore.
+        // Clear cached data. We don't need it anymore.
         cachedUserNotes = null
     }
 
@@ -102,29 +98,29 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         displayNoteMode.value = newMode
     }
 
-    fun deleteNote(index: String, context: Context): Boolean {
+    fun deleteNote(index: String): Boolean {
         info(TAG, "deleteNote()")
-        return notesRepository.delete(index, context)
+        return notesRepository.delete(index)
     }
 
-    fun addNote(noteModel: NoteModel, context: Context): Boolean {
+    fun addNote(noteModel: NoteModel): Boolean {
         info(TAG, "addNote()")
-        return notesRepository.add(noteModel, context)
+        return notesRepository.add(noteModel)
     }
 
-    fun updateNote(index: String, noteModel: NoteModel, context: Context): Boolean {
+    fun updateNote(index: String, noteModel: NoteModel): Boolean {
         info(TAG, "updateNote(), index = $index")
-        return notesRepository.update(index, noteModel, context)
+        return notesRepository.update(index, noteModel)
     }
 
-    fun getNote(index: String, context: Context): NoteModel {
+    fun getNote(index: String): NoteModel {
         info(TAG, "getNote(), index = $index")
-        return notesRepository.get(index, context)
+        return notesRepository.get(index)
     }
 
-    override fun updateData(context: Context) {
+    override fun updateData() {
         info(TAG, "updateData(), get all records")
-        val data = notesRepository.getAll(context)
+        val data = notesRepository.getAll()
         notes.value = data
     }
 
@@ -132,12 +128,12 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         return searchResults
     }
 
-    fun performSearch(context: Context, query: String, noteForSearch: NoteModel? = null) {
+    fun performSearch(query: String, noteForSearch: NoteModel? = null) {
         Log.info(message = "performSearch()")
         val noteForSearchList: List<NoteModel> = if (noteForSearch != null) {
             listOf(noteForSearch)
         } else {
-            notesRepository.getAll(context)
+            notesRepository.getAll()
         }
         // Start a search
         viewModelScope.launch(defaultDispatcher + CoroutineName("NoteSearch")) {

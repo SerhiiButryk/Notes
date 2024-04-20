@@ -6,6 +6,6 @@
 package com.serhii.apps.notes.ui.dialogs
 
 interface ConfirmDialogCallback {
-    fun onOkClicked()
-    fun onCancelClicked()
+    fun onOk()
+    fun onCancel()
 }

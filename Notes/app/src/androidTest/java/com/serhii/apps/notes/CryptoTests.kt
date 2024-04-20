@@ -7,7 +7,7 @@ package com.serhii.apps.notes
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.serhii.apps.notes.utils.TestUtility
-import com.serhii.core.security.Cipher
+import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
 import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.security.impl.crypto.Result
@@ -18,18 +18,18 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 /**
- * Unit Tests for [com.serhii.core.security.Cipher] class
+ * Unit Tests for [com.serhii.core.security.Crypto] class
  */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class CipherTests {
+class CryptoTests {
 
     /**
      * Symmetric enc / dec short text message
      *
      *  Test for
-     *  [com.serhii.core.security.Cipher.encryptSymmetric]
-     *  [com.serhii.core.security.Cipher.decryptSymmetric]
+     *  [com.serhii.core.security.Crypto.encrypt]
+     *  [com.serhii.core.security.Crypto.decrypt]
      *
      *  1. Test encrypts text using symmetric key
      *  2. Test decrypts text using symmetric key
@@ -40,7 +40,7 @@ class CipherTests {
 
        Log.i(TAG, "test01_OpenSSL_encrypt_decrypt() IN")
 
-        var cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        var crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         val originalMessage = "The quick brown fox jumps over the lazy dog"
         val key = "01234567890123456789012345678901"
@@ -50,15 +50,15 @@ class CipherTests {
         var decryptedMessage: Result
 
         // Encrypt message
-        encryptedMessage = cipher.encryptSymmetric(originalMessage, key, iv.toByteArray())
+        encryptedMessage = crypto.encryptWithIV(originalMessage, key, iv)
 
         Assert.assertFalse("Failed to encrypt", encryptedMessage.error != CryptoError.OK)
 
         // Create new object
-        cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         // Decrypted message
-        decryptedMessage = cipher.decryptSymmetric(encryptedMessage.message, key, iv.toByteArray())
+        decryptedMessage = crypto.decryptWithIV(encryptedMessage.message, key, iv)
 
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
@@ -70,8 +70,8 @@ class CipherTests {
      * Symmetric enc / dec
      *
      *  Test for
-     *  [com.serhii.core.security.Cipher.encryptSymmetric]
-     *  [com.serhii.core.security.Cipher.decryptSymmetric]
+     *  [com.serhii.core.security.Crypto.encrypt]
+     *  [com.serhii.core.security.Crypto.decrypt]
      *
      *  1. Test creates 2 key (key A and key B) in crypto provider store
      *  2. Test encrypts / decrypts using key A
@@ -79,47 +79,47 @@ class CipherTests {
      *  4. Test verifies expected results
      */
     @Test
-    fun test02_AndroidSecureStore_encrypt_decrypt() {
+    fun test02_Android_provider_encrypt_decrypt() {
 
-       Log.i(TAG, "test02_AndroidSecureStore_encrypt_decrypt() IN")
+       Log.i(TAG, "test02_Android_provider_encrypt_decrypt() IN")
 
-        val cipher = Cipher()
-        cipher.createKey(SECRET_KET_TEST_A, false)
-        cipher.createKey(SECRET_KET_TEST_B, false)
+        val crypto = Crypto()
+        crypto.createKey(SECRET_KET_TEST_A)
+        crypto.createKey(SECRET_KET_TEST_B)
 
-        cipher.selectKey(SECRET_KET_TEST_A)
+        crypto.selectKey(SECRET_KET_TEST_A)
 
         val message = "The quick brown fox jumps over the lazy dog"
 
-        val encMessage: Result = cipher.encryptSymmetric(message)
+        val encMessage: Result = crypto.encryptWithIV(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV = encMessage.iv)
+        val decMessage: Result = crypto.decryptWithIV(encMessage.message, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
 
-        cipher.selectKey(SECRET_KET_TEST_B)
+        crypto.selectKey(SECRET_KET_TEST_B)
 
         val message2 = "Very short story"
 
-        val encMessage2: Result = cipher.encryptSymmetric(message2)
+        val encMessage2: Result = crypto.encryptWithIV(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, inputIV = encMessage2.iv)
+        val decMessage2: Result = crypto.decryptWithIV(encMessage2.message, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
 
-       Log.i(TAG, "test02_AndroidSecureStore_encrypt_decrypt() OUT")
+       Log.i(TAG, "test02_Android_provider_encrypt_decrypt() OUT")
     }
 
     /**
      * Symmetric enc / dec long text message
      *
      *  Test for
-     *  [com.serhii.core.security.Cipher.encryptSymmetric]
-     *  [com.serhii.core.security.Cipher.decryptSymmetric]
+     *  [com.serhii.core.security.Crypto.encrypt]
+     *  [com.serhii.core.security.Crypto.decrypt]
      *
      *  1. Test encrypts text using symmetric key
      *  2. Test decrypts text using symmetric key
@@ -129,7 +129,7 @@ class CipherTests {
     fun test03_OpenSSL_encrypt_decrypt() {
         Log.i(TAG, "test03_OpenSSL_encrypt_decrypt() IN")
 
-        var cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        var crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         val originalMessage = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", originalMessage.isEmpty())
@@ -141,15 +141,15 @@ class CipherTests {
         var decryptedMessage: Result
 
         // Encrypt message
-        encryptedMessage = cipher.encryptSymmetric(originalMessage, key, iv.toByteArray())
+        encryptedMessage = crypto.encryptWithIV(originalMessage, key, iv)
 
         Assert.assertFalse("Failed to encrypt", encryptedMessage.error != CryptoError.OK)
 
         // Create new object
-        cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         // Decrypted message
-        decryptedMessage = cipher.decryptSymmetric(encryptedMessage.message, key, iv.toByteArray())
+        decryptedMessage = crypto.decryptWithIV(encryptedMessage.message, key, iv)
 
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
@@ -158,48 +158,48 @@ class CipherTests {
     }
 
     @Test
-    fun test04_AndroidSecureStore_encrypt_decrypt_LongText() {
-        Log.i(TAG, "test04_AndroidSecureStore_encrypt_decrypt_LongText() IN")
+    fun test04_Android_provider_encrypt_decrypt_LongText() {
+        Log.i(TAG, "test04_Android_provider_encrypt_decrypt_LongText() IN")
 
-        val cipher = Cipher()
-        cipher.createKey(SECRET_KET_TEST_A, false)
-        cipher.createKey(SECRET_KET_TEST_B, false)
+        val crypto = Crypto()
+        crypto.createKey(SECRET_KET_TEST_A)
+        crypto.createKey(SECRET_KET_TEST_B)
 
-        cipher.selectKey(SECRET_KET_TEST_A)
+        crypto.selectKey(SECRET_KET_TEST_A)
 
         val message = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", message.isEmpty())
 
-        val encMessage: Result = cipher.encryptSymmetric(message)
+        val encMessage: Result = crypto.encryptWithIV(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV = encMessage.iv)
+        val decMessage: Result = crypto.decryptWithIV(encMessage.message, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
 
-        cipher.selectKey(SECRET_KET_TEST_B)
+        crypto.selectKey(SECRET_KET_TEST_B)
 
         val message2 = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", message2.isEmpty())
 
-        val encMessage2: Result = cipher.encryptSymmetric(message2)
+        val encMessage2: Result = crypto.encryptWithIV(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = cipher.decryptSymmetric(encMessage2.message, inputIV = encMessage2.iv)
+        val decMessage2: Result = crypto.decryptWithIV(encMessage2.message, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage2.message, message2)
 
-        Log.i(TAG, "test04_AndroidSecureStore_encrypt_decrypt_LongText() OUT")
+        Log.i(TAG, "test04_Android_provider_encrypt_decrypt_LongText() OUT")
     }
 
     @Test
     fun test05_double_Key_Creation() {
         Log.i(TAG, "test05_double_Key_Creation() IN")
-        val cipher = Cipher()
-        cipher.createKey(SECRET_KET_TEST_C, false)
-        cipher.createKey(SECRET_KET_TEST_C, false)
+        val cipher = Crypto()
+        cipher.createKey(SECRET_KET_TEST_C)
+        cipher.createKey(SECRET_KET_TEST_C)
         Log.i(TAG, "test05_double_Key_Creation() OUT")
     }
 
@@ -212,7 +212,7 @@ class CipherTests {
         try {
 
             // Expected result is 'IllegalArgumentException' exception
-            val cipher = Cipher("Invalid")
+            Crypto("Invalid")
 
         } catch (e: Exception) {
             exception = e
@@ -259,102 +259,162 @@ class CipherTests {
     }
 
     @Test
-    fun test08_AndroidSecureStore_encrypt_decrypt_DefaultKey() {
-        Log.i(TAG, "test08_encryptDecryptUsingSecureStore_DefaultKey() IN")
+    fun test08_Android_provider_encrypt_decrypt_DefaultKey() {
+        Log.i(TAG, "test08_Android_provider_encrypt_decrypt_DefaultKey() IN")
 
-        val cipher = Cipher()
-        cipher.selectKey("Default-key-160375068")
+        val crypto = Crypto()
+        crypto.selectKey("Default-key-160375068")
 
         val message = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", message.isEmpty())
 
-        val encMessage: Result = cipher.encryptSymmetric(message)
+        val encMessage: Result = crypto.encryptWithIV(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = cipher.decryptSymmetric(encMessage.message, inputIV =  encMessage.iv)
+        val decMessage: Result = crypto.decryptWithIV(encMessage.message, inputIV =  encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
 
-        Log.i(TAG, "test08_encryptDecryptUsingSecureStore_DefaultKey() OUT")
+        Log.i(TAG, "test08_Android_provider_encrypt_decrypt_DefaultKey() OUT")
     }
 
     @Test
     fun test09_Simple_encrypt_decrypt_OpenSSL_short_key() {
         Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() IN")
 
-        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         val key = "a" // short key
         val message = "b" // short message
 
-        val result = cipher.encrypt(message, key)
+        // Should fail as we need a 32 len key
+        val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
-        Assert.assertTrue(result.isNotEmpty())
-
-        val cipher2 = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
-        val result2 = cipher2.decrypt(result, key)
-
-        Assert.assertNotNull(result2)
-        Assert.assertTrue(result2.isNotEmpty())
-
-        Assert.assertTrue(result2 == message)
+        Assert.assertTrue(result.isEmpty())
 
         Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() OUT")
     }
 
     @Test
-    fun test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() {
-        Log.i(TAG, "test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() IN")
+    fun test10_Simple_encrypt_decrypt_Android_provider() {
+        Log.i(TAG, "test11_Simple_encrypt_decrypt_Android_provider() IN")
 
-        val cipher = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
+        val crypto = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
 
-        var key = "a" // short key
-        val message = "b" // short message
+        val key = "dhwidiqwduhiwudhiqwhdiqhwidhqwiudhiwhdqihdwqidwihq"
+        val message = "The quick brown fox jumps over the lazy dog"
 
-        val result = cipher.encrypt(message, key)
+        val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
         Assert.assertTrue(result.isNotEmpty())
 
-        key = "b"
+        val crypto2 = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
 
-        val cipher2 = Cipher(Cipher.CRYPTO_PROVIDER_OPENSSL)
-        val result2 = cipher2.decrypt(result, key)
+        val decryptedMessage = crypto2.decrypt(result, key)
 
-        Assert.assertTrue(result2.isEmpty())
+        Assert.assertNotNull(decryptedMessage)
+        Assert.assertTrue(decryptedMessage == message)
 
-        Log.i(TAG, "test10_Simple_encrypt_decrypt_OpenSSL_wrong_key() OUT")
+        Log.i(TAG, "test11_Simple_encrypt_decrypt_Android_provider() OUT")
     }
 
     @Test
-    fun test09_Simple_encrypt_decrypt_SecureStore_short_key() {
-        Log.i(TAG, "test09_Simple_encrypt_decrypt_SecureStore_short_key() IN")
+    fun test11_Simple_encrypt_decrypt_OpenSSL_wrong_key() {
+        Log.i(TAG, "test11_Simple_encrypt_decrypt_OpenSSL_wrong_key() IN")
 
-        val cipher = Cipher()
+        val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+
+        var key = "diwdhuwdhiwwoepwrowmflemlemf;efe;fme;l;esfdfdsfefdsvvsdvsdvvsdv"
+        val message = "b" // short message
+
+        val result = crypto.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isNotEmpty())
+
+        key = "03ri094jeignoioneorgneroeirnoengorongeorognerogneorgenorngoe4p9-t0tt0i4-i"
+
+        val crypto1 = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+        val result2 = crypto1.decrypt(result, key)
+
+        Assert.assertNotNull(result2)
+        Assert.assertTrue(result2.isEmpty())
+
+        Log.i(TAG, "test11_Simple_encrypt_decrypt_OpenSSL_wrong_key() OUT")
+    }
+
+    @Test
+    fun test12_Simple_encrypt_decrypt_Android_provider_short_key() {
+        Log.i(TAG, "test12_Simple_encrypt_decrypt_Android_provider_short_key() IN")
+
+        val crypto = Crypto()
 
         val key = "a" // short key
         val message = "b" // short message
 
-        val result = cipher.encrypt(message, key)
+        // Should fail as we need a 32 len key
+        val result = crypto.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.isEmpty())
+
+        Log.i(TAG, "test12_Simple_encrypt_decrypt_Android_provider_short_key() OUT")
+    }
+
+    @Test
+    fun test13_Simple_encrypt_decrypt() {
+        Log.i(TAG, "test13_Simple_encrypt_decrypt() IN")
+
+        val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+
+        val key = "dhwidiqwduhiwudhiqwhdiqhwidhqwiudhiwhdqihdwqidwihq"
+        val message = "The quick brown fox jumps over the lazy dog"
+
+        val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
         Assert.assertTrue(result.isNotEmpty())
 
-        val cipher2 = Cipher()
-        val result2 = cipher2.decrypt(result, key)
+        val crypto2 = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
-        Assert.assertNotNull(result2)
-        Assert.assertTrue(result2.isNotEmpty())
+        val decryptedMessage = crypto2.decrypt(result, key)
 
-        Assert.assertTrue(result2 == message)
+        Assert.assertNotNull(decryptedMessage)
+        Assert.assertTrue(decryptedMessage == message)
 
-        Log.i(TAG, "test09_Simple_encrypt_decrypt_SecureStore_short_key() OUT")
+        Log.i(TAG, "test13_Simple_encrypt_decrypt() OUT")
+    }
+
+    @Test
+    fun test14_getRandomValue_verify_unique_values_generated() {
+        Log.i(TAG, "test14_getRandomValue_verify_unique_values_generated() IN")
+
+        val crypto = Crypto()
+        val size = 10
+
+        val byteArr1 = crypto.getRandomValue(size)
+
+        Assert.assertNotNull(byteArr1)
+        Assert.assertTrue(byteArr1.isNotEmpty())
+        Assert.assertTrue(byteArr1.size == 10)
+
+        val byteArr2 = crypto.getRandomValue(size)
+
+        Assert.assertNotNull(byteArr2)
+        Assert.assertTrue(byteArr2.isNotEmpty())
+        Assert.assertTrue(byteArr2.size == 10)
+
+        // Check that value are different
+        Assert.assertFalse(byteArr1.contentEquals(byteArr2))
+
+        Log.i(TAG, "test14_getRandomValue_verify_unique_values_generated() OUT")
     }
 
     companion object {
-        private val TAG: String = CipherTests::class.java.simpleName
+        private val TAG: String = CryptoTests::class.java.simpleName
 
         private const val SECRET_KET_TEST_A = "Key1"
         private const val SECRET_KET_TEST_B = "Key2"

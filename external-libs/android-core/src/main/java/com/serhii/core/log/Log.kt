@@ -5,17 +5,16 @@
 package com.serhii.core.log
 
 /**
- * Class provides logging functionality.
- * It is replacement for android native logger.
+ * Public class which provides logging functionality.
+ * It's a replacement for android native logger.
  */
 class Log {
 
-    // Added for compatibility with Java code
+    // Added 'JvmStatic' annotation for compatibility with Java code
     companion object {
 
-        @JvmStatic
-        fun init() {
-            enableDetailedLogsForDebug()
+        init {
+            LogImpl.init()
         }
 
         @JvmStatic
@@ -44,17 +43,8 @@ class Log {
             }
 
         @JvmStatic
-        fun enableDetailedLogs(isEnabled: Boolean) {
-            LogImpl.setDetailedLogs(isEnabled)
-        }
-
-        /**
-         * Enable detailed logs if it's debug build.
-         * No-op if it's release build.
-         */
-        @JvmStatic
-        fun enableDetailedLogsForDebug() {
-            LogImpl.setDetailedLogsForDebug()
+        fun enableDetailedLogs(enabled: Boolean) {
+            LogImpl.setDetailedLogs(enabled)
         }
 
         @JvmStatic
@@ -62,5 +52,4 @@ class Log {
             LogImpl.setVersionCode(versionCode)
         }
     }
-
 }

@@ -4,7 +4,6 @@
 #include "storage/file_system.h"
 #include "storage/cashe_manager.h"
 #include "app/logic/base/env_constants.h"
-#include "crypto/hash.h"
 #include "app/logic/action_dispatcher.h"
 #include "utils/log.h"
 #include "app/logic/utils/auth_utils.h"
@@ -23,56 +22,46 @@ namespace APP
 
     }
 
-    void RegisterHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
+    bool RegisterHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
     {
         Log::Info(TAG, "handleEvent() : got event");
 
         std::string username = event.getData(USERNAME_KEY);
         std::string password = event.getData(PASSWORD_KEY);
-        std::string confirmPassword = event.getData(CONFIRM_PASSWORD_KEY);
 
-        auto success = AuthUtils::checkRules(password, confirmPassword, username, true);
+        std::map<std::string, std::string> data;
+        data.insert(std::make_pair(username,password));
 
-        if (success == SYSTEM_MESSAGE ::NO_ERRORS)
+        SystemStorage ss;
+
+        // Save user credentials
+        if (FileSystem::getInstance()->isExists(kFileSystemData))
         {
-            std::map<std::string, std::string> data;
-            data.insert(std::make_pair(username, Hash::makeHashMD5(password)));
-
-            SystemStorage ss;
-
-            // Save user credentials
-            if (FileSystem::getInstance()->isExists(kFileSystemData))
+            if (AuthUtils::isUserAccountExists(username))
             {
-                if (AuthUtils::isUserAccountExists(username))
-                {
-                    ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::USER_NAME_EXISTS);
+                ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::USER_NAME_EXISTS);
 
-                    return;
-                }
-
-                ss.addData(kFileSystemData, data);
-
-            } else {
-
-                if (ss.createFile(kFileSystemData))
-                {
-                    ss.addData(kFileSystemData, data);
-                }
-
+                return false;
             }
 
-            // User is registered, cache user name
-            CacheManager cacheManager;
-            cacheManager.cache(kFileCashSystemData, kUserName, username);
+            ss.addData(kFileSystemData, data);
 
-            Log::Info(TAG, "handleEvent() - REGISTRATION_DONE");
+        } else {
 
-            ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::REGISTRATION_DONE);
+            if (ss.createFile(kFileSystemData))
+            {
+                ss.addData(kFileSystemData, data);
+            }
 
-            return;
         }
 
-        ActionDispatcher::getInstance()->sendMessage(success);
+        // User is registered, cache user name
+        CacheManager cacheManager;
+        cacheManager.cache(kFileCashSystemData, kUserName, username);
+
+        ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::REGISTRATION_DONE);
+
+        return true;
     }
 
 }

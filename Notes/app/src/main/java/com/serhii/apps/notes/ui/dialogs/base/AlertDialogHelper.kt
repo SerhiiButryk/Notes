@@ -28,8 +28,7 @@ class AlertDialogHelper(private val type: Int, context: Context) {
             title = context.getString(R.string.title_no_user_account)
             message = context.getString(R.string.ms_no_user_account)
         } else if (type == AuthResult.WRONG_PASSWORD.typeId) {
-            val nativeBridge = NativeBridge()
-            val limitLeft = nativeBridge.limitLeft
+            val limitLeft = NativeBridge.limitLeft
             title = context.getString(R.string.title_wrong_password)
             message = formatString(context.getString(R.string.ms_wrong_password), limitLeft)
         } else if (type == AuthResult.EMPTY_FIELD.typeId) {

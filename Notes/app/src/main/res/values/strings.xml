@@ -211,4 +211,10 @@
 
     <string name="save_note_in_file">Extract this note</string>
 
+    <string name="toast_unlock_key_copied">Unlock key is copied to the clipboard</string>
+
+    <string name="biometric_dialog_title">Biometric auth is failed or canceled</string>
+    <string name="biometric_dialog_message">Would you like to retry ? If you disagree you will not be able to use biometrics to login in this app</string>
+    <string name="biometric_toast_message">Sorry, failed to login with biometrics</string>
+
 </resources>

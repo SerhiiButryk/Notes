@@ -33,7 +33,6 @@ open class AppBaseActivity : AppCompatActivity() {
     }
 
     override fun onUserInteraction() {
-        Log.info(TAG_BASE, "onUserInteraction()")
         super.onUserInteraction()
         IdleLockHandler.onUserInteraction(this)
     }

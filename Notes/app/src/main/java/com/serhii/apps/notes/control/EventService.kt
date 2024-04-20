@@ -5,56 +5,182 @@
 package com.serhii.apps.notes.control
 
 import android.content.Context
-import com.serhii.apps.notes.control.auth.base.IAuthorizeService
+import androidx.fragment.app.FragmentActivity
+import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.AuthManager
+import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.RequestType
-import com.serhii.apps.notes.ui.data_model.AuthCredsModel
-import com.serhii.core.log.Log.Companion.info
+import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
+import com.serhii.apps.notes.ui.dialogs.DialogHelper
+import com.serhii.core.log.Log
+import com.serhii.core.security.BiometricAuthenticator
+import com.serhii.core.security.Crypto
+import com.serhii.core.utils.GoodUtils
+import javax.crypto.Cipher
 
 /**
  * Class which receives the events from other classes and delivers them to appropriate party.
  */
-object EventService : IAuthorizeService {
+object EventService : IEventService {
+
+    private val authManager = AuthManager()
+    private val crypto = Crypto()
 
     /**
      * Handle authorize event
      */
-    override fun onPasswordLogin(model: AuthCredsModel) {
-        val authManager = AuthManager()
-        // Initiate authorize request
-        authManager.handleRequest(RequestType.REQ_AUTHORIZE, model)
+    override fun onPasswordLogin(context: Context, model: AuthModel) {
+        Log.info(TAG, "onPasswordLogin()")
+        // Do password check and any other necessary actions
+        if (authManager.handleRequest(RequestType.REQ_AUTHORIZE, model)) {
+
+            crypto.getKeyMaster().initKeys(model.password)
+
+            NativeBridge.resetLoginLimitLeft(context)
+
+            // Auth is passed after this step
+
+            // Complete the authentication
+            authManager.complete()
+        } else {
+            Log.error(TAG, "onPasswordLogin() not authorized")
+        }
     }
 
     /**
      * Handle registration event
      */
-    override fun onRegistration(model: AuthCredsModel) {
-        val authManager = AuthManager()
-        // Initiate authorize request
-        authManager.handleRequest(RequestType.REQ_REGISTER, model)
+    override fun onRegistration(model: AuthModel, biometricAuthenticator: BiometricAuthenticator?,
+                                fragmentActivity: FragmentActivity) {
+        // Initiate registration request
+        val result = authManager.checkInput(model.password, model.confirmPassword, model.email)
+        if (result) {
+            Log.info(TAG, "onRegistration() success")
+
+            // Checks are passed and user is registered.
+            // So, we should create application keys and ask for biometric login here.
+            val keyMaster = crypto.getKeyMaster()
+            keyMaster.createKey(model.password)
+
+            if (biometricAuthenticator == null) {
+                // Finish
+                authManager.handleRequest(RequestType.REQ_REGISTER, model)
+                // For safety
+                model.confirmPassword = ""
+                model.password = ""
+                return
+            }
+
+            // If not null then can ask for Biometric login
+            biometricAuthenticator.authenticateFistTime(object : BiometricAuthenticator.Listener {
+
+                override fun onSuccess(cipher: Cipher) {
+                    Log.detail(TAG, "BiometricAuthenticator onSuccess()")
+                    keyMaster.createKey(cipher)
+                    // Finish
+                    authManager.handleRequest(RequestType.REQ_REGISTER, model)
+                    // For safety
+                    model.confirmPassword = ""
+                    model.password = ""
+                }
+
+                override fun onFailure() {
+                    Log.error(TAG, "BiometricAuthenticator onFailure()")
+
+                    DialogHelper.showConfirmDialog(fragmentActivity, object : ConfirmDialogCallback {
+
+                        override fun onOk() {
+                            Log.info(TAG, "BiometricAuthenticator Retrying...")
+                            onRegistration(model, biometricAuthenticator, fragmentActivity)
+                        }
+
+                        override fun onCancel() {
+                            Log.info(TAG, "BiometricAuthenticator Finishing...")
+                            // Finish
+                            authManager.handleRequest(RequestType.REQ_REGISTER, model)
+                            // For safety
+                            model.confirmPassword = ""
+                            model.password = ""
+                        }
+                    }, R.string.biometric_dialog_title, R.string.biometric_dialog_message)
+                }
+            })
+        } else {
+            Log.error(TAG, "onRegistration() failure")
+        }
     }
 
     /**
      * Handle biometric login event
      */
-    override fun onBiometricLogin() {
-        val authManager = AuthManager()
-        // Initiate authorize request
-        authManager.handleRequest(RequestType.REQ_BIOMETRIC_LOGIN, AuthCredsModel())
+    override fun onBiometricLogin(context: Context, authModel: AuthModel) {
+        Log.info(TAG, "onBiometricLogin()")
+
+        // Safe check. Should not Happen in a normal case.
+        if (authModel.cipher == null) {
+            Log.error(TAG, "onBiometricLogin(), cipher is null")
+            GoodUtils.showToast(context, R.string.biometric_toast_message)
+        }
+
+        val success = crypto.getKeyMaster().initKeys(authModel.cipher!!)
+        if (!success) {
+            Log.error(TAG, "onBiometricLogin(), filed to init keys")
+            GoodUtils.showToast(context, R.string.biometric_toast_message)
+        }
+
+        // Complete the authentication
+        authManager.handleRequest(RequestType.REQ_BIOMETRIC_LOGIN, authModel)
     }
 
     /**
-     * Handle user registered event
-     * User account is created, do one time application setup which is needed in this case
+     * Handle registration finished event
      */
-    override fun onUserRegistered(context: Context) {
-        info(TAG, "onUserRegistered()")
-        // Here we creates app session keys for user
-        // and set other settings which are related to user's security
-        val nativeBridge = NativeBridge()
-        nativeBridge.createUnlockKey()
-        // Set default login password limit
-        nativeBridge.setLoginLimitFromDefault(context)
+    override fun onRegistrationFinished(context: Context) {
+        Log.info(TAG, "onRegistrationFinished()")
+        NativeBridge.createUnlockKey()
+        NativeBridge.setLoginLimitFromDefault(context)
+    }
+
+    /**
+     * Handle change password event
+     */
+    override fun onChangePassword(newPassword: String): Boolean {
+        return NativeBridge.setNewPassword(newPassword)
+    }
+
+    /**
+     * Handle change change login limit event
+     */
+    override fun onChangeLoginLimit(newLimit: Int) {
+        NativeBridge.updateLimit(newLimit)
+    }
+
+    /**
+     * Handle show alert dialog event
+     */
+    override fun onShowAlertDialog(context: Context, type: Int) {
+        Log.info(TAG, "onShowAlertDialog()")
+        var shouldShowDialog = true
+        if (type == AuthResult.WRONG_PASSWORD.typeId) {
+            val currentLimit = NativeBridge.limitLeft
+            // If limit is exceeded then need to block application
+            if (currentLimit == 1) {
+                // Block application
+                NativeBridge.executeBlockApp()
+                // Block Ui is going to be shown. So do not show dialog.
+                shouldShowDialog = false
+            } else {
+                // Update password limit value
+                NativeBridge.updateLimit(currentLimit - 1)
+                Log.detail(TAG, "onShowAlertDialog(), updated limit")
+            }
+        }
+        if (shouldShowDialog) {
+            Log.info(TAG, "onShowAlertDialog(), show dialog")
+            DialogHelper.showDialog(type, context)
+        }
     }
 
     private const val TAG = "EventService"

@@ -34,7 +34,7 @@ import com.serhii.core.utils.GoodUtils.Companion.showToast
 /**
  * Fragment where user enters notes
  */
-class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
+class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
 
     private lateinit var titleNoteField: EditText
     private lateinit var noteTimeFiled: TextView
@@ -51,7 +51,7 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
      */
     private val clearDialogCallback = object : ConfirmDialogCallback {
 
-        override fun onOkClicked() {
+        override fun onOk() {
 
             val noteModelList: List<NoteModel> = noteEditorAdapter.currentDisplayedNotes
             var isEmpty = true
@@ -81,7 +81,7 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
             noteEditorAdapter.setDataChanged(noteModelList.toMutableList())
         }
 
-        override fun onCancelClicked() {
+        override fun onCancel() {
             // no-op
         }
     }
@@ -206,7 +206,7 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
             // of VM here. This will not be the same as we get in NotesViewActivity.
             val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
-            val note = viewModel.getNote(noteId!!, requireContext())
+            val note = viewModel.getNote(noteId!!)
 
             // Set note title
             titleNoteField.setText(note.title)
@@ -246,8 +246,8 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
         viewModel.getSearchResults().removeObserver(searchObserver)
         viewModel.getSearchResults().observe(viewLifecycleOwner, searchObserver)
 
-        val note = viewModel.getNote(noteId!!, requireContext())
-        viewModel.performSearch(requireContext(), query, note)
+        val note = viewModel.getNote(noteId!!)
+        viewModel.performSearch(query, note)
     }
 
     override fun onSearchFinished() {
@@ -262,7 +262,7 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
         val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
         // We should reset selection on NotesViewFragment when SearchView is closed
-        val note = viewModel.getNote(noteId!!, requireContext())
+        val note = viewModel.getNote(noteId!!)
         titleNoteField.setText(note.title)
         noteEditorAdapter.setNoteData(note)
 
@@ -280,11 +280,11 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
                 showConfirmDialog(
                     requireActivity(),
                     object : ConfirmDialogCallback {
-                        override fun onOkClicked() {
+                        override fun onOk() {
                             deleteNote()
                         }
 
-                        override fun onCancelClicked() {
+                        override fun onCancel() {
                             // no-op
                         }
                     },
@@ -300,11 +300,11 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
                 showConfirmDialog(
                     requireActivity(),
                     object : ConfirmDialogCallback {
-                        override fun onOkClicked() {
+                        override fun onOk() {
                             saveUserNote()
                         }
 
-                        override fun onCancelClicked() {
+                        override fun onCancel() {
                             // no-op
                         }
                     },
@@ -353,10 +353,10 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
 
         val result: Boolean = if (action == ACTION_NOTE_OPEN) {
             info(TAG, "saveUserNote() updated note")
-            viewModel.updateNote(noteId!!, notes, requireContext())
+            viewModel.updateNote(noteId!!, notes)
         } else {
             info(TAG, "saveUserNote() add new note")
-            viewModel.addNote(notes, requireContext())
+            viewModel.addNote(notes)
         }
 
         /*
@@ -379,7 +379,7 @@ class NoteEditorFragment : BaseFragment(), AppBaseActivity.NavigationCallback {
         val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
         // Delete if this note already exists
-        if (noteId != null && viewModel.deleteNote(noteId!!, requireContext())) {
+        if (noteId != null && viewModel.deleteNote(noteId!!)) {
             showToast(requireContext(), R.string.toast_action_deleted_message)
             interaction.onDeleteNote()
         } else {

@@ -13,19 +13,19 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.apps.notes.ui.data_model.AuthCredsModel
+import com.serhii.apps.notes.ui.data_model.createModel
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
+import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
 /**
  * Fragment where user registers itself
  */
-class RegistrationFragment : Fragment() {
+class RegistrationFragment : BaseFragment("RegistrationFragment") {
 
     private lateinit var emailField: EditText
     private lateinit var titleField: TextView
@@ -35,11 +35,7 @@ class RegistrationFragment : Fragment() {
 
     private val keyEventActionDone = OnEditorActionListener { v, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
-            // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-            // of VM here. This will not be the same as we get in AuthorizationActivity.
-            val viewModel: LoginViewModel by viewModels ({ requireActivity() })
-            // Set data
-            viewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION))
+            onProceed()
             return@OnEditorActionListener true
         }
         false
@@ -51,15 +47,11 @@ class RegistrationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in AuthorizationActivity.
-        val viewModel: LoginViewModel by viewModels ({ requireActivity() })
-
         val view = initView(inflater, container)
         titleField.text = getString(R.string.title_reg)
 
         registerButton.setOnClickListener {
-            viewModel.setAuthValue(createModel(AuthorizeType.AUTH_REGISTRATION))
+            onProceed()
         }
 
         if (emailField.requestFocus()) {
@@ -88,8 +80,34 @@ class RegistrationFragment : Fragment() {
         return view
     }
 
-    private fun createModel(type: AuthorizeType): AuthCredsModel {
-        return AuthCredsModel(getText(emailField), getText(passwordField), getText(confirmPasswordField), type)
+    private fun onProceed() {
+
+        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+        // of VM here. This will not be the same as we get in AuthorizationActivity.
+        val viewModel: LoginViewModel by viewModels ({ requireActivity() })
+
+        var biometricAuthenticator: BiometricAuthenticator? = null
+
+        if (BiometricAuthenticator.biometricsAvailable(requireContext())) {
+            biometricAuthenticator = BiometricAuthenticator()
+            biometricAuthenticator.init(requireContext(), this,
+                getString(R.string.biometric_prompt_title),
+                getString(R.string.biometric_prompt_subtitle),
+                getString(android.R.string.cancel))
+        }
+
+        val authModel = createModel(
+            getText(emailField),
+            getText(passwordField),
+            getText(confirmPasswordField),
+            AuthorizeType.AUTH_REGISTRATION
+        )
+
+        viewModel.proceedWithRegistration(authModel, biometricAuthenticator, requireActivity())
+
+        // For safety
+        passwordField.setText("")
+        confirmPasswordField.setText("")
     }
 
     companion object {

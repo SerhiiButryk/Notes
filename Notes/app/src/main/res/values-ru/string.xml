@@ -175,4 +175,8 @@
 
     <string name="save_note_in_file">Сохранить как файл</string>
 
+    <string name="biometric_dialog_title">Не удалось установить биометрию</string>
+    <string name="biometric_dialog_message">Попробовать еще раз? Если Вы отказаться, то виометрика не будет установлена и вход с биометрикой не будет доступен</string>
+    <string name="biometric_toast_message">Извините, не удалось войти с биометрикой</string>
+
 </resources>

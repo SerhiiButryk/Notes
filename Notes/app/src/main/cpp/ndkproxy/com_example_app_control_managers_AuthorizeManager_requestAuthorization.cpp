@@ -7,6 +7,7 @@
 #include "app/logic/receiver/system_event_receiver.h"
 #include "app/logic/base/system_constants.h"
 #include "utils/log.h"
+#include "app/logic/utils/auth_utils.h"
 
 using namespace APP;
 using namespace MYLIB;
@@ -15,7 +16,7 @@ using namespace MYLIB;
 extern "C" {
 #endif
 
-  JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestAuthorization
+  JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestAuthorization__Ljava_lang_String_2Ljava_lang_String_2
   (JNIEnv* env, jobject, jstring jpassword, jstring jusername)
   {
        Log::Info("JNI", " %s IN", __FUNCTION__ );
@@ -27,12 +28,14 @@ extern "C" {
        event.putData(PASSWORD_KEY, passwordString);
        event.putData(USERNAME_KEY, usernameString);
 
-       SystemEventReceiver::getInstance()->forward(event);
+       bool result = SystemEventReceiver::getInstance()->forward(event);
 
       Log::Info("JNI", " %s OUT", __FUNCTION__ );
+
+      return result;
   }
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestRegistration
+JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestRegistration
   (JNIEnv* env, jobject, jstring jpassword, jstring jconfirm_password, jstring jusername)
   {
       Log::Info("JNI", " %s IN", __FUNCTION__ );
@@ -46,9 +49,11 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_reque
       event.putData(PASSWORD_KEY, passwordString);
       event.putData(CONFIRM_PASSWORD_KEY, confirmpasswordString);
 
-      SystemEventReceiver::getInstance()->forward(event);
+      bool result = SystemEventReceiver::getInstance()->forward(event);
 
       Log::Info("JNI", " %s OUT", __FUNCTION__ );
+
+      return result;
   }
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestUnlock
@@ -68,7 +73,7 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_reque
       Log::Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestBiometricLogin
+JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_requestAuthorization__
         (JNIEnv *, jobject)
 {
     Log::Info("JNI", " %s IN", __FUNCTION__ );
@@ -77,6 +82,32 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_reque
     ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::AUTHORIZATION_DONE);
 
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
+}
+
+JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_auth_AuthManager_verifyInput
+        (JNIEnv * env, jobject, jstring jpassword, jstring jconfirm_password, jstring jusername)
+{
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
+    JString passwordString(env, jpassword);
+    JString usernameString(env, jusername);
+    JString confirmpasswordString(env, jconfirm_password);
+
+    auto success = AuthUtils::checkRules(passwordString, confirmpasswordString, usernameString, true);
+
+    bool result = false;
+    if (success == SYSTEM_MESSAGE ::NO_ERRORS)
+    {
+        result = true;
+    } else {
+        Log::Info("JNI", " %s sending message OUT", __FUNCTION__);
+
+        ActionDispatcher::getInstance()->sendMessage(success);
+    }
+
+    Log::Info("JNI", " %s res = %d OUT", __FUNCTION__, result);
+
+    return result;
 }
 
 #ifdef __cplusplus

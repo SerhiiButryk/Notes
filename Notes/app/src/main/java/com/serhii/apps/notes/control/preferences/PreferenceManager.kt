@@ -33,7 +33,7 @@ object PreferenceManager {
 
     fun isDetailLogsEnabled(context: Context): Boolean {
         val preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
-        return preferences.getBoolean(context.getString(R.string.preference_category_key_detail_logs), false)
+        return preferences.getBoolean(context.getString(R.string.preference_category_key_detail_logs), true)
     }
 
 }

@@ -102,14 +102,13 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Android library dependency
+    // Internal Android library dependency
     implementation project(":LibCoreAndroid")
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.preference:preference:1.1.1'
-    implementation 'androidx.biometric:biometric:1.0.1'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

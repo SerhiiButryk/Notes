@@ -14,7 +14,7 @@ APP::AuthorizeHandler::AuthorizeHandler() : EventHandlerBase(SYSTEM_EVENT::AUTHO
 
 }
 
-void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
+bool APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 {
     SystemStorage ss;
 
@@ -26,19 +26,20 @@ void APP::AuthorizeHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
 
             if (p.second == event.getData(PASSWORD_KEY))
             {
-                ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::AUTHORIZATION_DONE);
 
-                return;
+                return true;
 
             } else {
 
                 ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::WRONG_PASSWORD);
 
-                return;
+                return false;
             }
 
         }
     }
 
     ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::ACCOUNT_INVALID);
+
+    return false;
 }
