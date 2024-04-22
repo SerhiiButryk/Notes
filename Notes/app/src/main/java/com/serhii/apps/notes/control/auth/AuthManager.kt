@@ -15,10 +15,11 @@ import com.serhii.core.security.Hash
  */
 class AuthManager {
 
-    private val hash = Hash()
+    fun handleRequest(type: RequestType, data: AuthModel): Boolean {
 
-    fun handleRequest(type: RequestType, data: AuthModel): Boolean  =
-        when {
+        val hash = Hash()
+
+        return when {
             type == RequestType.REQ_AUTHORIZE && data.authType == AuthorizeType.AUTH_UNLOCK -> {
                 requestUnlock(data.password, hash.hashMD5(NativeBridge.unlockKey))
                 // Return result
@@ -48,6 +49,7 @@ class AuthManager {
             // Return result
             else -> true
         }
+    }
 
     // Only password check , no other actions here
     fun checkInput(password: String, confirmPassword: String, username: String): Boolean {

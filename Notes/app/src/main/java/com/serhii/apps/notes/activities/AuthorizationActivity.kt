@@ -7,6 +7,7 @@ package com.serhii.apps.notes.activities
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails
 import com.serhii.apps.notes.control.EventService
@@ -18,6 +19,8 @@ import com.serhii.apps.notes.ui.fragments.LoginFragment
 import com.serhii.apps.notes.ui.fragments.RegistrationFragment
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Login activity for user authorization
@@ -110,7 +113,7 @@ class AuthorizationActivity : AppBaseActivity() {
         val loginFragment = supportFragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
         if (loginFragment != null) {
             loginFragment.onUserAccountCreated()
-            EventService.onRegistrationFinished(this)
+            EventService.onRegistrationDone(this)
         } else {
             Log.error(TAG, "userRegistered(), loginFragment is null")
         }
@@ -122,15 +125,24 @@ class AuthorizationActivity : AppBaseActivity() {
     private fun showAlertDialog(type: Int) {
         Log.info(TAG, "showAlertDialog(), type $type")
 
-        EventService.onShowAlertDialog(this, type)
+        EventService.onErrorState(type) {
+            Log.detail(TAG, "showAlertDialog(), show dialog")
+            lifecycleScope.launch(Dispatchers.Main) {
+                DialogHelper.showDialog(type, this@AuthorizationActivity)
+            }
+        }
 
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
             val currentLimit = NativeBridge.limitLeft
             // If limit is exceeded then need to block app
             if (currentLimit == 1) {
-                Log.detail(TAG, "showAlertDialog(), add block fragment")
-                clearFragmentStack()
-                addFragment(BlockFragment(), BlockFragment.FRAGMENT_TAG, false)
+                // The method is called from background thread.
+                // So we need to move this call to UI thread
+                lifecycleScope.launch(Dispatchers.Main) {
+                    Log.detail(TAG, "showAlertDialog(), add block fragment")
+                    clearFragmentStack()
+                    addFragment(BlockFragment(), BlockFragment.FRAGMENT_TAG, false)
+                }
             }
         }
     }

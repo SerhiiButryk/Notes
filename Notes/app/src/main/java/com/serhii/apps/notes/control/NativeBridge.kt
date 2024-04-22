@@ -9,6 +9,7 @@ import android.util.Base64
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
+import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
 
@@ -21,6 +22,31 @@ object NativeBridge {
 
     val userName: String
         get() = _getUserName()
+
+    val isAppBlocked: Boolean
+        get() = _isAppBlocked()
+
+    val unlockKey: String
+        get() {
+            val unlockKey = _getUnlockKey()
+            // Return decrypted result
+            return crypto.decrypt(unlockKey)
+        }
+
+    var limitLeft: Int
+        get() {
+            val encMessage = _getLimitLeft()
+            val iv = encMessage.substring(0, 16)
+            val message = encMessage.substring(16)
+            val result = crypto.decryptWithIV(message, inputIV = iv)
+            // Return result
+            return result.message.toInt()
+        }
+        set(value) {
+            val result = crypto.encryptWithIV(value.toString())
+            // Set enc data
+            _setLimitLeft(result.iv + result.message)
+        }
 
     fun verifyPassword(passwordHash: String): Boolean {
         return _verifyPassword(_getUserName(), passwordHash)
@@ -35,36 +61,14 @@ object NativeBridge {
         _executeBlockApp()
     }
 
-    val isAppBlocked: Boolean
-        get() = _isAppBlocked()
-
-    fun setLoginLimitFromDefault(context: Context) {
+    fun resetLoginLimitLeft(context: Context) {
         // Get limit value from prefs
         val limit = getLockLimit(context)
-        val encMessage = crypto.encrypt(limit.toString())
-        // Set enc data
-        _setLimitLeft(encMessage)
-    }
-
-    fun resetLoginLimitLeft(context: Context) {
-        setLoginLimitFromDefault(context)
-    }
-
-    var limitLeft: Int
-        get() {
-            val encMessage = _getLimitLeft()
-            val message = crypto.decrypt(encMessage)
-            // Return result
-            return message.toInt()
+        if (limit != null) {
+            limitLeft = limit.toInt()
+        } else {
+            Log.error("NativeBridge", "setLoginLimitFromDefault() failed")
         }
-        private set(value) {
-            val encMessage = crypto.encrypt(value.toString())
-            // Set enc data
-            _setLimitLeft(encMessage)
-        }
-
-    fun updateLimit(value: Int) {
-        limitLeft = value
     }
 
     fun getLockLimit(context: Context): String? {
@@ -80,13 +84,6 @@ object NativeBridge {
         val encMessage = crypto.encrypt(String(encodedString))
         _setUnlockKey(encMessage)
     }
-
-    val unlockKey: String
-        get() {
-            val unlockKey = _getUnlockKey()
-            // Return decrypted result
-            return crypto.decrypt(unlockKey)
-        }
 
     private external fun _getUserName(): String
     private external fun _verifyPassword(userName: String, password: String): Boolean

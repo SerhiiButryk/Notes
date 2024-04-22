@@ -27,6 +27,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
      * Create keys for data encryption
      */
     fun createKey(input: String) {
+        Log.detail(TAG, "createKeys()")
         // 1. Generate derived key
         DERIVED_KEY_1 = providerOpenssl.genDerivedKey(input)
         val encodedDerivedKey = String(Base64.encode(DERIVED_KEY_1, Base64.NO_WRAP))
@@ -47,6 +48,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
      * Create keys for data encryption
      */
     fun createKey(cipher: javax.crypto.Cipher) {
+        Log.detail(TAG, "createKeys(cipher)")
         val appKey = getAppKey()
         if (appKey.isNotEmpty()) {
             // 1. Create a random value for derived key

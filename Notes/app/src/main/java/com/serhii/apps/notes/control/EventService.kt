@@ -18,6 +18,11 @@ import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
 
 /**
@@ -31,7 +36,7 @@ object EventService : IEventService {
     /**
      * Handle authorize event
      */
-    override fun onPasswordLogin(context: Context, model: AuthModel) {
+    override suspend fun onPasswordLogin(context: Context, model: AuthModel) {
         Log.info(TAG, "onPasswordLogin()")
         // Do password check and any other necessary actions
         if (authManager.handleRequest(RequestType.REQ_AUTHORIZE, model)) {
@@ -52,8 +57,10 @@ object EventService : IEventService {
     /**
      * Handle registration event
      */
-    override fun onRegistration(model: AuthModel, biometricAuthenticator: BiometricAuthenticator?,
-                                fragmentActivity: FragmentActivity) {
+    override suspend fun onRegistration(model: AuthModel,
+                                        biometricAuthenticator: BiometricAuthenticator?,
+                                        fragmentActivity: FragmentActivity,
+                                        coroutineScope: CoroutineScope) {
         // Initiate registration request
         val result = authManager.checkInput(model.password, model.confirmPassword, model.email)
         if (result) {
@@ -73,40 +80,45 @@ object EventService : IEventService {
                 return
             }
 
-            // If not null then can ask for Biometric login
-            biometricAuthenticator.authenticateFistTime(object : BiometricAuthenticator.Listener {
+            // Show biometrics
+            withContext(Dispatchers.Main) {
+                // If not null then can ask for Biometric login
+                biometricAuthenticator.authenticateFistTime(object : BiometricAuthenticator.Listener {
 
-                override fun onSuccess(cipher: Cipher) {
-                    Log.detail(TAG, "BiometricAuthenticator onSuccess()")
-                    keyMaster.createKey(cipher)
-                    // Finish
-                    authManager.handleRequest(RequestType.REQ_REGISTER, model)
-                    // For safety
-                    model.confirmPassword = ""
-                    model.password = ""
-                }
+                    override fun onSuccess(cipher: Cipher) {
+                        Log.detail(TAG, "BiometricAuthenticator onSuccess()")
+                        keyMaster.createKey(cipher)
+                        // Finish
+                        authManager.handleRequest(RequestType.REQ_REGISTER, model)
+                        // For safety
+                        model.confirmPassword = ""
+                        model.password = ""
+                    }
 
-                override fun onFailure() {
-                    Log.error(TAG, "BiometricAuthenticator onFailure()")
+                    override fun onFailure() {
+                        Log.error(TAG, "BiometricAuthenticator onFailure()")
 
-                    DialogHelper.showConfirmDialog(fragmentActivity, object : ConfirmDialogCallback {
+                        DialogHelper.showConfirmDialog(fragmentActivity, object : ConfirmDialogCallback {
 
-                        override fun onOk() {
-                            Log.info(TAG, "BiometricAuthenticator Retrying...")
-                            onRegistration(model, biometricAuthenticator, fragmentActivity)
-                        }
+                            override fun onOk() {
+                                coroutineScope.launch(Dispatchers.Default + CoroutineName("RegistrationRetry")) {
+                                    Log.info(TAG, "BiometricAuthenticator Retrying...")
+                                    onRegistration(model, biometricAuthenticator, fragmentActivity, this)
+                                }
+                            }
 
-                        override fun onCancel() {
-                            Log.info(TAG, "BiometricAuthenticator Finishing...")
-                            // Finish
-                            authManager.handleRequest(RequestType.REQ_REGISTER, model)
-                            // For safety
-                            model.confirmPassword = ""
-                            model.password = ""
-                        }
-                    }, R.string.biometric_dialog_title, R.string.biometric_dialog_message)
-                }
-            })
+                            override fun onCancel() {
+                                Log.info(TAG, "BiometricAuthenticator Finishing...")
+                                // Finish
+                                authManager.handleRequest(RequestType.REQ_REGISTER, model)
+                                // For safety
+                                model.confirmPassword = ""
+                                model.password = ""
+                            }
+                        }, R.string.biometric_dialog_title, R.string.biometric_dialog_message)
+                    }
+                })
+            }
         } else {
             Log.error(TAG, "onRegistration() failure")
         }
@@ -115,19 +127,23 @@ object EventService : IEventService {
     /**
      * Handle biometric login event
      */
-    override fun onBiometricLogin(context: Context, authModel: AuthModel) {
+    override suspend fun onBiometricLogin(context: Context, authModel: AuthModel) {
         Log.info(TAG, "onBiometricLogin()")
 
-        // Safe check. Should not Happen in a normal case.
+        // Safe check. Should not happen in a normal case.
         if (authModel.cipher == null) {
             Log.error(TAG, "onBiometricLogin(), cipher is null")
-            GoodUtils.showToast(context, R.string.biometric_toast_message)
+            withContext(Dispatchers.Main) {
+                GoodUtils.showToast(context, R.string.biometric_toast_message)
+            }
         }
 
         val success = crypto.getKeyMaster().initKeys(authModel.cipher!!)
         if (!success) {
             Log.error(TAG, "onBiometricLogin(), filed to init keys")
-            GoodUtils.showToast(context, R.string.biometric_toast_message)
+            withContext(Dispatchers.Main) {
+                GoodUtils.showToast(context, R.string.biometric_toast_message)
+            }
         }
 
         // Complete the authentication
@@ -137,10 +153,10 @@ object EventService : IEventService {
     /**
      * Handle registration finished event
      */
-    override fun onRegistrationFinished(context: Context) {
-        Log.info(TAG, "onRegistrationFinished()")
+    override fun onRegistrationDone(context: Context) {
+        Log.info(TAG, "onRegistrationDone()")
         NativeBridge.createUnlockKey()
-        NativeBridge.setLoginLimitFromDefault(context)
+        NativeBridge.resetLoginLimitLeft(context)
     }
 
     /**
@@ -154,14 +170,14 @@ object EventService : IEventService {
      * Handle change change login limit event
      */
     override fun onChangeLoginLimit(newLimit: Int) {
-        NativeBridge.updateLimit(newLimit)
+        NativeBridge.limitLeft = newLimit
     }
 
     /**
-     * Handle show alert dialog event
+     * Handle error event
      */
-    override fun onShowAlertDialog(context: Context, type: Int) {
-        Log.info(TAG, "onShowAlertDialog()")
+    override fun onErrorState(type: Int, showDialog: () -> Unit) {
+        Log.info(TAG, "onErrorState()")
         var shouldShowDialog = true
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
             val currentLimit = NativeBridge.limitLeft
@@ -173,13 +189,12 @@ object EventService : IEventService {
                 shouldShowDialog = false
             } else {
                 // Update password limit value
-                NativeBridge.updateLimit(currentLimit - 1)
-                Log.detail(TAG, "onShowAlertDialog(), updated limit")
+                NativeBridge.limitLeft = currentLimit - 1
+                Log.detail(TAG, "onErrorState(), updated limit")
             }
         }
         if (shouldShowDialog) {
-            Log.info(TAG, "onShowAlertDialog(), show dialog")
-            DialogHelper.showDialog(type, context)
+            showDialog()
         }
     }
 

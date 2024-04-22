@@ -119,9 +119,11 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     override fun updateData() {
-        info(TAG, "updateData(), get all records")
-        val data = notesRepository.getAll()
-        notes.value = data
+        viewModelScope.launch(Dispatchers.Default) {
+            Log.info(TAG, "updateData(), get all records")
+            val data = notesRepository.getAll()
+            notes.postValue(data)
+        }
     }
 
     fun getSearchResults(): LiveData<List<NoteModel>> {
@@ -129,15 +131,15 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     fun performSearch(query: String, noteForSearch: NoteModel? = null) {
-        Log.info(message = "performSearch()")
-        val noteForSearchList: List<NoteModel> = if (noteForSearch != null) {
-            listOf(noteForSearch)
-        } else {
-            notesRepository.getAll()
-        }
-        // Start a search
         viewModelScope.launch(defaultDispatcher + CoroutineName("NoteSearch")) {
-            search(query, noteForSearchList, searchResults)
+            Log.info(message = "performSearch()")
+            val noteForSearchList: List<NoteModel> = if (noteForSearch != null) {
+                listOf(noteForSearch)
+            } else {
+                notesRepository.getAll()
+            }
+                // Start a search
+                search(query, noteForSearchList, searchResults)
         }
     }
 
