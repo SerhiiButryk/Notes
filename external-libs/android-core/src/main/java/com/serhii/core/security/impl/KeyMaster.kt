@@ -8,6 +8,7 @@ package com.serhii.core.security.impl
 import com.serhii.core.log.Log
 import com.serhii.core.security.impl.crypto.BaseProvider
 import android.util.Base64
+import com.serhii.core.security.Crypto.Companion.KEY_MAX_SIZE
 import com.serhii.core.security.impl.crypto.Openssl
 
 /**
@@ -33,14 +34,14 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
         val encodedDerivedKey = String(Base64.encode(DERIVED_KEY_1, Base64.NO_WRAP))
 
         // 2. Create application key which is a random value
-        val appKey = providerOpenssl.getRandomValue(BaseProvider.KEY_MAX_SIZE)
+        val appKey = providerOpenssl.getRandomValue(KEY_MAX_SIZE)
         val encodedAppKey = String(Base64.encode(appKey, Base64.NO_WRAP))
 
         // 3. Encrypt application key with derived key
         val encryptedKey = providerOpenssl.encrypt(encodedAppKey, encodedDerivedKey)
 
         // 4. Save application key
-        _save(encryptedKey)
+        _save(encryptedKey.message)
         Log.detail(TAG, "createKeys() done")
     }
 
@@ -52,7 +53,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
         val appKey = getAppKey()
         if (appKey.isNotEmpty()) {
             // 1. Create a random value for derived key
-            val derivedKey = providerOpenssl.getRandomValue(BaseProvider.KEY_MAX_SIZE)
+            val derivedKey = providerOpenssl.getRandomValue(KEY_MAX_SIZE)
             val encodedDerivedKey = String(Base64.encode(derivedKey, Base64.NO_WRAP))
 
             // 2. Encrypt and save it
@@ -69,7 +70,8 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
 
             // 2. Encrypt and save application key
             val encryptedAppKey = providerOpenssl.encrypt(appKey, encodedDerivedKey)
-            _save2(encryptedAppKey)
+
+            _save2(encryptedAppKey.message)
         } else {
             Log.error(TAG, "createKey() key is empty")
         }
@@ -150,7 +152,9 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
             Base64.encode(DERIVED_KEY_1, Base64.NO_WRAP)
         )
 
-        return providerOpenssl.decrypt(encryptedKey, encodedDerivedKey)
+        val result = providerOpenssl.decrypt(encryptedKey, encodedDerivedKey)
+
+        return result.message
     }
 
     // Try to get application key which is associated with derived key 2
@@ -168,7 +172,9 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
             return ""
         }
 
-        return providerOpenssl.decrypt(encryptedKey, String(DERIVED_KEY_2))
+        val result = providerOpenssl.decrypt(encryptedKey, String(DERIVED_KEY_2))
+
+        return result.message
     }
 
     fun biometricsInitialized(): Boolean {

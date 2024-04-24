@@ -173,12 +173,11 @@ object BackupManager {
             val notes = UserNotesDatabase.getRecords()
             val json = NoteModel.convertNoteListToJson(notes)
 
-            // encrypt using keyword
-            val cipher = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
-            val message = cipher.encrypt(json, key)
+            val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+            val result = crypto.encrypt(json, key)
 
             try {
-                outputStream?.write(message.toByteArray())
+                outputStream?.write(result.message.toByteArray())
                 outputStream?.flush()
                 outputStream?.close()
             } catch (e: IOException) {
@@ -200,11 +199,10 @@ object BackupManager {
     private fun restoreData(json: String, key: String, context: Context): Boolean {
         detail(TAG, "restoreData() IN")
 
-        // decrypt using keyword
-        val cipher = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
-        val messageJson = cipher.decrypt(json, key)
+        val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+        val messageJson = crypto.decrypt(json, key)
 
-        val notes = NoteModel.convertJsonToNoteList(messageJson)
+        val notes = NoteModel.convertJsonToNoteList(messageJson.message)
 
         for (note in notes) {
             UserNotesDatabase.addRecord(note)

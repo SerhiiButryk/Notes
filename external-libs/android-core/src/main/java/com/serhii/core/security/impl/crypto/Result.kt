@@ -4,9 +4,11 @@
  */
 package com.serhii.core.security.impl.crypto
 
+// TODO Add proper getter for message if IV is set
 data class Result(val message: String = "",
                   val iv: String = "",
-                  val error: CryptoError = CryptoError.UNKNOWN) {
+                  val error: CryptoError = CryptoError.UNKNOWN,
+                  val messageWithIVdata: Boolean = false) {
 
     val isResultAvailable: Boolean
         get() = error === CryptoError.OK

@@ -18,7 +18,8 @@ import com.serhii.core.security.Hash
  */
 object NativeBridge {
 
-    val crypto = Crypto()
+    val cryptoOpenssl = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+    val cryptoAndroid = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
 
     val userName: String
         get() = _getUserName()
@@ -30,22 +31,20 @@ object NativeBridge {
         get() {
             val unlockKey = _getUnlockKey()
             // Return decrypted result
-            return crypto.decrypt(unlockKey)
+            return cryptoOpenssl.decrypt(unlockKey).message
         }
 
     var limitLeft: Int
         get() {
-            val encMessage = _getLimitLeft()
-            val iv = encMessage.substring(0, 16)
-            val message = encMessage.substring(16)
-            val result = crypto.decryptWithIV(message, inputIV = iv)
+            val message = _getLimitLeft()
+            val result = cryptoAndroid.decrypt(message)
             // Return result
             return result.message.toInt()
         }
         set(value) {
-            val result = crypto.encryptWithIV(value.toString())
+            val result = cryptoAndroid.encrypt(value.toString())
             // Set enc data
-            _setLimitLeft(result.iv + result.message)
+            _setLimitLeft(result.message)
         }
 
     fun verifyPassword(passwordHash: String): Boolean {
@@ -79,10 +78,10 @@ object NativeBridge {
 
     fun createUnlockKey() {
         // Take the first 8 characters
-        val randomString = crypto.getRandomValue(8)
+        val randomString = cryptoOpenssl.getRandomValue(8)
         val encodedString = Base64.encode(randomString, Base64.NO_WRAP)
-        val encMessage = crypto.encrypt(String(encodedString))
-        _setUnlockKey(encMessage)
+        val encMessage = cryptoOpenssl.encrypt(String(encodedString))
+        _setUnlockKey(encMessage.message)
     }
 
     private external fun _getUserName(): String

@@ -99,12 +99,12 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
     private fun encrypt(noteModel: NoteModel): String {
         Log.detail(TAG, "encrypt()")
         val json = NoteModel.getJson(noteModel)
-        return crypto.encrypt(json)
+        return crypto.encrypt(json).message
     }
 
     private fun decrypt(note: String): NoteModel {
         Log.detail(TAG, "decrypt()")
-        val json = crypto.decrypt(note)
+        val json = crypto.decrypt(note).message
         return NoteModel.fromJson(json)
     }
 

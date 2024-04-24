@@ -9,6 +9,7 @@ import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Base64
 import com.serhii.core.log.Log
+import com.serhii.core.security.Crypto
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.*
@@ -21,7 +22,7 @@ import javax.crypto.spec.GCMParameterSpec
 /**
  * Class provides Android keystore interface for crypto operations
  */
-internal class AndroidSecureStore : BaseProvider() {
+internal class AndroidProvider : BaseProvider() {
 
     private val keyStore: KeyStore
     private var selectedKey: String? = null
@@ -38,20 +39,18 @@ internal class AndroidSecureStore : BaseProvider() {
         init(key, timeOutSeconds, authRequired)
     }
 
-    override fun encryptSymmetric(message: String, inputIV: String, key: String): Result {
+    override fun encrypt(message: String, key: String, inputIV: String): Result {
         // Throw exception in case of error. Cannot proceed.
-        checkNotNull(selectedKey) { "No secret key is selected for cryptographic operation" }
+        checkNotNull(selectedKey) { "No key is selected for cryptographic operation" }
         try {
             val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
             val encryptionCipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
             encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey)
             val _iv = encryptionCipher.iv
-            val encryptedText =
-                encryptionCipher.doFinal(message.toByteArray(StandardCharsets.UTF_8))
-            return Result(
-                String(Base64.encode(encryptedText, Base64.NO_WRAP)),
-                String(Base64.encode(_iv, Base64.NO_WRAP)),
-                CryptoError.OK)
+            val encryptedText = encryptionCipher.doFinal(message.toByteArray(StandardCharsets.UTF_8))
+            val encryptedMessage = String(Base64.encode(encryptedText, Base64.NO_WRAP))
+            val iv = String(Base64.encode(_iv, Base64.NO_WRAP))
+            return Result(iv + encryptedMessage, iv, CryptoError.OK, true)
         } catch (e: UserNotAuthenticatedException) {
             Log.error(TAG, "user not authenticated exception: $e")
             e.printStackTrace()
@@ -63,17 +62,24 @@ internal class AndroidSecureStore : BaseProvider() {
         return Result(error = CryptoError.UNKNOWN)
     }
 
-    override fun decryptSymmetric(message: String, inputIV: String, key: String): Result {
+    override fun decrypt(message: String, key: String, inputIV: String): Result {
         // Throw exception in case of error. Cannot proceed.
-        checkNotNull(selectedKey) { "No secret key is selected for cryptographic operation" }
+        checkNotNull(selectedKey) { "No key is selected for cryptographic operation" }
         try {
             val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
             val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
-            val iv = Base64.decode(inputIV.toByteArray(), Base64.NO_WRAP)
+
+            var _iv = inputIV
+            var realMessage = message
+            if (_iv.isEmpty()) {
+                _iv = message.substring(0, Crypto.IV_MAX_SIZE)
+                realMessage = message.substring(Crypto.IV_MAX_SIZE)
+            }
+
+            val iv = Base64.decode(_iv.toByteArray(), Base64.NO_WRAP)
             val spec = GCMParameterSpec(128, iv)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-            val textToDecrypt = message.toByteArray()
-            val text = cipher.doFinal(Base64.decode(textToDecrypt, Base64.NO_WRAP))
+            val text = cipher.doFinal(Base64.decode(realMessage.toByteArray(), Base64.NO_WRAP))
             return Result(String(text), error = CryptoError.OK)
         } catch (e: UserNotAuthenticatedException) {
             Log.error(TAG, "user not authenticated exception: $e")
@@ -244,7 +250,7 @@ internal class AndroidSecureStore : BaseProvider() {
     }
 
     companion object {
-        private const val TAG = "SecureStore"
+        private const val TAG = "AndroidProvider"
         private const val SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding"
         private const val DEFAULT_KEY = "Default-key-160375068"
         private const val DEFAULT_KEY_FOR_BIOMETRIC = "Default-key-43294023"

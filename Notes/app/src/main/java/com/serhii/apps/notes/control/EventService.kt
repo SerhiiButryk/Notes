@@ -83,7 +83,7 @@ object EventService : IEventService {
             // Show biometrics
             withContext(Dispatchers.Main) {
                 // If not null then can ask for Biometric login
-                biometricAuthenticator.authenticateFistTime(object : BiometricAuthenticator.Listener {
+                biometricAuthenticator.authenticateInitial(object : BiometricAuthenticator.Listener {
 
                     override fun onSuccess(cipher: Cipher) {
                         Log.detail(TAG, "BiometricAuthenticator onSuccess()")

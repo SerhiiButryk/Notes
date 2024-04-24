@@ -10,21 +10,22 @@ import com.serhii.core.security.impl.crypto.CryptoProvider
 import com.serhii.core.security.impl.crypto.Result
 
 /**
- * Class provides an interface to common crypto functionality.
+ * Class provides an abstraction layer to different crypto APIs.
  *
- * Note: You can select OpenSSL or Android implementation.
+ * Note:
+ * You have a selection between OpenSSL or Android implementation.
  */
 class Crypto {
 
     private var provider: CryptoProvider
 
-    // Uses default android crypto provider
+    // With default android crypto provider
     constructor() {
         Log.detail(TAG, "$TAG()")
         provider = CoreEngine.configure(this)
     }
 
-    // User selected crypto provider
+    // With selected crypto provider
     constructor(_provider: String) {
         Log.detail(TAG, "$TAG(String), $_provider")
         provider = CoreEngine.configure(this, _provider)
@@ -35,22 +36,23 @@ class Crypto {
     }
 
     /**
-     * Function for symmetric encryption which accepts IV data.
-     * If key is empty then default key will be used
-     * IV can be absent
+     * Calls symmetric encryption which accepts IV and key data.
+     * If key is empty then the default key will be used
+     * If IV is empty then it is generated automatically
      */
-    fun encryptWithIV(message: String, key: String = "", inputIV: String = ""): Result {
+    fun encrypt(message: String, key: String = "", inputIV: String = ""): Result {
         Log.detail(TAG, "encryptWithIV(), BB 2")
-        return provider.encryptSymmetric(message, inputIV, key)
+        return provider.encrypt(message, key, inputIV)
     }
 
     /**
-     * Function for symmetric decryption which accepts IV data.
-     * If key is empty then default key will be used
+     * Calls symmetric decryption which accepts IV and key data.
+     * If key is empty then the default key will be used
+     * If IV is empty then it is retrieved from 'message' automatically
      */
-    fun decryptWithIV(message: String, key: String = "", inputIV: String = ""): Result {
+    fun decrypt(message: String, key: String = "", inputIV: String = ""): Result {
         Log.detail(TAG, "decryptWithIV(), BB 3")
-        return provider.decryptSymmetric(message, inputIV, key)
+        return provider.decrypt(message, key, inputIV)
     }
 
     fun selectKey(key: String) {
@@ -68,29 +70,18 @@ class Crypto {
         return provider.getRandomValue(size)
     }
 
-    /**
-     * Helper function for symmetric encryption.
-     * It doesn't require IV data for input.
-     * If key is empty then default key will be used
-     */
-    fun encrypt(message: String, key: String = ""): String {
-        return provider.encrypt(message, key)
-    }
-
-    /**
-     * Helper function for symmetric decryption.
-     * It doesn't require IV data for input.
-     * If key is empty then default key will be used
-     */
-    fun decrypt(message: String, key: String = ""): String {
-        return provider.decrypt(message, key)
-    }
-
     fun getKeyMaster() = CoreEngine.getKeyMaster()
 
     companion object {
+
         const val CRYPTO_PROVIDER_OPENSSL = "openssl"
         const val CRYPTO_PROVIDER_ANDROID = "android"
+
+        // Correct IV size
+        const val IV_MAX_SIZE = 16
+        // Correct key size
+        const val KEY_MAX_SIZE = 32
+
         const val TAG = "Crypto"
     }
 }

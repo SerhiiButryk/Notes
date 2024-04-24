@@ -13,7 +13,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import com.serhii.core.CoreEngine
 import com.serhii.core.log.Log
-import com.serhii.core.security.impl.crypto.AndroidSecureStore
+import com.serhii.core.security.impl.crypto.AndroidProvider
 import javax.crypto.spec.IvParameterSpec
 
 /**
@@ -25,9 +25,9 @@ class BiometricAuthenticator {
     private var promptInfo: BiometricPrompt.PromptInfo? = null
     private var listener: Listener? = null
 
-    fun authenticateFistTime(listener: Listener) {
+    fun authenticateInitial(listener: Listener) {
         if (biometricPrompt == null || promptInfo == null) {
-            Log.error(TAG, "authenticateFistTime(): prompt is null, return")
+            Log.error(TAG, "authenticateInitial(): prompt is null, return")
             return
         }
 
@@ -134,7 +134,7 @@ class BiometricAuthenticator {
 
             val provider = CoreEngine.configure(null, Crypto.CRYPTO_PROVIDER_ANDROID)
 
-            val secretKey = (provider as AndroidSecureStore).getSecretKeyForBiometricAuthOrCreate()
+            val secretKey = (provider as AndroidProvider).getSecretKeyForBiometricAuthOrCreate()
             val cipher = provider.getCipherForBiometricAuth()
 
             cipher.init(
@@ -149,7 +149,7 @@ class BiometricAuthenticator {
 
             val provider = CoreEngine.configure(null, Crypto.CRYPTO_PROVIDER_ANDROID)
 
-            val secretKey = (provider as AndroidSecureStore).getSecretKeyForBiometricAuthOrCreate()
+            val secretKey = (provider as AndroidProvider).getSecretKeyForBiometricAuthOrCreate()
             val cipher = provider.getCipherForBiometricAuth()
 
             cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey)

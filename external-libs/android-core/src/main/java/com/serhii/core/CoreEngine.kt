@@ -8,7 +8,7 @@ package com.serhii.core
 import com.serhii.core.base.Components
 import com.serhii.core.security.Hash
 import com.serhii.core.security.impl.hash.HashAlgorithms
-import com.serhii.core.security.impl.crypto.AndroidSecureStore
+import com.serhii.core.security.impl.crypto.AndroidProvider
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.impl.KeyMaster
@@ -26,7 +26,7 @@ internal object CoreEngine : Components {
     private const val TAG = "CE"
 
     private val providerOpenSSL = Openssl()
-    private val providerSecureStore = AndroidSecureStore()
+    private val providerSecureStore = AndroidProvider()
     private val hashProvider = HashAlgorithms()
     private val keyMaster = KeyMaster(providerOpenSSL)
 
