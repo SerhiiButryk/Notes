@@ -9,7 +9,7 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppDetails
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthResult
@@ -127,7 +127,7 @@ class AuthorizationActivity : AppBaseActivity() {
 
         EventService.onErrorState(type) {
             Log.detail(TAG, "showAlertDialog(), show dialog")
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(App.UI_DISPATCHER) {
                 DialogHelper.showDialog(type, this@AuthorizationActivity)
             }
         }
@@ -138,7 +138,7 @@ class AuthorizationActivity : AppBaseActivity() {
             if (currentLimit == 1) {
                 // The method is called from background thread.
                 // So we need to move this call to UI thread
-                lifecycleScope.launch(Dispatchers.Main) {
+                lifecycleScope.launch(App.UI_DISPATCHER) {
                     Log.detail(TAG, "showAlertDialog(), add block fragment")
                     clearFragmentStack()
                     addFragment(BlockFragment(), BlockFragment.FRAGMENT_TAG, false)
@@ -162,7 +162,7 @@ class AuthorizationActivity : AppBaseActivity() {
     companion object {
         private const val TAG = "AuthorizationActivity"
         init {
-            System.loadLibrary(AppDetails.RUNTIME_LIBRARY)
+            System.loadLibrary(App.RUNTIME_LIBRARY)
         }
     }
 

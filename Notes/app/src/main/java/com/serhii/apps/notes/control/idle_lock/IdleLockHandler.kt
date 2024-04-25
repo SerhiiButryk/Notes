@@ -7,16 +7,17 @@ package com.serhii.apps.notes.control.idle_lock
 
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.activities.AuthorizationActivity
 import com.serhii.apps.notes.control.AppForegroundListener
-import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
-import com.serhii.apps.notes.control.background_work.WorkId
-import com.serhii.apps.notes.control.background_work.WorkItem
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.detail
-import java.util.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Date
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -28,69 +29,51 @@ object IdleLockHandler {
 
     private val isInactivityTimeoutReceived = AtomicBoolean(false)
 
+    private var lastJob: Job? = null
+
     fun onUserInteraction(context: Context) {
-        cancelLockTimeout(context)
-        startLockTimeout(context)
+        detail(TAG, "onUserInteraction()")
+        startLockTimeout(context, getTimeout(context))
     }
 
     fun onActivityResumed(context: Context) {
-        if (context is AuthorizationActivity) {
-            detail(TAG, "onActivityResumed(), stop timer")
-            // Stop inactivity timer\
-            cancelLockTimeout(context)
-        } else {
-            detail(TAG, "onActivityResumed(), start timer")
-            // Check if inactivity timeout is received
-            checkInactivityTimeout(context)
-            // Start lock timer
-            startLockTimeout(context)
+        detail(TAG, "onActivityResumed()")
+        // Check if timeout is received and start a job if not
+        if (!checkInactivityTimeout(context)) {
+            startLockTimeout(context, getTimeout(context))
         }
     }
 
-    fun forceRestartTimer(context: Context, newTimeMillis: Long) {
-        detail(TAG, "forceRestartTimer()")
-        cancelLockTimeout(context)
-        startLockTimeout(context, newTimeMillis)
+    fun restartTimer(context: Context, time: Long) {
+        detail(TAG, "restartTimer()")
+        startLockTimeout(context, time)
     }
 
-    private fun startLockTimeout(context: Context, timeMillis: Long = 0) {
-        detail(TAG, "startLockTimeout(), in")
+    private fun startLockTimeout(context: Context, time: Long) {
 
         if (context is AuthorizationActivity) {
-            detail(TAG, "startLockTimeout(), ignore for auth activity")
+            Log.detail(TAG, "startLockTimeout(), ignore for auth activity")
+            // Stop timer job
+            lastJob?.cancel()
             return
         }
 
-        if (BackgroundWorkHandler.hasPendingWork(context, WorkId.IDLE_LOCK_WORK_ID)) {
-            detail(TAG, "startLockTimeout(), has pending job")
-            return
+        lastJob?.cancel()
+
+        lastJob = MainScope().launch {
+            Log.detail(TAG, "coroutine: started")
+            delay(time)
+            Log.detail(TAG, "coroutine: time elapsed")
+            onTimeout(context)
+            Log.detail(TAG, "coroutine: finished")
         }
-
-        detail(TAG, "startLockTimeout(), schedule work")
-
-        val time = if (timeMillis == 0L) getTimeout(context) else timeMillis
-
-        detail(TAG, "getTimeout(), time: $time")
-
-        val workItem = WorkItem(WorkId.IDLE_LOCK_WORK_ID, time, { cxt, _ ->
-            onLockEventReceived(cxt)
-        }, null, null)
-
-        BackgroundWorkHandler.putWork(workItem, context)
-
-        detail(TAG, "startLockTimeout(), out")
     }
 
-    private fun cancelLockTimeout(context: Context) {
-        detail(TAG, "cancelLockTimeout()")
-        BackgroundWorkHandler.removeWork(WorkId.IDLE_LOCK_WORK_ID, context)
-    }
-
-    private fun onLockEventReceived(context: Context) {
-        detail(TAG, "onLockEventReceived(), received inactivity timeout, time: " + Date(System.currentTimeMillis()))
+    private fun onTimeout(context: Context) {
+        Log.detail(TAG, "onTimeout(), received inactivity timeout, time: " + Date(System.currentTimeMillis()))
         isInactivityTimeoutReceived.set(true)
         if (AppForegroundListener.isInForeground()) {
-            detail(TAG, "onLockEventReceived(), in foreground, start auth activity")
+            Log.detail(TAG, "onTimeout(), in foreground, start auth activity")
             startAuthActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
         }
     }
@@ -98,16 +81,17 @@ object IdleLockHandler {
     private fun checkInactivityTimeout(context: Context): Boolean {
 
         if (context is AuthorizationActivity) {
-            detail(TAG, "checkInactivityTimeout(), ignore for auth activity")
+            Log.detail(TAG, "checkInactivityTimeout(), ignore for auth activity")
             isInactivityTimeoutReceived.set(false)
             return false
         }
 
         if (isInactivityTimeoutReceived.get()) {
-            detail(TAG,"checkInactivityTimeout(), time out received, start auth activity")
+            Log.detail(TAG,"checkInactivityTimeout(), timeout received, start auth activity")
             startAuthActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             return true
         }
+
         return false
     }
 

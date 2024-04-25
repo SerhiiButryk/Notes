@@ -12,19 +12,20 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
-import com.serhii.apps.notes.control.background_work.WorkId
-import com.serhii.apps.notes.control.background_work.WorkItem
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.EnterPasswordDialogUI
 import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.apps.notes.ui.fragments.SettingsFragment
-import com.serhii.apps.notes.ui.view_model.NotesViewModel
+import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
+import java.io.InputStream
 import java.io.OutputStream
 
 /**
@@ -90,10 +91,14 @@ class SettingsActivity : AppBaseActivity() {
                 }
 
                 // Start backup
-                lifecycleScope.launch(NotesViewModel.defaultDispatcher) {
+                lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
                     if (UserNotesDatabase.recordsCount != 0) {
                         val notes = UserNotesDatabase.getRecords()
-                        BackupManager.extractNotes(baseContext, outputStream, notes)
+                        BackupManager.extractNotes(outputStream, notes) { result ->
+                            withContext(App.UI_DISPATCHER) {
+                                showStatusMessage(result)
+                            }
+                        }
                     } else {
                         info(TAG, "onActivityResult() no data")
                     }
@@ -112,21 +117,37 @@ class SettingsActivity : AppBaseActivity() {
                 // Ask for keyword
                 DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
 
-                    override fun onOkClicked(enteredText: String?, context: Context?) {
+                    override fun onOk(enteredText: String?, context: Context?) {
                         if (enteredText != null) {
 
-                            val workItem = WorkItem(WorkId.BACKUP_DATA_WORK_ID, 0, { ctx, workItem ->
-                                // Backup data
-                                BackupManager.backupNotes(workItem.extraData as Intent, enteredText, ctx)
-                            }, null, null)
+                            val outputStream: OutputStream? = try {
+                                val uri = data.data
+                                if (uri != null) {
+                                    context?.contentResolver?.openOutputStream(uri)
+                                } else null
+                            } catch (e: FileNotFoundException) {
+                                Log.error(TAG, "onActivityResult() error: $e")
+                                e.printStackTrace()
+                                return
+                            }
 
-                            workItem.extraData = data
+                            if (outputStream == null) {
+                                Log.error(TAG, "onActivityResult() error: outputStream == null")
+                                return
+                            }
 
-                            BackgroundWorkHandler.putWork(workItem, context!!)
+                            // Start backup
+                            lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
+                                BackupManager.backupNotes(enteredText, outputStream) { result ->
+                                    withContext(App.UI_DISPATCHER) {
+                                        showStatusMessage(result)
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    override fun onCancelClicked(context: Context?) {
+                    override fun onCancel(context: Context?) {
                     }
                 }, title, hint)
 
@@ -144,22 +165,36 @@ class SettingsActivity : AppBaseActivity() {
                 // Ask for keyword
                 DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
 
-                    override fun onOkClicked(enteredText: String?, context: Context?) {
+                    override fun onOk(enteredText: String?, context: Context?) {
                         if (enteredText != null) {
 
-                            val workItem = WorkItem(WorkId.RESTORE_DATA_WORK_ID, 0, { ctx, workItem ->
-                                BackupManager.restoreNotes(workItem.extraData as Intent, enteredText, ctx)
-                            }, null, null)
+                            val inputStream: InputStream? = try {
+                                context?.contentResolver?.openInputStream(data.data!!)
+                            } catch (e: FileNotFoundException) {
+                                error(TAG, "onActivityResult() error: $e")
+                                e.printStackTrace()
+                                return
+                            }
 
-                            workItem.extraData = data
+                            if (inputStream == null) {
+                                Log.error(TAG, "onActivityResult() error: outputStream == null")
+                                return
+                            }
 
-                            BackgroundWorkHandler.putWork(workItem, context!!)
+                            // Start restore
+                            lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
+                                BackupManager.restoreNotes(enteredText, inputStream) { result ->
+                                    withContext(App.UI_DISPATCHER) {
+                                        showStatusMessage(result)
+                                    }
+                                }
+                            }
                         }
-
                     }
 
-                    override fun onCancelClicked(context: Context?) {
+                    override fun onCancel(context: Context?) {
                     }
+
                 }, title, hint)
 
 
@@ -168,7 +203,14 @@ class SettingsActivity : AppBaseActivity() {
                 error(TAG, "onActivityResult() data is null")
             }
         }
+    }
 
+    private fun showStatusMessage(result: Boolean) {
+        if (result) {
+            GoodUtils.showToast(baseContext, R.string.result_success)
+        } else {
+            GoodUtils.showToast(baseContext, R.string.result_failed)
+        }
     }
 
     companion object {

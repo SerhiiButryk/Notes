@@ -7,6 +7,8 @@ package com.serhii.apps.notes.control
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.common.App
+import com.serhii.apps.notes.common.App.UI_DISPATCHER
 import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.AuthManager
 import com.serhii.apps.notes.control.auth.types.AuthResult
@@ -17,6 +19,7 @@ import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.security.Crypto
+import com.serhii.core.security.Hash
 import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -81,7 +84,7 @@ object EventService : IEventService {
             }
 
             // Show biometrics
-            withContext(Dispatchers.Main) {
+            withContext(UI_DISPATCHER) {
                 // If not null then can ask for Biometric login
                 biometricAuthenticator.authenticateInitial(object : BiometricAuthenticator.Listener {
 
@@ -101,7 +104,8 @@ object EventService : IEventService {
                         DialogHelper.showConfirmDialog(fragmentActivity, object : ConfirmDialogCallback {
 
                             override fun onOk() {
-                                coroutineScope.launch(Dispatchers.Default + CoroutineName("RegistrationRetry")) {
+                                coroutineScope.launch(App.BACKGROUND_DISPATCHER
+                                        + CoroutineName("RegistrationRetry")) {
                                     Log.info(TAG, "BiometricAuthenticator Retrying...")
                                     onRegistration(model, biometricAuthenticator, fragmentActivity, this)
                                 }
@@ -163,7 +167,7 @@ object EventService : IEventService {
      * Handle change password event
      */
     override fun onChangePassword(newPassword: String): Boolean {
-        return NativeBridge.setNewPassword(newPassword)
+        return NativeBridge.setNewPassword(Hash.hashMD5(newPassword))
     }
 
     /**

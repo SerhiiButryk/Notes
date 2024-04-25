@@ -7,17 +7,10 @@ package com.serhii.apps.notes.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppDetails
-import com.serhii.apps.notes.control.EventService
-import com.serhii.apps.notes.control.NativeBridge
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
-import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
-import com.serhii.apps.notes.control.background_work.WorkId
-import com.serhii.apps.notes.control.background_work.WorkItem
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
@@ -28,8 +21,10 @@ import com.serhii.apps.notes.ui.fragments.NoteViewFragment.NoteInteraction
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getFilePath
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.OutputStream
 
@@ -94,9 +89,17 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
                 }
 
                 // Start an extract
-                lifecycleScope.launch(NotesViewModel.defaultDispatcher) {
+                lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
                     val note = UserNotesDatabase.getRecord(noteId)
-                    BackupManager.extractNotes(baseContext, outputStream, listOf(note))
+                    BackupManager.extractNotes(outputStream, listOf(note)) { result ->
+                        withContext(App.UI_DISPATCHER) {
+                            if (result) {
+                                GoodUtils.showToast(baseContext, R.string.result_success)
+                            } else {
+                                GoodUtils.showToast(baseContext, R.string.result_failed)
+                            }
+                        }
+                    }
                 }
             } else {
                 // Should not happen
@@ -207,7 +210,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     companion object {
         private const val TAG = "NotesViewActivity"
         init {
-            System.loadLibrary(AppDetails.RUNTIME_LIBRARY)
+            System.loadLibrary(App.RUNTIME_LIBRARY)
         }
     }
 }

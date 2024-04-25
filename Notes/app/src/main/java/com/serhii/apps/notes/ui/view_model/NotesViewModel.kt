@@ -5,12 +5,12 @@
 package com.serhii.apps.notes.ui.view_model
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
+import com.serhii.apps.notes.common.App.BACKGROUND_DISPATCHER
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDisplayModePref
 import com.serhii.apps.notes.database.UserNotesDatabase
@@ -20,9 +20,7 @@ import com.serhii.apps.notes.repository.DataChangedListener
 import com.serhii.apps.notes.ui.search.search
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.impl.crypto.CryptoError
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -119,7 +117,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     override fun updateData() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(BACKGROUND_DISPATCHER) {
             Log.info(TAG, "updateData(), get all records")
             val data = notesRepository.getAll()
             notes.postValue(data)
@@ -131,7 +129,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
     }
 
     fun performSearch(query: String, noteForSearch: NoteModel? = null) {
-        viewModelScope.launch(defaultDispatcher + CoroutineName("NoteSearch")) {
+        viewModelScope.launch(BACKGROUND_DISPATCHER + CoroutineName("NoteSearch")) {
             Log.info(message = "performSearch()")
             val noteForSearchList: List<NoteModel> = if (noteForSearch != null) {
                 listOf(noteForSearch)
@@ -145,7 +143,5 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
 
     companion object {
         private const val TAG = "NotesViewModel"
-        // For coroutines
-        val defaultDispatcher = Dispatchers.Default;
     }
 }

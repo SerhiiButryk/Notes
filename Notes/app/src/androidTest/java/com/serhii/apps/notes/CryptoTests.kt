@@ -50,7 +50,7 @@ class CryptoTests {
         var decryptedMessage: Result
 
         // Encrypt message
-        encryptedMessage = crypto.encryptWithIV(originalMessage, key, iv)
+        encryptedMessage = crypto.encrypt(originalMessage, key, iv)
 
         Assert.assertFalse("Failed to encrypt", encryptedMessage.error != CryptoError.OK)
 
@@ -58,7 +58,7 @@ class CryptoTests {
         crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         // Decrypted message
-        decryptedMessage = crypto.decryptWithIV(encryptedMessage.message, key, iv)
+        decryptedMessage = crypto.decrypt(encryptedMessage.message, key, iv)
 
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
@@ -91,10 +91,10 @@ class CryptoTests {
 
         val message = "The quick brown fox jumps over the lazy dog"
 
-        val encMessage: Result = crypto.encryptWithIV(message)
+        val encMessage: Result = crypto.encrypt(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = crypto.decryptWithIV(encMessage.message, inputIV = encMessage.iv)
+        val decMessage: Result = crypto.decrypt(encMessage.message)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
         Assert.assertEquals("Text are not correct", decMessage.message, message)
@@ -103,13 +103,13 @@ class CryptoTests {
 
         val message2 = "Very short story"
 
-        val encMessage2: Result = crypto.encryptWithIV(message2)
+        val encMessage2: Result = crypto.encrypt(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = crypto.decryptWithIV(encMessage2.message, inputIV = encMessage2.iv)
+        val decMessage2: Result = crypto.decrypt(encMessage2.realMessage, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
-        Assert.assertEquals("Text are not correct", decMessage2.message, message2)
+        Assert.assertEquals("Text are not correct", decMessage2.realMessage, message2)
 
        Log.i(TAG, "test02_Android_provider_encrypt_decrypt() OUT")
     }
@@ -141,7 +141,7 @@ class CryptoTests {
         var decryptedMessage: Result
 
         // Encrypt message
-        encryptedMessage = crypto.encryptWithIV(originalMessage, key, iv)
+        encryptedMessage = crypto.encrypt(originalMessage, key, iv)
 
         Assert.assertFalse("Failed to encrypt", encryptedMessage.error != CryptoError.OK)
 
@@ -149,7 +149,7 @@ class CryptoTests {
         crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         // Decrypted message
-        decryptedMessage = crypto.decryptWithIV(encryptedMessage.message, key, iv)
+        decryptedMessage = crypto.decrypt(encryptedMessage.message, key, iv)
 
         Assert.assertFalse("Failed to decrypt", decryptedMessage.error != CryptoError.OK)
         Assert.assertTrue("Text are not correct", decryptedMessage.message == originalMessage)
@@ -170,26 +170,26 @@ class CryptoTests {
         val message = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", message.isEmpty())
 
-        val encMessage: Result = crypto.encryptWithIV(message)
+        val encMessage: Result = crypto.encrypt(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = crypto.decryptWithIV(encMessage.message, inputIV = encMessage.iv)
+        val decMessage: Result = crypto.decrypt(encMessage.realMessage, inputIV = encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
-        Assert.assertEquals("Text are not correct", decMessage.message, message)
+        Assert.assertEquals("Text are not correct", decMessage.realMessage, message)
 
         crypto.selectKey(SECRET_KET_TEST_B)
 
         val message2 = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", message2.isEmpty())
 
-        val encMessage2: Result = crypto.encryptWithIV(message2)
+        val encMessage2: Result = crypto.encrypt(message2)
         Assert.assertTrue("Failed to encrypt", encMessage2.error == CryptoError.OK)
 
-        val decMessage2: Result = crypto.decryptWithIV(encMessage2.message, inputIV = encMessage2.iv)
+        val decMessage2: Result = crypto.decrypt(encMessage2.realMessage, inputIV = encMessage2.iv)
         Assert.assertTrue("Failed to decrypt", decMessage2.error == CryptoError.OK)
 
-        Assert.assertEquals("Text are not correct", decMessage2.message, message2)
+        Assert.assertEquals("Text are not correct", decMessage2.realMessage, message2)
 
         Log.i(TAG, "test04_Android_provider_encrypt_decrypt_LongText() OUT")
     }
@@ -231,16 +231,15 @@ class CryptoTests {
         Log.i(TAG, "test07_hash_MD5() IN")
 
         val message1 = "0123456789"
-        val hash = Hash()
 
-        var result = hash.hashMD5(message1)
+        var result = Hash.hashMD5(message1)
         var expectedResult = "781e5e245d69b566979b86e28d23f2c7"
 
         Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
 
         val message2 = "Apple Inc. is an American multinational technology"
 
-        result = hash.hashMD5(message2)
+        result = Hash.hashMD5(message2)
         expectedResult = "0b29dd825349b4f080e05991de4f3d29"
 
         Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
@@ -250,7 +249,7 @@ class CryptoTests {
             "Cupertino, California, United States. Apple is the largest technology company by revenue" +
             " (totaling US365.8 billion in 2021) and"
 
-        result = hash.hashMD5(message3)
+        result = Hash.hashMD5(message3)
         expectedResult = "ef62781f3cbd4199f4dffb73bff18d8e"
 
         Assert.assertTrue("Failed to generate correct hash", result == expectedResult)
@@ -268,13 +267,13 @@ class CryptoTests {
         val message = TestUtility.readFileFromTestAssets("long_text_example.txt")
         Assert.assertFalse("Failed to read file  from assets", message.isEmpty())
 
-        val encMessage: Result = crypto.encryptWithIV(message)
+        val encMessage: Result = crypto.encrypt(message)
         Assert.assertTrue("Failed to encrypt", encMessage.error == CryptoError.OK)
 
-        val decMessage: Result = crypto.decryptWithIV(encMessage.message, inputIV =  encMessage.iv)
+        val decMessage: Result = crypto.decrypt(encMessage.realMessage, inputIV =  encMessage.iv)
         Assert.assertTrue("Failed to decrypt", decMessage.error == CryptoError.OK)
 
-        Assert.assertEquals("Text are not correct", decMessage.message, message)
+        Assert.assertEquals("Text are not correct", decMessage.realMessage, message)
 
         Log.i(TAG, "test08_Android_provider_encrypt_decrypt_DefaultKey() OUT")
     }
@@ -292,7 +291,7 @@ class CryptoTests {
         val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
-        Assert.assertTrue(result.isEmpty())
+        Assert.assertTrue(result.message.isEmpty())
 
         Log.i(TAG, "test09_Simple_encrypt_decrypt_OpenSSL_short_key() OUT")
     }
@@ -309,14 +308,14 @@ class CryptoTests {
         val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
-        Assert.assertTrue(result.isNotEmpty())
+        Assert.assertTrue(result.message.isNotEmpty())
 
         val crypto2 = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
 
-        val decryptedMessage = crypto2.decrypt(result, key)
+        val decryptedMessage = crypto2.decrypt(result.message, key)
 
         Assert.assertNotNull(decryptedMessage)
-        Assert.assertTrue(decryptedMessage == message)
+        Assert.assertTrue(decryptedMessage.message == message)
 
         Log.i(TAG, "test11_Simple_encrypt_decrypt_Android_provider() OUT")
     }
@@ -333,24 +332,48 @@ class CryptoTests {
         val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
-        Assert.assertTrue(result.isNotEmpty())
+        Assert.assertTrue(result.message.isNotEmpty())
 
         key = "03ri094jeignoioneorgneroeirnoengorongeorognerogneorgenorngoe4p9-t0tt0i4-i"
 
         val crypto1 = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
-        val result2 = crypto1.decrypt(result, key)
+        val result2 = crypto1.decrypt(result.message, key)
 
         Assert.assertNotNull(result2)
-        Assert.assertTrue(result2.isEmpty())
+        Assert.assertTrue(result2.message.isEmpty())
 
         Log.i(TAG, "test11_Simple_encrypt_decrypt_OpenSSL_wrong_key() OUT")
     }
 
     @Test
-    fun test12_Simple_encrypt_decrypt_Android_provider_short_key() {
-        Log.i(TAG, "test12_Simple_encrypt_decrypt_Android_provider_short_key() IN")
+    fun test12a_Simple_encrypt_decrypt_Android_provider_short_key() {
+        Log.i(TAG, "test12a_Simple_encrypt_decrypt_Android_provider_short_key() IN")
 
         val crypto = Crypto()
+
+        val key = "a" // short key
+        val message = "b" // short message
+
+        // Should not fail as we use Default key
+        val result = crypto.encrypt(message, key)
+
+        Assert.assertNotNull(result)
+        Assert.assertTrue(result.message.isNotEmpty())
+
+        val result2 = crypto.decrypt(result.message, key)
+
+        Assert.assertNotNull(result2)
+        Assert.assertTrue(result2.message.isNotEmpty())
+        Assert.assertTrue(result2.message == message)
+
+        Log.i(TAG, "test12a_Simple_encrypt_decrypt_Android_provider_short_key() OUT")
+    }
+
+    @Test
+    fun test12b_Simple_encrypt_decrypt_Openssl_provider_short_key() {
+        Log.i(TAG, "test12b_Simple_encrypt_decrypt_Openssl_provider_short_key() IN")
+
+        val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
         val key = "a" // short key
         val message = "b" // short message
@@ -359,9 +382,9 @@ class CryptoTests {
         val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
-        Assert.assertTrue(result.isEmpty())
+        Assert.assertTrue(result.message.isEmpty())
 
-        Log.i(TAG, "test12_Simple_encrypt_decrypt_Android_provider_short_key() OUT")
+        Log.i(TAG, "test12b_Simple_encrypt_decrypt_Openssl_provider_short_key() OUT")
     }
 
     @Test
@@ -376,14 +399,14 @@ class CryptoTests {
         val result = crypto.encrypt(message, key)
 
         Assert.assertNotNull(result)
-        Assert.assertTrue(result.isNotEmpty())
+        Assert.assertTrue(result.message.isNotEmpty())
 
         val crypto2 = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
 
-        val decryptedMessage = crypto2.decrypt(result, key)
+        val decryptedMessage = crypto2.decrypt(result.message, key)
 
         Assert.assertNotNull(decryptedMessage)
-        Assert.assertTrue(decryptedMessage == message)
+        Assert.assertTrue(decryptedMessage.message == message)
 
         Log.i(TAG, "test13_Simple_encrypt_decrypt() OUT")
     }

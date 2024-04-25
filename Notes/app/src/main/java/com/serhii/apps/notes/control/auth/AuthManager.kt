@@ -17,18 +17,16 @@ class AuthManager {
 
     fun handleRequest(type: RequestType, data: AuthModel): Boolean {
 
-        val hash = Hash()
-
         return when {
             type == RequestType.REQ_AUTHORIZE && data.authType == AuthorizeType.AUTH_UNLOCK -> {
-                requestUnlock(data.password, hash.hashMD5(NativeBridge.unlockKey))
+                requestUnlock(data.password, Hash.hashMD5(NativeBridge.unlockKey))
                 // Return result
                 true
             }
 
             type == RequestType.REQ_AUTHORIZE -> {
                 // Return result is true or false
-                requestAuthorization(hash.hashMD5(data.password), data.email)
+                requestAuthorization(Hash.hashMD5(data.password), data.email)
             }
 
             type == RequestType.REQ_REGISTER ->
@@ -38,7 +36,7 @@ class AuthManager {
                 */
 
                 // Return result is true or false
-                requestRegistration(hash.hashMD5(data.password), hash.hashMD5(data.confirmPassword), data.email)
+                requestRegistration(Hash.hashMD5(data.password), Hash.hashMD5(data.confirmPassword), data.email)
 
             type == RequestType.REQ_BIOMETRIC_LOGIN -> {
                 requestAuthorization()

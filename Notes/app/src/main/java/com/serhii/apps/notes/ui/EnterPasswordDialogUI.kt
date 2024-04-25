@@ -35,7 +35,7 @@ class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogF
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
         okButton.setOnClickListener {
             if (listener != null) {
-                listener.onOkClicked(getText(editTextField), context)
+                listener.onOk(getText(editTextField), context)
                 dismiss()
             }
         }
@@ -46,7 +46,7 @@ class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogF
         editTextField.addTextChangedListener(textChecker)
         val cancelButton = dialogView.findViewById<Button>(R.id.btn_cancel)
         cancelButton.setOnClickListener {
-            listener?.onCancelClicked(context)
+            listener?.onCancel(context)
             dismiss()
         }
 
@@ -66,8 +66,8 @@ class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogF
     }
 
     interface DialogListener {
-        fun onOkClicked(enteredText: String?, context: Context?)
-        fun onCancelClicked(context: Context?)
+        fun onOk(enteredText: String?, context: Context?)
+        fun onCancel(context: Context?)
     }
 
     companion object {

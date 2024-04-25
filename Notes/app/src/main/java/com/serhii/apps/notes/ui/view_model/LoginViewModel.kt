@@ -9,13 +9,13 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.security.BiometricAuthenticator
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -29,7 +29,8 @@ class LoginViewModel : ViewModel() {
 
     fun proceedWithAuth(context: Context, authModel: AuthModel) {
         // Launch a new coroutine to handle this request
-        viewModelScope.launch(Dispatchers.Default + CoroutineName("AuthRequest")) {
+        viewModelScope.launch(App.BACKGROUND_DISPATCHER
+                + CoroutineName("AuthRequest")) {
             when (authModel.authType) {
                 AuthorizeType.AUTH_UNLOCK, AuthorizeType.AUTH_PASSWORD_LOGIN ->
                     authorizeService.onPasswordLogin(context, authModel)
@@ -47,7 +48,8 @@ class LoginViewModel : ViewModel() {
 
     fun proceedWithRegistration(authModel: AuthModel, biometricAuthenticator: BiometricAuthenticator?, fragmentActivity: FragmentActivity) {
         // Launch a new coroutine to handle this request
-        viewModelScope.launch(Dispatchers.Default + CoroutineName("RegistrationRequest")) {
+        viewModelScope.launch(App.BACKGROUND_DISPATCHER
+                + CoroutineName("RegistrationRequest")) {
             authorizeService.onRegistration(authModel, biometricAuthenticator, fragmentActivity, this)
         }
     }

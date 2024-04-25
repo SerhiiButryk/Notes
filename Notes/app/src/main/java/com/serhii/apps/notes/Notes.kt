@@ -5,7 +5,7 @@
 package com.serhii.apps.notes
 
 import android.app.Application
-import com.serhii.apps.notes.common.AppDetails
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.preferences.PreferenceManager
 import com.serhii.core.log.Log
 
@@ -16,7 +16,7 @@ class Notes : Application() {
     override fun onCreate() {
         super.onCreate()
         // Setup global app settings
-        Log.tag = AppDetails.APP_LOG_TAG
+        Log.tag = App.APP_LOG_TAG
         val enabled = PreferenceManager.isDetailLogsEnabled(this)
         Log.enableDetailedLogs(enabled)
         Log.setVersionCode(BuildConfig.VERSION_NAME)

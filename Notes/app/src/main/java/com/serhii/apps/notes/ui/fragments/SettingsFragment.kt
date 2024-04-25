@@ -14,7 +14,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppDetails
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.backup.BackupManager.openBackUpFile
@@ -78,7 +78,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val version = findPreference<Preference>(getString(R.string.preference_about_version_key))
         if (version != null) {
-            version.summary = AppDetails.VERSION_LIBRARY
+            version.summary = App.VERSION_LIBRARY
         }
 
         val idleLockTimeOut = findPreference<Preference>(getString(R.string.preference_idle_lock_timeout_key))
@@ -88,7 +88,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 Preference.OnPreferenceChangeListener { preference, newValue ->
                     val selectedTimeMillis = newValue.toString().toLong()
                     info(TAG, "onPreferenceChange(), selected idle lock time $selectedTimeMillis")
-                    IdleLockHandler.forceRestartTimer(requireContext(), selectedTimeMillis)
+                    IdleLockHandler.restartTimer(requireContext(), selectedTimeMillis)
                     true
                 }
         }
@@ -164,7 +164,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun openEmailClientApp() {
         // Open email client app for sending feedback
-        val mailto = Uri.parse("mailto:${AppDetails.DEV_EMAIL}?" +
+        val mailto = Uri.parse("mailto:${App.DEV_EMAIL}?" +
                 "subject=" +
                 getString(R.string.email_feedback_title) +
                 "&body=" +

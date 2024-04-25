@@ -4,13 +4,20 @@
  */
 package com.serhii.core.security.impl.crypto
 
-// TODO Add proper getter for message if IV is set
-data class Result(val message: String = "",
+import com.serhii.core.security.Crypto
+
+data class Result(
+                  // Can contain IV data part
+                  val message: String = "",
                   val iv: String = "",
                   val error: CryptoError = CryptoError.UNKNOWN,
-                  val messageWithIVdata: Boolean = false) {
+                  val hasIV: Boolean = false) {
 
-    val isResultAvailable: Boolean
+    // A message without IV data part
+    val realMessage = if (hasIV && message.isNotEmpty())
+        message.substring(Crypto.IV_MAX_SIZE) else message
+
+    val errorOk: Boolean
         get() = error === CryptoError.OK
 
     override fun toString(): String {
@@ -27,7 +34,7 @@ data class Result(val message: String = "",
         if (message != other.message) return false
         if (!iv.contentEquals(other.iv)) return false
         if (error != other.error) return false
-        if (isResultAvailable != other.isResultAvailable) return false
+        if (errorOk != other.errorOk) return false
 
         return true
     }

@@ -7,7 +7,7 @@ package com.serhii.apps.notes.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
+import com.serhii.apps.notes.common.App.RUNTIME_LIBRARY
 import com.serhii.apps.notes.control.AppForegroundListener
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.core.log.Log

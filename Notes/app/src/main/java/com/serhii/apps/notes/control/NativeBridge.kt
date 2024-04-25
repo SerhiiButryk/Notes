@@ -8,18 +8,17 @@ import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.AppDetails.RUNTIME_LIBRARY
+import com.serhii.apps.notes.common.App.RUNTIME_LIBRARY
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
-import com.serhii.core.security.Hash
 
 /**
  * Global point for access to C++ layer
  */
 object NativeBridge {
 
-    val cryptoOpenssl = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
-    val cryptoAndroid = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
+    private val cryptoOpenssl = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
+    private val cryptoAndroid = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
 
     val userName: String
         get() = _getUserName()
@@ -52,8 +51,7 @@ object NativeBridge {
     }
 
     fun setNewPassword(password: String): Boolean {
-        val hash = Hash()
-        return _setNewPassword(hash.hashMD5(password))
+        return _setNewPassword(password)
     }
 
     fun executeBlockApp() {
@@ -66,7 +64,7 @@ object NativeBridge {
         if (limit != null) {
             limitLeft = limit.toInt()
         } else {
-            Log.error("NativeBridge", "setLoginLimitFromDefault() failed")
+            Log.error("NativeBridge", "resetLoginLimitLeft() failed")
         }
     }
 

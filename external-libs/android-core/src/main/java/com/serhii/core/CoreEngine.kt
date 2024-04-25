@@ -26,7 +26,7 @@ internal object CoreEngine : Components {
     private const val TAG = "CE"
 
     private val providerOpenSSL = Openssl()
-    private val providerSecureStore = AndroidProvider()
+    private val providerAndroid = AndroidProvider()
     private val hashProvider = HashAlgorithms()
     private val keyMaster = KeyMaster(providerOpenSSL)
 
@@ -37,14 +37,14 @@ internal object CoreEngine : Components {
 
     override fun configure(cipher: Crypto?) : CryptoProvider {
         Log.info(TAG, "configure(), CC")
-        return providerSecureStore
+        return providerAndroid
     }
 
     override fun configure(cipher: Crypto?, provider: String) : CryptoProvider {
         Log.info(TAG, "configure(), CC1")
         return when (provider) {
             Crypto.CRYPTO_PROVIDER_ANDROID -> {
-                providerSecureStore
+                providerAndroid
             }
             Crypto.CRYPTO_PROVIDER_OPENSSL -> {
                 providerOpenSSL
