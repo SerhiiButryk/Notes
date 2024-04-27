@@ -37,10 +37,6 @@
     <string name="ms_password_is_short">Password is short or empty. Please, enter password longer than 5 characters.</string>
     <string name="ms_email_is_not_valid">Your entered invalid email. Please, try again.</string>
 
-    // Common buttons
-    <string name="kbtn_ok">OK</string>
-    <string name="kbtn_cancel">Cancel</string>
-
     // Login Activity
     <string name="text_description">Welcome to note app. Manage all your notes here. Firstly you need to create a user. Click \"Continue\" button to proceed.</string>
     <string name="btn_create_user">Continue</string>

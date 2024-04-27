@@ -5,14 +5,17 @@
 package com.serhii.apps.notes
 
 import android.util.Log
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.serhii.apps.notes.utils.TestUtility
+import com.serhii.core.FileSystem
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
 import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.security.impl.crypto.Result
 import org.junit.Assert
 import org.junit.FixMethodOrder
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -28,7 +31,7 @@ class CryptoTests {
      * Symmetric enc / dec short text message
      *
      *  Test for
-     *  [com.serhii.core.security.Crypto.encrypt]
+     * encodedString [com.serhii.core.security.Crypto.encrypt]
      *  [com.serhii.core.security.Crypto.decrypt]
      *
      *  1. Test encrypts text using symmetric key
@@ -434,6 +437,39 @@ class CryptoTests {
         Assert.assertFalse(byteArr1.contentEquals(byteArr2))
 
         Log.i(TAG, "test14_getRandomValue_verify_unique_values_generated() OUT")
+    }
+
+    // TODO: Fix test
+    @Ignore("Fix me !!!")
+    @Test
+    fun test15_key_master() {
+        Log.i(TAG, "test15_key_master() IN")
+
+        val keyMaster = Crypto().getKeyMaster()
+
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        FileSystem.setFilePath(context)
+
+        val input = "Hello"
+        keyMaster.createKey(input)
+
+        val appKey = keyMaster.getApplicationSymmetricKey()
+        Assert.assertTrue(appKey.isNotEmpty())
+
+        keyMaster.createUnlockKey()
+
+        val unlockKey = keyMaster.getUnlockKey()
+        Assert.assertTrue(unlockKey.isNotEmpty())
+
+        keyMaster.clear()
+
+        keyMaster.initUnlockKey(unlockKey)
+        val appKey2 = keyMaster.getApplicationSymmetricKey()
+        Assert.assertTrue(appKey2.isNotEmpty())
+
+        Assert.assertTrue(appKey2 == appKey)
+
+        Log.i(TAG, "test15_key_master() OUT")
     }
 
     companion object {

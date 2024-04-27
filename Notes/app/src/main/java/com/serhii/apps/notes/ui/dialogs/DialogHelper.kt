@@ -28,7 +28,7 @@ object DialogHelper {
     }
 
     @JvmStatic
-    fun showEnterPasswordField(
+    fun showEnterPasswordDialog(
         activity: FragmentActivity, listener: DialogListener?,
         title: String?, hint: String?) {
 
@@ -69,7 +69,7 @@ object DialogHelper {
     fun showDialog(type: Int, context: Context) {
         val dialog = AlertDialogHelper(type, context)
         val builder = AlertDialog.Builder(context)
-        builder.setPositiveButton(context.resources.getString(R.string.kbtn_ok)) { _, _ -> }
+        builder.setPositiveButton(context.resources.getString(android.R.string.ok)) { _, _ -> }
         builder.setTitle(dialog.title)
         builder.setMessage(dialog.message)
         builder.show()

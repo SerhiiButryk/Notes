@@ -7,14 +7,17 @@ package com.serhii.apps.notes.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.serhii.apps.notes.R
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.common.App.RUNTIME_LIBRARY
 import com.serhii.apps.notes.control.AppForegroundListener
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.core.log.Log
 import com.serhii.core.utils.GoodUtils
+import kotlinx.coroutines.withContext
 
 /**
- * Class provides common behavior for all app activities
+ * Class provides common behavior for all activities
  */
 open class AppBaseActivity : AppCompatActivity() {
 
@@ -24,11 +27,8 @@ open class AppBaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Enable secure screen content settings
         GoodUtils.enableUnsecureScreenProtection(this)
-        // Do not add lifecycle observer for auth activity
-        if (this !is AuthorizationActivity) {
-            // Initialize lifecycle aware components
-            lifecycle.addObserver(AppForegroundListener)
-        }
+        // Initialize lifecycle aware components
+        lifecycle.addObserver(AppForegroundListener)
         Log.info(TAG_BASE, "onCreate()")
     }
 
@@ -57,12 +57,22 @@ open class AppBaseActivity : AppCompatActivity() {
         TAG_BASE += tag
     }
 
+    suspend fun showStatusMessage(result: Boolean) {
+        withContext(App.UI_DISPATCHER) {
+            if (result) {
+                GoodUtils.showToast(baseContext, R.string.result_success)
+            } else {
+                GoodUtils.showToast(baseContext, R.string.result_failed)
+            }
+        }
+    }
+
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
         Log.info(TAG_BASE, "init()")
     }
 
-    // A callback to an activity from a fragment
+    // A callback from a fragment
     interface NavigationCallback {
         fun onNavigateBack()
     }

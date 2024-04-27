@@ -5,9 +5,9 @@
 
 package com.serhii.core.security.impl
 
-import com.serhii.core.log.Log
-import com.serhii.core.security.impl.crypto.BaseProvider
 import android.util.Base64
+import com.serhii.core.log.Log
+import com.serhii.core.security.Crypto
 import com.serhii.core.security.Crypto.Companion.KEY_MAX_SIZE
 import com.serhii.core.security.impl.crypto.Openssl
 
@@ -23,6 +23,8 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
     private var DERIVED_KEY_1: ByteArray = ByteArray(0)
     // For biometric login flow
     private var DERIVED_KEY_2: ByteArray = ByteArray(0)
+    // For unlock key
+    private var DERIVED_KEY_3: ByteArray = ByteArray(0)
 
     /**
      * Create keys for data encryption
@@ -117,6 +119,10 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
             appKey = getAppKey2()
         }
 
+        if (appKey.isEmpty()) {
+            appKey = getAppKey3()
+        }
+
         if (appKey.isEmpty())
             throw IllegalStateException("Failed to get app key")
 
@@ -181,14 +187,60 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
         return _get3().isNotEmpty() && _get2().isNotEmpty()
     }
 
+    fun createUnlockKey() {
+        val randomBytes = providerOpenssl.getRandomValue(Crypto.IV_MAX_SIZE)
+        val encodedString = Base64.encode(randomBytes, Base64.NO_WRAP)
+
+        val appKey = getAppKey()
+        val result = providerOpenssl.encrypt(appKey, String(encodedString))
+
+        _save5(result.message)
+        _setUnlockKey(String(encodedString))
+    }
+
+    fun initUnlockKey(key: String) {
+        DERIVED_KEY_3 = key.toByteArray()
+    }
+
+    fun getUnlockKey(): String { return _getUnlockKey() }
+
+    private fun getAppKey3(): String {
+        Log.detail(TAG, "getAppKey3()")
+        val encryptedKey = _get5()
+
+        if (encryptedKey.isEmpty()) {
+            Log.error(TAG, "getAppKey3() failed to get app key")
+            return ""
+        }
+
+        if (DERIVED_KEY_3.isEmpty()) {
+            Log.error(TAG, "getAppKey3() failed to get derived key")
+            return ""
+        }
+
+        val result = providerOpenssl.decrypt(encryptedKey, String(DERIVED_KEY_3))
+        return result.message
+    }
+
+    // For test only
+    fun clear() {
+        DERIVED_KEY_1 = ByteArray(0)
+        DERIVED_KEY_2 = ByteArray(0)
+        DERIVED_KEY_3 = ByteArray(0)
+    }
+
     // Saves app key to a file storage
     private external fun _save(value: String)
     private external fun _save2(value: String)
     private external fun _save3(value: String)
     private external fun _save4(value: String)
+    private external fun _save5(value: String)
     // Gets app key from a file storage
     private external fun _get(): String
     private external fun _get2(): String
     private external fun _get3(): String
     private external fun _get4(): String
+    private external fun _get5(): String
+    private external fun _getUnlockKey(): String
+    private external fun _setUnlockKey(unlockKey: String)
 }

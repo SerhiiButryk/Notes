@@ -8,6 +8,7 @@ import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
 import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
 
 /**
@@ -19,7 +20,11 @@ class AuthManager {
 
         return when {
             type == RequestType.REQ_AUTHORIZE && data.authType == AuthorizeType.AUTH_UNLOCK -> {
-                requestUnlock(data.password, Hash.hashMD5(NativeBridge.unlockKey))
+
+                val crypto = Crypto()
+                crypto.getKeyMaster().initUnlockKey(data.password)
+
+                requestUnlock(data.password, crypto.getKeyMaster().getUnlockKey())
                 // Return result
                 true
             }

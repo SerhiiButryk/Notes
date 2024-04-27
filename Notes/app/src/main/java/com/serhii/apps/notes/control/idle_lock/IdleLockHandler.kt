@@ -39,7 +39,7 @@ object IdleLockHandler {
     fun onActivityResumed(context: Context) {
         detail(TAG, "onActivityResumed()")
         // Check if timeout is received and start a job if not
-        if (!checkInactivityTimeout(context)) {
+        if (!hasIdleTimeout(context)) {
             startLockTimeout(context, getTimeout(context))
         }
     }
@@ -78,16 +78,16 @@ object IdleLockHandler {
         }
     }
 
-    private fun checkInactivityTimeout(context: Context): Boolean {
+    private fun hasIdleTimeout(context: Context): Boolean {
 
         if (context is AuthorizationActivity) {
-            Log.detail(TAG, "checkInactivityTimeout(), ignore for auth activity")
+            Log.detail(TAG, "hasIdleTimeout(), ignore for auth activity")
             isInactivityTimeoutReceived.set(false)
             return false
         }
 
         if (isInactivityTimeoutReceived.get()) {
-            Log.detail(TAG,"checkInactivityTimeout(), timeout received, start auth activity")
+            Log.detail(TAG,"hasIdleTimeout(), timeout received, start auth activity")
             startAuthActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             return true
         }

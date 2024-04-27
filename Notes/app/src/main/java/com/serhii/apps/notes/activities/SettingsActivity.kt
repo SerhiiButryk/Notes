@@ -41,9 +41,6 @@ class SettingsActivity : AppBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        toolbar = findViewById(R.id.toolbar)
-        toolbar?.setNavigationOnClickListener { onBackPressed() }
-
         if (savedInstanceState == null) {
             addFragment()
         }
@@ -59,6 +56,8 @@ class SettingsActivity : AppBaseActivity() {
     }
 
     private fun setActionBar() {
+        toolbar = findViewById(R.id.toolbar)
+        toolbar?.setNavigationOnClickListener { onBackPressed() }
         setSupportActionBar(toolbar)
         if (supportActionBar != null) {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -95,9 +94,7 @@ class SettingsActivity : AppBaseActivity() {
                     if (UserNotesDatabase.recordsCount != 0) {
                         val notes = UserNotesDatabase.getRecords()
                         BackupManager.extractNotes(outputStream, notes) { result ->
-                            withContext(App.UI_DISPATCHER) {
-                                showStatusMessage(result)
-                            }
+                            showStatusMessage(result)
                         }
                     } else {
                         info(TAG, "onActivityResult() no data")
@@ -115,7 +112,7 @@ class SettingsActivity : AppBaseActivity() {
                 val hint = getString(R.string.set_password_dialog_hint_backup)
 
                 // Ask for keyword
-                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
+                DialogHelper.showEnterPasswordDialog(this, object : EnterPasswordDialogUI.DialogListener {
 
                     override fun onOk(enteredText: String?, context: Context?) {
                         if (enteredText != null) {
@@ -139,9 +136,7 @@ class SettingsActivity : AppBaseActivity() {
                             // Start backup
                             lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
                                 BackupManager.backupNotes(enteredText, outputStream) { result ->
-                                    withContext(App.UI_DISPATCHER) {
-                                        showStatusMessage(result)
-                                    }
+                                    showStatusMessage(result)
                                 }
                             }
                         }
@@ -163,7 +158,7 @@ class SettingsActivity : AppBaseActivity() {
                 val hint = getString(R.string.set_password_dialog_hint_restore)
 
                 // Ask for keyword
-                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
+                DialogHelper.showEnterPasswordDialog(this, object : EnterPasswordDialogUI.DialogListener {
 
                     override fun onOk(enteredText: String?, context: Context?) {
                         if (enteredText != null) {
@@ -202,14 +197,6 @@ class SettingsActivity : AppBaseActivity() {
                 // Should not happen
                 error(TAG, "onActivityResult() data is null")
             }
-        }
-    }
-
-    private fun showStatusMessage(result: Boolean) {
-        if (result) {
-            GoodUtils.showToast(baseContext, R.string.result_success)
-        } else {
-            GoodUtils.showToast(baseContext, R.string.result_failed)
         }
     }
 

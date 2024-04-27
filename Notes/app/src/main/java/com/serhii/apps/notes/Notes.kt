@@ -7,6 +7,7 @@ package com.serhii.apps.notes
 import android.app.Application
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.preferences.PreferenceManager
+import com.serhii.core.FileSystem
 import com.serhii.core.log.Log
 
 /**
@@ -15,10 +16,12 @@ import com.serhii.core.log.Log
 class Notes : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Setup global app settings
+        // Setup log settings
         Log.tag = App.APP_LOG_TAG
         val enabled = PreferenceManager.isDetailLogsEnabled(this)
         Log.enableDetailedLogs(enabled)
         Log.setVersionCode(BuildConfig.VERSION_NAME)
+        // Setup file system settings
+        FileSystem.setFilePath(this)
     }
 }

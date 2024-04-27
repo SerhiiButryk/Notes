@@ -19,7 +19,6 @@ import com.serhii.apps.notes.ui.fragments.LoginFragment
 import com.serhii.apps.notes.ui.fragments.RegistrationFragment
 import com.serhii.apps.notes.ui.view_model.LoginViewModel
 import com.serhii.core.log.Log
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -30,17 +29,15 @@ class AuthorizationActivity : AppBaseActivity() {
     private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.info(TAG, "onCreate()")
         setLoggingTagForActivity(TAG)
 
-        Log.info(TAG, "onCreate() IN")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
 
         initNative()
         showLoginFragment(savedInstanceState)
         setupObservers()
-
-        Log.info(TAG, "onCreate() OUT")
     }
 
     override fun onBackPressed() {
@@ -133,7 +130,7 @@ class AuthorizationActivity : AppBaseActivity() {
         }
 
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
-            val currentLimit = NativeBridge.limitLeft
+            val currentLimit = NativeBridge.unlockLimit
             // If limit is exceeded then need to block app
             if (currentLimit == 1) {
                 // The method is called from background thread.

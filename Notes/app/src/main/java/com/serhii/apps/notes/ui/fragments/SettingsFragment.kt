@@ -28,6 +28,7 @@ import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper.Companion.ALERT_D
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.formatString
 
@@ -126,7 +127,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val unlockNote = findPreference<Preference>(getString(R.string.preference_unlock_note_key))
         if (unlockNote != null) {
-            unlockNote.summary = NativeBridge.unlockKey
+            unlockNote.summary = Crypto().getKeyMaster().getUnlockKey()
             // Put the string to clipboard on User click
             unlockNote.setOnPreferenceClickListener {
                 val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE)

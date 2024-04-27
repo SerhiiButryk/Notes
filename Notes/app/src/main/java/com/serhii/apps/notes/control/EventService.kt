@@ -159,7 +159,7 @@ object EventService : IEventService {
      */
     override fun onRegistrationDone(context: Context) {
         Log.info(TAG, "onRegistrationDone()")
-        NativeBridge.createUnlockKey()
+        crypto.getKeyMaster().createUnlockKey()
         NativeBridge.resetLoginLimitLeft(context)
     }
 
@@ -174,7 +174,7 @@ object EventService : IEventService {
      * Handle change change login limit event
      */
     override fun onChangeLoginLimit(newLimit: Int) {
-        NativeBridge.limitLeft = newLimit
+        NativeBridge.unlockLimit = newLimit
     }
 
     /**
@@ -184,7 +184,7 @@ object EventService : IEventService {
         Log.info(TAG, "onErrorState()")
         var shouldShowDialog = true
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
-            val currentLimit = NativeBridge.limitLeft
+            val currentLimit = NativeBridge.unlockLimit
             // If limit is exceeded then need to block application
             if (currentLimit == 1) {
                 // Block application
@@ -193,7 +193,7 @@ object EventService : IEventService {
                 shouldShowDialog = false
             } else {
                 // Update password limit value
-                NativeBridge.limitLeft = currentLimit - 1
+                NativeBridge.unlockLimit = currentLimit - 1
                 Log.detail(TAG, "onErrorState(), updated limit")
             }
         }

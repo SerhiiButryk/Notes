@@ -29,6 +29,7 @@ LIB_PATH := ../../../libs
                        ndkproxy/com_serhii_core_log_LogImpl.cpp \
                        ndkproxy/com_serhii_core_security_impl_crypto_CryptoOpenssl.cpp \
                        ndkproxy/com_serhii_core_security_KeyMaster.cpp \
+                       ndkproxy/com_serhii_core_FileSystem.cpp \
                        crypto/hash.cpp \
                        crypto/crypto_utils.cpp \
                        storage/file_system.cpp \

@@ -21,10 +21,7 @@ import com.serhii.apps.notes.ui.fragments.NoteViewFragment.NoteInteraction
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.utils.GoodUtils
-import com.serhii.core.utils.GoodUtils.Companion.getFilePath
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.OutputStream
 
@@ -43,8 +40,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         setContentView(R.layout.activity_note_view)
 
         // Need to call initNativeConfigs() before authorization process at the beginning.
-        val filePath = getFilePath(this)
-        initNativeConfigs(filePath)
+        initNativeConfigs()
 
         if (savedInstanceState == null) {
             addNoteViewFragment()
@@ -92,13 +88,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
                 lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
                     val note = UserNotesDatabase.getRecord(noteId)
                     BackupManager.extractNotes(outputStream, listOf(note)) { result ->
-                        withContext(App.UI_DISPATCHER) {
-                            if (result) {
-                                GoodUtils.showToast(baseContext, R.string.result_success)
-                            } else {
-                                GoodUtils.showToast(baseContext, R.string.result_failed)
-                            }
-                        }
+                        showStatusMessage(result)
                     }
                 }
             } else {
@@ -205,7 +195,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
      * Native interface
      *
      */
-    private external fun initNativeConfigs(path: String)
+    private external fun initNativeConfigs()
 
     companion object {
         private const val TAG = "NotesViewActivity"

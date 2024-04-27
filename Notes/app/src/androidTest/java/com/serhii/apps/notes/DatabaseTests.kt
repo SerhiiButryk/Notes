@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 /**
- * Unit Tests for [com.serhii.apps.notes.database.NotesDatabaseProvider] class
+ * Unit Tests for [com.serhii.apps.notes.database.UserNotesDatabase] class
  */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -39,15 +39,12 @@ class DatabaseTests {
             Log.i(TAG, "cleanup()")
             UserNotesDatabase.close()
         }
-
     }
 
     @Before
     fun setup() {
         Log.i(TAG, "setup()")
-
         val notesDatabase = UserNotesDatabase
-
         // Delete records
         val records = UserNotesDatabase.getRecords()
         for (record in records) {
@@ -91,5 +88,4 @@ class DatabaseTests {
 
         Log.i(TAG, "test01_AddRecord() OUT")
     }
-
 }

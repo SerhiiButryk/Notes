@@ -5,7 +5,6 @@
 package com.serhii.apps.notes.control
 
 import android.content.Context
-import android.util.Base64
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App.RUNTIME_LIBRARY
@@ -17,7 +16,6 @@ import com.serhii.core.security.Crypto
  */
 object NativeBridge {
 
-    private val cryptoOpenssl = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
     private val cryptoAndroid = Crypto(Crypto.CRYPTO_PROVIDER_ANDROID)
 
     val userName: String
@@ -26,14 +24,7 @@ object NativeBridge {
     val isAppBlocked: Boolean
         get() = _isAppBlocked()
 
-    val unlockKey: String
-        get() {
-            val unlockKey = _getUnlockKey()
-            // Return decrypted result
-            return cryptoOpenssl.decrypt(unlockKey).message
-        }
-
-    var limitLeft: Int
+    var unlockLimit: Int
         get() {
             val message = _getLimitLeft()
             val result = cryptoAndroid.decrypt(message)
@@ -62,7 +53,7 @@ object NativeBridge {
         // Get limit value from prefs
         val limit = getLockLimit(context)
         if (limit != null) {
-            limitLeft = limit.toInt()
+            unlockLimit = limit.toInt()
         } else {
             Log.error("NativeBridge", "resetLoginLimitLeft() failed")
         }
@@ -74,14 +65,6 @@ object NativeBridge {
         return sharedPreferences.getString(context.getString(R.string.preference_login_limit_key), logLimitDefault)
     }
 
-    fun createUnlockKey() {
-        // Take the first 8 characters
-        val randomString = cryptoOpenssl.getRandomValue(8)
-        val encodedString = Base64.encode(randomString, Base64.NO_WRAP)
-        val encMessage = cryptoOpenssl.encrypt(String(encodedString))
-        _setUnlockKey(encMessage.message)
-    }
-
     private external fun _getUserName(): String
     private external fun _verifyPassword(userName: String, password: String): Boolean
     private external fun _setNewPassword(password: String): Boolean
@@ -90,8 +73,6 @@ object NativeBridge {
     private external fun _setLimitLeft(newValue: String)
     private external fun _executeBlockApp()
     private external fun _isAppBlocked(): Boolean
-    private external fun _getUnlockKey(): String
-    private external fun _setUnlockKey(unlockKey: String)
 
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
