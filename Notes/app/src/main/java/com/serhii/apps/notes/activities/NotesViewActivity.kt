@@ -112,7 +112,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
      */
     override fun onUserAuthorized() {
         info(TAG, "onUserAuthorized()")
-        notesViewModel.updateData()
+        notesViewModel.updateAllNotes()
     }
 
     override fun onOpenNote(note: NoteModel?) {
@@ -149,20 +149,14 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
     override fun onBackNavigation() {
         // Send a notification before we move back
         notifyAboutBackNavigation()
-
         val fm = supportFragmentManager
         fm.popBackStack()
-        // Notify View Model
-        notesViewModel.onBackNavigation()
     }
 
     override fun onBackPressed() {
         // Send a notification before we move back
         notifyAboutBackNavigation()
-
         super.onBackPressed()
-        // Notify View Model
-        notesViewModel.onBackNavigation()
     }
 
     private fun notifyAboutBackNavigation() {

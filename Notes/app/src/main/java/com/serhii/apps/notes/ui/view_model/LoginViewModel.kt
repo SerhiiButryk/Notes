@@ -48,8 +48,8 @@ class LoginViewModel : ViewModel() {
 
     fun proceedWithRegistration(authModel: AuthModel, biometricAuthenticator: BiometricAuthenticator?, fragmentActivity: FragmentActivity) {
         // Launch a new coroutine to handle this request
-        viewModelScope.launch(App.BACKGROUND_DISPATCHER
-                + CoroutineName("RegistrationRequest")) {
+        val context = App.BACKGROUND_DISPATCHER + CoroutineName("RegistrationRequest")
+        viewModelScope.launch(context) {
             authorizeService.onRegistration(authModel, biometricAuthenticator, fragmentActivity, this)
         }
     }

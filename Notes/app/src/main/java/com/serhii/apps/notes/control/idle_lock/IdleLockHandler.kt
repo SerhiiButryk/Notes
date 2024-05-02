@@ -10,13 +10,16 @@ import android.content.Intent
 import androidx.preference.PreferenceManager
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.activities.AuthorizationActivity
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.AppForegroundListener
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.detail
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -49,6 +52,8 @@ object IdleLockHandler {
         startLockTimeout(context, time)
     }
 
+    // TODO: Revisit global scope
+    @OptIn(DelicateCoroutinesApi::class)
     private fun startLockTimeout(context: Context, time: Long) {
 
         if (context is AuthorizationActivity) {
@@ -60,7 +65,7 @@ object IdleLockHandler {
 
         lastJob?.cancel()
 
-        lastJob = MainScope().launch {
+        lastJob = GlobalScope.launch(App.BACKGROUND_DISPATCHER) {
             Log.detail(TAG, "coroutine: started")
             delay(time)
             Log.detail(TAG, "coroutine: time elapsed")
@@ -69,12 +74,14 @@ object IdleLockHandler {
         }
     }
 
-    private fun onTimeout(context: Context) {
+    private suspend fun onTimeout(context: Context) {
         Log.detail(TAG, "onTimeout(), received inactivity timeout, time: " + Date(System.currentTimeMillis()))
         isInactivityTimeoutReceived.set(true)
         if (AppForegroundListener.isInForeground()) {
             Log.detail(TAG, "onTimeout(), in foreground, start auth activity")
-            startAuthActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
+            withContext(App.UI_DISPATCHER) {
+                startAuthActivity(context, Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
         }
     }
 

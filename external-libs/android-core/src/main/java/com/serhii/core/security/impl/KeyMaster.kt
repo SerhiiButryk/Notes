@@ -8,7 +8,7 @@ package com.serhii.core.security.impl
 import android.util.Base64
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
-import com.serhii.core.security.Crypto.Companion.KEY_MAX_SIZE
+import com.serhii.core.security.Crypto.Companion.KEY_SIZE
 import com.serhii.core.security.impl.crypto.Openssl
 
 /**
@@ -36,7 +36,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
         val encodedDerivedKey = String(Base64.encode(DERIVED_KEY_1, Base64.NO_WRAP))
 
         // 2. Create application key which is a random value
-        val appKey = providerOpenssl.getRandomValue(KEY_MAX_SIZE)
+        val appKey = providerOpenssl.getRandomValue(KEY_SIZE)
         val encodedAppKey = String(Base64.encode(appKey, Base64.NO_WRAP))
 
         // 3. Encrypt application key with derived key
@@ -55,7 +55,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
         val appKey = getAppKey()
         if (appKey.isNotEmpty()) {
             // 1. Create a random value for derived key
-            val derivedKey = providerOpenssl.getRandomValue(KEY_MAX_SIZE)
+            val derivedKey = providerOpenssl.getRandomValue(KEY_SIZE)
             val encodedDerivedKey = String(Base64.encode(derivedKey, Base64.NO_WRAP))
 
             // 2. Encrypt and save it
@@ -188,7 +188,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
     }
 
     fun createUnlockKey() {
-        val randomBytes = providerOpenssl.getRandomValue(Crypto.IV_MAX_SIZE)
+        val randomBytes = providerOpenssl.getRandomValue(Crypto.IV_SIZE)
         val encodedString = Base64.encode(randomBytes, Base64.NO_WRAP)
 
         val appKey = getAppKey()

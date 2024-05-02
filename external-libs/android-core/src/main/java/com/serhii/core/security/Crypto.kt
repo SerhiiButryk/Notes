@@ -78,9 +78,9 @@ class Crypto {
         const val CRYPTO_PROVIDER_ANDROID = "android"
 
         // Correct IV size
-        const val IV_MAX_SIZE = 16
+        const val IV_SIZE = 16
         // Correct key size
-        const val KEY_MAX_SIZE = 32
+        const val KEY_SIZE = 32
 
         const val TAG = "Crypto"
     }

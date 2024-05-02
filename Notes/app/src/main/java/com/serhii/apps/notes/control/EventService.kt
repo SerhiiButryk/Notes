@@ -84,7 +84,7 @@ object EventService : IEventService {
             }
 
             // Show biometrics
-            withContext(UI_DISPATCHER) {
+            withContext(App.UI_DISPATCHER) {
                 // If not null then can ask for Biometric login
                 biometricAuthenticator.authenticateInitial(object : BiometricAuthenticator.Listener {
 
@@ -137,7 +137,7 @@ object EventService : IEventService {
         // Safe check. Should not happen in a normal case.
         if (authModel.cipher == null) {
             Log.error(TAG, "onBiometricLogin(), cipher is null")
-            withContext(Dispatchers.Main) {
+            withContext(App.UI_DISPATCHER) {
                 GoodUtils.showToast(context, R.string.biometric_toast_message)
             }
         }
@@ -145,7 +145,7 @@ object EventService : IEventService {
         val success = crypto.getKeyMaster().initKeys(authModel.cipher!!)
         if (!success) {
             Log.error(TAG, "onBiometricLogin(), filed to init keys")
-            withContext(Dispatchers.Main) {
+            withContext(App.UI_DISPATCHER) {
                 GoodUtils.showToast(context, R.string.biometric_toast_message)
             }
         }
@@ -157,10 +157,12 @@ object EventService : IEventService {
     /**
      * Handle registration finished event
      */
-    override fun onRegistrationDone(context: Context) {
+    override fun onRegistrationDone(context: Context, coroutineScope: CoroutineScope) {
         Log.info(TAG, "onRegistrationDone()")
-        crypto.getKeyMaster().createUnlockKey()
-        NativeBridge.resetLoginLimitLeft(context)
+        coroutineScope.launch(App.BACKGROUND_DISPATCHER) {
+            crypto.getKeyMaster().createUnlockKey()
+            NativeBridge.resetLoginLimitLeft(context)
+        }
     }
 
     /**

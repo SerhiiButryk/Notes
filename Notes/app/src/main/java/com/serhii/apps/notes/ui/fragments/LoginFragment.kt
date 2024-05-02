@@ -46,15 +46,17 @@ class LoginFragment : BaseFragment(TAG) {
 
     private var biometricAuthManager: BiometricAuthenticator? = null
 
+    // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+    // of VM here. This will not be the same as we get in AuthorizationActivity.
+    private val viewModel: LoginViewModel by viewModels ({ requireActivity() })
+
     private val keyEventActionDone = OnEditorActionListener { v, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             if (getText(passwordField).isEmpty() || getText(emailField).isEmpty()) {
                 Toast.makeText(context, getString(R.string.empty_login), Toast.LENGTH_LONG).show()
                 return@OnEditorActionListener true
             }
-            // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-            // of VM here. This will not be the same as we get in AuthorizationActivity.
-            val viewModel: LoginViewModel by viewModels ({ requireActivity() })
+
             // Set data
             val authModel = createModel(
                 GoodUtils.getText(emailField),
@@ -75,10 +77,6 @@ class LoginFragment : BaseFragment(TAG) {
         override fun onSuccess(cipher: Cipher) {
             Log.info(TAG, "BiometricAuthenticator::onSuccess()")
 
-            // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-            // of VM here. This will not be the same as we get in AuthorizationActivity.
-            val viewModel: LoginViewModel by viewModels ({ requireActivity() })
-
             val authModel = createModel(cipher, AuthorizeType.AUTH_BIOMETRIC_LOGIN)
             viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
         }
@@ -94,10 +92,6 @@ class LoginFragment : BaseFragment(TAG) {
         super.onAttach(context)
         if (BiometricAuthenticator.biometricsAvailable(context)) {
             biometricAuthManager = BiometricAuthenticator()
-            biometricAuthManager?.init(context, this,
-            getString(R.string.biometric_prompt_title),
-            getString(R.string.biometric_prompt_subtitle),
-            getString(android.R.string.cancel))
         }
     }
 
@@ -144,11 +138,13 @@ class LoginFragment : BaseFragment(TAG) {
             emailLayout.visibility = View.GONE
         }
 
-        fingerprintBtn.setOnClickListener { biometricAuthManager?.authenticate(authListener) }
-
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in AuthorizationActivity.
-        val viewModel: LoginViewModel by viewModels ({ requireActivity() })
+        fingerprintBtn.setOnClickListener {
+            biometricAuthManager?.init(requireContext(), this,
+                getString(R.string.biometric_prompt_title),
+                getString(R.string.biometric_prompt_subtitle),
+                getString(android.R.string.cancel))
+            biometricAuthManager?.authenticate(authListener)
+        }
 
         titleLabel.text = getString(R.string.title_login)
         registerAccountBtn.setOnClickListener { viewModel.requestRegistrationUI() }

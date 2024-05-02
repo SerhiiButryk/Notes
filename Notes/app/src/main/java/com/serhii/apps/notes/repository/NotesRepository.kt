@@ -12,37 +12,23 @@ import com.serhii.apps.notes.ui.data_model.NoteModel
  * The class is an entry point to a database in the app
  * Encapsulates logic related to retrieving data from a database provider
  */
-class NotesRepository(private val callback: DataChangedListener) {
+class NotesRepository() {
 
     fun close() {
         UserNotesDatabase.close()
     }
 
     fun delete(index: String): Boolean {
-        val result = UserNotesDatabase.deleteRecord(index)
-        if (result) {
-            callback.updateData()
-        }
-        return result
+        return UserNotesDatabase.deleteRecord(index)
     }
 
-    fun add(noteModel: NoteModel): Boolean {
-        // Save data in database
-        val result = UserNotesDatabase.addRecord(noteModel)
-        if (result != -1 && result != 0) {
-            callback.updateData()
-            return true
-        }
+    fun add(noteModel: NoteModel): Int {
         // Failed to save data
-        return false
+        return UserNotesDatabase.addRecord(noteModel)
     }
 
     fun update(index: String, noteModel: NoteModel): Boolean {
-        val result = UserNotesDatabase.updateRecord(index, noteModel)
-        if (result) {
-            callback.updateData()
-        }
-        return result
+        return UserNotesDatabase.updateRecord(index, noteModel)
     }
 
     fun get(index: String): NoteModel {
@@ -53,11 +39,4 @@ class NotesRepository(private val callback: DataChangedListener) {
         return UserNotesDatabase.getRecords()
     }
 
-}
-
-/**
- * Interface for notifying View Model that data has been changed
- */
-interface DataChangedListener {
-    fun updateData()
 }

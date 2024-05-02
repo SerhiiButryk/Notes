@@ -8,8 +8,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,13 +42,17 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
     private lateinit var hintNotesImage: ImageView
     private lateinit var hintNotesText: TextView
 
-    private val dataChangedObserver = Observer<List<NoteModel>> { newNotes ->
-        info(TAG, "onChanged() new data has been received, size = ${newNotes.size}")
-        updateUI(newNotes)
+    // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+    // of VM here. This will not be the same as we get in NotesViewActivity.
+    private val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+
+    private val dataChangedObserver = Observer<NotesViewModel.NotesUIState> { uiState ->
+        Log.info(TAG, "onChanged() new data has been received, size = ${uiState.currentNotes.size}")
+        updateUI(uiState.currentNotes)
     }
 
     private val searchObserver = Observer<List<NoteModel>> { newNotes ->
-        info(TAG, "onChanged() new search results have been received, size = ${newNotes.size}")
+        Log.info(TAG, "onChanged() new search results have been received, size = ${newNotes.size}")
         updateUI(newNotes, true)
     }
 
@@ -107,13 +109,9 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+        viewModel.getUIState().observe(viewLifecycleOwner, dataChangedObserver)
 
-        viewModel.getNotes().observe(requireActivity(), dataChangedObserver)
-
-        viewModel.getDisplayNoteMode().observe(requireActivity()) { mode ->
+        viewModel.getDisplayNoteMode().observe(viewLifecycleOwner) { mode ->
             if (mode == DISPLAY_MODE_LIST) {
                 notesRecyclerView.layoutManager = LinearLayoutManager(context)
             } else if (mode == DISPLAY_MODE_GRID) {
@@ -151,10 +149,6 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
 
     @SuppressLint("NonConstantResourceId", "NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-
         when (item.itemId) {
             R.id.settings_item -> {
                 startActivity(Intent(activity, SettingsActivity::class.java))
@@ -179,10 +173,6 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
     }
 
     private fun updateDisplayModeIcon(menuItem: MenuItem) {
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-
         val mode = viewModel.getDisplayNoteMode().value
         if (mode == NoteModel.LIST_NOTE_VIEW_TYPE) {
             // Update icon
@@ -197,9 +187,6 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
 
     override fun onSearchStarted(query: String) {
         Log.info(TAG, "onSearchStarted()")
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
         // Start observing data change events for this search
         viewModel.getSearchResults().removeObserver(searchObserver)
         viewModel.getSearchResults().observe(viewLifecycleOwner, searchObserver)
@@ -209,13 +196,10 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
 
     override fun onSearchFinished() {
         Log.info(TAG, "onSearchFinished()")
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val notesViewModel: NotesViewModel by viewModels ({ requireActivity() })
         // Start observing data change events for this search
-        notesViewModel.getSearchResults().removeObserver(searchObserver)
+        viewModel.getSearchResults().removeObserver(searchObserver)
         // Update data
-        notesViewModel.updateData()
+        viewModel.updateAllNotes()
     }
 
     private fun updateIconAndTextHint(notes: List<NoteModel>, isSearch: Boolean = false) {

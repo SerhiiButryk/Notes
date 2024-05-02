@@ -44,25 +44,28 @@ internal object LogImpl : ILog {
     private fun logInternal(tag: String, message:  String, level: Int) {
 
         if (versionCodeInfoSet && !firstCall) {
-            // Log debug information only once
+            // Log this info once
             Log.i(TAG, getDebugInformation())
             firstCall = true
         }
 
-        val predicate: String = when (level) {
-            ERROR, INFO -> DELIMITER + tag + DELIMITER
-            DETAIL -> "DETAIL$DELIMITER$tag$DELIMITER"
-            else -> ""
-        }
+        val predicate: String = tag + DELIMITER
+        val messageFormatted = predicate + message
 
-        val messageFormatted = predicate + message;
+        var appTag = TAG
+        if (level == DETAIL) {
+            appTag += "-DETAIL"
+        }
 
         when (level) {
             ERROR -> {
-                Log.e(TAG, messageFormatted)
+                Log.e(appTag, messageFormatted)
             }
-            INFO, DETAIL -> {
-                Log.i(TAG, messageFormatted)
+            INFO -> {
+                Log.i(appTag, messageFormatted)
+            }
+            DETAIL -> {
+                Log.v(appTag, messageFormatted)
             }
         }
     }

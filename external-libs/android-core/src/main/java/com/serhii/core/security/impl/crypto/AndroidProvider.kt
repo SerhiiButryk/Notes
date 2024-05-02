@@ -72,8 +72,8 @@ internal class AndroidProvider : BaseProvider() {
             var _iv = inputIV
             var realMessage = message
             if (_iv.isEmpty()) {
-                _iv = message.substring(0, Crypto.IV_MAX_SIZE)
-                realMessage = message.substring(Crypto.IV_MAX_SIZE)
+                _iv = message.substring(0, Crypto.IV_SIZE)
+                realMessage = message.substring(Crypto.IV_SIZE)
             }
 
             val iv = Base64.decode(_iv.toByteArray(), Base64.NO_WRAP)

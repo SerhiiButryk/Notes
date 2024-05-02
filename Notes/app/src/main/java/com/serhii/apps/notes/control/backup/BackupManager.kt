@@ -10,10 +10,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.core.log.Log.Companion.detail
-import com.serhii.core.log.Log.Companion.error
-import com.serhii.core.log.Log.Companion.info
+import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
+import com.serhii.core.security.Hash
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -24,19 +23,19 @@ object BackupManager {
     private val noteShouldBeUpdated: MutableLiveData<Boolean> = MutableLiveData(false)
 
     suspend fun extractNotes(outputStream: OutputStream?, notes: List<NoteModel>, callback: suspend (Boolean) -> Unit) {
-        info(TAG, "extractNotes()")
+        Log.info(TAG, "extractNotes()")
         val result = saveDataAsPlainText(outputStream, notes)
         callback(result)
     }
 
     suspend fun backupNotes(key: String, outputStream: OutputStream, callback: suspend (Boolean) -> Unit) {
-        info(TAG, "backupNotes() starting...")
+        Log.info(TAG, "backupNotes() starting...")
         val result = backupData(outputStream, key)
         callback(result)
     }
 
     suspend fun restoreNotes(key: String, inputStream: InputStream, callback: suspend (Boolean) -> Unit) {
-        info(TAG, "restoreNotes() starting...")
+        Log.info(TAG, "restoreNotes() starting...")
         val json = readBackupFile(inputStream)
         val result = restoreData(json, key)
         callback(result)
@@ -50,7 +49,7 @@ object BackupManager {
                 content.append(String(buffer))
             }
         } catch (e: Exception) {
-            error(TAG, "readBackupFile() exception while reading the file: $e")
+            Log.error(TAG, "readBackupFile() exception while reading the file: $e")
             e.printStackTrace()
             return ""
         } finally {
@@ -68,16 +67,16 @@ object BackupManager {
     }
 
     fun onDataUpdated() {
-        noteShouldBeUpdated.value = false
+        noteShouldBeUpdated.postValue(false)
     }
 
     fun openDirectoryChooserForExtractData(activity: Activity) {
-        info(TAG, "openDirectoryChooser()")
+        Log.info(TAG, "openDirectoryChooser()")
         activity.startActivityForResult(createIntent(FILE_NAME_EXTRACTED_DATA), REQUEST_CODE_EXTRACT_NOTES)
     }
 
     fun openDirectoryChooserForBackup(activity: Activity) {
-        info(TAG, "openDirectoryChooserForBackup()")
+        Log.info(TAG, "openDirectoryChooserForBackup()")
         activity.startActivityForResult(createIntent(FILE_NAME_BACKUP_DATA), REQUEST_CODE_BACKUP_NOTES)
     }
 
@@ -92,7 +91,7 @@ object BackupManager {
     }
 
     private fun saveDataAsPlainText(outputStream: OutputStream?, notes: List<NoteModel>): Boolean {
-        info(TAG, "saveDataAsPlainText()")
+        Log.info(TAG, "saveDataAsPlainText()")
         try {
             if (notes.isNotEmpty()) {
                 val builder = StringBuilder()
@@ -108,64 +107,74 @@ object BackupManager {
                     outputStream?.write(data.toByteArray())
                     outputStream?.flush()
                     outputStream?.close()
-                    info(TAG, "saveDataAsPlainText() done")
+                    Log.info(TAG, "saveDataAsPlainText() done")
                     return true
                 } else {
-                    info(TAG, "saveDataAsPlainText() empty data")
+                    Log.info(TAG, "saveDataAsPlainText() empty data")
                 }
             } else {
-                info(TAG, "saveDataAsPlainText() empty note list")
+                Log.info(TAG, "saveDataAsPlainText() empty note list")
             }
         } catch (e: Exception) {
-            error(TAG, "saveDataAsPlainText() error: $e")
+            Log.error(TAG, "saveDataAsPlainText() error: $e")
             e.printStackTrace()
         }
         return false
     }
 
     private fun backupData(outputStream: OutputStream?, key: String): Boolean {
-        info(TAG, "backupDataAsEncryptedText() found records: " + UserNotesDatabase.recordsCount)
+        Log.info(TAG, "backupDataAsEncryptedText() found records: " + UserNotesDatabase.recordsCount)
 
         if (UserNotesDatabase.recordsCount != 0) {
             val notes = UserNotesDatabase.getRecords()
             val json = NoteModel.convertNoteListToJson(notes)
 
             val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
-            val result = crypto.encrypt(json, key)
+            val result = crypto.encrypt(json, Hash.hashMD5(key))
+
+            if (!result.errorOk) {
+                Log.error(TAG, "backupDataAsEncryptedText() failed to encrypt")
+                return false
+            }
 
             try {
                 outputStream?.write(result.message.toByteArray())
                 outputStream?.flush()
                 outputStream?.close()
             } catch (e: IOException) {
-                error(TAG, "backupDataAsEncryptedText() error: $e")
+                Log.error(TAG, "backupDataAsEncryptedText() error: $e")
                 e.printStackTrace()
                 return false
             }
 
-            info(TAG, "backupDataAsEncryptedText() success OUT")
+            Log.info(TAG, "backupDataAsEncryptedText() success OUT")
             return true
         } else {
-            info(TAG, "backupDataAsEncryptedText() database is empty")
+            Log.info(TAG, "backupDataAsEncryptedText() database is empty")
         }
 
-        info(TAG, "backupDataAsEncryptedText() failure OUT")
+        Log.info(TAG, "backupDataAsEncryptedText() failure OUT")
         return false
     }
 
     private fun restoreData(json: String, key: String): Boolean {
-        detail(TAG, "restoreData() IN")
+        Log.info(TAG, "restoreData() IN")
 
         val crypto = Crypto(Crypto.CRYPTO_PROVIDER_OPENSSL)
-        val messageJson = crypto.decrypt(json, key)
+        val result = crypto.decrypt(json, Hash.hashMD5(key))
 
-        val notes = NoteModel.convertJsonToNoteList(messageJson.message)
+        if (!result.errorOk) {
+            Log.error(TAG, "restoreData() failed to decrypt")
+            return false
+        }
+
+        val notes = NoteModel.convertJsonToNoteList(result.message)
 
         for (note in notes) {
             UserNotesDatabase.addRecord(note)
         }
 
-        noteShouldBeUpdated.value = true
+        noteShouldBeUpdated.postValue(true)
 
         return true
     }

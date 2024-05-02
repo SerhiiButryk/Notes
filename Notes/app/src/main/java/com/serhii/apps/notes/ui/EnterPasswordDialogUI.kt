@@ -14,9 +14,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.serhii.apps.notes.R
+import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
 class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogFragment() {
+
+    private lateinit var passwordField: EditText
 
     @SuppressLint("InflateParams")
     override fun initView(inflater: LayoutInflater): ViewGroup {
@@ -26,8 +29,8 @@ class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogF
 
         val title = dialogView.findViewById<TextView>(R.id.title_dialog)
         title.text = bundle!!.getString(EXTRA_TITLE_TEXT)
-        val editTextField = dialogView.findViewById<EditText>(R.id.edit_text_field)
-        editTextField.requestFocus()
+        passwordField = dialogView.findViewById<EditText>(R.id.edit_text_field)
+        passwordField.requestFocus()
 
         val info = dialogView.findViewById<TextView>(R.id.info_dialog)
         info.text = bundle.getString(EXTRA_HINT_TEXT)
@@ -35,15 +38,15 @@ class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogF
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
         okButton.setOnClickListener {
             if (listener != null) {
-                listener.onOk(getText(editTextField), context)
+                listener.onOk(getText(passwordField), context)
                 dismiss()
             }
         }
 
         // By default
         okButton.setEnabled(false)
-        val textChecker = TextChecker(editTextField, okButton)
-        editTextField.addTextChangedListener(textChecker)
+        val textChecker = TextChecker(passwordField, okButton)
+        passwordField.addTextChangedListener(textChecker)
         val cancelButton = dialogView.findViewById<Button>(R.id.btn_cancel)
         cancelButton.setOnClickListener {
             listener?.onCancel(context)
@@ -51,6 +54,11 @@ class EnterPasswordDialogUI(private val listener: DialogListener?) : BaseDialogF
         }
 
         return dialogView
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GoodUtils.showKeyboard(requireContext(), passwordField)
     }
 
     private class TextChecker(private val password: EditText, private val okButton: Button) : TextWatcher {

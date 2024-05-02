@@ -16,10 +16,8 @@ import com.serhii.apps.notes.control.preferences.PreferenceManager.getNoteDispla
 import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.repository.NotesRepository
-import com.serhii.apps.notes.repository.DataChangedListener
 import com.serhii.apps.notes.ui.search.search
 import com.serhii.core.log.Log
-import com.serhii.core.log.Log.Companion.info
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 
@@ -27,32 +25,40 @@ import kotlinx.coroutines.launch
  * View model for managing UI state of NotesViewActivity
  *
  * Responsibilities:
- * 1) Save/Retrieve data to a database
+ * 1) Save/Retrieve data to/from a database
  * 2) Hold data during config changes
  * 3) Access and update the UI state
  */
-class NotesViewModel(application: Application) : AndroidViewModel(application), DataChangedListener {
+class NotesViewModel(application: Application) : AndroidViewModel(application) {
 
-    // User's notes list
-    private val notes = MutableLiveData<List<NoteModel>>()
+    // UI state observable data
+    private val uiState = MutableLiveData<NotesUIState>()
 
     // This is the result of a text search in user's note items
     private val searchResults = MutableLiveData<List<NoteModel>>()
 
     private val displayNoteMode = MutableLiveData<Int>()
 
+    // UI State class
+    class NotesUIState(val currentNotes: List<NoteModel> = emptyList(),
+                       val lastNoteId: Int = -1,
+                       val actionId: Int = ACTION_NONE,
+                       val success: Boolean = false,
+                       // We have situations when the last state can be delivered again.
+                       // For example, user opened Editor Fragment, saved/updated note, then closed it
+                       // and opened a new Editor Fragment to create a new note. In this case Editor Fragment receives
+                       // the last UI state which is not okay. Added this to work-around this case.
+                       var processed: Boolean = false)
+
     fun getDisplayNoteMode(): LiveData<Int> = displayNoteMode
 
-    var cachedUserNotes: List<NoteModel>? = null
-        private set
-
-    private val notesRepository: NotesRepository = NotesRepository(this)
+    private val notesRepository: NotesRepository = NotesRepository()
 
     private val backupDataObserver: Observer<Boolean> =
         Observer { shouldUpdateData ->
             if (shouldUpdateData) {
-                info(TAG, "onChanged() got data change event, retrieving new data")
-                updateData()
+                Log.info(TAG, "onChanged() got data change event, retrieving new data")
+                updateAllNotes()
                 BackupManager.onDataUpdated()
             }
         }
@@ -61,7 +67,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         // Init database
         UserNotesDatabase.init(application)
 
-        notes.value = ArrayList()
+        uiState.value = NotesUIState()
 
         val mode = getNoteDisplayModePref(application.applicationContext)
         displayNoteMode.value = mode
@@ -69,58 +75,80 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
         // Subscribe for updates from backup manager
         BackupManager.getUpdateDataFlagData().observeForever(backupDataObserver)
 
-        info(TAG, "NotesViewModel(), instance is created")
+        Log.info(TAG, "NotesViewModel(), instance is created")
     }
 
     override fun onCleared() {
         super.onCleared()
         notesRepository.close()
         BackupManager.getUpdateDataFlagData().removeObserver(backupDataObserver)
-        info(TAG, "onCleared()")
+        Log.info(TAG, "onCleared()")
     }
 
-    fun getNotes(): LiveData<List<NoteModel>> {
-        return notes
-    }
-
-    fun cacheUserNote(userListCached: List<NoteModel>?) {
-        cachedUserNotes = userListCached
-    }
-
-    fun onBackNavigation() {
-        // Clear cached data. We don't need it anymore.
-        cachedUserNotes = null
+    fun getUIState(): LiveData<NotesUIState> {
+        return uiState
     }
 
     fun setDisplayNoteMode(newMode: Int) {
         displayNoteMode.value = newMode
     }
 
-    fun deleteNote(index: String): Boolean {
-        info(TAG, "deleteNote()")
-        return notesRepository.delete(index)
+    fun deleteNote(index: String?) {
+        viewModelScope.launch(BACKGROUND_DISPATCHER) {
+            Log.info(TAG, "deleteNote()")
+            if (index.isNullOrEmpty()) {
+                Log.info(TAG, "deleteNote() empty")
+                uiState.postValue(NotesUIState(actionId = ACTION_DELETED, success = false))
+            } else {
+                val result = notesRepository.delete(index)
+                uiState.postValue(NotesUIState(actionId = ACTION_DELETED, success = result))
+            }
+        }
     }
 
-    fun addNote(noteModel: NoteModel): Boolean {
-        info(TAG, "addNote()")
+    private fun addNote(noteModel: NoteModel): Int {
+        Log.info(TAG, "addNote()")
         return notesRepository.add(noteModel)
     }
 
-    fun updateNote(index: String, noteModel: NoteModel): Boolean {
-        info(TAG, "updateNote(), index = $index")
-        return notesRepository.update(index, noteModel)
+    fun saveNote(index: String?, noteModel: NoteModel) {
+        viewModelScope.launch(BACKGROUND_DISPATCHER) {
+            Log.info(TAG, "saveNote(), index = $index")
+            var noteid = -1
+            var result = false
+            // Update note by passed index if exists or add a new one
+            if (index.isNullOrEmpty()) {
+                noteid = addNote(noteModel)
+            } else {
+                val note = notesRepository.get(index)
+                if (!note.isEmpty) {
+                    result = notesRepository.update(index, noteModel)
+                } else {
+                    noteid = addNote(noteModel)
+                }
+            }
+
+            val notes = notesRepository.getAll()
+
+            // Update ui state
+            if ((noteid != -1 && noteid != 0) || result) {
+                uiState.postValue(NotesUIState(notes, noteid, ACTION_SAVE, true))
+            } else {
+                uiState.postValue(NotesUIState(notes, noteid, ACTION_SAVE, false))
+            }
+        }
     }
 
     fun getNote(index: String): NoteModel {
-        info(TAG, "getNote(), index = $index")
+        Log.info(TAG, "getNote(), index = $index")
         return notesRepository.get(index)
     }
 
-    override fun updateData() {
+    fun updateAllNotes() {
         viewModelScope.launch(BACKGROUND_DISPATCHER) {
-            Log.info(TAG, "updateData(), get all records")
-            val data = notesRepository.getAll()
-            notes.postValue(data)
+            Log.info(TAG, "updateAllNotes()")
+            val notes = notesRepository.getAll()
+            uiState.postValue(NotesUIState(notes))
         }
     }
 
@@ -136,12 +164,16 @@ class NotesViewModel(application: Application) : AndroidViewModel(application), 
             } else {
                 notesRepository.getAll()
             }
-                // Start a search
-                search(query, noteForSearchList, searchResults)
+            // Start a search
+            search(query, noteForSearchList, searchResults)
         }
     }
 
     companion object {
         private const val TAG = "NotesViewModel"
+
+        val ACTION_NONE = -1
+        val ACTION_SAVE = 1
+        val ACTION_DELETED = 2
     }
 }

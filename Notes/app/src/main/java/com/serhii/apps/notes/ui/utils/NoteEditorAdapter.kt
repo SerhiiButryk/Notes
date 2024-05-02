@@ -177,8 +177,8 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setDataChanged(newData: MutableList<NoteModel>) {
-        setData(newData)
+    fun setDataChanged(newData: List<NoteModel>) {
+        setData(newData.toMutableList())
         notifyDataSetChanged()
     }
 

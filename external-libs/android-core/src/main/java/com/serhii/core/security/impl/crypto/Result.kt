@@ -15,7 +15,7 @@ data class Result(
 
     // A message without IV data part
     val realMessage = if (hasIV && message.isNotEmpty())
-        message.substring(Crypto.IV_MAX_SIZE) else message
+        message.substring(Crypto.IV_SIZE) else message
 
     val errorOk: Boolean
         get() = error === CryptoError.OK

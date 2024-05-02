@@ -25,6 +25,8 @@ import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter
 import com.serhii.apps.notes.ui.utils.TextChangeNotifier
 import com.serhii.apps.notes.ui.view_model.NotesViewModel
+import com.serhii.apps.notes.ui.view_model.NotesViewModel.Companion.ACTION_DELETED
+import com.serhii.apps.notes.ui.view_model.NotesViewModel.Companion.ACTION_SAVE
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils
@@ -43,6 +45,10 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
     private var action: String? = null
     private var noteId: String? = null
     private val noteEditorAdapter = NoteEditorAdapter()
+
+    // We should specify ViewModelStoreOwner, because otherwise we get a different instance
+    // of VM here. This will not be the same as we get in NotesViewActivity.
+    private val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
     fun getNoteId() = noteId
 
@@ -107,6 +113,66 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
         }
     }
 
+    /**
+     * UI state updates
+     */
+    private val uiStateObserver = Observer<NotesViewModel.NotesUIState> { uiState ->
+        Log.info(TAG, "onChanged() got new update")
+
+        // If this is already processed, then return
+        if (uiState.processed) {
+            Log.info(TAG, "onChanged() already processed this state, ignoring")
+            return@Observer
+        }
+
+        val lastNoteId = uiState.lastNoteId
+        val currentNotes = uiState.currentNotes
+        val success = uiState.success
+        val actionId = uiState.actionId
+
+        if (actionId == ACTION_SAVE) {
+
+            /*
+                Update note id
+            */
+            if (lastNoteId != -1) {
+                noteId = lastNoteId.toString()
+            }
+
+            /*
+                Display info toast message
+            */
+            if (success) {
+                Log.info(TAG, "onChanged() saved new note")
+                showToast(requireContext(), R.string.toast_action_message)
+            } else {
+                Log.info(TAG, "onChanged() failed to save")
+                showToast(requireContext(), R.string.result_failed)
+            }
+
+            /*
+                Note has changed
+            */
+            if (currentNotes.isNotEmpty()) {
+                Log.info(TAG, "onChanged() refresh data")
+                updateUI()
+            }
+
+        } else if (actionId == ACTION_DELETED) {
+            if (success) {
+                Log.info(TAG, "onChanged() deleted")
+                showToast(requireContext(), R.string.toast_action_deleted_message)
+                interaction.onDeleteNote()
+            } else {
+                Log.info(TAG, "onChanged() failed to delete")
+                // Show warning message otherwise
+                showToast(requireContext(), R.string.toast_action_deleted_message_no_note)
+            }
+        }
+
+        uiState.processed = true
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         interaction = try {
@@ -168,25 +234,8 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
         noteId = requireArguments().getString(ARG_NOTE_ID)
 
         processArgs()
-    }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-        viewModel.cacheUserNote(noteEditorAdapter.getNoteList())
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-        val cachedList = viewModel.cachedUserNotes
-        if (cachedList != null) {
-            noteEditorAdapter.setDataChanged(cachedList.toMutableList())
-        }
+        viewModel.getUIState().observe(viewLifecycleOwner, uiStateObserver)
     }
 
     override fun onNavigateBack() {
@@ -202,25 +251,25 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
                 GoodUtils.showKeyboard(requireContext(), titleNoteField)
             }
         } else if (action == ACTION_NOTE_OPEN) {
-            // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-            // of VM here. This will not be the same as we get in NotesViewActivity.
-            val viewModel: NotesViewModel by viewModels ({ requireActivity() })
+           updateUI()
+        }
+    }
 
-            val note = viewModel.getNote(noteId!!)
+    private fun updateUI() {
+        val note = viewModel.getNote(noteId!!)
 
-            // Set note title
-            titleNoteField.setText(note.title)
+        // Set note title
+        titleNoteField.setText(note.title)
 
-            // Set new data to list adapter. After that recycle view will be updated with
-            // new data from list.
-            noteEditorAdapter.setNoteData(note)
-            val timeDate = note.time
+        // Set new data to list adapter. After that recycle view will be updated with
+        // new data from list.
+        noteEditorAdapter.setNoteData(note)
+        val timeDate = note.time
 
-            if (timeDate.isNotEmpty()) {
-                val timeDateString = getString(R.string.time_date_label)
-                noteTimeFiled.text = String.format(timeDateString, timeDate)
-                noteTimeFiled.visibility = View.VISIBLE
-            }
+        if (timeDate.isNotEmpty()) {
+            val timeDateString = getString(R.string.time_date_label)
+            noteTimeFiled.text = String.format(timeDateString, timeDate)
+            noteTimeFiled.visibility = View.VISIBLE
         }
     }
 
@@ -238,10 +287,6 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
             return
         }
 
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-
         // Start observing data change events for this search
         viewModel.getSearchResults().removeObserver(searchObserver)
         viewModel.getSearchResults().observe(viewLifecycleOwner, searchObserver)
@@ -256,10 +301,6 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
             Log.error(TAG, "onSearchFinished() unexpected error, noteId == null")
             return
         }
-
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
 
         // We should reset selection on NotesViewFragment when SearchView is closed
         val note = viewModel.getNote(noteId!!)
@@ -347,25 +388,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
             return
         }
 
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-
-        val result: Boolean = if (action == ACTION_NOTE_OPEN) {
-            info(TAG, "saveUserNote() updated note")
-            viewModel.updateNote(noteId!!, notes)
-        } else {
-            info(TAG, "saveUserNote() add new note")
-            viewModel.addNote(notes)
-        }
-
-        /*
-            Display info toast message
-        */
-        if (result) {
-            info(TAG, "saveUserNote() saved new note")
-            showToast(requireContext(), R.string.toast_action_message)
-        }
+        viewModel.saveNote(noteId, notes)
     }
 
     private fun deleteNote() {
@@ -374,18 +397,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
             return
         }
 
-        // We should specify ViewModelStoreOwner, because otherwise we get a different instance
-        // of VM here. This will not be the same as we get in NotesViewActivity.
-        val viewModel: NotesViewModel by viewModels ({ requireActivity() })
-
-        // Delete if this note already exists
-        if (noteId != null && viewModel.deleteNote(noteId!!)) {
-            showToast(requireContext(), R.string.toast_action_deleted_message)
-            interaction.onDeleteNote()
-        } else {
-            // Show warning message otherwise
-            showToast(requireContext(), R.string.toast_action_deleted_message_no_note)
-        }
+        viewModel.deleteNote(noteId)
     }
 
     interface EditorNoteInteraction {

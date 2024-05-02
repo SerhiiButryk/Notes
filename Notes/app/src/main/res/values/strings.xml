@@ -203,7 +203,7 @@
     <string name="info_author">Author: Serhii Butryk</string>
 
     <string name="search_title">Search</string>
-    <string name="message_email_app_not_found">К сожалению, у вас нет приложения почты. Невозможно выполнить это действие.</string>
+    <string name="message_email_app_not_found">Sorry, you don\'t have email app. Cannot complete this action.</string>
 
     <string name="save_note_in_file">Extract this note</string>
 

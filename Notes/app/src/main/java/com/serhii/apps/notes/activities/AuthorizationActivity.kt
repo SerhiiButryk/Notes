@@ -110,7 +110,7 @@ class AuthorizationActivity : AppBaseActivity() {
         val loginFragment = supportFragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
         if (loginFragment != null) {
             loginFragment.onUserAccountCreated()
-            EventService.onRegistrationDone(this)
+            EventService.onRegistrationDone(this, lifecycleScope)
         } else {
             Log.error(TAG, "userRegistered(), loginFragment is null")
         }

@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import android.content.Context
 import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import com.serhii.core.CoreEngine
@@ -95,7 +94,7 @@ class BiometricAuthenticator {
             .setTitle(title)
             .setSubtitle(subtitle)
             .setNegativeButtonText(buttonText)
-            .setAllowedAuthenticators(BIOMETRIC_STRONG)
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
             .build()
     }
 
@@ -114,18 +113,13 @@ class BiometricAuthenticator {
             return pm.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
         }
 
-        private fun canAuthenticate(context: Context?): Boolean {
-            val biometricManager = BiometricManager.from(
-                context!!
-            )
-            val result = biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+        private fun canAuthenticate(context: Context): Boolean {
+            val biometricManager = BiometricManager.from(context)
+            val result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
             if (result) {
                 Log.info(TAG, "Biometric are available")
             } else {
-                Log.info(
-                    TAG,
-                    "Biometric are NOT available (NOT enrolled or device doesn't support it)"
-                )
+                Log.info(TAG, "Biometric are NOT available (NOT enrolled or device doesn't support it)")
             }
             return result
         }
