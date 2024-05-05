@@ -167,6 +167,8 @@ object EventService : IEventService {
 
     /**
      * Handle change password event
+     *
+     * TODO: Improve to work with KeyMater
      */
     override fun onChangePassword(newPassword: String): Boolean {
         return NativeBridge.setNewPassword(Hash.hashMD5(newPassword))

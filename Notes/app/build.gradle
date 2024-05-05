@@ -67,6 +67,7 @@ android {
 }
 
 // SpotBugs tasks
+// Run "./gradlew check" to execute these checks
 tasks.withType(SpotBugsTask) {
     // Dependent tasks
     dependsOn 'assembleDebug'

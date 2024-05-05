@@ -42,11 +42,11 @@
     <string name="btn_create_user">Continue</string>
     <string name="login_btn">Login</string>
     <string name="create_account_bnt">Done</string>
-    <string name="usr_psw">Your user password</string>
-    <string name="usr_email">Your user email</string>
-    <string name="usr_new_psw">Enter your password</string>
-    <string name="usr_approve_new_psw">Repeat your password</string>
-    <string name="usr_new_email">Enter your user email</string>
+    <string name="usr_psw">Password</string>
+    <string name="usr_email">Email</string>
+    <string name="usr_new_psw">Password</string>
+    <string name="usr_approve_new_psw">Confirm password</string>
+    <string name="usr_new_email">Email</string>
     <string name="title_login">Welcome</string>
     <string name="title_reg">Registration</string>
     <string name="login_with_biometric">Login with biometric</string>
@@ -58,10 +58,10 @@
     <string name="empty_string"> </string>
 
     // NoteEditor
-    <string name="title_note">Enter your note title</string>
-    <string name="body_note">Start typing your note</string>
+    <string name="title_note">Note title</string>
+    <string name="body_note">Your note</string>
     <string name="time_date_label">Updated: %s</string>
-    <string name="title_toolbar">Note editor</string>
+    <string name="title_toolbar">Editor</string>
 
     <string name="toast_action_message">Note is saved</string>
     <string name="toast_action_deleted_message">Note is deleted</string>
@@ -85,7 +85,7 @@
     <string name="action_layout_list" translatable="false">Convert to list</string>
 
     // PreferenceActivity
-    <string name="preference_title">App settings</string>
+    <string name="preference_title">Settings</string>
 
     <string name="preference_change_password_key" translatable="false">change_password</string>
     <string name="preference_change_password_title">Change password</string>
@@ -161,13 +161,13 @@
     <string name="preference_unlock_note_title">Unlock key</string>
 
     // Change password dialog
-    <string name="hint_new_password">Enter new password</string>
-    <string name="hint_old_password">Enter your current password</string>
+    <string name="hint_new_password">New password</string>
+    <string name="hint_old_password">Current password</string>
     <string name="change_password_title_dialog">Change your password</string>
 
     <string name="change_password_toast_not_correct_password">Entered current password is not correct</string>
     <string name="change_password_toast_password_set">Password is set</string>
-    <string name="change_password_toast_password_error">Error occurred. Sorry.</string>
+    <string name="change_password_toast_password_error">Error. Sorry.</string>
 
     // Enter keyword dialog
     <string name="set_password_dialog_title">Enter a keyword to encrypt your data</string>

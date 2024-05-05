@@ -39,13 +39,13 @@
     // Login Activity
     <string name="text_description">Вітаєм у додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
     <string name="btn_create_user">Далі</string>
-    <string name="login_btn">Війти</string>
+    <string name="login_btn">Вхід</string>
     <string name="create_account_bnt">Далі</string>
-    <string name="usr_psw">Пароль користувача</string>
-    <string name="usr_email">Електронна пошта користувача</string>
-    <string name="usr_new_psw">Уведіть пароль</string>
+    <string name="usr_psw">Пароль</string>
+    <string name="usr_email">Пошта</string>
+    <string name="usr_new_psw">Пароль</string>
     <string name="usr_approve_new_psw">Повторіть пароль</string>
-    <string name="usr_new_email">Уведіть пошту</string>
+    <string name="usr_new_email">Пошта</string>
     <string name="title_login">Вітаєм</string>
     <string name="title_reg">Реєстрація</string>
     <string name="login_with_biometric">Війти через біометрику</string>
@@ -57,10 +57,10 @@
     <string name="empty_string"> </string>
 
     // NoteEditor
-    <string name="title_note">Уведіть заготовок нотатки</string>
-    <string name="body_note">Почніть свою нотатку</string>
+    <string name="title_note">Заголовок</string>
+    <string name="body_note">Нотатка</string>
     <string name="time_date_label">Оновлено: %s</string>
-    <string name="title_toolbar">Нотатка</string>
+    <string name="title_toolbar">Редактор</string>
 
     <string name="toast_action_message">Нотатка збережена</string>
     <string name="toast_action_deleted_message">Нотатка видалена</string>
@@ -81,7 +81,7 @@
     <string name="settings_item">Налаштування</string>
 
     // PreferenceActivity
-    <string name="preference_title">Налаштування додатку</string>
+    <string name="preference_title">Налаштування</string>
 
     <string name="preference_change_password_title">Змінити пароль</string>
     <string name="preference_change_password_desc">Змінити пароль для входу у додаток.</string>
@@ -124,8 +124,8 @@
     <string name="email_feedback_body">[Знайшли проблему ? - Опишіть]\n[Маєте ідеї ? - Поділіться ними]\n[Маєте питання ? - Задайте]</string>
 
     // Change password dialog
-    <string name="hint_new_password">Уведіть новий пароль</string>
-    <string name="hint_old_password">Уведіть ваш поточний пароль</string>
+    <string name="hint_new_password">Новий пароль</string>
+    <string name="hint_old_password">Поточний пароль</string>
     <string name="change_password_title_dialog">Змінити пароль</string>
 
     <string name="change_password_toast_not_correct_password">Ведений поточний пароль не правильний</string>

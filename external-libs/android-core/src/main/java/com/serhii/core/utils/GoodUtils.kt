@@ -28,7 +28,7 @@ class GoodUtils {
 
     companion object {
 
-        private const val DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
+        private const val DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm"
 
         private val keyboardHelper = KeyboardHelper()
 

@@ -23,7 +23,6 @@ class NotesRepository() {
     }
 
     fun add(noteModel: NoteModel): Int {
-        // Failed to save data
         return UserNotesDatabase.addRecord(noteModel)
     }
 

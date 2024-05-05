@@ -136,11 +136,6 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        SCREEN_ORIENTATION_PREVIOUS = resources.configuration.orientation
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.note_view_menu, menu)
         updateDisplayModeIcon(menu)
@@ -237,6 +232,5 @@ class NoteViewFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback {
         const val DISPLAY_MODE_LIST = 1
         const val DISPLAY_MODE_GRID = 2
         private const val NOTES_COLUMN_COUNT = 2
-        private var SCREEN_ORIENTATION_PREVIOUS: Int = 1000
     }
 }

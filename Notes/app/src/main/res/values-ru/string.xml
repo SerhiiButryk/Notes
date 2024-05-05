@@ -40,11 +40,11 @@
     <string name="btn_create_user">Далее</string>
     <string name="login_btn">Войти</string>
     <string name="create_account_bnt">Готово</string>
-    <string name="usr_psw">Пароль пользователя</string>
-    <string name="usr_email">Электронная почта пользователя</string>
-    <string name="usr_new_psw">Введите пароль</string>
+    <string name="usr_psw">Пароль</string>
+    <string name="usr_email">Электронная почта</string>
+    <string name="usr_new_psw">Пароль</string>
     <string name="usr_approve_new_psw">Повторите пароль</string>
-    <string name="usr_new_email">Ведите почту</string>
+    <string name="usr_new_email">Почта</string>
     <string name="title_login">Приветствуем</string>
     <string name="title_reg">Регистрация</string>
     <string name="login_with_biometric">Войти через биометрику</string>
@@ -56,10 +56,10 @@
     <string name="empty_string"> </string>
 
     // NoteEditor
-    <string name="title_note">Ведите заготовки заметки</string>
-    <string name="body_note">Начните новою заметку</string>
+    <string name="title_note">Заголовок заметки</string>
+    <string name="body_note">Заметка</string>
     <string name="time_date_label">Обновлено: %s</string>
-    <string name="title_toolbar">Редактор заметок</string>
+    <string name="title_toolbar">Редактор</string>
 
     <string name="toast_action_message">Заметка сохранена</string>
     <string name="toast_action_deleted_message">Заметка удалена</string>
@@ -80,7 +80,7 @@
     <string name="settings_item">Настройка</string>
 
     // PreferenceActivity
-    <string name="preference_title">Настройки приложения</string>
+    <string name="preference_title">Настройки</string>
 
     <string name="preference_change_password_title">Изменить пароль</string>
     <string name="preference_change_password_desc">Изменить пароль для входа в приложение.</string>
@@ -123,8 +123,8 @@
     <string name="email_feedback_body">[Нашли проблему ? - Опишите]\n[Имеете идеи ? - Поделитесь ими]\n[Имеете вопрос ? - Задайте]</string>
 
     // Change password dialog
-    <string name="hint_new_password">Введите новый пароль</string>
-    <string name="hint_old_password">Ведите свой текущий пароль</string>
+    <string name="hint_new_password">Новый пароль</string>
+    <string name="hint_old_password">Текущий пароль</string>
     <string name="change_password_title_dialog">Изменить пароль</string>
 
     <string name="change_password_toast_not_correct_password">Введенный текущий пароль неверен</string>

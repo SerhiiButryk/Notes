@@ -37,7 +37,13 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     // This is the result of a text search in user's note items
     private val searchResults = MutableLiveData<List<NoteModel>>()
 
+    // List or grid view mode for the Note View screen
     private val displayNoteMode = MutableLiveData<Int>()
+
+    // During rotation we want to save any data which User entered
+    // We cannot simply save it to database and then update before rotations
+    // because auto save is not supported yet. So this is a kind of work-around
+    var cachedNote: NoteModel? = null
 
     // UI State class
     class NotesUIState(val currentNotes: List<NoteModel> = emptyList(),
@@ -96,13 +102,15 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteNote(index: String?) {
         viewModelScope.launch(BACKGROUND_DISPATCHER) {
             Log.info(TAG, "deleteNote()")
-            if (index.isNullOrEmpty()) {
+
+            val result = if (index.isNullOrEmpty()) {
                 Log.info(TAG, "deleteNote() empty")
-                uiState.postValue(NotesUIState(actionId = ACTION_DELETED, success = false))
+                false
             } else {
-                val result = notesRepository.delete(index)
-                uiState.postValue(NotesUIState(actionId = ACTION_DELETED, success = result))
+                notesRepository.delete(index)
             }
+
+            uiState.postValue(NotesUIState(actionId = ACTION_DELETED, success = result))
         }
     }
 
@@ -131,11 +139,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
             val notes = notesRepository.getAll()
 
             // Update ui state
-            if ((noteid != -1 && noteid != 0) || result) {
-                uiState.postValue(NotesUIState(notes, noteid, ACTION_SAVE, true))
-            } else {
-                uiState.postValue(NotesUIState(notes, noteid, ACTION_SAVE, false))
-            }
+            val success = (noteid != -1 && noteid != 0) || result
+
+            uiState.postValue(NotesUIState(notes, noteid, ACTION_SAVE, success))
         }
     }
 

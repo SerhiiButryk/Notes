@@ -42,9 +42,11 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
     private lateinit var noteTimeFiled: TextView
     private lateinit var toolbar: Toolbar
     private lateinit var interaction: EditorNoteInteraction
+
     private var action: String? = null
     private var noteId: String? = null
-    private val noteEditorAdapter = NoteEditorAdapter()
+
+    private val viewAdapter = NoteEditorAdapter()
 
     // We should specify ViewModelStoreOwner, because otherwise we get a different instance
     // of VM here. This will not be the same as we get in NotesViewActivity.
@@ -59,20 +61,9 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
 
         override fun onOk() {
 
-            val noteModelList: List<NoteModel> = noteEditorAdapter.currentDisplayedNotes
-            var isEmpty = true
+            val noteModelList: List<NoteModel> = viewAdapter.currentDisplayedNotes
 
-            for (noteModel in noteModelList) {
-                if (noteModel.viewType == NoteModel.LIST_NOTE_VIEW_TYPE
-                    || noteModel.viewType == NoteModel.ONE_NOTE_VIEW_TYPE &&
-                    !noteModel.isEmpty
-                ) {
-                    isEmpty = false
-                    break
-                }
-            }
-
-            if (isEmpty) {
+            if (viewAdapter.isEmpty()) {
                 showToast(
                     requireActivity(),
                     R.string.toast_action_error_note_nothing_to_clear
@@ -84,7 +75,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
                 n.clearNotes()
             }
 
-            noteEditorAdapter.setDataChanged(noteModelList.toMutableList())
+            viewAdapter.setDataChanged(noteModelList.toMutableList())
         }
 
         override fun onCancel() {
@@ -107,7 +98,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
                 GoodUtils.setTextHighlighting(note[0].queryInfo!!.rangeForNoteTitle, titleNoteField, note[0].title)
             }
             // Set selection for other notes
-            noteEditorAdapter.setNoteData(note[0])
+            viewAdapter.setNoteData(note[0])
         } else {
             Log.error(TAG, "onChanged() got wrong result")
         }
@@ -155,7 +146,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
             */
             if (currentNotes.isNotEmpty()) {
                 Log.info(TAG, "onChanged() refresh data")
-                updateUI()
+                refreshUI()
             }
 
         } else if (actionId == ACTION_DELETED) {
@@ -206,7 +197,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
 
         val noteList = view.findViewById<RecyclerView>(R.id.note_list)
         noteList.layoutManager = LinearLayoutManager(context)
-        noteList.adapter = noteEditorAdapter
+        noteList.adapter = viewAdapter
 
         return view
     }
@@ -226,44 +217,57 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
             (activity as AppCompatActivity?)!!.supportActionBar!!.setDisplayHomeAsUpEnabled(true)
             (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle(R.string.title_toolbar)
         }
-    }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         action = requireArguments().getString(ARG_ACTION)
         noteId = requireArguments().getString(ARG_NOTE_ID)
 
-        processArgs()
-
-        viewModel.getUIState().observe(viewLifecycleOwner, uiStateObserver)
-    }
-
-    override fun onNavigateBack() {
-        collapseSearchbar()
-    }
-
-    private fun processArgs() {
         if (action == ACTION_NOTE_CREATE) {
             // Display empty note
-            noteEditorAdapter.prepareEmptyNote()
+            viewAdapter.prepareEmptyNote()
             // Open keyboard
             if (titleNoteField.requestFocus()) {
                 GoodUtils.showKeyboard(requireContext(), titleNoteField)
             }
         } else if (action == ACTION_NOTE_OPEN) {
-           updateUI()
+            refreshUI()
+        }
+
+        viewModel.getUIState().observe(viewLifecycleOwner, uiStateObserver)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Cache a note to restore after config changes
+        val note = viewAdapter.getNote()
+        note.title = getText(titleNoteField)
+        viewModel.cachedNote = note
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        // Restore a note after config changes
+        if (viewModel.cachedNote != null) {
+            refreshUI(viewModel.cachedNote!!)
         }
     }
 
-    private fun updateUI() {
-        val note = viewModel.getNote(noteId!!)
+    override fun onNavigateBack() {
+        collapseSearchbar()
+        viewModel.cachedNote = null
+    }
 
+    private fun refreshUI() {
+        val note = viewModel.getNote(noteId!!)
+        refreshUI(note)
+    }
+
+    private fun refreshUI(note: NoteModel) {
         // Set note title
         titleNoteField.setText(note.title)
 
         // Set new data to list adapter. After that recycle view will be updated with
         // new data from list.
-        noteEditorAdapter.setNoteData(note)
+        viewAdapter.setNoteData(note)
         val timeDate = note.time
 
         if (timeDate.isNotEmpty()) {
@@ -305,7 +309,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
         // We should reset selection on NotesViewFragment when SearchView is closed
         val note = viewModel.getNote(noteId!!)
         titleNoteField.setText(note.title)
-        noteEditorAdapter.setNoteData(note)
+        viewAdapter.setNoteData(note)
 
         // Remove observer for this search
         viewModel.getSearchResults().removeObserver(searchObserver)
@@ -365,7 +369,7 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
                 /**
                  * Change note layout
                  */
-                noteEditorAdapter.transformView()
+                viewAdapter.transformView()
                 return true
             }
             R.id.save_note_in_file -> {
@@ -380,19 +384,19 @@ class NoteEditorFragment : BaseFragment(TAG), AppBaseActivity.NavigationCallback
     }
 
     private fun saveUserNote() {
-        val notes = noteEditorAdapter.getNote()
-        notes.title = getText(titleNoteField)
+        val note = viewAdapter.getNote()
+        note.title = getText(titleNoteField)
 
-        if (notes.isEmpty) {
+        if (note.isEmpty) {
             showToast(requireContext(), R.string.toast_action_error_note_is_empty)
             return
         }
 
-        viewModel.saveNote(noteId, notes)
+        viewModel.saveNote(noteId, note)
     }
 
     private fun deleteNote() {
-        if (noteEditorAdapter.getNote().isEmpty) {
+        if (viewAdapter.getNote().isEmpty) {
             showToast(requireContext(), R.string.toast_action_delete_error_note)
             return
         }

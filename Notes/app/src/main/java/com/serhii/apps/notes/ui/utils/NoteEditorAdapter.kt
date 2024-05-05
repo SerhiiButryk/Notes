@@ -182,6 +182,22 @@ class NoteEditorAdapter : RecyclerView.Adapter<NoteViewHolderBase>(), UserAction
         notifyDataSetChanged()
     }
 
+    fun isEmpty(): Boolean {
+        for (noteModel in currentDisplayedNotes) {
+            if (noteModel.viewType == NoteModel.LIST_NOTE_VIEW_TYPE
+                || noteModel.viewType == NoteModel.ONE_NOTE_VIEW_TYPE &&
+                !noteModel.isEmpty
+            ) {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun getViewType(): Int {
+        return currentDisplayedNotes.get(0).viewType
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     private fun setDataChangedForAdd(newData: MutableList<NoteModel>) {
         setData(newData)
