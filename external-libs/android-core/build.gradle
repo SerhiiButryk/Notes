@@ -34,6 +34,12 @@ repositories {
 
 android {
 
+    namespace = "com.serhii.core"
+
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         consumerProguardFiles 'consumer-rules.pro'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

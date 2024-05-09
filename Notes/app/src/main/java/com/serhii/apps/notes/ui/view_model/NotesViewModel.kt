@@ -110,7 +110,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
                 notesRepository.delete(index)
             }
 
-            uiState.postValue(NotesUIState(actionId = ACTION_DELETED, success = result))
+            val notes = notesRepository.getAll()
+
+            uiState.postValue(NotesUIState(currentNotes = notes, actionId = ACTION_DELETED, success = result))
         }
     }
 

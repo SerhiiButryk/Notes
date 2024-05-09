@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.google.android.material.textfield.TextInputLayout
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.activities.AppBaseActivity
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthorizeType
 import com.serhii.apps.notes.ui.data_model.createModel
@@ -77,8 +78,13 @@ class LoginFragment : BaseFragment(TAG) {
         override fun onSuccess(cipher: Cipher) {
             Log.info(TAG, "BiometricAuthenticator::onSuccess()")
 
+            val activity = requireActivity()
+            val appBaseActivity = activity as? AppBaseActivity
+
             val authModel = createModel(cipher, AuthorizeType.AUTH_BIOMETRIC_LOGIN)
-            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+            viewModel.proceedWithAuth(requireContext().applicationContext, authModel) {
+                appBaseActivity?.showMessage(it)
+            }
         }
 
         override fun onFailure() {

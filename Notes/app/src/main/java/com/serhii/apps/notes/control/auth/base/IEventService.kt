@@ -17,9 +17,9 @@ interface IEventService {
     suspend fun onPasswordLogin(context: Context, model: AuthModel)
     suspend fun onRegistration(model: AuthModel, biometricAuthenticator: BiometricAuthenticator?,
                                fragmentActivity: FragmentActivity, coroutineScope: CoroutineScope)
-    suspend fun onBiometricLogin(context: Context, authModel: AuthModel)
+    suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit)
     fun onRegistrationDone(context: Context, coroutineScope: CoroutineScope)
-    fun onChangePassword(newPassword: String): Boolean
+    fun onChangePassword(oldPassword: String, newPassword: String, showMessage: (id: Int) -> Unit): Boolean
     fun onChangeLoginLimit(newLimit: Int)
     fun onErrorState(type: Int, showDialog: () -> Unit)
 }

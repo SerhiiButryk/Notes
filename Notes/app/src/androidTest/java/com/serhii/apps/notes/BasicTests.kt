@@ -12,7 +12,6 @@ import com.serhii.apps.notes.activities.NotesViewActivity
 import com.serhii.apps.notes.ui.data_model.NoteList
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter
-import com.serhii.apps.notes.utils.TestUtility
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -22,7 +21,7 @@ import org.junit.runners.MethodSorters
  */
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class AppTests {
+class BasicTests {
 
     @Test
     fun test01_Notes_serialize_deserialize() {
@@ -161,7 +160,7 @@ class AppTests {
     }
 
     companion object {
-        private val TAG: String = AppTests::class.java.simpleName
+        private val TAG: String = BasicTests::class.java.simpleName
         private const val userName: String = "myemail@gmail.com"
         private const val userPassword: String = "myPassword"
 

@@ -67,6 +67,10 @@ open class AppBaseActivity : AppCompatActivity() {
         }
     }
 
+    fun showMessage(id: Int) {
+        GoodUtils.showToast(baseContext, id)
+    }
+
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
         Log.info(TAG_BASE, "init()")

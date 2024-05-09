@@ -15,6 +15,6 @@ import org.junit.runners.Suite.SuiteClasses
 @SuiteClasses(
     CryptoTests::class,
     DatabaseTests::class,
-    AppTests::class
+    BasicTests::class
 )
 class AllTests

@@ -5,8 +5,6 @@
 package com.serhii.apps.notes.ui
 
 import android.annotation.SuppressLint
-import android.app.Dialog
-import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -14,15 +12,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.EventService
-import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
-class ChangePasswordDialogUI : BaseDialogFragment() {
+class ChangePasswordDialogUI(
+    private val callback: (old: String, new: String) -> Boolean
+) : BaseDialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun initView(inflater: LayoutInflater): ViewGroup {
@@ -38,23 +33,10 @@ class ChangePasswordDialogUI : BaseDialogFragment() {
 
         val okButton = dialogView.findViewById<Button>(R.id.btn_ok)
         okButton.setOnClickListener { // Check entered password
-            val success = NativeBridge.verifyPassword(getText(oldPassword))
-            if (!success) {
-                Toast.makeText(requireContext().applicationContext,
-                    getString(R.string.change_password_toast_not_correct_password),
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                val result = EventService.onChangePassword(getText(newPassword))
-                if (result) {
-                    Toast.makeText(requireContext().applicationContext,
-                        getString(R.string.change_password_toast_password_set), Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    Toast.makeText(requireContext().applicationContext,
-                        getString(R.string.change_password_toast_password_error), Toast.LENGTH_LONG
-                    ).show()
-                }
+
+            val success = callback(getText(oldPassword), getText(newPassword))
+
+            if (success) {
                 dismiss()
             }
         }

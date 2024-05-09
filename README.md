@@ -42,7 +42,7 @@ and it provides simple interface for use.
 
 # Supported platforms
 
-- Android version: Android 8 - Android 13
+- Android version: Android 8 - Android 14
 - Supported ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
 
 # Localization support
@@ -55,8 +55,8 @@ and it provides simple interface for use.
 
 Required tools:
 
-1) NDK verions: 21.4.7075529
-2) Java version: 11
+1) NDK verions: 26
+2) Java version: 17
 2) Kotlin version: 1.6
 
 Use gradlew or Android Studio ('Build' menu) to build this application

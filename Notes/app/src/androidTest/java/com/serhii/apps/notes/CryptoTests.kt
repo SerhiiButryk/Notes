@@ -15,7 +15,6 @@ import com.serhii.core.security.impl.crypto.CryptoError
 import com.serhii.core.security.impl.crypto.Result
 import org.junit.Assert
 import org.junit.FixMethodOrder
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -439,11 +438,12 @@ class CryptoTests {
         Log.i(TAG, "test14_getRandomValue_verify_unique_values_generated() OUT")
     }
 
-    // TODO: Fix test
-    @Ignore("Fix me !!!")
+    /**
+     * Basic test for creation and usage of encryption keys in the app
+     */
     @Test
-    fun test15_key_master() {
-        Log.i(TAG, "test15_key_master() IN")
+    fun test15_create_keys_with_key_master() {
+        Log.i(TAG, "test15_create_keys_with_key_master() IN")
 
         val keyMaster = Crypto().getKeyMaster()
 
@@ -469,7 +469,7 @@ class CryptoTests {
 
         Assert.assertTrue(appKey2 == appKey)
 
-        Log.i(TAG, "test15_key_master() OUT")
+        Log.i(TAG, "test15_create_keys_with_key_master() OUT")
     }
 
     companion object {

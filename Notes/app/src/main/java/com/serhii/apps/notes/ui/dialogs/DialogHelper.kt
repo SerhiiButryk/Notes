@@ -22,8 +22,8 @@ object DialogHelper {
     private const val AL_DIALOG_TAG = "Alert dialog"
 
     @JvmStatic
-    fun showChangePasswordDialog(activity: FragmentActivity) {
-        val dialog = ChangePasswordDialogUI()
+    fun showChangePasswordDialog(activity: FragmentActivity, callback: (old: String, new: String) -> Boolean) {
+        val dialog = ChangePasswordDialogUI(callback)
         dialog.show(activity.supportFragmentManager, CPD_DIALOG_TAG)
     }
 

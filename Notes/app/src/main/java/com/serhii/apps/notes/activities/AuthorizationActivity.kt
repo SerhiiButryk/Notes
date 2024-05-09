@@ -104,15 +104,18 @@ class AuthorizationActivity : AppBaseActivity() {
      * Callback from native
      */
     fun userRegistered() {
-        Log.info(TAG, "userRegistered() IN")
-        // Close Registration UI
-        onBackPressed()
-        val loginFragment = supportFragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
-        if (loginFragment != null) {
-            loginFragment.onUserAccountCreated()
-            EventService.onRegistrationDone(this, lifecycleScope)
-        } else {
-            Log.error(TAG, "userRegistered(), loginFragment is null")
+        // Could be called from background thread
+        lifecycleScope.launch(App.UI_DISPATCHER) {
+            Log.info(TAG, "userRegistered() IN")
+            // Close Registration UI
+            onBackPressed()
+            val loginFragment = supportFragmentManager.findFragmentByTag(LoginFragment.FRAGMENT_TAG) as LoginFragment?
+            if (loginFragment != null) {
+                loginFragment.onUserAccountCreated()
+                EventService.onRegistrationDone(baseContext, lifecycleScope)
+            } else {
+                Log.error(TAG, "userRegistered(), loginFragment is null")
+            }
         }
     }
 
@@ -130,9 +133,8 @@ class AuthorizationActivity : AppBaseActivity() {
         }
 
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
-            val currentLimit = NativeBridge.unlockLimit
-            // If limit is exceeded then need to block app
-            if (currentLimit == 1) {
+            // If app gets blocked then show Block UI
+            if (NativeBridge.isAppBlocked) {
                 // The method is called from background thread.
                 // So we need to move this call to UI thread
                 lifecycleScope.launch(App.UI_DISPATCHER) {

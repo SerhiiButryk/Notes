@@ -9,6 +9,7 @@ import android.util.Base64
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Crypto.Companion.KEY_SIZE
+import com.serhii.core.security.Hash
 import com.serhii.core.security.impl.crypto.Openssl
 
 /**
@@ -19,11 +20,11 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
     private val TAG = "KeyMaster"
 
     // TODO: Probably need to encrypt it
-    // For password login flow
+    // For password flow
     private var DERIVED_KEY_1: ByteArray = ByteArray(0)
-    // For biometric login flow
+    // For biometric flow
     private var DERIVED_KEY_2: ByteArray = ByteArray(0)
-    // For unlock key
+    // For unlock flow
     private var DERIVED_KEY_3: ByteArray = ByteArray(0)
 
     /**
@@ -98,7 +99,7 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
 
         val decodedKey = Base64.decode(encodedDerivedKey.toByteArray(), Base64.NO_WRAP)
 
-        var decryptedDerivedKey = ByteArray(0)
+        val decryptedDerivedKey: ByteArray
         try {
             decryptedDerivedKey = cipher.doFinal(decodedKey)
         } catch (e: Exception) {
@@ -188,14 +189,16 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
     }
 
     fun createUnlockKey() {
-        val randomBytes = providerOpenssl.getRandomValue(Crypto.IV_SIZE)
-        val encodedString = Base64.encode(randomBytes, Base64.NO_WRAP)
+        val randomBytes = providerOpenssl.getRandomValue(10)
+        val encodedUnlockKey = String(Base64.encode(randomBytes, Base64.NO_WRAP))
 
         val appKey = getAppKey()
-        val result = providerOpenssl.encrypt(appKey, String(encodedString))
+        val encKey = Hash.hashMD5(encodedUnlockKey)
+
+        val result = providerOpenssl.encrypt(appKey, encKey)
 
         _save5(result.message)
-        _setUnlockKey(String(encodedString))
+        _setUnlockKey(encodedUnlockKey)
     }
 
     fun initUnlockKey(key: String) {
@@ -218,7 +221,8 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
             return ""
         }
 
-        val result = providerOpenssl.decrypt(encryptedKey, String(DERIVED_KEY_3))
+        val decKey = Hash.hashMD5(String(DERIVED_KEY_3))
+        val result = providerOpenssl.decrypt(encryptedKey, decKey)
         return result.message
     }
 

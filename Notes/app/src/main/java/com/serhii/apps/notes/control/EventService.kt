@@ -8,9 +8,8 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
-import com.serhii.apps.notes.common.App.UI_DISPATCHER
-import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.AuthManager
+import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
@@ -20,10 +19,8 @@ import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
-import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
@@ -131,23 +128,25 @@ object EventService : IEventService {
     /**
      * Handle biometric login event
      */
-    override suspend fun onBiometricLogin(context: Context, authModel: AuthModel) {
+    override suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit) {
         Log.info(TAG, "onBiometricLogin()")
 
         // Safe check. Should not happen in a normal case.
         if (authModel.cipher == null) {
             Log.error(TAG, "onBiometricLogin(), cipher is null")
             withContext(App.UI_DISPATCHER) {
-                GoodUtils.showToast(context, R.string.biometric_toast_message)
+                showMessage(R.string.biometric_toast_message)
             }
+            return
         }
 
         val success = crypto.getKeyMaster().initKeys(authModel.cipher!!)
         if (!success) {
             Log.error(TAG, "onBiometricLogin(), filed to init keys")
             withContext(App.UI_DISPATCHER) {
-                GoodUtils.showToast(context, R.string.biometric_toast_message)
+                showMessage(R.string.biometric_toast_message)
             }
+            return
         }
 
         // Complete the authentication
@@ -170,8 +169,20 @@ object EventService : IEventService {
      *
      * TODO: Improve to work with KeyMater
      */
-    override fun onChangePassword(newPassword: String): Boolean {
-        return NativeBridge.setNewPassword(Hash.hashMD5(newPassword))
+    override fun onChangePassword(oldPassword: String, newPassword: String, showMessage: (id: Int) -> Unit): Boolean {
+        var result = false
+        val success = NativeBridge.verifyPassword(Hash.hashMD5(oldPassword))
+        if (!success) {
+            showMessage(R.string.change_password_toast_not_correct_password)
+        } else {
+            result = NativeBridge.setNewPassword(Hash.hashMD5(newPassword))
+            if (result) {
+                showMessage(R.string.change_password_toast_password_set)
+            } else {
+                showMessage(R.string.change_password_toast_password_error)
+            }
+        }
+        return result
     }
 
     /**
@@ -197,7 +208,7 @@ object EventService : IEventService {
                 shouldShowDialog = false
             } else {
                 // Update password limit value
-                NativeBridge.unlockLimit = currentLimit - 1
+                NativeBridge.unlockLimit -= 1
                 Log.detail(TAG, "onErrorState(), updated limit")
             }
         }

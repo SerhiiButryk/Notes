@@ -58,7 +58,8 @@ LIB_PATH := ../../../libs
     # Additional flag to link with log library at runtime
     LOCAL_LDLIBS := -llog
 
-    LOCAL_SHARED_LIBRARIES := libc++_shared
+    # Do not use c++ import anymore
+    # LOCAL_SHARED_LIBRARIES := libc++_shared
     LOCAL_STATIC_LIBRARIES := crypto_static ssl_static
 
     include $(BUILD_SHARED_LIBRARY)

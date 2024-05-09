@@ -27,7 +27,7 @@ class LoginViewModel : ViewModel() {
 
     private val authorizeService: IEventService = EventService
 
-    fun proceedWithAuth(context: Context, authModel: AuthModel) {
+    fun proceedWithAuth(context: Context, authModel: AuthModel, showMessage: ((id: Int) -> Unit)? = null) {
         // Launch a new coroutine to handle this request
         viewModelScope.launch(App.BACKGROUND_DISPATCHER
                 + CoroutineName("AuthRequest")) {
@@ -38,7 +38,7 @@ class LoginViewModel : ViewModel() {
                     throw RuntimeException("Not a right method")
                 }
                 AuthorizeType.AUTH_BIOMETRIC_LOGIN ->
-                    authorizeService.onBiometricLogin(context, authModel)
+                    authorizeService.onBiometricLogin(authModel, showMessage!!)
                 else -> {
                     throw RuntimeException("Unknown auth type")
                 }

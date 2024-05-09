@@ -31,7 +31,7 @@ $(info [MY-LOGS] Entering Android.mk file)
     LOCAL_LDLIBS := -llog
 
     # Local libraries are included
-    LOCAL_SHARED_LIBRARIES := libc++_shared core
+    LOCAL_SHARED_LIBRARIES := core
 
     include $(BUILD_SHARED_LIBRARY)
 

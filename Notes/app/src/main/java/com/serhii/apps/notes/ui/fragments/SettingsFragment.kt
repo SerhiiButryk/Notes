@@ -14,6 +14,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.activities.AppBaseActivity
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
@@ -49,9 +50,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val changePassword = findPreference<Preference>(getString(R.string.preference_change_password_key))
 
+        val activity = requireActivity()
+        val appBaseActivity = activity as? AppBaseActivity
+
         // TODO: Fix change password flow
         changePassword?.setOnPreferenceClickListener {
-            showChangePasswordDialog(requireActivity())
+            showChangePasswordDialog(requireActivity()) { old, new ->
+                EventService.onChangePassword(old, new) {
+                    appBaseActivity?.showMessage(it)
+                }
+            }
             true
         }
 
