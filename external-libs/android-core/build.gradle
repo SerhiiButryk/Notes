@@ -4,34 +4,6 @@ apply plugin: 'kotlin-android'
 apply from: '../../gradle_configs/common_ndk_version.gradle'
 apply from: '../../gradle_configs/common_android_versions.gradle'
 
-buildscript {
-
-    apply from: '../../gradle_configs/common_build_script_versions.gradle'
-
-    repositories {
-        mavenCentral()
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-    }
-
-    dependencies {
-        // Android Gradle Plugin Version
-        classpath "com.android.tools.build:gradle:$gradle_plugin_version"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-
-}
-
-repositories {
-    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
-    mavenCentral()
-    google()
-    jcenter()
-}
-
 android {
 
     namespace = "com.serhii.core"
@@ -59,12 +31,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
 }
@@ -73,15 +41,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Kotlin
-    implementation "androidx.core:core-ktx:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
 
     // Biometrics
     implementation 'androidx.biometric:biometric:1.1.0'
-
-    // Tests use Kotlin
-    androidTestImplementation "androidx.core:core-ktx:$kotlin_version"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // Tests dependencies
     androidTestImplementation 'junit:junit:4.13.2'

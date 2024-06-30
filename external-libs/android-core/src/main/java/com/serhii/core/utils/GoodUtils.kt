@@ -16,7 +16,6 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
-import androidx.core.text.set
 import com.serhii.core.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.*
@@ -120,8 +119,9 @@ class GoodUtils {
         fun setTextHighlighting(ranges: List<IntRange>, view: TextView, content: String) {
             val selection = SpannableString(content)
             for (range in ranges) {
-                selection[range] = BackgroundColorSpan(Color.YELLOW)
-                selection[range] = ForegroundColorSpan(Color.BLACK)
+                // TODO: FIX ME !!!
+//                selection[range] = BackgroundColorSpan(Color.YELLOW)
+//                selection[range] = ForegroundColorSpan(Color.BLACK)
             }
             view.text = selection
         }
