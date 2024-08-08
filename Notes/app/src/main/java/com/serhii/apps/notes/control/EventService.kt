@@ -5,7 +5,6 @@
 package com.serhii.apps.notes.control
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.auth.AuthManager
@@ -13,20 +12,14 @@ import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
-import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
-import com.serhii.apps.notes.ui.dialogs.DialogHelper
 import com.serhii.core.log.Log
-import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
 
 /**
- * Class which receives the events from other classes and delivers them to appropriate party.
+ * Class which receives the events from UI layer and delivers them to appropriate party.
  */
 object EventService : IEventService {
 
@@ -46,7 +39,6 @@ object EventService : IEventService {
             NativeBridge.resetLoginLimitLeft(context)
 
             // Auth is passed after this step
-
             // Complete the authentication
             authManager.complete()
         } else {
@@ -57,77 +49,62 @@ object EventService : IEventService {
     /**
      * Handle registration event
      */
-    override suspend fun onRegistration(model: AuthModel,
-                                        biometricAuthenticator: BiometricAuthenticator?,
-                                        fragmentActivity: FragmentActivity,
-                                        coroutineScope: CoroutineScope) {
+    override suspend fun onRegistration(
+        model: AuthModel,
+        hasBiometric: Boolean,
+        showBiometricDialog: suspend () -> Unit
+    ) {
         // Initiate registration request
         val result = authManager.checkInput(model.password, model.confirmPassword, model.email)
         if (result) {
-            Log.info(TAG, "onRegistration() success")
+            Log.info(TAG, "onRegistration() initial request processed")
 
             // Checks are passed and user is registered.
             // So, we should create application keys and ask for biometric login here.
             val keyMaster = crypto.getKeyMaster()
             keyMaster.createKey(model.password)
 
-            if (biometricAuthenticator == null) {
+            if (!hasBiometric) {
                 // Finish
                 authManager.handleRequest(RequestType.REQ_REGISTER, model)
-                // For safety
-                model.confirmPassword = ""
-                model.password = ""
                 return
-            }
-
-            // Show biometrics
-            withContext(App.UI_DISPATCHER) {
-                // If not null then can ask for Biometric login
-                biometricAuthenticator.authenticateInitial(object : BiometricAuthenticator.Listener {
-
-                    override fun onSuccess(cipher: Cipher) {
-                        Log.detail(TAG, "BiometricAuthenticator onSuccess()")
-                        keyMaster.createKey(cipher)
-                        // Finish
-                        authManager.handleRequest(RequestType.REQ_REGISTER, model)
-                        // For safety
-                        model.confirmPassword = ""
-                        model.password = ""
-                    }
-
-                    override fun onFailure() {
-                        Log.error(TAG, "BiometricAuthenticator onFailure()")
-
-                        DialogHelper.showConfirmDialog(fragmentActivity, object : ConfirmDialogCallback {
-
-                            override fun onOk() {
-                                coroutineScope.launch(App.BACKGROUND_DISPATCHER
-                                        + CoroutineName("RegistrationRetry")) {
-                                    Log.info(TAG, "BiometricAuthenticator Retrying...")
-                                    onRegistration(model, biometricAuthenticator, fragmentActivity, this)
-                                }
-                            }
-
-                            override fun onCancel() {
-                                Log.info(TAG, "BiometricAuthenticator Finishing...")
-                                // Finish
-                                authManager.handleRequest(RequestType.REQ_REGISTER, model)
-                                // For safety
-                                model.confirmPassword = ""
-                                model.password = ""
-                            }
-                        }, R.string.biometric_dialog_title, R.string.biometric_dialog_message)
-                    }
-                })
+            } else {
+                showBiometricDialog()
             }
         } else {
-            Log.error(TAG, "onRegistration() failure")
+            Log.error(TAG, "onRegistration() initial request failed")
         }
+        // For safety
+        model.confirmPassword = ""
+        model.password = ""
+    }
+
+    /**
+     * Handle registration event
+     */
+    override fun onRegistrationDone(
+        completedSuccessfully: Boolean,
+        cipher: Cipher?,
+        authModel: AuthModel
+    ) {
+        if (completedSuccessfully) {
+            Log.detail(TAG, "onRegistrationDone() result is success")
+            val keyMaster = crypto.getKeyMaster()
+            keyMaster.createKey(cipher!!)
+        } else {
+            Log.info(TAG, "onRegistrationDone() result is failure or canceled")
+        }
+        // Finish
+        authManager.handleRequest(RequestType.REQ_REGISTER, authModel)
+        // For safety
+        authModel.confirmPassword = ""
+        authModel.password = ""
     }
 
     /**
      * Handle biometric login event
      */
+    // TODO: Get rid of UI actions here
     override suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit) {
         Log.info(TAG, "onBiometricLogin()")
 
@@ -142,7 +119,7 @@ object EventService : IEventService {
 
         val success = crypto.getKeyMaster().initKeys(authModel.cipher!!)
         if (!success) {
-            Log.error(TAG, "onBiometricLogin(), filed to init keys")
+            Log.error(TAG, "onBiometricLogin(), failed to init keys")
             withContext(App.UI_DISPATCHER) {
                 showMessage(R.string.biometric_toast_message)
             }
@@ -151,17 +128,19 @@ object EventService : IEventService {
 
         // Complete the authentication
         authManager.handleRequest(RequestType.REQ_BIOMETRIC_LOGIN, authModel)
+
+        // For safety
+        authModel.confirmPassword = ""
+        authModel.password = ""
     }
 
     /**
-     * Handle registration finished event
+     * Handle registration done event
      */
-    override fun onRegistrationDone(context: Context, coroutineScope: CoroutineScope) {
+    override fun onRegistrationDone(context: Context) {
         Log.info(TAG, "onRegistrationDone()")
-        coroutineScope.launch(App.BACKGROUND_DISPATCHER) {
-            crypto.getKeyMaster().createUnlockKey()
-            NativeBridge.resetLoginLimitLeft(context)
-        }
+        crypto.getKeyMaster().createUnlockKey()
+        NativeBridge.resetLoginLimitLeft(context)
     }
 
     /**
@@ -169,7 +148,12 @@ object EventService : IEventService {
      *
      * TODO: Improve to work with KeyMater
      */
-    override fun onChangePassword(oldPassword: String, newPassword: String, showMessage: (id: Int) -> Unit): Boolean {
+    // TODO: Get rid of UI actions here
+    override fun onChangePassword(
+        oldPassword: String,
+        newPassword: String,
+        showMessage: (id: Int) -> Unit
+    ): Boolean {
         var result = false
         val success = NativeBridge.verifyPassword(Hash.hashMD5(oldPassword))
         if (!success) {
@@ -186,7 +170,7 @@ object EventService : IEventService {
     }
 
     /**
-     * Handle change change login limit event
+     * Handle change login limit event
      */
     override fun onChangeLoginLimit(newLimit: Int) {
         NativeBridge.unlockLimit = newLimit
@@ -195,7 +179,7 @@ object EventService : IEventService {
     /**
      * Handle error event
      */
-    override fun onErrorState(type: Int, showDialog: () -> Unit) {
+    override fun onErrorState(type: Int, dialogCallback: () -> Unit) {
         Log.info(TAG, "onErrorState()")
         var shouldShowDialog = true
         if (type == AuthResult.WRONG_PASSWORD.typeId) {
@@ -209,11 +193,11 @@ object EventService : IEventService {
             } else {
                 // Update password limit value
                 NativeBridge.unlockLimit -= 1
-                Log.detail(TAG, "onErrorState(), updated limit")
+                Log.detail(TAG, "onErrorState(), done")
             }
         }
         if (shouldShowDialog) {
-            showDialog()
+            dialogCallback()
         }
     }
 

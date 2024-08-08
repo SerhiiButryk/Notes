@@ -18,7 +18,7 @@ import com.serhii.apps.notes.ui.fragments.NoteEditorFragment
 import com.serhii.apps.notes.ui.fragments.NoteEditorFragment.EditorNoteInteraction
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment
 import com.serhii.apps.notes.ui.fragments.NoteViewFragment.NoteInteraction
-import com.serhii.apps.notes.ui.view_model.NotesViewModel
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 import kotlinx.coroutines.launch

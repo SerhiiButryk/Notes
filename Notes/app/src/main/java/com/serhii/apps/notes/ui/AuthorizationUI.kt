@@ -1,0 +1,288 @@
+/*
+ * Copyright 2024. Happy coding ! :)
+ * Author: Serhii Butryk
+ */
+
+package com.serhii.apps.notes.ui
+
+import android.content.res.Configuration
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.serhii.apps.notes.R
+import com.serhii.apps.notes.control.auth.types.UIRequestType
+import com.serhii.apps.notes.ui.theme.AppMaterialTheme
+import com.serhii.apps.notes.ui.state_holders.LoginViewModel
+import com.serhii.apps.notes.ui.state_holders.LoginViewModel.LoginUIState
+
+/**
+ * User login and registration screen UI
+ */
+
+@Composable
+fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewModel) {
+
+    val leftPadding = dimensionResource(R.dimen.left_right_padding)
+    val rightPadding = dimensionResource(R.dimen.left_right_padding)
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(start = leftPadding, end = rightPadding)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+
+        val emailFiledFocus = remember { FocusRequester() }
+        val focusModifier = Modifier.focusRequester(emailFiledFocus)
+
+        // TODO: Doesn't work
+        //emailFiledFocus.requestFocus()
+
+        TitleUI(title = uiState.title)
+
+        EmailFieldUI(label = uiState.emailFiledLabel, hint = uiState.emailFiledHint,
+            getValue = { viewModel.authModel.email }, modifier = focusModifier) {
+            newText -> viewModel.authModel.email = newText
+        }
+
+        PasswordFieldUI(label = uiState.passwordFiledLabel, hint = uiState.passwordFiledHint,
+            getValue = { viewModel.authModel.password }) {
+            newText -> viewModel.authModel.password = newText
+        }
+
+        if (uiState is LoginViewModel.RegistrationUIState) {
+            PasswordFieldUI(label = uiState.confirmPasswordFiledLabel, hint = uiState.confirmPasswordFiledHint,
+                getValue = { viewModel.authModel.confirmPassword }) {
+                newText -> viewModel.authModel.confirmPassword = newText
+            }
+        }
+
+        val context = LocalContext.current
+
+        ButtonUI(text = uiState.buttonText) {
+            viewModel.proceed(uiState.requestType, context, authModel = viewModel.authModel)
+        }
+
+        if (uiState is LoginUIState && uiState.hasBiometric) {
+            ButtonUI(text = uiState.biometricButtonText) {
+                viewModel.proceed(UIRequestType.BIOMETRIC_LOGIN, context)
+            }
+        }
+    }
+
+    var openDialog by remember { mutableStateOf(false) }
+
+    openDialog = uiState.openDialog
+
+    if (openDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog = false
+                uiState.openDialog = false
+                uiState.dialogState.onCancel()
+            },
+            title = {
+                Text(
+                    text = stringResource(id = uiState.dialogState.title),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = uiState.dialogState.message),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Text(
+                    text = stringResource(id = android.R.string.ok),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .clickable {
+                            openDialog = false
+                            uiState.openDialog = false
+                            uiState.dialogState.onConfirm()
+                        }
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun EmailFieldUI(label: String, hint: String, getValue: () -> String, modifier: Modifier, onValueChanged: (String) -> Unit) {
+
+    var inputValue by rememberSaveable { mutableStateOf("") }
+
+    inputValue = getValue()
+
+    val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
+
+    val textModifiers = Modifier
+        .padding(bottom = bottomPadding)
+        .fillMaxWidth()
+
+    val textStyle = MaterialTheme.typography.bodyMedium
+    val labelStyle = MaterialTheme.typography.bodySmall
+
+    OutlinedTextField(
+        modifier = textModifiers.then(modifier),
+        value = inputValue,
+        onValueChange = { newText ->
+            inputValue = newText
+            onValueChanged(newText)
+        },
+        label = {
+            Text(text = label, style = labelStyle)
+        },
+        textStyle = textStyle,
+        singleLine = true,
+        maxLines = 1,
+        placeholder =  {
+            Text(text = hint, style = labelStyle)
+        },
+        shape = RoundedCornerShape(percent = 20),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+    )
+}
+
+@Composable
+private fun PasswordFieldUI(label: String, hint: String, getValue: () -> String, onValueChanged: (String) -> Unit) {
+
+    var showPassword by rememberSaveable { mutableStateOf(false) }
+    var inputValue by rememberSaveable { mutableStateOf("") }
+
+    inputValue = getValue()
+
+    val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
+
+    val textModifiers = Modifier
+        .padding(bottom = bottomPadding)
+        .fillMaxWidth()
+
+    val textStyle = MaterialTheme.typography.bodyMedium
+    val labelStyle = MaterialTheme.typography.bodySmall
+
+    OutlinedTextField(
+        modifier = textModifiers,
+        value = inputValue,
+        onValueChange = { newText ->
+            inputValue = newText
+            onValueChanged(newText)
+        },
+        label = {
+            Text(text = label, style = labelStyle)
+        },
+        textStyle = textStyle,
+        singleLine = true,
+        maxLines = 1,
+        placeholder =  {
+            Text(text = hint, style = labelStyle)
+        },
+        shape = RoundedCornerShape(percent = 20),
+        // Setup password filed transformation
+        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+        // Setup additional keyboard mode
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        // Setup password eye icon
+        trailingIcon = {
+            val onClick = { showPassword = !showPassword }
+            if (showPassword) {
+                IconButton(onClick = onClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Visibility,
+                        contentDescription = ""
+                    )
+                }
+            } else {
+                IconButton(onClick = onClick) {
+                    Icon(
+                        imageVector = Icons.Filled.VisibilityOff,
+                        contentDescription = ""
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    showBackground = true,
+    name = "Light Mode"
+)
+@Composable
+private fun AuthorizationUILightPreview() {
+    AuthorizationUIForPreview()
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+    name = "Dark Mode"
+)
+@Composable
+private fun AuthorizationUIDarkPreview() {
+    AuthorizationUIForPreview()
+}
+
+@Composable
+private fun AuthorizationUIForPreview() {
+
+    val uiState = LoginUIState(title = "Welcome",
+        emailFiledLabel = "Email",
+        emailFiledHint = "Type email",
+        passwordFiledLabel = "Password",
+        passwordFiledHint = "Type password",
+        buttonText = "Login",
+        hasBiometric = true,
+        biometricButtonText = "Biometrics",
+        uiRequestType = UIRequestType.UNLOCK)
+
+    AppMaterialTheme {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            AuthorizationUI(uiState, LoginViewModel())
+        }
+    }
+}

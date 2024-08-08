@@ -20,12 +20,11 @@ import com.google.android.material.textfield.TextInputLayout
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.activities.AppBaseActivity
 import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.auth.types.AuthorizeType
+import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.data_model.createModel
-import com.serhii.apps.notes.ui.view_model.LoginViewModel
+import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
-import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
 import javax.crypto.Cipher
@@ -62,9 +61,9 @@ class LoginFragment : BaseFragment(TAG) {
             val authModel = createModel(
                 GoodUtils.getText(emailField),
                 GoodUtils.getText(passwordField),
-                AuthorizeType.AUTH_PASSWORD_LOGIN)
+                UIRequestType.PASSWORD_LOGIN)
 
-            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+//            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
 
             // For safety
             passwordField.setText("")
@@ -81,10 +80,10 @@ class LoginFragment : BaseFragment(TAG) {
             val activity = requireActivity()
             val appBaseActivity = activity as? AppBaseActivity
 
-            val authModel = createModel(cipher, AuthorizeType.AUTH_BIOMETRIC_LOGIN)
-            viewModel.proceedWithAuth(requireContext().applicationContext, authModel) {
-                appBaseActivity?.showMessage(it)
-            }
+            val authModel = createModel(cipher, UIRequestType.BIOMETRIC_LOGIN)
+//            viewModel.proceedWithAuth(requireContext().applicationContext, authModel) {
+//                appBaseActivity?.showMessage(it)
+//            }
         }
 
         override fun onFailure() {
@@ -153,7 +152,7 @@ class LoginFragment : BaseFragment(TAG) {
         }
 
         titleLabel.text = getString(R.string.title_login)
-        registerAccountBtn.setOnClickListener { viewModel.requestRegistrationUI() }
+//        registerAccountBtn.setOnClickListener { viewModel.requestRegistrationUI() }
 
         loginButton.setOnClickListener(View.OnClickListener {
             if (getText(passwordField).isEmpty() || getText(emailField).isEmpty()) {
@@ -165,9 +164,9 @@ class LoginFragment : BaseFragment(TAG) {
             val authModel = createModel(
                 GoodUtils.getText(emailField),
                 GoodUtils.getText(passwordField),
-                AuthorizeType.AUTH_PASSWORD_LOGIN)
+                UIRequestType.PASSWORD_LOGIN)
 
-            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+//            viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
 
             // For safety
             passwordField.setText("")

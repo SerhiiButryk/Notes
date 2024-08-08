@@ -4,16 +4,17 @@
  */
 package com.serhii.apps.notes.ui.data_model
 
-import com.serhii.apps.notes.control.auth.types.AuthorizeType
-import com.serhii.core.utils.GoodUtils
+import com.serhii.apps.notes.control.auth.types.UIRequestType
 import javax.crypto.Cipher
 
-data class AuthModel(val email: String = "", var password: String = "",
-                     var confirmPassword: String = "", val authType: AuthorizeType = AuthorizeType.UN_SET) {
+data class AuthModel(
+    var email: String = "", var password: String = "",
+    var confirmPassword: String = "", var authType: UIRequestType = UIRequestType.UN_SET
+) {
     var cipher: Cipher? = null
 }
 
-fun createModel(email: String, password: String, type: AuthorizeType): AuthModel {
+fun createModel(email: String, password: String, type: UIRequestType): AuthModel {
     val authModel = AuthModel(
         email,
         password,
@@ -23,7 +24,12 @@ fun createModel(email: String, password: String, type: AuthorizeType): AuthModel
     return authModel
 }
 
-fun createModel(email: String, password: String, confirmPassword: String, type: AuthorizeType): AuthModel {
+fun createModel(
+    email: String,
+    password: String,
+    confirmPassword: String,
+    type: UIRequestType
+): AuthModel {
     val authModel = AuthModel(
         email,
         password,
@@ -33,7 +39,7 @@ fun createModel(email: String, password: String, confirmPassword: String, type: 
     return authModel
 }
 
-fun createModel(cipher: Cipher, type: AuthorizeType): AuthModel {
+fun createModel(cipher: Cipher, type: UIRequestType): AuthModel {
     val model = AuthModel("", "", "", type)
     model.cipher = cipher
     return model

@@ -25,9 +25,8 @@ import com.serhii.apps.notes.activities.SettingsActivity
 import com.serhii.apps.notes.control.preferences.PreferenceManager.saveNoteDisplayModePref
 import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.utils.NoteListAdapter
-import com.serhii.apps.notes.ui.view_model.NotesViewModel
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 import com.serhii.core.log.Log
-import com.serhii.core.log.Log.Companion.info
 
 /**
  * Fragment where user sees list of notes

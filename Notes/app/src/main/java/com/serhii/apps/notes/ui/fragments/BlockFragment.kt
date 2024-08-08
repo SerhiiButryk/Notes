@@ -14,10 +14,10 @@ import android.widget.EditText
 import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.viewModels
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.auth.types.AuthorizeType
+import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.apps.notes.ui.utils.TextChecker
-import com.serhii.apps.notes.ui.view_model.LoginViewModel
+import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 import com.serhii.core.utils.GoodUtils.Companion.getText
 
 /**
@@ -64,14 +64,14 @@ class BlockFragment : BaseFragment("BlockFragment") {
     }
 
     private fun unlockApplication() {
-        val authModel = AuthModel("", getText(accessKeyField), "", AuthorizeType.AUTH_UNLOCK)
+        val authModel = AuthModel("", getText(accessKeyField), "", UIRequestType.UNLOCK)
         // For safety
         accessKeyField.setText("")
         // We should specify ViewModelStoreOwner, because otherwise we get a different instance
         // of VM here. This will not be the same as we get in AuthorizationActivity.
         val viewModel: LoginViewModel by viewModels ({ requireActivity() })
 
-        viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
+//        viewModel.proceedWithAuth(requireContext().applicationContext, authModel)
     }
 
     companion object {

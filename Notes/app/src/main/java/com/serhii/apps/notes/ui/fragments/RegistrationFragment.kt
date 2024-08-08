@@ -15,9 +15,9 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.viewModels
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.auth.types.AuthorizeType
+import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.data_model.createModel
-import com.serhii.apps.notes.ui.view_model.LoginViewModel
+import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.utils.GoodUtils
 import com.serhii.core.utils.GoodUtils.Companion.getText
@@ -100,10 +100,10 @@ class RegistrationFragment : BaseFragment("RegistrationFragment") {
             getText(emailField),
             getText(passwordField),
             getText(confirmPasswordField),
-            AuthorizeType.AUTH_REGISTRATION
+            UIRequestType.REGISTRATION
         )
 
-        viewModel.proceedWithRegistration(authModel, biometricAuthenticator, requireActivity())
+//        viewModel.proceedWithRegistration(authModel, biometricAuthenticator, requireActivity())
 
         // For safety
         passwordField.setText("")

@@ -38,7 +38,7 @@
 
     // Login Activity
     <string name="text_description">Вітаєм у додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
-    <string name="btn_create_user">Далі</string>
+    <string name="btn_continue">Далі</string>
     <string name="login_btn">Вхід</string>
     <string name="create_account_bnt">Далі</string>
     <string name="usr_psw">Пароль</string>

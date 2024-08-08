@@ -61,8 +61,8 @@ internal object CoreEngine : Components {
         Log.info(TAG, "loadNativeLibrary() IN")
         try {
             System.loadLibrary(RUNTIME_LIBRARY)
-        } catch (e: Exception) {
-            Log.error(TAG, "error: $e")
+        } catch (e: UnsatisfiedLinkError) {
+            Log.error(TAG, "failed to load native library, error: $e")
         }
         Log.info(TAG, "loadNativeLibrary() OUT")
     }

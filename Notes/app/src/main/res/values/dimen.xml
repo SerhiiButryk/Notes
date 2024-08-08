@@ -25,6 +25,11 @@
     <dimen name="text_size_large">20sp</dimen>
 
     // Login / Block / Registration screen
+    <dimen name="left_right_padding">20dp</dimen>
+    <dimen name="bottom_padding">40dp</dimen>
+    <dimen name="bottom_input_field_padding">20dp</dimen>
+    <dimen name="button_bottom_padding">40dp</dimen>
+
     <dimen name="margin_icon_note_shift">5dp</dimen>
 
     <dimen name="margin_middle_icon_lock">15dp</dimen>

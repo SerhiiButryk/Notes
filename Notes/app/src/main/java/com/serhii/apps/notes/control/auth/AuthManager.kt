@@ -4,8 +4,7 @@
  */
 package com.serhii.apps.notes.control.auth
 
-import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.auth.types.AuthorizeType
+import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.security.Crypto
@@ -19,7 +18,7 @@ class AuthManager {
     fun handleRequest(type: RequestType, data: AuthModel): Boolean {
 
         return when {
-            type == RequestType.REQ_AUTHORIZE && data.authType == AuthorizeType.AUTH_UNLOCK -> {
+            type == RequestType.REQ_AUTHORIZE && data.authType == UIRequestType.UNLOCK -> {
 
                 val crypto = Crypto()
                 crypto.getKeyMaster().initUnlockKey(data.password)
@@ -41,7 +40,11 @@ class AuthManager {
                 */
 
                 // Return result is true or false
-                requestRegistration(Hash.hashMD5(data.password), Hash.hashMD5(data.confirmPassword), data.email)
+                requestRegistration(
+                    Hash.hashMD5(data.password),
+                    Hash.hashMD5(data.confirmPassword),
+                    data.email
+                )
 
             type == RequestType.REQ_BIOMETRIC_LOGIN -> {
                 requestAuthorization()
@@ -65,11 +68,20 @@ class AuthManager {
     }
 
     private external fun requestAuthorization(password: String, username: String): Boolean
-    private external fun requestRegistration(password: String, confirmPassword: String, username: String): Boolean
+    private external fun requestRegistration(
+        password: String,
+        confirmPassword: String,
+        username: String
+    ): Boolean
+
     private external fun requestUnlock(unlockKey: String, currentKey: String)
     private external fun requestAuthorization()
 
-    private external fun verifyInput(password: String, confirmPassword: String, username: String): Boolean
+    private external fun verifyInput(
+        password: String,
+        confirmPassword: String,
+        username: String
+    ): Boolean
 
     companion object {
         const val TAG = "AuthManager"

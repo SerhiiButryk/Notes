@@ -11,9 +11,10 @@ import com.serhii.core.FileSystem
 import com.serhii.core.log.Log
 
 /**
- * A point of initialization of app components
+ * Performs setup of app components
  */
 class Notes : Application() {
+
     override fun onCreate() {
         super.onCreate()
         // Setup log settings

@@ -37,7 +37,7 @@
 
     // Login Activity
     <string name="text_description">Добро пожаловать в приложение для записи заметок. Сохраняй все заметки здесь. Для начала создайте пользователя. Нажмите \"Далее\", чтобы продолжить.</string>
-    <string name="btn_create_user">Далее</string>
+    <string name="btn_continue">Далее</string>
     <string name="login_btn">Войти</string>
     <string name="create_account_bnt">Готово</string>
     <string name="usr_psw">Пароль</string>

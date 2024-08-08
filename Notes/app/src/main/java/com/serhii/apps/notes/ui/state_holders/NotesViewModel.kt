@@ -2,7 +2,7 @@
  * Copyright 2022. Happy coding ! :)
  * Author: Serhii Butryk
  */
-package com.serhii.apps.notes.ui.view_model
+package com.serhii.apps.notes.ui.state_holders
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -22,12 +22,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 
 /**
- * View model for managing UI state of NotesViewActivity
- *
- * Responsibilities:
- * 1) Save/Retrieve data to/from a database
- * 2) Hold data during config changes
- * 3) Access and update the UI state
+ *  View model for managing UI state and business logic of NotesViewActivity
  */
 class NotesViewModel(application: Application) : AndroidViewModel(application) {
 

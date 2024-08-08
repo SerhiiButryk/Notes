@@ -12,7 +12,7 @@ import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
 
 /**
- * Global point for access to C++ layer
+ * Global access point to native API layer
  */
 object NativeBridge {
 

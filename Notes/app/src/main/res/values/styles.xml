@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppThemeNoActionbarTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppThemeNoActionbarTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppSettingsThemeNoActionbarTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppSettingsThemeNoActionbarTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -22,18 +22,6 @@
     <style name="AppBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="PopupBarTheme" parent="ThemeOverlay.AppCompat.Light" />
-
-<!--  Commented out as it's not used  -->
-<!--    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">-->
-<!--        <item name="android:background">@drawable/round_sheet_background</item>-->
-<!--    </style>-->
-
-<!--    <style name="BottomSheetTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">-->
-<!--        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>-->
-<!--        <item name="colorPrimary">@color/blue_contrast</item>-->
-<!--        <item name="colorPrimaryDark">@color/blue_contrast</item>-->
-<!--        <item name="colorAccent">@color/blue_accent</item>-->
-<!--    </style>-->
 
     <style name="NoteEditText" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/round_background</item>

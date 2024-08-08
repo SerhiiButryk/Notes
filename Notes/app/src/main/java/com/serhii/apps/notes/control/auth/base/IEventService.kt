@@ -5,21 +5,37 @@
 package com.serhii.apps.notes.control.auth.base
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
 import com.serhii.apps.notes.ui.data_model.AuthModel
-import com.serhii.core.security.BiometricAuthenticator
-import kotlinx.coroutines.CoroutineScope
+import javax.crypto.Cipher
 
 /**
- * The interface to handle user events
+ * The interface to handle UI events
  */
 interface IEventService {
+
     suspend fun onPasswordLogin(context: Context, model: AuthModel)
-    suspend fun onRegistration(model: AuthModel, biometricAuthenticator: BiometricAuthenticator?,
-                               fragmentActivity: FragmentActivity, coroutineScope: CoroutineScope)
-    suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit)
-    fun onRegistrationDone(context: Context, coroutineScope: CoroutineScope)
-    fun onChangePassword(oldPassword: String, newPassword: String, showMessage: (id: Int) -> Unit): Boolean
+
+    suspend fun onRegistration(
+        model: AuthModel, hasBiometric: Boolean, showBiometricDialog: suspend () -> Unit
+    )
+
+    fun onRegistrationDone(
+        completedSuccessfully: Boolean,
+        cipher: Cipher? = null,
+        authModel: AuthModel
+    )
+
+    suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit = {})
+
+    fun onRegistrationDone(context: Context)
+
+    fun onChangePassword(
+        oldPassword: String,
+        newPassword: String,
+        showMessage: (id: Int) -> Unit
+    ): Boolean
+
     fun onChangeLoginLimit(newLimit: Int)
-    fun onErrorState(type: Int, showDialog: () -> Unit)
+
+    fun onErrorState(type: Int, dialogCallback: () -> Unit)
 }

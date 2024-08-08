@@ -24,7 +24,7 @@ import javax.crypto.spec.GCMParameterSpec
  */
 internal class AndroidProvider : BaseProvider() {
 
-    private val keyStore: KeyStore
+    private var keyStore: KeyStore? = null
     private var selectedKey: String? = null
 
     override fun selectKey(key: String) {
@@ -43,7 +43,7 @@ internal class AndroidProvider : BaseProvider() {
         // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No key is selected for cryptographic operation" }
         try {
-            val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
+            val secretKey = keyStore?.getKey(selectedKey, null) as SecretKey
             val encryptionCipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
             encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey)
             val _iv = encryptionCipher.iv
@@ -66,7 +66,7 @@ internal class AndroidProvider : BaseProvider() {
         // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No key is selected for cryptographic operation" }
         try {
-            val secretKey = keyStore.getKey(selectedKey, null) as SecretKey
+            val secretKey = keyStore?.getKey(selectedKey, null) as SecretKey
             val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
 
             var _iv = inputIV
@@ -118,7 +118,7 @@ internal class AndroidProvider : BaseProvider() {
 
     private fun isSecretKeyExists(key: String): Boolean {
         try {
-            val entry: KeyStore.Entry? = keyStore.getEntry(key, null)
+            val entry: KeyStore.Entry? = keyStore?.getEntry(key, null)
             return entry != null
         } catch (e: KeyStoreException) {
             Log.error(TAG, "exception: " + e.message)
@@ -240,7 +240,7 @@ internal class AndroidProvider : BaseProvider() {
             createKeyForBiometricAuth()
         }
 
-        return keyStore.getKey(DEFAULT_KEY_FOR_BIOMETRIC, null) as? SecretKey
+        return keyStore?.getKey(DEFAULT_KEY_FOR_BIOMETRIC, null) as? SecretKey
     }
 
     fun getCipherForBiometricAuth(): Cipher {
@@ -257,11 +257,15 @@ internal class AndroidProvider : BaseProvider() {
     }
 
     init {
-        keyStore = initKeyStore()
-        val success = load(keyStore)
-        createKey(DEFAULT_KEY, 0, false)
-        selectKey(DEFAULT_KEY)
-        Log.detail(TAG, "init(): key store loaded '$success'")
+        try {
+            keyStore = initKeyStore()
+            val success = load(keyStore!!)
+            createKey(DEFAULT_KEY, 0, false)
+            selectKey(DEFAULT_KEY)
+            Log.detail(TAG, "init(): key store loaded '$success'")
+        } catch (e: Exception) {
+            Log.error(TAG, "init(): failed to load, error = $e")
+        }
     }
 
 }

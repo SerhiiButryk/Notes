@@ -11,8 +11,8 @@
     <string name="ms_no_notes">No notes yet</string>
     <string name="ms_no_search_results">Nothing found. Sorry.</string>
 
-    // Alter Dialog
-    <string name="ms_no_user_account">This user account is not authorized. \nPlease, authorize your user.</string>
+    // Alert Dialog
+    <string name="ms_no_user_account">This user account is not authorized. Please, authorize your user.</string>
     <string name="title_no_user_account">Authorize error</string>
 
     <string name="ms_wrong_password">Password is incorrect. You have %s attempts.</string>
@@ -39,7 +39,7 @@
 
     // Login Activity
     <string name="text_description">Welcome to note app. Manage all your notes here. Firstly you need to create a user. Click \"Continue\" button to proceed.</string>
-    <string name="btn_create_user">Continue</string>
+    <string name="btn_continue">Continue</string>
     <string name="login_btn">Login</string>
     <string name="create_account_bnt">Done</string>
     <string name="usr_psw">Password</string>

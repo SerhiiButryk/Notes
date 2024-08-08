@@ -24,9 +24,9 @@ import com.serhii.apps.notes.ui.dialogs.ConfirmDialogCallback
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showConfirmDialog
 import com.serhii.apps.notes.ui.utils.NoteEditorAdapter
 import com.serhii.apps.notes.ui.utils.TextChangeNotifier
-import com.serhii.apps.notes.ui.view_model.NotesViewModel
-import com.serhii.apps.notes.ui.view_model.NotesViewModel.Companion.ACTION_DELETED
-import com.serhii.apps.notes.ui.view_model.NotesViewModel.Companion.ACTION_SAVE
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel.Companion.ACTION_DELETED
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel.Companion.ACTION_SAVE
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.utils.GoodUtils
