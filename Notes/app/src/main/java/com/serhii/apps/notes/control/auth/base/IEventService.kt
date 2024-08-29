@@ -16,7 +16,7 @@ interface IEventService {
     suspend fun onPasswordLogin(context: Context, model: AuthModel)
 
     suspend fun onRegistration(
-        model: AuthModel, hasBiometric: Boolean, showBiometricDialog: suspend () -> Unit
+        model: AuthModel, hasBiometric: Boolean, requestBiometricDialog: suspend () -> Unit
     )
 
     fun onRegistrationDone(
@@ -25,7 +25,7 @@ interface IEventService {
         authModel: AuthModel
     )
 
-    suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit = {})
+    suspend fun onBiometricLogin(authModel: AuthModel, requestMessage: suspend () -> Unit = {})
 
     fun onRegistrationDone(context: Context)
 

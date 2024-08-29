@@ -5,7 +5,6 @@
 package com.serhii.apps.notes.activities
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,17 +27,20 @@ import kotlinx.coroutines.launch
 /**
  * Activity which starts user authorization
  */
-class AuthorizationActivity : ComponentActivity() {
+class AuthorizationActivity : AppBaseActivity() {
 
     private val authViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setLoggingTagForActivity(TAG)
         super.onCreate(savedInstanceState)
         Log.info(TAG, "onCreate()")
 
         if (savedInstanceState == null) {
             authViewModel.initViewModel(this)
         }
+
+        authViewModel.setupBiometrics(this)
 
         configureUI()
         initNative()

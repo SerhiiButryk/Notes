@@ -6,34 +6,24 @@
 package com.serhii.apps.notes.ui
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.serhii.apps.notes.R
 
 @Composable
 fun ButtonUI(
     text: String,
-    @SuppressLint("ModifierParameter") modifier: Modifier? = null,
+    @SuppressLint("ModifierParameter") modifier: Modifier,
     onClick: () -> Unit
 ) {
-
-    val bottomPadding = dimensionResource(R.dimen.button_bottom_padding)
-
-    val buttonModifier = modifier ?: Modifier
-        .padding(bottom = bottomPadding)
-        .fillMaxWidth()
-
     Button(
         onClick = { onClick() },
-        modifier = buttonModifier
+        modifier = modifier
     ) {
         Text(
             text = text,

@@ -6,7 +6,6 @@ package com.serhii.apps.notes.control
 
 import android.content.Context
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.auth.AuthManager
 import com.serhii.apps.notes.control.auth.base.IEventService
 import com.serhii.apps.notes.control.auth.types.AuthResult
@@ -15,7 +14,6 @@ import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
-import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
 
 /**
@@ -33,11 +31,7 @@ object EventService : IEventService {
         Log.info(TAG, "onPasswordLogin()")
         // Do password check and any other necessary actions
         if (authManager.handleRequest(RequestType.REQ_AUTHORIZE, model)) {
-
             crypto.getKeyMaster().initKeys(model.password)
-
-            NativeBridge.resetLoginLimitLeft(context)
-
             // Auth is passed after this step
             // Complete the authentication
             authManager.complete()
@@ -52,7 +46,7 @@ object EventService : IEventService {
     override suspend fun onRegistration(
         model: AuthModel,
         hasBiometric: Boolean,
-        showBiometricDialog: suspend () -> Unit
+        requestBiometricDialog: suspend () -> Unit
     ) {
         // Initiate registration request
         val result = authManager.checkInput(model.password, model.confirmPassword, model.email)
@@ -67,16 +61,19 @@ object EventService : IEventService {
             if (!hasBiometric) {
                 // Finish
                 authManager.handleRequest(RequestType.REQ_REGISTER, model)
+                // For safety
+                model.confirmPassword = ""
+                model.password = ""
                 return
             } else {
-                showBiometricDialog()
+                requestBiometricDialog()
             }
         } else {
             Log.error(TAG, "onRegistration() initial request failed")
+            // For safety
+            model.confirmPassword = ""
+            model.password = ""
         }
-        // For safety
-        model.confirmPassword = ""
-        model.password = ""
     }
 
     /**
@@ -92,7 +89,7 @@ object EventService : IEventService {
             val keyMaster = crypto.getKeyMaster()
             keyMaster.createKey(cipher!!)
         } else {
-            Log.info(TAG, "onRegistrationDone() result is failure or canceled")
+            Log.info(TAG, "onRegistrationDone() failure or canceled")
         }
         // Finish
         authManager.handleRequest(RequestType.REQ_REGISTER, authModel)
@@ -104,25 +101,21 @@ object EventService : IEventService {
     /**
      * Handle biometric login event
      */
-    // TODO: Get rid of UI actions here
-    override suspend fun onBiometricLogin(authModel: AuthModel, showMessage: (id: Int) -> Unit) {
+    override suspend fun onBiometricLogin(authModel: AuthModel, requestMessage: suspend () -> Unit) {
         Log.info(TAG, "onBiometricLogin()")
 
         // Safe check. Should not happen in a normal case.
         if (authModel.cipher == null) {
             Log.error(TAG, "onBiometricLogin(), cipher is null")
-            withContext(App.UI_DISPATCHER) {
-                showMessage(R.string.biometric_toast_message)
-            }
+            requestMessage()
             return
         }
 
+        // Safe check. Should not happen in a normal case.
         val success = crypto.getKeyMaster().initKeys(authModel.cipher!!)
         if (!success) {
             Log.error(TAG, "onBiometricLogin(), failed to init keys")
-            withContext(App.UI_DISPATCHER) {
-                showMessage(R.string.biometric_toast_message)
-            }
+            requestMessage()
             return
         }
 

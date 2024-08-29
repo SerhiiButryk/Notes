@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -40,16 +41,18 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.UIRequestType
-import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 import com.serhii.apps.notes.ui.state_holders.LoginViewModel.LoginUIState
+import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 
 /**
  * User login and registration screen UI
@@ -61,51 +64,85 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
     val leftPadding = dimensionResource(R.dimen.left_right_padding)
     val rightPadding = dimensionResource(R.dimen.left_right_padding)
 
+    val columModifiers = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .padding(start = leftPadding, end = rightPadding)
+        .verticalScroll(rememberScrollState())
+
     Column(
-        Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(start = leftPadding, end = rightPadding)
-            .verticalScroll(rememberScrollState()),
+        columModifiers,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        val emailFiledFocus = remember { FocusRequester() }
-        val focusModifier = Modifier.focusRequester(emailFiledFocus)
+        val inputFocusEmail = remember { FocusRequester() }
+        val focusModifierEmail = Modifier.focusRequester(inputFocusEmail)
 
-        // TODO: Doesn't work
-        //emailFiledFocus.requestFocus()
+        val inputFocusPassword = remember { FocusRequester() }
+        val focusModifierPassword = Modifier.focusRequester(inputFocusPassword)
+
+        val context = LocalContext.current
+
+        val isRegistrationUI = uiState is LoginViewModel.RegistrationUIState
+
+        val doneAction = {
+            val requestType = if (isRegistrationUI) UIRequestType.REGISTRATION else UIRequestType.PASSWORD_LOGIN
+            viewModel.proceed(requestType, context, authModel = viewModel.authModel)
+        }
 
         TitleUI(title = uiState.title)
 
         EmailFieldUI(label = uiState.emailFiledLabel, hint = uiState.emailFiledHint,
-            getValue = { viewModel.authModel.email }, modifier = focusModifier) {
+            getValue = { viewModel.authModel.email }, modifier = focusModifierEmail) {
             newText -> viewModel.authModel.email = newText
         }
 
         PasswordFieldUI(label = uiState.passwordFiledLabel, hint = uiState.passwordFiledHint,
-            getValue = { viewModel.authModel.password }) {
+            doneAction = if (isRegistrationUI) null else doneAction,
+            actionKeyboard = if (isRegistrationUI) ImeAction.Next else ImeAction.Done,
+            getValue = { viewModel.authModel.password }, modifier = focusModifierPassword) {
             newText -> viewModel.authModel.password = newText
         }
 
         if (uiState is LoginViewModel.RegistrationUIState) {
-            PasswordFieldUI(label = uiState.confirmPasswordFiledLabel, hint = uiState.confirmPasswordFiledHint,
+            PasswordFieldUI(label = uiState.confirmPasswordFiledLabel,
+                doneAction = doneAction, actionKeyboard = ImeAction.Done,
+                hint = uiState.confirmPasswordFiledHint,
                 getValue = { viewModel.authModel.confirmPassword }) {
                 newText -> viewModel.authModel.confirmPassword = newText
             }
         }
 
-        val context = LocalContext.current
+        val bottomPaddingMax = dimensionResource(R.dimen.button_bottom_padding)
+        val bottomPaddingMin = dimensionResource(R.dimen.bottom_input_field_padding)
 
-        ButtonUI(text = uiState.buttonText) {
-            viewModel.proceed(uiState.requestType, context, authModel = viewModel.authModel)
+        val hasBiometrics = uiState is LoginUIState && uiState.hasBiometric
+
+        val loginButtonModifiers = if (hasBiometrics)
+            Modifier.padding(bottom = bottomPaddingMin).fillMaxWidth()
+        else Modifier.padding(bottom = bottomPaddingMax).fillMaxWidth()
+
+        ButtonUI(text = uiState.buttonText, modifier = loginButtonModifiers) {
+            doneAction()
         }
 
         if (uiState is LoginUIState && uiState.hasBiometric) {
-            ButtonUI(text = uiState.biometricButtonText) {
+
+            // Add biometrics button
+
+            val biometricButtonModifiers = Modifier.padding(bottom = bottomPaddingMax).fillMaxWidth()
+
+            ButtonUI(text = uiState.biometricButtonText, modifier = biometricButtonModifiers) {
                 viewModel.proceed(UIRequestType.BIOMETRIC_LOGIN, context)
             }
+        }
+
+        // Request for email or password field
+        if (viewModel.authModel.email.isEmpty()) {
+            viewModel.requestKeyboard(inputFocusEmail)
+        } else {
+            viewModel.requestKeyboard(inputFocusPassword)
         }
     }
 
@@ -116,9 +153,11 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
     if (openDialog) {
         AlertDialog(
             onDismissRequest = {
-                openDialog = false
-                uiState.openDialog = false
-                uiState.dialogState.onCancel()
+                if (uiState.dialogState.dialogDismissible) {
+                    openDialog = false
+                    uiState.openDialog = false
+                    uiState.dialogState.onCancel()
+                }
             },
             title = {
                 Text(
@@ -134,7 +173,7 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
             },
             confirmButton = {
                 Text(
-                    text = stringResource(id = android.R.string.ok),
+                    text = stringResource(id = uiState.dialogState.positiveBtn),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -145,6 +184,22 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
                             uiState.dialogState.onConfirm()
                         }
                 )
+            },
+            dismissButton = {
+                if (uiState.dialogState.hasCancelButton) {
+                    Text(
+                        text = stringResource(id = uiState.dialogState.negativeBtn),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .clickable {
+                                openDialog = false
+                                uiState.openDialog = false
+                                uiState.dialogState.onCancel()
+                            }
+                    )
+                }
             }
         )
     }
@@ -159,7 +214,7 @@ private fun EmailFieldUI(label: String, hint: String, getValue: () -> String, mo
 
     val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
 
-    val textModifiers = Modifier
+    val defaultModifiers = Modifier
         .padding(bottom = bottomPadding)
         .fillMaxWidth()
 
@@ -167,7 +222,7 @@ private fun EmailFieldUI(label: String, hint: String, getValue: () -> String, mo
     val labelStyle = MaterialTheme.typography.bodySmall
 
     OutlinedTextField(
-        modifier = textModifiers.then(modifier),
+        modifier = defaultModifiers.then(modifier),
         value = inputValue,
         onValueChange = { newText ->
             inputValue = newText
@@ -183,12 +238,14 @@ private fun EmailFieldUI(label: String, hint: String, getValue: () -> String, mo
             Text(text = hint, style = labelStyle)
         },
         shape = RoundedCornerShape(percent = 20),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        keyboardOptions = KeyboardOptions(autoCorrect = false, keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
     )
 }
 
 @Composable
-private fun PasswordFieldUI(label: String, hint: String, getValue: () -> String, onValueChanged: (String) -> Unit) {
+private fun PasswordFieldUI(label: String, modifier: Modifier? = null,
+                            doneAction: (() -> Unit)? = null, actionKeyboard: ImeAction = ImeAction.Next,
+                            hint: String, getValue: () -> String, onValueChanged: (String) -> Unit) {
 
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf("") }
@@ -197,7 +254,7 @@ private fun PasswordFieldUI(label: String, hint: String, getValue: () -> String,
 
     val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
 
-    val textModifiers = Modifier
+    val defaultModifiers = Modifier
         .padding(bottom = bottomPadding)
         .fillMaxWidth()
 
@@ -205,7 +262,7 @@ private fun PasswordFieldUI(label: String, hint: String, getValue: () -> String,
     val labelStyle = MaterialTheme.typography.bodySmall
 
     OutlinedTextField(
-        modifier = textModifiers,
+        modifier = if (modifier != null) defaultModifiers.then(modifier) else defaultModifiers,
         value = inputValue,
         onValueChange = { newText ->
             inputValue = newText
@@ -224,7 +281,7 @@ private fun PasswordFieldUI(label: String, hint: String, getValue: () -> String,
         // Setup password filed transformation
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         // Setup additional keyboard mode
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = actionKeyboard),
         // Setup password eye icon
         trailingIcon = {
             val onClick = { showPassword = !showPassword }
@@ -243,7 +300,9 @@ private fun PasswordFieldUI(label: String, hint: String, getValue: () -> String,
                     )
                 }
             }
-        }
+        },
+        // Setup additional keyboard actions
+        keyboardActions = KeyboardActions(onDone = { doneAction?.invoke() })
     )
 }
 

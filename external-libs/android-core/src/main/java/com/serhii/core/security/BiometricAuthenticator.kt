@@ -10,6 +10,7 @@ import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.serhii.core.CoreEngine
 import com.serhii.core.log.Log
 import com.serhii.core.security.impl.crypto.AndroidProvider
@@ -54,7 +55,7 @@ class BiometricAuthenticator {
         biometricPrompt!!.authenticate(promptInfo!!, BiometricPrompt.CryptoObject(cipher))
     }
 
-    fun init(context: Context, fragment: Fragment, title: String, subtitle: String, buttonText: String) {
+    fun init(context: Context, fragment: FragmentActivity, title: String, subtitle: String, buttonText: String) {
 
         val executor = ContextCompat.getMainExecutor(context)
 
@@ -98,11 +99,11 @@ class BiometricAuthenticator {
             .build()
     }
 
-    fun isReady(): Boolean {
-        return CoreEngine.getKeyMaster().biometricsInitialized()
-    }
-
     companion object {
+
+        fun isReady(): Boolean {
+            return CoreEngine.getKeyMaster().biometricsInitialized()
+        }
 
         fun biometricsAvailable(context: Context): Boolean {
             return canAuthenticate(context) && hasFingerPrint(context)
@@ -153,6 +154,7 @@ class BiometricAuthenticator {
         private const val TAG = "BiometricAuthenticator"
 
     }
+
     interface Listener {
         fun onSuccess(cipher: javax.crypto.Cipher)
         fun onFailure()

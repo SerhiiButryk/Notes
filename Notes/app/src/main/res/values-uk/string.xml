@@ -37,7 +37,7 @@
     <string name="ms_email_is_not_valid">Введена вами електронна адреса є недійсною. Будь ласка спробуйте ще раз.</string>
 
     // Login Activity
-    <string name="text_description">Вітаєм у додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
+    <string name="text_description">Ласкаво просимо до додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
     <string name="btn_continue">Далі</string>
     <string name="login_btn">Вхід</string>
     <string name="create_account_bnt">Далі</string>
@@ -46,7 +46,7 @@
     <string name="usr_new_psw">Пароль</string>
     <string name="usr_approve_new_psw">Повторіть пароль</string>
     <string name="usr_new_email">Пошта</string>
-    <string name="title_login">Вітаєм</string>
+    <string name="title_login">Ласкаво просимо</string>
     <string name="title_reg">Реєстрація</string>
     <string name="login_with_biometric">Війти через біометрику</string>
 
@@ -173,7 +173,7 @@
     <string name="save_note_in_file">Зберегти у файл</string>
 
     <string name="biometric_dialog_title">Невдалося встановити біометрику</string>
-    <string name="biometric_dialog_message">Спробувати ще раз ? Якщо Ви відмовитися то біометрика не буде встановлена і вхід з біометрикою не буде доступний</string>
+    <string name="biometric_dialog_message">Спробувати ще раз ? Якщо Ви відмовитеся то біометрика не буде встановлена і вхід з біометрикою не буде доступний</string>
     <string name="biometric_toast_message">Вибачте не вдалося увійти з біометрикою</string>
 
     <string name="toast_unlock_key_copied">Ключ скопійований</string>

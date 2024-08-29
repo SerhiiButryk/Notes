@@ -57,7 +57,7 @@ object IdleLockHandler {
     private fun startLockTimeout(context: Context, time: Long) {
 
         if (context is AuthorizationActivity) {
-            Log.detail(TAG, "startLockTimeout(), ignore for auth activity")
+            Log.detail(TAG, "startLockTimeout(), ignore for this activity")
             // Stop timer job
             lastJob?.cancel()
             return
@@ -88,7 +88,7 @@ object IdleLockHandler {
     private fun hasIdleTimeout(context: Context): Boolean {
 
         if (context is AuthorizationActivity) {
-            Log.detail(TAG, "hasIdleTimeout(), ignore for auth activity")
+            Log.detail(TAG, "hasIdleTimeout(), ignore for this activity")
             isInactivityTimeoutReceived.set(false)
             return false
         }

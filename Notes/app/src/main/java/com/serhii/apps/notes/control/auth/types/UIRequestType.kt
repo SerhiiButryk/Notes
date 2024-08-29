@@ -22,5 +22,7 @@ enum class UIRequestType(val description: String, val type: Int) {
 
     LOGIN_UI("LOGIN_UI", 108),
 
+    SHOW_BIOMETRICS_UI("SHOW_BIOMETRICS_UI", 109),
+
     UN_SET("UN_SET", 1);
 }

@@ -56,7 +56,8 @@ fun WelcomeUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewModel) {
         val context = LocalContext.current
 
         ButtonUI(
-            text = uiState.buttonText, Modifier
+            text = uiState.buttonText,
+            Modifier
                 .fillMaxWidth()
                 .padding(start = leftPadding, end = rightPadding, bottom = bottomPadding)
                 .align(alignment = Alignment.BottomCenter)

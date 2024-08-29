@@ -25,22 +25,23 @@ open class AppBaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.info(TAG_BASE, "onCreate()")
         // Enable secure screen content settings
         GoodUtils.enableUnsecureScreenProtection(this)
         // Initialize lifecycle aware components
         lifecycle.addObserver(AppForegroundListener)
-        Log.info(TAG_BASE, "onCreate()")
     }
 
     override fun onUserInteraction() {
         super.onUserInteraction()
+        Log.info(TAG_BASE, "onUserInteraction()")
         IdleLockHandler.onUserInteraction(this)
     }
 
     override fun onResume() {
         super.onResume()
-        IdleLockHandler.onActivityResumed(this)
         Log.info(TAG_BASE, "onResume()")
+        IdleLockHandler.onActivityResumed(this)
     }
 
     override fun onStop() {

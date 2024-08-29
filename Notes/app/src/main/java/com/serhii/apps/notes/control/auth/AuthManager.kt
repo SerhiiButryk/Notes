@@ -29,17 +29,16 @@ class AuthManager {
             }
 
             type == RequestType.REQ_AUTHORIZE -> {
-                // Return result is true or false
+                /*
+                    Result can be true or false
+                */
                 requestAuthorization(Hash.hashMD5(data.password), data.email)
             }
 
             type == RequestType.REQ_REGISTER ->
                 /*
-                    Entered credentials will be checked on the native side
-                    It will make a decision about the next step
+                    Result can be true or false
                 */
-
-                // Return result is true or false
                 requestRegistration(
                     Hash.hashMD5(data.password),
                     Hash.hashMD5(data.confirmPassword),
