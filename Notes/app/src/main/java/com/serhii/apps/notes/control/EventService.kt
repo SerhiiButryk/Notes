@@ -172,26 +172,8 @@ object EventService : IEventService {
     /**
      * Handle error event
      */
-    override fun onErrorState(type: Int, dialogCallback: () -> Unit) {
+    override fun onErrorState() {
         Log.info(TAG, "onErrorState()")
-        var shouldShowDialog = true
-        if (type == AuthResult.WRONG_PASSWORD.typeId) {
-            val currentLimit = NativeBridge.unlockLimit
-            // If limit is exceeded then need to block application
-            if (currentLimit == 1) {
-                // Block application
-                NativeBridge.executeBlockApp()
-                // Block Ui is going to be shown. So do not show dialog.
-                shouldShowDialog = false
-            } else {
-                // Update password limit value
-                NativeBridge.unlockLimit -= 1
-                Log.detail(TAG, "onErrorState(), done")
-            }
-        }
-        if (shouldShowDialog) {
-            dialogCallback()
-        }
     }
 
     private const val TAG = "EventService"

@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -112,6 +112,15 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
                 getValue = { viewModel.authModel.confirmPassword }) {
                 newText -> viewModel.authModel.confirmPassword = newText
             }
+        } else {
+            Text(
+                text = stringResource(id = R.string.forgot_password),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .padding(bottom = dimensionResource(id = R.dimen.padding_small))
+                    .clickable {  },
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
 
         val bottomPaddingMax = dimensionResource(R.dimen.button_bottom_padding)
@@ -120,8 +129,12 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
         val hasBiometrics = uiState is LoginUIState && uiState.hasBiometric
 
         val loginButtonModifiers = if (hasBiometrics)
-            Modifier.padding(bottom = bottomPaddingMin).fillMaxWidth()
-        else Modifier.padding(bottom = bottomPaddingMax).fillMaxWidth()
+            Modifier
+                .padding(bottom = bottomPaddingMin)
+                .fillMaxWidth()
+        else Modifier
+            .padding(bottom = bottomPaddingMax)
+            .fillMaxWidth()
 
         ButtonUI(text = uiState.buttonText, modifier = loginButtonModifiers) {
             doneAction()
@@ -131,7 +144,9 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
 
             // Add biometrics button
 
-            val biometricButtonModifiers = Modifier.padding(bottom = bottomPaddingMax).fillMaxWidth()
+            val biometricButtonModifiers = Modifier
+                .padding(bottom = bottomPaddingMax)
+                .fillMaxWidth()
 
             ButtonUI(text = uiState.biometricButtonText, modifier = biometricButtonModifiers) {
                 viewModel.proceed(UIRequestType.BIOMETRIC_LOGIN, context)

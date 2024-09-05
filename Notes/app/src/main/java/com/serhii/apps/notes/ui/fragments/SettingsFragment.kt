@@ -5,9 +5,6 @@
 package com.serhii.apps.notes.ui.fragments
 
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,21 +14,18 @@ import com.serhii.apps.notes.R
 import com.serhii.apps.notes.activities.AppBaseActivity
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
-import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.backup.BackupManager.openBackUpFile
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForBackup
 import com.serhii.apps.notes.control.backup.BackupManager.openDirectoryChooserForExtractData
 import com.serhii.apps.notes.control.idle_lock.IdleLockHandler
 import com.serhii.apps.notes.database.UserNotesDatabase.recordsCount
-import com.serhii.apps.notes.ui.dialogs.DialogHelper.showDialog
 import com.serhii.apps.notes.ui.dialogs.DialogHelper.showChangePasswordDialog
+import com.serhii.apps.notes.ui.dialogs.DialogHelper.showDialog
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper.Companion.ALERT_DIALOG_TYPE_BACKUP_ERROR
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
-import com.serhii.core.security.Crypto
 import com.serhii.core.utils.GoodUtils
-import com.serhii.core.utils.GoodUtils.Companion.formatString
 
 
 /**
@@ -63,28 +57,29 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val pref: Preference? = findPreference(getString(R.string.preference_login_limit_key))
-        if (pref != null) {
-            loginAttempts = pref
-        }
-
-        loginAttempts.summary = formatString(getString(R.string.preference_login_limit_summary),
-            NativeBridge.getLockLimit(requireContext()))
-
-        loginAttempts.onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener { _, newValue ->
-
-                val selectedValue = newValue.toString().toInt()
-
-                info(TAG, "onPreferenceChange(), selected new login limit: $selectedValue")
-
-                loginAttempts.summary =
-                    formatString(getString(R.string.preference_login_limit_summary), selectedValue)
-
-                EventService.onChangeLoginLimit(selectedValue)
-
-                true
-            }
+// Stopped handling login limit as we don't have reliable recovery functionality currently
+//        val pref: Preference? = findPreference(getString(R.string.preference_login_limit_key))
+//        if (pref != null) {
+//            loginAttempts = pref
+//        }
+//
+//        loginAttempts.summary = formatString(getString(R.string.preference_login_limit_summary),
+//            NativeBridge.getLockLimit(requireContext()))
+//
+//        loginAttempts.onPreferenceChangeListener =
+//            Preference.OnPreferenceChangeListener { _, newValue ->
+//
+//                val selectedValue = newValue.toString().toInt()
+//
+//                info(TAG, "onPreferenceChange(), selected new login limit: $selectedValue")
+//
+//                loginAttempts.summary =
+//                    formatString(getString(R.string.preference_login_limit_summary), selectedValue)
+//
+//                EventService.onChangeLoginLimit(selectedValue)
+//
+//                true
+//            }
 
         val version = findPreference<Preference>(getString(R.string.preference_about_version_key))
         if (version != null) {
@@ -133,19 +128,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     }
                 }
         }
-
-        val unlockNote = findPreference<Preference>(getString(R.string.preference_unlock_note_key))
-        if (unlockNote != null) {
-            unlockNote.summary = Crypto().getKeyMaster().getUnlockKey()
-            // Put the string to clipboard on User click
-            unlockNote.setOnPreferenceClickListener {
-                val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE)
-                        as ClipboardManager
-                clipboardManager.setPrimaryClip(ClipData.newPlainText("", unlockNote.summary))
-                GoodUtils.showToast(requireContext(), R.string.toast_unlock_key_copied)
-                true
-            }
-        }
+// Stopped handling login limit as we don't have reliable recovery functionality currently
+//        val unlockNote = findPreference<Preference>(getString(R.string.preference_unlock_note_key))
+//        if (unlockNote != null) {
+//            unlockNote.summary = Crypto().getKeyMaster().getUnlockKey()
+//            // Put the string to clipboard on User click
+//            unlockNote.setOnPreferenceClickListener {
+//                val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE)
+//                        as ClipboardManager
+//                clipboardManager.setPrimaryClip(ClipData.newPlainText("", unlockNote.summary))
+//                GoodUtils.showToast(requireContext(), R.string.toast_unlock_key_copied)
+//                true
+//            }
+//        }
 
         val restoreNotes = findPreference<Preference>(getString(R.string.preference_restore_note_key))
         if (restoreNotes != null) {

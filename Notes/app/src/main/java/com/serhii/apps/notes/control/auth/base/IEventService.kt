@@ -37,5 +37,5 @@ interface IEventService {
 
     fun onChangeLoginLimit(newLimit: Int)
 
-    fun onErrorState(type: Int, dialogCallback: () -> Unit)
+    fun onErrorState()
 }

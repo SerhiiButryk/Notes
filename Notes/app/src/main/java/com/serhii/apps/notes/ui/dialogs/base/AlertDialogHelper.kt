@@ -6,9 +6,7 @@ package com.serhii.apps.notes.ui.dialogs.base
 
 import android.content.Context
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthResult
-import com.serhii.core.utils.GoodUtils.Companion.formatString
 
 class AlertDialogHelper(private val type: Int, context: Context) {
 
@@ -27,9 +25,8 @@ class AlertDialogHelper(private val type: Int, context: Context) {
             title = context.getString(R.string.title_no_user_account)
             message = context.getString(R.string.ms_no_user_account)
         } else if (type == AuthResult.WRONG_PASSWORD.typeId) {
-            val limitLeft = NativeBridge.unlockLimit
             title = context.getString(R.string.title_wrong_password)
-            message = formatString(context.getString(R.string.ms_wrong_password), limitLeft)
+            message = context.getString(R.string.ms_wrong_password)
         } else if (type == AuthResult.EMPTY_FIELD.typeId) {
             title = context.getString(R.string.title_empty_field)
             message = context.getString(R.string.ms_empty_field)

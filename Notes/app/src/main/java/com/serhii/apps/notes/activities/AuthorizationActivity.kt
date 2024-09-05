@@ -6,8 +6,11 @@ package com.serhii.apps.notes.activities
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,7 +28,7 @@ import com.serhii.core.log.Log
 import kotlinx.coroutines.launch
 
 /**
- * Activity which starts user authorization
+ * Activity which performs user authorization
  */
 class AuthorizationActivity : AppBaseActivity() {
 
@@ -36,34 +39,37 @@ class AuthorizationActivity : AppBaseActivity() {
         super.onCreate(savedInstanceState)
         Log.info(TAG, "onCreate()")
 
+        enableEdgeToEdge()
+
         if (savedInstanceState == null) {
             authViewModel.initViewModel(this)
         }
 
         authViewModel.setupBiometrics(this)
 
-        configureUI()
+        setupUI()
         initNative()
     }
 
-    private fun configureUI() {
-        Log.info(TAG, "configureUI()")
+    private fun setupUI() {
+        Log.info(TAG, "setupUI()")
         setContent {
             AppMaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
+                    Box(Modifier.safeDrawingPadding()) {
 
-                    // Convert from State Flow to a State observable holder
-                    val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
+                        // Convert from State Flow to a State observable holder
+                        val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
+                        val appUIState = uiState.value
 
-                    val appUIState = uiState.value
-
-                    // AuthorizationUI handles LoginUIState and RegistrationUIState states
-                    if (appUIState is LoginViewModel.LoginUIState ||
-                        appUIState is LoginViewModel.RegistrationUIState
-                    ) {
-                        AuthorizationUI(uiState = appUIState, authViewModel)
-                    } else if (appUIState is LoginViewModel.WelcomeUIState) {
-                        WelcomeUI(uiState = appUIState, authViewModel)
+                        // AuthorizationUI handles LoginUIState and RegistrationUIState states
+                        if (appUIState is LoginViewModel.LoginUIState ||
+                            appUIState is LoginViewModel.RegistrationUIState
+                        ) {
+                            AuthorizationUI(uiState = appUIState, authViewModel)
+                        } else if (appUIState is LoginViewModel.WelcomeUIState) {
+                            WelcomeUI(uiState = appUIState, authViewModel)
+                        }
                     }
                 }
             }
@@ -71,16 +77,16 @@ class AuthorizationActivity : AppBaseActivity() {
     }
 
     /**
-     * Called by native
+     * Called by native to notify that user has been logged in
      */
     fun onAuthorizationFinished() {
-        Log.info(TAG, "onAuthorize(), activity is finishing")
-        // Close activity
+        Log.info(TAG, "onAuthorize()")
+        // Close this activity
         finish()
     }
 
     /**
-     * Called by native
+     * Called by native to notify that registration has completed
      */
     fun userRegistered() {
         Log.info(TAG, "userRegistered()")
@@ -93,28 +99,16 @@ class AuthorizationActivity : AppBaseActivity() {
     }
 
     /**
-     * Called by native to notify that a dialog should be shown
+     * Called by native to notify that we need to show a dialog
      */
     private fun showAlertDialog(type: Int) {
         Log.info(TAG, "showAlertDialog(), type $type")
-
-        // Process error state
-        EventService.onErrorState(type) {
-            Log.detail(TAG, "showAlertDialog(), show dialog")
-            authViewModel.proceed(
-                requestType = UIRequestType.SHOW_DIALOG,
-                context = applicationContext,
-                type = type
-            )
-        }
-
-        // If app gets blocked then show Block UI
-        if (type == AuthResult.WRONG_PASSWORD.typeId && NativeBridge.isAppBlocked) {
-            authViewModel.proceed(
-                requestType = UIRequestType.BLOCK_UI,
-                context = applicationContext
-            )
-        }
+        // Show a dialog
+        authViewModel.proceed(
+            requestType = UIRequestType.SHOW_DIALOG,
+            context = applicationContext,
+            type = type
+        )
     }
 
     /**

@@ -15,7 +15,7 @@
     <string name="ms_no_user_account">This user account is not authorized. Please, authorize your user.</string>
     <string name="title_no_user_account">Authorize error</string>
 
-    <string name="ms_wrong_password">Password is incorrect. You have %s attempts.</string>
+    <string name="ms_wrong_password">Password is wrong. Please, try again.</string>
     <string name="title_wrong_password">Authorize error</string>
 
     <string name="ms_empty_field">Empty password or user name. \nPlease enter valid credentials.</string>
@@ -209,11 +209,13 @@
 
     <string name="toast_unlock_key_copied">Unlock key is copied to the clipboard</string>
 
-    <string name="biometric_dialog_title">Biometric auth is failed or canceled</string>
+    <string name="biometric_dialog_title">Biometric authentication</string>
     <string name="biometric_dialog_message">Would you like to retry ? If you disagree you will not be able to use biometrics to login in this app</string>
     <string name="biometric_toast_message">Sorry, failed to login with biometrics</string>
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <string name="forgot_password">Forgot password ?</string>
 
 </resources>

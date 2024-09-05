@@ -4,7 +4,7 @@
 
 This application is developed for keeping and accessing all your notes securely on a device. 
 The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication
-and it provides simple interface for use.
+Also it provides simple and beautiful interface.
 
 # Get on Google Play
 
@@ -13,19 +13,18 @@ and it provides simple interface for use.
 # Features
 
 - User authentication
-- Basic text editing
-- Limitation of user login attempts
-- Application inactivity lock (UI app lock after a timeout)
+- Basic text edit
+- Application idle lock (UI app screen lock after a timeout)
 - Secure data storage
 - Backup/restore support
 - A search across all your notes
 
 # Repository structure
 
-- external-libs/ - libraries folder
-- Notes/ - app root folder
-- tools/ - helper scripts
-- gradle_configs/ - common project gradle settings
+- external-libs/ - additinal libraries which the app is using
+- Notes/ - the app project folder
+- tools/ - utility scripts
+- gradle_configs/ - utility project gradle settings
 
 # Used technologies
 
@@ -38,14 +37,14 @@ and it provides simple interface for use.
 3) CSCRYPTO - https://www.copperspice.com/docs/cs_crypto/basic_what.html
 
 - Build tools: NDK, Gradle
-- Android conponents/libraries: Jatpack libraries, fragments, view model, SQL database.
+- Android conponents/libraries: Jatpack Compose, Fragments, ViewModel, SQL database.
 
 # Supported platforms
 
-- Android version: Android 8 - Android 14
-- Supported ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
+- Android OS: Android 8 - Android 14
+- ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
 
-# Localization support
+# Localization
 
 - ua (Ukraine)
 - ru (Russia)
@@ -57,15 +56,15 @@ Required tools:
 
 1) NDK verions: 26
 2) Java version: 17
-2) Kotlin version: 1.6
+2) Kotlin version: 2.0
 
-Use gradlew or Android Studio ('Build' menu) to build this application
+Use gradlew or Android Studio 'Build' menu to build this project
 
 # Unit Tests
 
 Find tests under 'Notes/app/src/androidTest' folder.
 
-# App designs
+# App designs [This is not up-to-date]
 
 <img src="images/Screenshot_1.png" height="420" width="220"> <img src="images/Screenshot_2.png" height="420" width="220">
 <img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220"> 
@@ -73,6 +72,6 @@ Find tests under 'Notes/app/src/androidTest' folder.
 <img src="images/Screenshot_7.png" height="420" width="220"> <img src="images/Screenshot_8.png" height="420" width="220">
 <img src="images/Screenshot_9.png" height="420" width="220">
 
-# Contacts or questions
+# Questions or help
 
 Reach out to me: sergeybutr@gmail.com.

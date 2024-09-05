@@ -15,7 +15,7 @@
     <string name="ms_no_user_account">Ваш акаунт не знайдений. \nБудь ласка, створіть акаунт.</string>
     <string name="title_no_user_account">Помилка авторизації</string>
 
-    <string name="ms_wrong_password">Пароль неправильний. У вас лишилося %s спроби.</string>
+    <string name="ms_wrong_password">Пароль неправильний. Будь ласка, спробуйте ще раз.</string>
     <string name="title_wrong_password">Помилка авторизації</string>
 
     <string name="ms_empty_field">Порожній пароль чи ім\'я користувача. \nБудь ласка спробуйте ще раз.</string>

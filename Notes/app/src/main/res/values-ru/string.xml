@@ -15,7 +15,7 @@
     <string name="ms_no_user_account">Ваш аккаунт не найден. \тПожалуйста, создайте аккаунт.</string>
     <string name="title_no_user_account">Ошибка авторизации</string>
 
-    <string name="ms_wrong_password">Пароль неверен. У вас осталось %s попыток.</string>
+    <string name="ms_wrong_password">Пароль неверен. Пожалуйста, попробуйте еще раз.</string>
     <string name="title_wrong_password">Ошибка авторизации</string>
 
     <string name="ms_empty_field">Пустой пароль или имя пользователя. \nПожалуйста, попробуйте еще раз.</string>

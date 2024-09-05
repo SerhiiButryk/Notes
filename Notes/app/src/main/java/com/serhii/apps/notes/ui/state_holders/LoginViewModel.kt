@@ -15,6 +15,7 @@ import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
+import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper
@@ -141,12 +142,17 @@ class LoginViewModel : ViewModel() {
                         createRegistrationUIState(context)
                     }
 
+                    val hasCancelButton = !(AuthResult.WRONG_PASSWORD.typeId == type
+                            || AuthResult.ACCOUNT_INVALID.typeId == type
+                            || AuthResult.EMPTY_FIELD.typeId == type)
+
                     requestDialog(
                         AlertDialogHelper.getTitleFor(type),
                         AlertDialogHelper.getMessageFor(type),
                         { /* No-op */ },
                         { /* No-op */ },
-                        uiState = newUiState
+                        uiState = newUiState,
+                        hasCancelButton = hasCancelButton
                     )
                 }
 
@@ -226,6 +232,7 @@ class LoginViewModel : ViewModel() {
         onCancel: () -> Unit,
         positiveBtn: Int = android.R.string.ok,
         negativeBtn: Int = android.R.string.cancel,
+        hasCancelButton: Boolean = true,
         uiState: AuthUIState
     ) {
 
@@ -234,8 +241,8 @@ class LoginViewModel : ViewModel() {
             message = message,
             onConfirm = onConfirm,
             onCancel = onCancel,
-            hasCancelButton = true,
-            dialogDismissible = false,
+            hasCancelButton = hasCancelButton,
+            dialogDismissible = !hasCancelButton,
             positiveBtn = positiveBtn,
             negativeBtn = negativeBtn
         )

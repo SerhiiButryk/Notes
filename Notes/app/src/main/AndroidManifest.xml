@@ -29,7 +29,7 @@
             android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
             android:exported="false"
             android:theme="@style/AppThemeNoActionbarTheme"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
 
         <activity android:name="com.serhii.apps.notes.activities.NotesViewActivity"
             android:theme="@style/AppThemeNoActionbarTheme"
