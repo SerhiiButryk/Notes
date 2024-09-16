@@ -97,6 +97,7 @@
 
     <string name="preference_category_title_debug">Diagnostics</string>
     <string name="preference_category_message_detail_logs">Enable detail logs</string>
+    <string name="preference_category_message_detail_logs_sub">Enable detail logs</string>
     <string name="preference_category_key_detail_logs" translatable="false">detail logs</string>
 
     <string name="preference_login_limit_key" translatable="false">login_limit</string>
@@ -200,12 +201,13 @@
     <string name="empty_login">Empty username or password</string>
     <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
 
-    <string name="info_author">Author: Serhii Butryk</string>
+    <string name="info_author">Author</string>
+    <string name="info_author_sub">Serhii Butryk</string>
 
     <string name="search_title">Search</string>
     <string name="message_email_app_not_found">Sorry, you don\'t have email app. Cannot complete this action.</string>
 
-    <string name="save_note_in_file">Extract this note</string>
+    <string name="save_note_in_file">Extract note as plain text</string>
 
     <string name="toast_unlock_key_copied">Unlock key is copied to the clipboard</string>
 

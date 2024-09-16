@@ -6,21 +6,32 @@ package com.serhii.apps.notes.activities
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.database.UserNotesDatabase
-import com.serhii.apps.notes.ui.data_model.NoteModel
-import com.serhii.apps.notes.ui.fragments.NoteEditorFragment
-import com.serhii.apps.notes.ui.fragments.NoteEditorFragment.EditorNoteInteraction
-import com.serhii.apps.notes.ui.fragments.NoteViewFragment
-import com.serhii.apps.notes.ui.fragments.NoteViewFragment.NoteInteraction
+import com.serhii.apps.notes.ui.MenuOptions
+import com.serhii.apps.notes.ui.NotesEditorUI
+import com.serhii.apps.notes.ui.NotesPreviewUI
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
+import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.core.log.Log
-import com.serhii.core.log.Log.Companion.info
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 import java.io.OutputStream
@@ -28,38 +39,39 @@ import java.io.OutputStream
 /**
  * Activity which displays user note list
  */
-class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, EditorNoteInteraction {
+class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
 
-    private val notesViewModel: NotesViewModel by viewModels()
+    private val viewModel: NotesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        info(TAG, "onCreate()")
         setLoggingTagForActivity(TAG)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note_view)
+        Log.info(TAG, "onCreate()")
+
+        if (savedInstanceState == null) {
+            viewModel.initViewModel(this)
+        }
+
+        setupUI()
 
         // Need to call initNativeConfigs() before authorization process at the beginning.
         initNativeConfigs()
 
-        if (savedInstanceState == null) {
-            addNoteViewFragment()
-        }
-
         // Start authorization process.
         authorizeUser(savedInstanceState)
-    }
 
-    private fun addNoteViewFragment() {
-        val fm = supportFragmentManager
-        val f = NoteViewFragment()
-        fm.beginTransaction().replace(R.id.main_layout, f, NoteViewFragment.FRAGMENT_TAG)
-            .setReorderingAllowed(true) // Needed for optimization
-            .commit()
+        // Handle back button clicks
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (!viewModel.navigateBack()) {
+                    moveTaskToBack(false)
+                }
+            }
+        })
     }
 
     override fun onDestroy() {
-        info(TAG, "onDestroy()")
+        Log.info(TAG, "onDestroy()")
         super.onDestroy()
     }
 
@@ -67,12 +79,12 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         super.onActivityResult(requestCode, resultCode, data)
 
         if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
-            info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
+            Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
             if (data != null) {
 
-                val noteId = getNoteId()
+                val noteId = ""
                 if (noteId.isNullOrEmpty()) {
-                    info(TAG, "onActivityResult() empty noteId, return")
+                    Log.info(TAG, "onActivityResult() empty noteId, return")
                     return
                 }
 
@@ -98,75 +110,12 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
         }
     }
 
-    private fun getNoteId(): String? {
-        val fm = supportFragmentManager
-        val f = fm.findFragmentByTag(NoteEditorFragment.FRAGMENT_TAG) as? NoteEditorFragment
-        if (f != null) {
-            return f.getNoteId()
-        }
-        return ""
-    }
-
     /**
      * Called when user is authorized
      */
     override fun onUserAuthorized() {
-        info(TAG, "onUserAuthorized()")
-        notesViewModel.updateAllNotes()
-    }
-
-    override fun onOpenNote(note: NoteModel?) {
-        info(TAG, "onOpenNote()")
-
-        val fm = supportFragmentManager
-        if (fm.findFragmentByTag(NoteEditorFragment.FRAGMENT_TAG) != null) {
-            info(TAG, "onOpenNote() fragment is already opened, return")
-            return
-        }
-
-        val args = Bundle()
-        if (note == null) {
-            // Handle add note button click
-            args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_CREATE)
-        } else {
-            // Handle open note button click
-            args.putString(NoteEditorFragment.ARG_NOTE_ID, note.id)
-            args.putString(NoteEditorFragment.ARG_ACTION, NoteEditorFragment.ACTION_NOTE_OPEN)
-        }
-
-        fm.beginTransaction().add(R.id.main_layout, NoteEditorFragment::class.java, args,
-            NoteEditorFragment.FRAGMENT_TAG)
-            .setReorderingAllowed(true) // Needed for optimization
-            .addToBackStack(null)
-            .commit()
-    }
-
-    override fun onDeleteNote() {
-        val fm = supportFragmentManager
-        fm.popBackStack()
-    }
-
-    override fun onBackNavigation() {
-        // Send a notification before we move back
-        notifyAboutBackNavigation()
-        val fm = supportFragmentManager
-        fm.popBackStack()
-    }
-
-    override fun onBackPressed() {
-        // Send a notification before we move back
-        notifyAboutBackNavigation()
-        super.onBackPressed()
-    }
-
-    private fun notifyAboutBackNavigation() {
-        val fm = supportFragmentManager
-        for (f in fm.fragments) {
-            if (f != null) {
-                val callback = f as? NavigationCallback
-                callback?.onNavigateBack()
-            }
-        }
+        Log.info(TAG, "onUserAuthorized()")
+        viewModel.updateNotesData()
     }
 
     // This will start auth activity
@@ -182,6 +131,47 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser, NoteInteraction, Ed
             startActivity(intent)
         } else {
             onUserAuthorized()
+        }
+    }
+
+    private fun setupUI() {
+        // Add menu options
+        val menuOptions = mutableListOf<MenuOptions>()
+        // Add 'Go to settings' option
+        menuOptions.add(MenuOptions(textId = R.string.settings_item, icon = Icons.Default.Settings, onClick = {
+            viewModel.openSettings(this)
+        }))
+
+        val menuOptionsEditor = mutableListOf<MenuOptions>()
+        // Save
+        menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_item, icon = Icons.Default.Save, onClick = {
+
+        }))
+        // Delete
+        menuOptionsEditor.add(MenuOptions(textId = R.string.delete_note_item, icon = Icons.Default.Delete, onClick = {
+
+        }))
+        // Extract
+        menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_in_file, icon = Icons.Default.Backup, onClick = {
+
+        }))
+
+        setContent {
+            AppMaterialTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Box(Modifier.safeDrawingPadding()) {
+
+                        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+                        val appUiState: NotesViewModel.BaseUIState = uiState.value
+
+                        if (appUiState is NotesViewModel.NotesMainUIState) {
+                            NotesPreviewUI(appUiState, viewModel, menuOptions)
+                        } else if (appUiState is NotesViewModel.NotesEditorUIState) {
+                            NotesEditorUI(viewModel, menuOptionsEditor)
+                        }
+                    }
+                }
+            }
         }
     }
 

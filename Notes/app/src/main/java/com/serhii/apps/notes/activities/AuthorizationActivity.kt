@@ -6,7 +6,6 @@ package com.serhii.apps.notes.activities
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +16,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
-import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.AuthorizationUI
 import com.serhii.apps.notes.ui.WelcomeUI
@@ -32,43 +29,40 @@ import kotlinx.coroutines.launch
  */
 class AuthorizationActivity : AppBaseActivity() {
 
-    private val authViewModel: LoginViewModel by viewModels()
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setLoggingTagForActivity(TAG)
         super.onCreate(savedInstanceState)
         Log.info(TAG, "onCreate()")
 
-        enableEdgeToEdge()
-
         if (savedInstanceState == null) {
-            authViewModel.initViewModel(this)
+            viewModel.initViewModel(this)
         }
 
-        authViewModel.setupBiometrics(this)
+        viewModel.setupBiometrics(this)
 
         setupUI()
         initNative()
     }
 
     private fun setupUI() {
-        Log.info(TAG, "setupUI()")
         setContent {
             AppMaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(Modifier.safeDrawingPadding()) {
 
                         // Convert from State Flow to a State observable holder
-                        val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
+                        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
                         val appUIState = uiState.value
 
                         // AuthorizationUI handles LoginUIState and RegistrationUIState states
                         if (appUIState is LoginViewModel.LoginUIState ||
                             appUIState is LoginViewModel.RegistrationUIState
                         ) {
-                            AuthorizationUI(uiState = appUIState, authViewModel)
+                            AuthorizationUI(uiState = appUIState, viewModel)
                         } else if (appUIState is LoginViewModel.WelcomeUIState) {
-                            WelcomeUI(uiState = appUIState, authViewModel)
+                            WelcomeUI(uiState = appUIState, viewModel)
                         }
                     }
                 }
@@ -91,7 +85,7 @@ class AuthorizationActivity : AppBaseActivity() {
     fun userRegistered() {
         Log.info(TAG, "userRegistered()")
 
-        authViewModel.proceed(requestType = UIRequestType.LOGIN_UI, context = applicationContext)
+        viewModel.proceed(requestType = UIRequestType.LOGIN_UI, context = applicationContext)
 
         lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
             EventService.onRegistrationDone(applicationContext)
@@ -104,7 +98,7 @@ class AuthorizationActivity : AppBaseActivity() {
     private fun showAlertDialog(type: Int) {
         Log.info(TAG, "showAlertDialog(), type $type")
         // Show a dialog
-        authViewModel.proceed(
+        viewModel.proceed(
             requestType = UIRequestType.SHOW_DIALOG,
             context = applicationContext,
             type = type

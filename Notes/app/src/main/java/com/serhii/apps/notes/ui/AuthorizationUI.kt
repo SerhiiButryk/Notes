@@ -9,7 +9,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,11 +54,11 @@ import com.serhii.apps.notes.ui.state_holders.LoginViewModel.LoginUIState
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 
 /**
- * User login and registration screen UI
+ * User login and registration screen
  */
 
 @Composable
-fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewModel) {
+fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewModel) {
 
     val leftPadding = dimensionResource(R.dimen.left_right_padding)
     val rightPadding = dimensionResource(R.dimen.left_right_padding)
@@ -87,30 +86,33 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
         val isRegistrationUI = uiState is LoginViewModel.RegistrationUIState
 
         val doneAction = {
-            val requestType = if (isRegistrationUI) UIRequestType.REGISTRATION else UIRequestType.PASSWORD_LOGIN
+            val requestType =
+                if (isRegistrationUI) UIRequestType.REGISTRATION else UIRequestType.PASSWORD_LOGIN
             viewModel.proceed(requestType, context, authModel = viewModel.authModel)
         }
 
         TitleUI(title = uiState.title)
 
         EmailFieldUI(label = uiState.emailFiledLabel, hint = uiState.emailFiledHint,
-            getValue = { viewModel.authModel.email }, modifier = focusModifierEmail) {
-            newText -> viewModel.authModel.email = newText
+            getValue = { viewModel.authModel.email }, modifier = focusModifierEmail
+        ) { newText ->
+            viewModel.authModel.email = newText
         }
 
         PasswordFieldUI(label = uiState.passwordFiledLabel, hint = uiState.passwordFiledHint,
             doneAction = if (isRegistrationUI) null else doneAction,
             actionKeyboard = if (isRegistrationUI) ImeAction.Next else ImeAction.Done,
-            getValue = { viewModel.authModel.password }, modifier = focusModifierPassword) {
-            newText -> viewModel.authModel.password = newText
+            getValue = { viewModel.authModel.password }, modifier = focusModifierPassword
+        ) { newText ->
+            viewModel.authModel.password = newText
         }
 
         if (uiState is LoginViewModel.RegistrationUIState) {
             PasswordFieldUI(label = uiState.confirmPasswordFiledLabel,
                 doneAction = doneAction, actionKeyboard = ImeAction.Done,
                 hint = uiState.confirmPasswordFiledHint,
-                getValue = { viewModel.authModel.confirmPassword }) {
-                newText -> viewModel.authModel.confirmPassword = newText
+                getValue = { viewModel.authModel.confirmPassword }) { newText ->
+                viewModel.authModel.confirmPassword = newText
             }
         } else {
             Text(
@@ -118,7 +120,7 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(bottom = dimensionResource(id = R.dimen.padding_small))
-                    .clickable {  },
+                    .clickable { },
                 color = MaterialTheme.colorScheme.secondary
             )
         }
@@ -221,7 +223,13 @@ fun AuthorizationUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewMod
 }
 
 @Composable
-private fun EmailFieldUI(label: String, hint: String, getValue: () -> String, modifier: Modifier, onValueChanged: (String) -> Unit) {
+private fun EmailFieldUI(
+    label: String,
+    hint: String,
+    getValue: () -> String,
+    modifier: Modifier,
+    onValueChanged: (String) -> Unit
+) {
 
     var inputValue by rememberSaveable { mutableStateOf("") }
 
@@ -249,18 +257,24 @@ private fun EmailFieldUI(label: String, hint: String, getValue: () -> String, mo
         textStyle = textStyle,
         singleLine = true,
         maxLines = 1,
-        placeholder =  {
+        placeholder = {
             Text(text = hint, style = labelStyle)
         },
         shape = RoundedCornerShape(percent = 20),
-        keyboardOptions = KeyboardOptions(autoCorrect = false, keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(
+            autoCorrect = false,
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        ),
     )
 }
 
 @Composable
-private fun PasswordFieldUI(label: String, modifier: Modifier? = null,
-                            doneAction: (() -> Unit)? = null, actionKeyboard: ImeAction = ImeAction.Next,
-                            hint: String, getValue: () -> String, onValueChanged: (String) -> Unit) {
+private fun PasswordFieldUI(
+    label: String, modifier: Modifier? = null,
+    doneAction: (() -> Unit)? = null, actionKeyboard: ImeAction = ImeAction.Next,
+    hint: String, getValue: () -> String, onValueChanged: (String) -> Unit
+) {
 
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf("") }
@@ -289,14 +303,18 @@ private fun PasswordFieldUI(label: String, modifier: Modifier? = null,
         textStyle = textStyle,
         singleLine = true,
         maxLines = 1,
-        placeholder =  {
+        placeholder = {
             Text(text = hint, style = labelStyle)
         },
         shape = RoundedCornerShape(percent = 20),
         // Setup password filed transformation
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         // Setup additional keyboard mode
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = actionKeyboard),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            autoCorrect = false,
+            imeAction = actionKeyboard
+        ),
         // Setup password eye icon
         trailingIcon = {
             val onClick = { showPassword = !showPassword }
@@ -344,7 +362,8 @@ private fun AuthorizationUIDarkPreview() {
 @Composable
 private fun AuthorizationUIForPreview() {
 
-    val uiState = LoginUIState(title = "Welcome",
+    val uiState = LoginUIState(
+        title = "Welcome",
         emailFiledLabel = "Email",
         emailFiledHint = "Type email",
         passwordFiledLabel = "Password",
@@ -352,7 +371,8 @@ private fun AuthorizationUIForPreview() {
         buttonText = "Login",
         hasBiometric = true,
         biometricButtonText = "Biometrics",
-        uiRequestType = UIRequestType.UNLOCK)
+        uiRequestType = UIRequestType.UNLOCK
+    )
 
     AppMaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {

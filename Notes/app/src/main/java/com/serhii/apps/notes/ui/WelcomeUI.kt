@@ -29,11 +29,11 @@ import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 
 /**
- * Welcome screen UI
+ * Welcome screen
  */
 
 @Composable
-fun WelcomeUI(uiState: LoginViewModel.AuthUIState, viewModel: LoginViewModel) {
+fun WelcomeUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewModel) {
 
     val leftPadding = dimensionResource(R.dimen.left_right_padding)
     val rightPadding = dimensionResource(R.dimen.left_right_padding)

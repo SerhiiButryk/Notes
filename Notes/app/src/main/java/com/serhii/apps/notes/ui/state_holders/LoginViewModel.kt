@@ -5,11 +5,8 @@
 package com.serhii.apps.notes.ui.state_holders
 
 import android.content.Context
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.focus.FocusRequester
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
@@ -17,8 +14,8 @@ import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.UIRequestType
+import com.serhii.apps.notes.ui.DialogHelper
 import com.serhii.apps.notes.ui.data_model.AuthModel
-import com.serhii.apps.notes.ui.dialogs.base.AlertDialogHelper
 import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.utils.GoodUtils
@@ -35,27 +32,24 @@ import javax.crypto.Cipher
 
 private const val TAG = "LoginViewModel"
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel : AppViewModel() {
 
     // UI State of the managed auth screens
-    private val authStateFlow: MutableStateFlow<AuthUIState> = MutableStateFlow(AuthUIState())
-    val uiState: StateFlow<AuthUIState> = authStateFlow
+    private val _uiState: MutableStateFlow<BaseUIState> = MutableStateFlow(BaseUIState())
+    val uiState: StateFlow<BaseUIState> = _uiState
 
     // Current user auth data
     val authModel: AuthModel = AuthModel()
     private var biometricAuthManager: BiometricAuthenticator? = null
 
-    private var immManager: InputMethodManager? = null
-
-    fun initViewModel(context: Context) {
+    override fun initViewModel(context: Context) {
         Log.info(TAG, "initViewModel()")
-        authStateFlow.value = getUIState(context)
+        super.initViewModel(context)
+        _uiState.value = getUIState(context)
 
         if (BiometricAuthenticator.biometricsAvailable(context) && biometricAuthManager == null) {
             biometricAuthManager = BiometricAuthenticator()
         }
-
-        immManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     fun setupBiometrics(activity: FragmentActivity) {
@@ -67,7 +61,7 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    private fun getUIState(context: Context): AuthUIState {
+    private fun getUIState(context: Context): BaseUIState {
         Log.info(TAG, "getUIState()")
 
         val userExists = NativeBridge.userName.isNotEmpty()
@@ -107,7 +101,7 @@ class LoginViewModel : ViewModel() {
 
                 UIRequestType.WELCOME_UI -> {
                     // Open next screen
-                    authStateFlow.value = createRegistrationUIState(context)
+                    _uiState.value = createRegistrationUIState(context)
                 }
 
                 UIRequestType.REGISTRATION -> {
@@ -135,8 +129,8 @@ class LoginViewModel : ViewModel() {
 
                 UIRequestType.SHOW_DIALOG -> {
 
-                    // TODO: Doest look good, might be revisited later
-                    val newUiState: AuthUIState = if (uiState.value is LoginUIState) {
+                    // TODO: Doest not look good, might be revisited later
+                    val newUiState: BaseUIState = if (uiState.value is LoginUIState) {
                         createLoginUIState(context)
                     } else {
                         createRegistrationUIState(context)
@@ -147,8 +141,8 @@ class LoginViewModel : ViewModel() {
                             || AuthResult.EMPTY_FIELD.typeId == type)
 
                     requestDialog(
-                        AlertDialogHelper.getTitleFor(type),
-                        AlertDialogHelper.getMessageFor(type),
+                        DialogHelper.getTitleFor(type),
+                        DialogHelper.getMessageFor(type),
                         { /* No-op */ },
                         { /* No-op */ },
                         uiState = newUiState,
@@ -160,7 +154,7 @@ class LoginViewModel : ViewModel() {
 
                 UIRequestType.LOGIN_UI -> {
                     // Open next screen
-                    authStateFlow.value = createLoginUIState(context)
+                    _uiState.value = createLoginUIState(context)
                 }
 
                 UIRequestType.SHOW_BIOMETRICS_UI -> {
@@ -173,17 +167,7 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun requestKeyboard(focusRequester: FocusRequester) {
-        viewModelScope.launch(App.UI_DISPATCHER) {
-            Log.detail(TAG, "requestKeyboard() try to show keyboard")
-            if (immManager != null && !immManager!!.isAcceptingText()) {
-                focusRequester.requestFocus()
-                Log.detail(TAG, "requestKeyboard() done")
-            }
-        }
-    }
-
-    private fun requestBiometricDialog(context: Context, uiState: AuthUIState) {
+    private fun requestBiometricDialog(context: Context, uiState: BaseUIState) {
         Log.detail(TAG, "requestBiometricDialog()")
 
         // Start authentication using biometrics
@@ -233,7 +217,7 @@ class LoginViewModel : ViewModel() {
         positiveBtn: Int = android.R.string.ok,
         negativeBtn: Int = android.R.string.cancel,
         hasCancelButton: Boolean = true,
-        uiState: AuthUIState
+        uiState: BaseUIState
     ) {
 
         uiState.dialogState = DialogUIState(
@@ -249,7 +233,7 @@ class LoginViewModel : ViewModel() {
 
         uiState.openDialog = true
 
-        authStateFlow.value = uiState
+        _uiState.value = uiState
     }
 
     // UI State factory methods
@@ -306,7 +290,7 @@ class LoginViewModel : ViewModel() {
     )
 
     @Stable
-    open class AuthUIState(
+    open class BaseUIState(
         val title: String = "",
         val emailFiledLabel: String = "",
         val emailFiledHint: String = "",
@@ -330,7 +314,7 @@ class LoginViewModel : ViewModel() {
         val hasBiometric: Boolean,
         val biometricButtonText: String,
         uiRequestType: UIRequestType
-    ) : AuthUIState(
+    ) : BaseUIState(
         title = title,
         emailFiledLabel = emailFiledLabel,
         emailFiledHint = emailFiledHint,
@@ -351,7 +335,7 @@ class LoginViewModel : ViewModel() {
         val confirmPasswordFiledLabel: String,
         val confirmPasswordFiledHint: String,
         uiRequestType: UIRequestType
-    ) : AuthUIState(
+    ) : BaseUIState(
         title = title,
         emailFiledLabel = emailFiledLabel,
         emailFiledHint = emailFiledHint,
@@ -367,7 +351,7 @@ class LoginViewModel : ViewModel() {
         descriptionText: String,
         buttonText: String,
         uiRequestType: UIRequestType
-    ) : AuthUIState(
+    ) : BaseUIState(
         title = title,
         descriptionText = descriptionText,
         buttonText = buttonText,

@@ -6,6 +6,7 @@
 package com.serhii.apps.notes.activities
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
@@ -25,6 +26,7 @@ open class AppBaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         Log.info(TAG_BASE, "onCreate()")
         // Enable secure screen content settings
         GoodUtils.enableUnsecureScreenProtection(this)
@@ -75,11 +77,6 @@ open class AppBaseActivity : AppCompatActivity() {
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
         Log.info(TAG_BASE, "init()")
-    }
-
-    // A callback from a fragment
-    interface NavigationCallback {
-        fun onNavigateBack()
     }
 
 }
