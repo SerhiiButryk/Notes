@@ -15,6 +15,7 @@ import com.serhii.apps.notes.control.NativeBridge
 import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.DialogHelper
+import com.serhii.apps.notes.ui.DialogUIState
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
@@ -129,24 +130,29 @@ class LoginViewModel : AppViewModel() {
 
                 UIRequestType.SHOW_DIALOG -> {
 
-                    // TODO: Doest not look good, might be revisited later
-                    val newUiState: BaseUIState = if (uiState.value is LoginUIState) {
-                        createLoginUIState(context)
-                    } else {
-                        createRegistrationUIState(context)
+                    val createNewUiState = {
+                        // TODO: Doest not look good, might be revisited later
+                        if (uiState.value is LoginUIState) {
+                            createLoginUIState(context)
+                        } else {
+                            createRegistrationUIState(context)
+                        }
                     }
 
-                    val hasCancelButton = !(AuthResult.WRONG_PASSWORD.typeId == type
-                            || AuthResult.ACCOUNT_INVALID.typeId == type
-                            || AuthResult.EMPTY_FIELD.typeId == type)
-
-                    requestDialog(
+                    openDialog(
                         DialogHelper.getTitleFor(type),
                         DialogHelper.getMessageFor(type),
-                        { /* No-op */ },
-                        { /* No-op */ },
-                        uiState = newUiState,
-                        hasCancelButton = hasCancelButton
+                        {
+                            // TODO: Doest not look good, might be revisited later
+                            // A hack to close dialog
+                            _uiState.value = createNewUiState()
+                        },
+                        {
+                            // TODO: Doest not look good, might be revisited later
+                            // A hack to close dialog
+                            _uiState.value = createNewUiState()
+                        },
+                        uiState = createNewUiState()
                     )
                 }
 
@@ -186,7 +192,7 @@ class LoginViewModel : AppViewModel() {
             override fun onFailure() {
                 Log.error(TAG, "BiometricAuthenticator.Listener: onFailure()")
 
-                requestDialog(
+                openDialog(
                     title = R.string.biometric_dialog_title,
                     message = R.string.biometric_dialog_message,
                     onConfirm = {
@@ -202,31 +208,31 @@ class LoginViewModel : AppViewModel() {
                     },
                     uiState = uiState,
                     positiveBtn = R.string.yes,
-                    negativeBtn = R.string.no
+                    negativeBtn = R.string.no,
+                    hasCancelButton = true,
                 )
             }
 
         })
     }
 
-    private fun requestDialog(
+    private fun openDialog(
         title: Int,
         message: Int,
         onConfirm: () -> Unit,
         onCancel: () -> Unit,
         positiveBtn: Int = android.R.string.ok,
         negativeBtn: Int = android.R.string.cancel,
-        hasCancelButton: Boolean = true,
+        hasCancelButton: Boolean = false,
         uiState: BaseUIState
     ) {
 
-        uiState.dialogState = DialogUIState(
+        uiState.dialogState = requestDialog(
             title = title,
             message = message,
             onConfirm = onConfirm,
             onCancel = onCancel,
             hasCancelButton = hasCancelButton,
-            dialogDismissible = !hasCancelButton,
             positiveBtn = positiveBtn,
             negativeBtn = negativeBtn
         )
@@ -274,20 +280,6 @@ class LoginViewModel : AppViewModel() {
             uiRequestType = UIRequestType.WELCOME_UI
         )
     }
-
-    // UI State declarations
-
-    @Stable
-    class DialogUIState(
-        val title: Int = -1,
-        val message: Int = -1,
-        val dialogDismissible: Boolean = true,
-        val hasCancelButton: Boolean = false,
-        val onConfirm: () -> Unit = {},
-        val onCancel: () -> Unit = {},
-        val positiveBtn: Int = android.R.string.ok,
-        val negativeBtn: Int = android.R.string.cancel,
-    )
 
     @Stable
     open class BaseUIState(

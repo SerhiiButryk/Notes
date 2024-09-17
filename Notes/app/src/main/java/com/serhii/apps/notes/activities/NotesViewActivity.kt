@@ -29,6 +29,7 @@ import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.MenuOptions
 import com.serhii.apps.notes.ui.NotesEditorUI
 import com.serhii.apps.notes.ui.NotesPreviewUI
+import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.core.log.Log
@@ -115,7 +116,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
      */
     override fun onUserAuthorized() {
         Log.info(TAG, "onUserAuthorized()")
-        viewModel.updateNotesData()
+        viewModel.reloadData()
     }
 
     // This will start auth activity
@@ -145,11 +146,11 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
         val menuOptionsEditor = mutableListOf<MenuOptions>()
         // Save
         menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_item, icon = Icons.Default.Save, onClick = {
-
+            viewModel.saveNote(NoteModel())
         }))
         // Delete
         menuOptionsEditor.add(MenuOptions(textId = R.string.delete_note_item, icon = Icons.Default.Delete, onClick = {
-
+            viewModel.deleteNote(NoteModel())
         }))
         // Extract
         menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_in_file, icon = Icons.Default.Backup, onClick = {
@@ -167,7 +168,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
                         if (appUiState is NotesViewModel.NotesMainUIState) {
                             NotesPreviewUI(appUiState, viewModel, menuOptions)
                         } else if (appUiState is NotesViewModel.NotesEditorUIState) {
-                            NotesEditorUI(viewModel, menuOptionsEditor)
+                            NotesEditorUI(viewModel = viewModel, menuOptionsList = menuOptionsEditor, uiState = appUiState)
                         }
                     }
                 }

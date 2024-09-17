@@ -21,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +45,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.state_holders.LoginViewModel
@@ -163,62 +161,9 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
         }
     }
 
-    var openDialog by remember { mutableStateOf(false) }
-
-    openDialog = uiState.openDialog
-
-    if (openDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                if (uiState.dialogState.dialogDismissible) {
-                    openDialog = false
-                    uiState.openDialog = false
-                    uiState.dialogState.onCancel()
-                }
-            },
-            title = {
-                Text(
-                    text = stringResource(id = uiState.dialogState.title),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(id = uiState.dialogState.message),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            confirmButton = {
-                Text(
-                    text = stringResource(id = uiState.dialogState.positiveBtn),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable {
-                            openDialog = false
-                            uiState.openDialog = false
-                            uiState.dialogState.onConfirm()
-                        }
-                )
-            },
-            dismissButton = {
-                if (uiState.dialogState.hasCancelButton) {
-                    Text(
-                        text = stringResource(id = uiState.dialogState.negativeBtn),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(15.dp)
-                            .clickable {
-                                openDialog = false
-                                uiState.openDialog = false
-                                uiState.dialogState.onCancel()
-                            }
-                    )
-                }
-            }
-        )
+    val openDialog = uiState.openDialog
+    if (openDialog && !uiState.dialogState.isOpen) {
+        BasicDialogUI(dialogState = uiState.dialogState)
     }
 }
 

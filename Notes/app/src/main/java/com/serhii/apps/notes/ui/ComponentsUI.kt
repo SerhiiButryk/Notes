@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.DropdownMenu
@@ -28,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -178,4 +179,75 @@ fun Menu(menuOptionsList: List<MenuOptions>) {
             }
         }
     }
+}
+
+@Stable
+class DialogUIState(
+    val title: Int = -1,
+    val message: Int = -1,
+    val dialogDismissible: Boolean = true,
+    val hasCancelButton: Boolean = false,
+    val onConfirm: () -> Unit = {},
+    val onCancel: () -> Unit = {},
+    val positiveBtn: Int = android.R.string.ok,
+    val negativeBtn: Int = android.R.string.cancel,
+    var isOpen: Boolean = false
+)
+
+@Composable
+fun BasicDialogUI(dialogState: DialogUIState) {
+
+    var openDialog by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = {
+            if (dialogState.dialogDismissible) {
+                openDialog = false
+                dialogState.isOpen = false
+                dialogState.onCancel()
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(id = dialogState.title),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(id = dialogState.message),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            Text(
+                text = stringResource(id = dialogState.positiveBtn),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .clickable {
+                        openDialog = false
+                        dialogState.isOpen = false
+                        dialogState.onConfirm()
+                    }
+            )
+        },
+        dismissButton = {
+            if (dialogState.hasCancelButton) {
+                Text(
+                    text = stringResource(id = dialogState.negativeBtn),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .clickable {
+                            openDialog = false
+                            dialogState.isOpen = false
+                            dialogState.onCancel()
+                        }
+                )
+            }
+        }
+    )
 }

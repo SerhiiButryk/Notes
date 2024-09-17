@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
@@ -35,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 
 /**
@@ -42,50 +41,24 @@ import com.serhii.apps.notes.ui.state_holders.NotesViewModel
  */
 
 @Composable
-fun NotesEditorUI(viewModel: NotesViewModel? = null, menuOptionsList: List<MenuOptions> = emptyList()) {
+fun NotesEditorUI(
+    note: NoteModel = NoteModel(),
+    viewModel: NotesViewModel? = null,
+    menuOptionsList: List<MenuOptions> = emptyList(),
+    uiState: NotesViewModel.NotesEditorUIState,
+) {
 
     Scaffold(
         topBar = {
-            SearchUI(hint = "Search text here",
+            SearchUI(
+                hint = "Search text here",
                 hasBackButton = true,
                 backAction = { viewModel?.navigateBack() },
-                menuOptionsList = menuOptionsList)
+                menuOptionsList = menuOptionsList
+            )
         },
         bottomBar = {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceDim),
-
-            ) {
-
-                val modifier = Modifier.size(30.dp)
-
-                IconButton(onClick = {  }) {
-                    Icon(
-                        imageVector = Icons.Default.Save,
-                        contentDescription = null,
-                        modifier = modifier
-                    )
-                }
-
-                IconButton(onClick = {  }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        modifier = modifier
-                    )
-                }
-
-                IconButton(onClick = {  }) {
-                    Icon(
-                        imageVector = Icons.Default.Backup,
-                        contentDescription = null,
-                        modifier = modifier
-                    )
-                }
-            }
+            BottomBarUI(viewModel = viewModel, note = note)
         }
     ) { innerPadding ->
 
@@ -107,7 +80,62 @@ fun NotesEditorUI(viewModel: NotesViewModel? = null, menuOptionsList: List<MenuO
                     .clip(RoundedCornerShape(16.dp)),
             )
 
+            viewModel?.saveEditorState(state)
             viewModel?.requestKeyboard(inputFocusEditor)
+        }
+    }
+
+    val openDialog = uiState.openDialog
+    if (openDialog && !uiState.dialogState.isOpen) {
+        BasicDialogUI(dialogState = uiState.dialogState)
+    }
+}
+
+@Composable
+fun BottomBarUI(viewModel: NotesViewModel?, note: NoteModel) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceDim),
+
+        ) {
+
+        val modifier = Modifier.size(30.dp)
+
+        IconButton(onClick = {
+
+            val editor = viewModel?.editorState
+
+            if (editor != null) {
+
+                val textNote = editor.toText()
+                note.note = textNote
+
+                viewModel.saveNote(note)
+            }
+        }) {
+            Icon(
+                imageVector = Icons.Default.Save,
+                contentDescription = null,
+                modifier = modifier
+            )
+        }
+
+        IconButton(onClick = { viewModel?.deleteNote(note) }) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                modifier = modifier
+            )
+        }
+
+        IconButton(onClick = { viewModel?.backupNote(note) }) {
+            Icon(
+                imageVector = Icons.Default.Backup,
+                contentDescription = null,
+                modifier = modifier
+            )
         }
     }
 }
@@ -115,7 +143,7 @@ fun NotesEditorUI(viewModel: NotesViewModel? = null, menuOptionsList: List<MenuO
 @Preview(showBackground = true)
 @Composable
 fun NotesEditorUIPreview() {
-    NotesEditorUI()
+    NotesEditorUI(uiState = NotesViewModel.NotesEditorUIState(NoteModel()))
 }
 
 @Preview(
@@ -124,5 +152,5 @@ fun NotesEditorUIPreview() {
 )
 @Composable
 fun NotesEditorUIPreviewDark() {
-    NotesEditorUI()
+    NotesEditorUI(uiState = NotesViewModel.NotesEditorUIState(NoteModel()))
 }

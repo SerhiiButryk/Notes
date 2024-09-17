@@ -11,6 +11,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serhii.apps.notes.common.App
+import com.serhii.apps.notes.ui.DialogUIState
 import com.serhii.core.log.Log
 import kotlinx.coroutines.launch
 
@@ -36,5 +37,26 @@ open class AppViewModel : ViewModel() {
                 Log.detail(TAG, "requestKeyboard() done")
             }
         }
+    }
+
+    fun requestDialog(
+        title: Int,
+        message: Int,
+        onConfirm: () -> Unit,
+        onCancel: () -> Unit,
+        positiveBtn: Int = android.R.string.ok,
+        negativeBtn: Int = android.R.string.cancel,
+        hasCancelButton: Boolean = true
+    ): DialogUIState {
+        return DialogUIState(
+            title = title,
+            message = message,
+            onConfirm = onConfirm,
+            onCancel = onCancel,
+            hasCancelButton = hasCancelButton,
+            dialogDismissible = !hasCancelButton,
+            positiveBtn = positiveBtn,
+            negativeBtn = negativeBtn
+        )
     }
 }
