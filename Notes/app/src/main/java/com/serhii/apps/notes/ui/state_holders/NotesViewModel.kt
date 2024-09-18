@@ -35,7 +35,7 @@ class NotesViewModel : AppViewModel() {
     private val _uiState = MutableStateFlow(BaseUIState())
     val uiState: StateFlow<BaseUIState> = _uiState
 
-    private var latestNotes: List<NoteModel> = emptyList()
+    private var cachedNotesData: List<NoteModel> = emptyList()
     var editorState: RichTextState? = null
 
     ///////////////////////////// UI State class /////////////////////////////
@@ -47,7 +47,8 @@ class NotesViewModel : AppViewModel() {
 
     class NotesMainUIState(val notes: List<NoteModel> = emptyList()) : BaseUIState()
 
-    class NotesEditorUIState(val note: NoteModel = NoteModel()) : BaseUIState()
+    class NotesEditorUIState(var note: NoteModel = NoteModel(),
+                             var isExistingNote: Boolean = false) : BaseUIState()
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -86,20 +87,24 @@ class NotesViewModel : AppViewModel() {
         viewModelScope.launch(BACKGROUND_DISPATCHER) {
             val notesList = notesRepository.getAll()
 
-            latestNotes = notesList
+            cachedNotesData = notesList
 
-            if (_uiState.value is NotesMainUIState) {
-                _uiState.value = createNotesMainUIState()
-            }
+            _uiState.value = createNotesMainUIState()
+
+            Log.info(TAG, "reloadData()")
         }
     }
 
-    fun deleteNote(noteModel: NoteModel) {
+    fun deleteNote(uiState: NotesEditorUIState) {
 
         val deleteNote = {
             viewModelScope.launch(BACKGROUND_DISPATCHER) {
-                val result = notesRepository.delete(noteModel.id)
-                Log.info(TAG, "deleteNote() id = ${noteModel.id} result = $result")
+                val result = notesRepository.delete(uiState.note.id)
+                if (result) {
+                    // Reload data & closing editor screen
+                    reloadData()
+                }
+                Log.info(TAG, "deleteNote() id = ${uiState.note.id} result = $result")
             }
         }
 
@@ -109,29 +114,41 @@ class NotesViewModel : AppViewModel() {
             onConfirm = {
                 // TODO: Doest not look good, might be revisited later
                 // A hack to close dialog
-                _uiState.value = createNewUiState()
+                _uiState.value = createNewUiState(uiState)
 
-                // TODO: Test
-//                deleteNote()
+                deleteNote()
             },
             onCancel = {
                 // TODO: Doest not look good, might be revisited later
                 // A hack to close dialog
-                _uiState.value = createNewUiState()
+                _uiState.value = createNewUiState(uiState)
             }
         )
     }
 
-    fun saveNote(noteModel: NoteModel) {
+    fun saveNote(uiState: NotesEditorUIState) {
+
+        val editor = editorState
+        if (editor != null) {
+            val textNote = editor.toText()
+            uiState.note.plainText = textNote
+        } else {
+            Log.info(TAG, "saveNote() failed editor is null")
+            return
+        }
+
         val saveNote = {
             viewModelScope.launch(BACKGROUND_DISPATCHER) {
-                Log.info(TAG, "saveNote() id = ${noteModel.id}")
+                Log.info(TAG, "saveNote() id = ${uiState.note.id}")
 
-                val id = noteModel.id
+                val id = uiState.note.id
                 if (id.isEmpty()) {
-                    val newId = notesRepository.add(noteModel)
+                    val newId = notesRepository.add(uiState.note)
 
                     if (newId != -1) {
+                        val note = notesRepository.get(newId.toString())
+                        uiState.note = note
+
                         Log.info(TAG, "saveNote() success")
                     } else {
                         Log.info(TAG, "saveNote() failed")
@@ -140,17 +157,12 @@ class NotesViewModel : AppViewModel() {
                     return@launch
                 }
 
-                // If id is not empty then we going to update existing note
+                val result = notesRepository.update(id, uiState.note)
+                if (result)
+                    Log.info(TAG, "saveNote() updated note by id = $id")
+                else
+                    Log.info(TAG, "saveNote() failed to update note by id = $id")
 
-                val note = notesRepository.get(id)
-
-                if (!note.isEmpty) {
-                    val result = notesRepository.update(id, noteModel)
-                    if (result)
-                        Log.info(TAG, "saveNote() updated note by id = $id")
-                    else
-                        Log.info(TAG, "saveNote() failed to update note by id = $id")
-                }
             }
         }
 
@@ -160,20 +172,19 @@ class NotesViewModel : AppViewModel() {
             onConfirm = {
                 // TODO: Doest not look good, might be revisited later
                 // A hack to close dialog
-                _uiState.value = createNewUiState()
+                _uiState.value = createNewUiState(uiState)
 
-                // TODO: Test
-//                saveNote()
+                saveNote()
             },
             onCancel = {
                 // TODO: Doest not look good, might be revisited later
                 // A hack to close dialog
-                _uiState.value = createNewUiState()
+                _uiState.value = createNewUiState(uiState)
             }
         )
     }
 
-    fun backupNote(noteModel: NoteModel) {
+    fun backupNote() {
         TODO("Not yet implemented")
     }
 
@@ -181,7 +192,7 @@ class NotesViewModel : AppViewModel() {
         if (noteModel == null) {
             _uiState.value = NotesEditorUIState()
         } else {
-            _uiState.value = NotesEditorUIState(noteModel)
+            _uiState.value = NotesEditorUIState(noteModel, true)
         }
     }
 
@@ -202,21 +213,21 @@ class NotesViewModel : AppViewModel() {
     }
 
     private fun createNotesMainUIState(): NotesMainUIState {
-        return NotesMainUIState(latestNotes)
+        return NotesMainUIState(cachedNotesData)
     }
 
-    private fun createNotesEditorUIState(): NotesEditorUIState {
-        return NotesEditorUIState()
+    private fun createNotesEditorUIState(copyUiState: NotesEditorUIState): NotesEditorUIState {
+        return NotesEditorUIState(copyUiState.note)
     }
 
-    private fun createNewUiState(): BaseUIState {
+    private fun createNewUiState(copyUiState: BaseUIState): BaseUIState {
         return when (_uiState.value) {
             is NotesMainUIState -> {
                 createNotesMainUIState()
             }
 
             is NotesEditorUIState -> {
-                createNotesEditorUIState()
+                createNotesEditorUIState(copyUiState as NotesEditorUIState)
             }
 
             else -> {
@@ -240,7 +251,7 @@ class NotesViewModel : AppViewModel() {
     ) {
 
         // TODO: Doest not look good, might be revisited later
-        val newUiState = createNewUiState()
+        val newUiState = createNewUiState(uiState.value)
 
         newUiState.openDialog = true
         newUiState.dialogState = requestDialog(

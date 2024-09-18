@@ -26,7 +26,7 @@ suspend fun search(query: String, notesForSearch: List<NoteModel>, results: Muta
     val foundNotes = notesForSearch.filter { element ->
         Log.info(message = "performSearch() note = '${element.id}'")
 
-        val noteText = element.note
+        val noteText = element.plainText
         val noteTitle = element.title
 
         val rangeItemTitleResult: Deferred<List<IntRange>> = async(CoroutineName("itemTitle")) {

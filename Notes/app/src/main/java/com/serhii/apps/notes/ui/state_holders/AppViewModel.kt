@@ -14,6 +14,7 @@ import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.ui.DialogUIState
 import com.serhii.core.log.Log
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 
 /**
  *  View model for reusing UI logic of application
@@ -33,8 +34,13 @@ open class AppViewModel : ViewModel() {
         viewModelScope.launch(App.UI_DISPATCHER) {
             Log.detail(TAG, "requestKeyboard() try to show keyboard")
             if (immManager != null && !immManager!!.isAcceptingText()) {
-                focusRequester.requestFocus()
-                Log.detail(TAG, "requestKeyboard() done")
+                try {
+                    focusRequester.requestFocus()
+                    Log.detail(TAG, "requestKeyboard() done")
+                } catch (e: IllegalStateException) {
+                    // Might be in case of note deletion
+                    Log.detail(TAG, "requestKeyboard() cannot show keyboard this time")
+                }
             }
         }
     }

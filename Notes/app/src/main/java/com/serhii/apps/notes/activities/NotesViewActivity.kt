@@ -29,7 +29,6 @@ import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.MenuOptions
 import com.serhii.apps.notes.ui.NotesEditorUI
 import com.serhii.apps.notes.ui.NotesPreviewUI
-import com.serhii.apps.notes.ui.data_model.NoteModel
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.core.log.Log
@@ -137,20 +136,20 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
 
     private fun setupUI() {
         // Add menu options
-        val menuOptions = mutableListOf<MenuOptions>()
+        val menuOptionsPreview = mutableListOf<MenuOptions>()
         // Add 'Go to settings' option
-        menuOptions.add(MenuOptions(textId = R.string.settings_item, icon = Icons.Default.Settings, onClick = {
+        menuOptionsPreview.add(MenuOptions(textId = R.string.settings_item, icon = Icons.Default.Settings, onClick = {
             viewModel.openSettings(this)
         }))
 
         val menuOptionsEditor = mutableListOf<MenuOptions>()
         // Save
         menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_item, icon = Icons.Default.Save, onClick = {
-            viewModel.saveNote(NoteModel())
+            viewModel.saveNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
         }))
         // Delete
         menuOptionsEditor.add(MenuOptions(textId = R.string.delete_note_item, icon = Icons.Default.Delete, onClick = {
-            viewModel.deleteNote(NoteModel())
+            viewModel.deleteNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
         }))
         // Extract
         menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_in_file, icon = Icons.Default.Backup, onClick = {
@@ -166,7 +165,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
                         val appUiState: NotesViewModel.BaseUIState = uiState.value
 
                         if (appUiState is NotesViewModel.NotesMainUIState) {
-                            NotesPreviewUI(appUiState, viewModel, menuOptions)
+                            NotesPreviewUI(appUiState, viewModel, menuOptionsPreview)
                         } else if (appUiState is NotesViewModel.NotesEditorUIState) {
                             NotesEditorUI(viewModel = viewModel, menuOptionsList = menuOptionsEditor, uiState = appUiState)
                         }

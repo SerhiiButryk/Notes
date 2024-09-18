@@ -49,7 +49,7 @@ class BasicTests {
 
         Assert.assertNotNull("Note is null", note2)
 
-        Assert.assertTrue("Wrong note", note2.note == noteText)
+        Assert.assertTrue("Wrong note", note2.plainText == noteText)
         Assert.assertTrue("Wrong title", note2.title == noteTitle)
         Assert.assertTrue("Wrong id", note2.id == id)
         Assert.assertTrue("Wrong time", note2.time == time)

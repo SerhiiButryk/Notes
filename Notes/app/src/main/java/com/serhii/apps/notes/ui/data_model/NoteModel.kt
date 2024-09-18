@@ -20,7 +20,7 @@ import org.json.JSONObject
 
 data class NoteList(var note: String = "", var isChecked:Boolean = false)
 
-data class NoteModel(var note: String = "", var title: String = "",
+data class NoteModel(var plainText: String = "", var title: String = "",
                      var time: String = "", var id: String = "" /* Record id of note in the database */,
                      var viewType: Int = ONE_NOTE_VIEW_TYPE,
                      /**
@@ -36,7 +36,7 @@ data class NoteModel(var note: String = "", var title: String = "",
     val isEmpty: Boolean
         get() {
             if (viewType == ONE_NOTE_VIEW_TYPE) {
-                return note.isEmpty() && title.isEmpty()
+                return plainText.isEmpty() && title.isEmpty()
             } else if (viewType == LIST_NOTE_VIEW_TYPE) {
                 var isEmpty = true
                 for (n in listNote) {
@@ -62,7 +62,7 @@ data class NoteModel(var note: String = "", var title: String = "",
     fun clearNotes() {
 
         if (viewType == ONE_NOTE_VIEW_TYPE) {
-            note = ""
+            plainText = ""
         }
 
         if (viewType == LIST_NOTE_VIEW_TYPE) {
@@ -171,7 +171,7 @@ data class NoteModel(var note: String = "", var title: String = "",
             }
 
             return buildJsonObject {
-                put(NOTE_KEY, note.note)
+                put(NOTE_KEY, note.plainText)
                 put(TITLE_KEY, note.title)
                 put(TIME_KEY, note.time)
                 put(ID_KEY, note.id)
@@ -181,13 +181,13 @@ data class NoteModel(var note: String = "", var title: String = "",
         }
 
         fun getCopy(note: NoteModel): NoteModel {
-            val copyNote = NoteModel(note.note, note.title, note.time, note.id, note.viewType, note.listNote)
+            val copyNote = NoteModel(note.plainText, note.title, note.time, note.id, note.viewType, note.listNote)
             copyNote.queryInfo = note.queryInfo
             return copyNote
         }
 
         fun getCopy(note: NoteModel, listNote: MutableList<NoteList>): NoteModel {
-            val copyNote = NoteModel(note.note, note.title, note.time, note.id,
+            val copyNote = NoteModel(note.plainText, note.title, note.time, note.id,
                 note.viewType, listNote)
             copyNote.queryInfo = note.queryInfo
             return copyNote

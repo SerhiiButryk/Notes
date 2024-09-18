@@ -8,6 +8,7 @@ package com.serhii.apps.notes.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,7 +60,7 @@ fun NotesPreviewUI(uiState: NotesViewModel.NotesMainUIState, viewModel: NotesVie
             if (noNotesYet) {
                 NoNotesYetUI()
             } else {
-                NotesUI(uiState)
+                NotesUI(uiState, viewModel)
             }
         }
     }
@@ -95,24 +96,30 @@ private fun NoNotesYetUI() {
 }
 
 @Composable
-private fun NotesUI(uiState: NotesViewModel.NotesMainUIState) {
+private fun NotesUI(uiState: NotesViewModel.NotesMainUIState, viewModel: NotesViewModel) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(120.dp),
         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp)
     ) {
-        items(10) {
+        items(uiState.notes.size) { index ->
+
+            val previewNote = uiState.notes[index]
+
             Card(
                 modifier = Modifier
                     .padding(all = 4.dp)
-                    .defaultMinSize(minHeight = 100.dp)
-                    .clip(CardDefaults.shape),
+                    .defaultMinSize(minHeight = 120.dp)
+                    .clip(CardDefaults.shape)
+                    .clickable {
+                        viewModel.openNoteEditorUI(previewNote)
+                    },
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             ) {
-                DescriptionUI(desc = "Test title")
-                DescriptionUI(desc = "Test decs")
+                DescriptionUI(desc = previewNote.plainText)
             }
+
         }
     }
 }
@@ -120,7 +127,7 @@ private fun NotesUI(uiState: NotesViewModel.NotesMainUIState) {
 @Preview(showBackground = true)
 @Composable
 private fun NotesUIPreview() {
-    NotesUI(NotesViewModel.NotesMainUIState())
+    NotesUI(NotesViewModel.NotesMainUIState(), NotesViewModel())
 }
 
 @Preview(
@@ -129,5 +136,5 @@ private fun NotesUIPreview() {
 )
 @Composable
 private fun NotesUIPreviewDark() {
-    NotesUI(NotesViewModel.NotesMainUIState())
+    NotesUI(NotesViewModel.NotesMainUIState(), NotesViewModel())
 }

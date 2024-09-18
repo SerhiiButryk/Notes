@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
@@ -23,18 +25,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-import com.serhii.apps.notes.ui.data_model.NoteModel
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Notes editor screen
@@ -42,7 +50,6 @@ import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 
 @Composable
 fun NotesEditorUI(
-    note: NoteModel = NoteModel(),
     viewModel: NotesViewModel? = null,
     menuOptionsList: List<MenuOptions> = emptyList(),
     uiState: NotesViewModel.NotesEditorUIState,
@@ -58,7 +65,7 @@ fun NotesEditorUI(
             )
         },
         bottomBar = {
-            BottomBarUI(viewModel = viewModel, note = note)
+            BottomBarUI(viewModel = viewModel, uiState)
         }
     ) { innerPadding ->
 
@@ -80,6 +87,17 @@ fun NotesEditorUI(
                     .clip(RoundedCornerShape(16.dp)),
             )
 
+            LaunchedEffect("Test") {
+                CoroutineScope(App.UI_DISPATCHER).launch {
+                    // User opened a note from preview screen so set its content
+                    if (uiState.isExistingNote) {
+                        state.setText(uiState.note.plainText)
+                        // TODO: Revisit this is incorrect
+                        uiState.isExistingNote = false
+                    }
+                }
+            }
+
             viewModel?.saveEditorState(state)
             viewModel?.requestKeyboard(inputFocusEditor)
         }
@@ -92,29 +110,29 @@ fun NotesEditorUI(
 }
 
 @Composable
-fun BottomBarUI(viewModel: NotesViewModel?, note: NoteModel) {
+fun BottomBarUI(viewModel: NotesViewModel?, uiState: NotesViewModel.NotesEditorUIState) {
     Row(
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceDim),
-
+            .padding(start = 10.dp, end = 10.dp, bottom = 4.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = RoundedCornerShape(percent = 20)
+            ),
         ) {
 
         val modifier = Modifier.size(30.dp)
 
-        IconButton(onClick = {
+        VerticalDivider(
+            modifier = Modifier
+                .height(30.dp)
+                .width(3.dp)
+                .background(Color.Black)
+        )
 
-            val editor = viewModel?.editorState
-
-            if (editor != null) {
-
-                val textNote = editor.toText()
-                note.note = textNote
-
-                viewModel.saveNote(note)
-            }
-        }) {
+        IconButton(onClick = { viewModel?.saveNote(uiState) }) {
             Icon(
                 imageVector = Icons.Default.Save,
                 contentDescription = null,
@@ -122,7 +140,14 @@ fun BottomBarUI(viewModel: NotesViewModel?, note: NoteModel) {
             )
         }
 
-        IconButton(onClick = { viewModel?.deleteNote(note) }) {
+        VerticalDivider(
+            modifier = Modifier
+                .height(30.dp)
+                .width(3.dp)
+                .background(Color.Black)
+        )
+
+        IconButton(onClick = { viewModel?.deleteNote(uiState) }) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = null,
@@ -130,20 +155,34 @@ fun BottomBarUI(viewModel: NotesViewModel?, note: NoteModel) {
             )
         }
 
-        IconButton(onClick = { viewModel?.backupNote(note) }) {
+        VerticalDivider(
+            modifier = Modifier
+                .height(30.dp)
+                .width(3.dp)
+                .background(Color.Black)
+        )
+
+        IconButton(onClick = { viewModel?.backupNote() }) {
             Icon(
                 imageVector = Icons.Default.Backup,
                 contentDescription = null,
                 modifier = modifier
             )
         }
+
+        VerticalDivider(
+            modifier = Modifier
+                .height(30.dp)
+                .width(3.dp)
+                .background(Color.Black)
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun NotesEditorUIPreview() {
-    NotesEditorUI(uiState = NotesViewModel.NotesEditorUIState(NoteModel()))
+    NotesEditorUI(uiState = NotesViewModel.NotesEditorUIState())
 }
 
 @Preview(
@@ -152,5 +191,5 @@ fun NotesEditorUIPreview() {
 )
 @Composable
 fun NotesEditorUIPreviewDark() {
-    NotesEditorUI(uiState = NotesViewModel.NotesEditorUIState(NoteModel()))
+    NotesEditorUI(uiState = NotesViewModel.NotesEditorUIState())
 }

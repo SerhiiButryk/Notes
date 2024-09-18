@@ -8,6 +8,7 @@ package com.serhii.apps.notes.ui
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -95,47 +97,58 @@ fun SearchUI(
         var query by remember { mutableStateOf("") }
 
         DockedSearchBar(
-            modifier = Modifier.fillMaxWidth(),
-            query = query,
-            onQueryChange = {
-                query = it
-            },
-            onSearch = { },
-            active = false,
-            onActiveChange = {
-            },
-            placeholder = { Text(text = hint) },
-            leadingIcon = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = {
+                        query = it
+                    },
+                    onSearch = { },
+                    expanded = false,
+                    enabled = true,
+                    placeholder = { Text(text = hint) },
+                    leadingIcon = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
-                    // Back button
-                    if (hasBackButton) {
-                        IconButton(onClick = { backAction?.invoke() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null,
-                            )
+                            // Back button
+                            if (hasBackButton) {
+                                IconButton(onClick = { backAction?.invoke() }) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = null,
+                                    )
+                                }
+                            }
+
+                            // Search button
+                            IconButton(onClick = { /* Do smth */ }) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "",
+                                    modifier = Modifier.padding(end = 6.dp)
+                                )
+                            }
                         }
-                    }
-
-                    // Search button
-                    IconButton(onClick = { /* Do smth */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "",
-                            modifier = Modifier.padding(end = 6.dp)
-                        )
-                    }
-                }
+                    },
+                    trailingIcon = {
+                        Menu(menuOptionsList)
+                    },
+                    colors = SearchBarDefaults.colors().inputFieldColors,
+                    interactionSource = null,
+                    onExpandedChange = {}
+                )
             },
-            trailingIcon = {
-                Menu(menuOptionsList)
-            }
-        ) {
-            /* Empty */
-        }
+            expanded = false,
+            onExpandedChange = {},
+            modifier = Modifier.fillMaxWidth(),
+            shape = SearchBarDefaults.dockedShape,
+            colors = SearchBarDefaults.colors(),
+            tonalElevation = SearchBarDefaults.TonalElevation,
+            shadowElevation = SearchBarDefaults.ShadowElevation,
+            content = {},
+        )
     }
 }
 
