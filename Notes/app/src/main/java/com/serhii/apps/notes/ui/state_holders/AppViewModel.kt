@@ -5,16 +5,23 @@
 
 package com.serhii.apps.notes.ui.state_holders
 
+import android.app.Activity
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
+import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.ui.DialogUIState
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel.NotesEditorUIState
 import com.serhii.core.log.Log
+import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.IllegalStateException
+import java.lang.ref.WeakReference
 
 /**
  *  View model for reusing UI logic of application
@@ -25,15 +32,26 @@ private const val TAG = "AppViewModel"
 open class AppViewModel : ViewModel() {
 
     private var immManager: InputMethodManager? = null
+    protected var activityRef: WeakReference<Activity>? = null
 
-    open fun initViewModel(context: Context) {
-        immManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    open fun initViewModel(activity: Activity) {
+        immManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        activityRef = WeakReference(activity)
+    }
+
+    open fun backupNote(uiState: NotesEditorUIState) {
+        val activity = activityRef?.get()
+        if (activity != null) {
+            BackupManager.openDirectoryChooserForExtractData(activity)
+        } else {
+            Log.error(TAG, "backupNote() failed activity ref is null")
+        }
     }
 
     fun requestKeyboard(focusRequester: FocusRequester) {
         viewModelScope.launch(App.UI_DISPATCHER) {
             Log.detail(TAG, "requestKeyboard() try to show keyboard")
-            if (immManager != null && !immManager!!.isAcceptingText()) {
+            if (immManager != null) {
                 try {
                     focusRequester.requestFocus()
                     Log.detail(TAG, "requestKeyboard() done")
@@ -48,8 +66,8 @@ open class AppViewModel : ViewModel() {
     fun requestDialog(
         title: Int,
         message: Int,
-        onConfirm: () -> Unit,
-        onCancel: () -> Unit,
+        onConfirm: () -> Unit = {},
+        onCancel: () -> Unit= {},
         positiveBtn: Int = android.R.string.ok,
         negativeBtn: Int = android.R.string.cancel,
         hasCancelButton: Boolean = true
@@ -64,5 +82,15 @@ open class AppViewModel : ViewModel() {
             positiveBtn = positiveBtn,
             negativeBtn = negativeBtn
         )
+    }
+
+    suspend fun showStatusMessage(context: Context, result: Boolean) {
+        withContext(App.UI_DISPATCHER) {
+            if (result) {
+                GoodUtils.showToast(context, R.string.result_success)
+            } else {
+                GoodUtils.showToast(context, R.string.result_failed)
+            }
+        }
     }
 }

@@ -20,21 +20,16 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.auth.base.IAuthorizeUser
 import com.serhii.apps.notes.control.backup.BackupManager
-import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.MenuOptions
 import com.serhii.apps.notes.ui.NotesEditorUI
 import com.serhii.apps.notes.ui.NotesPreviewUI
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.core.log.Log
-import kotlinx.coroutines.launch
-import java.io.FileNotFoundException
-import java.io.OutputStream
 
 /**
  * Activity which displays user note list
@@ -77,32 +72,10 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
             Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
             if (data != null) {
-
-                val noteId = ""
-                if (noteId.isNullOrEmpty()) {
-                    Log.info(TAG, "onActivityResult() empty noteId, return")
-                    return
-                }
-
-                val outputStream: OutputStream? = try {
-                    contentResolver.openOutputStream(data.data!!)
-                } catch (e: FileNotFoundException) {
-                    Log.error(TAG, "onActivityResult() failed to get output stream, error: $e")
-                    e.printStackTrace()
-                    return
-                }
-
-                // Start an extract
-                lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
-                    val note = UserNotesDatabase.getRecord(noteId)
-                    BackupManager.extractNotes(outputStream, listOf(note)) { result ->
-                        showStatusMessage(result)
-                    }
-                }
+                viewModel.extractNote(applicationContext, data)
             } else {
                 // Should not happen
                 Log.error(TAG, "onActivityResult() data is null")
@@ -111,14 +84,13 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
     }
 
     /**
-     * Called when user is authorized
+     * Called when the user is authorized
      */
     override fun onUserAuthorized() {
         Log.info(TAG, "onUserAuthorized()")
         viewModel.reloadData()
     }
 
-    // This will start auth activity
     private fun authorizeUser(bundle: Bundle?) {
         /**
          * Activity is launched first time
@@ -129,8 +101,6 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
             */
             val intent = Intent(this, AuthorizationActivity::class.java)
             startActivity(intent)
-        } else {
-            onUserAuthorized()
         }
     }
 
@@ -138,23 +108,33 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
         // Add menu options
         val menuOptionsPreview = mutableListOf<MenuOptions>()
         // Add 'Go to settings' option
-        menuOptionsPreview.add(MenuOptions(textId = R.string.settings_item, icon = Icons.Default.Settings, onClick = {
-            viewModel.openSettings(this)
-        }))
+        menuOptionsPreview.add(
+            MenuOptions(textId = R.string.settings_item, icon = Icons.Default.Settings, onClick = {
+                viewModel.openSettings(this)
+            })
+        )
 
         val menuOptionsEditor = mutableListOf<MenuOptions>()
         // Save
-        menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_item, icon = Icons.Default.Save, onClick = {
-            viewModel.saveNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
-        }))
+        menuOptionsEditor.add(
+            MenuOptions(textId = R.string.save_note_item, icon = Icons.Default.Save, onClick = {
+                viewModel.saveNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
+            })
+        )
         // Delete
-        menuOptionsEditor.add(MenuOptions(textId = R.string.delete_note_item, icon = Icons.Default.Delete, onClick = {
-            viewModel.deleteNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
-        }))
+        menuOptionsEditor.add(
+            MenuOptions(textId = R.string.delete_note_item, icon = Icons.Default.Delete, onClick = {
+                viewModel.deleteNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
+            })
+        )
         // Extract
-        menuOptionsEditor.add(MenuOptions(textId = R.string.save_note_in_file, icon = Icons.Default.Backup, onClick = {
-
-        }))
+        menuOptionsEditor.add(
+            MenuOptions(textId = R.string.save_note_in_file,
+                icon = Icons.Default.Backup,
+                onClick = {
+                    viewModel.backupNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
+                })
+        )
 
         setContent {
             AppMaterialTheme {
@@ -167,7 +147,11 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
                         if (appUiState is NotesViewModel.NotesMainUIState) {
                             NotesPreviewUI(appUiState, viewModel, menuOptionsPreview)
                         } else if (appUiState is NotesViewModel.NotesEditorUIState) {
-                            NotesEditorUI(viewModel = viewModel, menuOptionsList = menuOptionsEditor, uiState = appUiState)
+                            NotesEditorUI(
+                                viewModel = viewModel,
+                                menuOptionsList = menuOptionsEditor,
+                                uiState = appUiState
+                            )
                         }
                     }
                 }

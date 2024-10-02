@@ -4,6 +4,7 @@
  */
 package com.serhii.apps.notes.ui.state_holders
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.runtime.Stable
 import androidx.fragment.app.FragmentActivity
@@ -12,11 +13,11 @@ import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.NativeBridge
-import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.DialogHelper
 import com.serhii.apps.notes.ui.DialogUIState
 import com.serhii.apps.notes.ui.data_model.AuthModel
+import com.serhii.apps.notes.ui.state_holders.NotesViewModel.NotesEditorUIState
 import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
 import com.serhii.core.utils.GoodUtils
@@ -43,22 +44,25 @@ class LoginViewModel : AppViewModel() {
     val authModel: AuthModel = AuthModel()
     private var biometricAuthManager: BiometricAuthenticator? = null
 
-    override fun initViewModel(context: Context) {
+    override fun initViewModel(activity: Activity) {
         Log.info(TAG, "initViewModel()")
-        super.initViewModel(context)
-        _uiState.value = getUIState(context)
+        super.initViewModel(activity)
+        _uiState.value = getUIState(activity.applicationContext)
 
-        if (BiometricAuthenticator.biometricsAvailable(context) && biometricAuthManager == null) {
+        if (BiometricAuthenticator.biometricsAvailable(activity.applicationContext) && biometricAuthManager == null) {
             biometricAuthManager = BiometricAuthenticator()
         }
     }
 
     fun setupBiometrics(activity: FragmentActivity) {
         if (BiometricAuthenticator.biometricsAvailable(activity.applicationContext)) {
-            biometricAuthManager?.init(activity.applicationContext, activity,
+            biometricAuthManager?.init(
+                activity.applicationContext,
+                activity,
                 activity.getString(R.string.biometric_prompt_title),
                 activity.getString(R.string.biometric_prompt_subtitle),
-                activity.getString(android.R.string.cancel))
+                activity.getString(android.R.string.cancel)
+            )
         }
     }
 
@@ -128,7 +132,7 @@ class LoginViewModel : AppViewModel() {
 
                 UIRequestType.UN_SET -> {}
 
-                UIRequestType.SHOW_DIALOG -> {
+                UIRequestType.DIALOG_UI -> {
 
                     val createNewUiState = {
                         // TODO: Doest not look good, might be revisited later
@@ -139,20 +143,15 @@ class LoginViewModel : AppViewModel() {
                         }
                     }
 
-                    openDialog(
-                        DialogHelper.getTitleFor(type),
-                        DialogHelper.getMessageFor(type),
-                        {
-                            // TODO: Doest not look good, might be revisited later
-                            // A hack to close dialog
-                            _uiState.value = createNewUiState()
-                        },
-                        {
-                            // TODO: Doest not look good, might be revisited later
-                            // A hack to close dialog
-                            _uiState.value = createNewUiState()
-                        },
-                        uiState = createNewUiState()
+                    openDialog(DialogHelper.getTitleFor(type), DialogHelper.getMessageFor(type), {
+                        // TODO: Doest not look good, might be revisited later
+                        // A hack to close dialog
+                        _uiState.value = createNewUiState()
+                    }, {
+                        // TODO: Doest not look good, might be revisited later
+                        // A hack to close dialog
+                        _uiState.value = createNewUiState()
+                    }, uiState = createNewUiState()
                     )
                 }
 
@@ -163,10 +162,14 @@ class LoginViewModel : AppViewModel() {
                     _uiState.value = createLoginUIState(context)
                 }
 
-                UIRequestType.SHOW_BIOMETRICS_UI -> {
+                UIRequestType.BIOMETRICS_UI -> {
                     showBiometrics()
                 }
 
+                UIRequestType.FORGOT_PASSWORD_UI -> {
+                    // Open next screen
+                    _uiState.value = createForgotPasswordUIState(context)
+                }
             }
 
             Log.detail(TAG, "proceed() <<")
@@ -183,9 +186,7 @@ class LoginViewModel : AppViewModel() {
                 Log.detail(TAG, "BiometricAuthenticator.Listener: onSuccess()")
 
                 EventService.onRegistrationDone(
-                    completedSuccessfully = true,
-                    authModel = authModel,
-                    cipher = cipher
+                    completedSuccessfully = true, authModel = authModel, cipher = cipher
                 )
             }
 
@@ -197,13 +198,12 @@ class LoginViewModel : AppViewModel() {
                     message = R.string.biometric_dialog_message,
                     onConfirm = {
                         Log.info(TAG, "BiometricAuthenticator.Listener: re-open")
-                        proceed(UIRequestType.SHOW_BIOMETRICS_UI, context)
+                        proceed(UIRequestType.BIOMETRICS_UI, context)
                     },
                     onCancel = {
                         Log.info(TAG, "BiometricAuthenticator.Listener: cancel biometric")
                         EventService.onRegistrationDone(
-                            completedSuccessfully = false,
-                            authModel = authModel
+                            completedSuccessfully = false, authModel = authModel
                         )
                     },
                     uiState = uiState,
@@ -242,15 +242,27 @@ class LoginViewModel : AppViewModel() {
         _uiState.value = uiState
     }
 
+    fun navigateBack(context: Context): Boolean {
+        val currentUIState = _uiState.value
+
+        if (currentUIState is ForgotPasswordUIState) {
+            // Go to previous screen
+            _uiState.value = createLoginUIState(context)
+            return true
+        }
+
+        return false
+    }
+
     // UI State factory methods
 
     private fun createLoginUIState(context: Context): LoginUIState {
         return LoginUIState(
             title = context.getString(R.string.title_login),
             emailFiledLabel = context.getString(R.string.usr_email),
-            emailFiledHint = "Type email",
+            emailFiledHint = context.getString(R.string.type_email),
             passwordFiledLabel = context.getString(R.string.usr_psw),
-            passwordFiledHint = "Type password",
+            passwordFiledHint = context.getString(R.string.type_password),
             buttonText = context.getString(R.string.login_btn),
             hasBiometric = BiometricAuthenticator.biometricsAvailable(context) && BiometricAuthenticator.isReady(),
             biometricButtonText = context.getString(R.string.login_with_biometric),
@@ -262,12 +274,12 @@ class LoginViewModel : AppViewModel() {
         return RegistrationUIState(
             title = context.getString(R.string.title_reg),
             emailFiledLabel = context.getString(R.string.usr_email),
-            emailFiledHint = "Type email",
+            emailFiledHint = context.getString(R.string.type_email),
             passwordFiledLabel = context.getString(R.string.usr_psw),
-            passwordFiledHint = "Type password",
+            passwordFiledHint = context.getString(R.string.type_password),
             buttonText = context.getString(R.string.btn_continue),
             confirmPasswordFiledLabel = context.getString(R.string.usr_approve_new_psw),
-            confirmPasswordFiledHint = "Type password",
+            confirmPasswordFiledHint = context.getString(R.string.type_password),
             UIRequestType.REGISTRATION
         )
     }
@@ -278,6 +290,18 @@ class LoginViewModel : AppViewModel() {
             descriptionText = context.getString(R.string.text_description),
             buttonText = context.getString(R.string.btn_continue),
             uiRequestType = UIRequestType.WELCOME_UI
+        )
+    }
+
+    private fun createForgotPasswordUIState(context: Context): ForgotPasswordUIState {
+        return ForgotPasswordUIState(
+            title = context.getString(R.string.forgot_password_title),
+            passwordFiledLabel = context.getString(R.string.usr_psw),
+            passwordFiledHint = context.getString(R.string.type_password),
+            buttonText = context.getString(R.string.btn_continue),
+            confirmPasswordFiledLabel = context.getString(R.string.usr_approve_new_psw),
+            confirmPasswordFiledHint = context.getString(R.string.type_password),
+            uiRequestType = UIRequestType.FORGOT_PASSWORD_UI
         )
     }
 
@@ -339,14 +363,28 @@ class LoginViewModel : AppViewModel() {
 
     @Stable
     class WelcomeUIState(
-        title: String,
-        descriptionText: String,
-        buttonText: String,
-        uiRequestType: UIRequestType
+        title: String, descriptionText: String, buttonText: String, uiRequestType: UIRequestType
     ) : BaseUIState(
         title = title,
         descriptionText = descriptionText,
         buttonText = buttonText,
         requestType = uiRequestType
+    )
+
+    @Stable
+    class ForgotPasswordUIState(
+        title: String, buttonText: String, uiRequestType: UIRequestType,
+        val confirmPasswordFiledLabel: String,
+        val confirmPasswordFiledHint: String,
+        passwordFiledLabel: String,
+        passwordFiledHint: String,
+        var password: String = "",
+        var confirmPassword: String = ""
+    ) : BaseUIState(
+        title = title,
+        buttonText = buttonText,
+        requestType = uiRequestType,
+        passwordFiledHint = passwordFiledHint,
+        passwordFiledLabel = passwordFiledLabel
     )
 }

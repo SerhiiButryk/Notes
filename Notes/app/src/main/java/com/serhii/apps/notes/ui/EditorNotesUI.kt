@@ -162,7 +162,7 @@ fun BottomBarUI(viewModel: NotesViewModel?, uiState: NotesViewModel.NotesEditorU
                 .background(Color.Black)
         )
 
-        IconButton(onClick = { viewModel?.backupNote() }) {
+        IconButton(onClick = { viewModel?.backupNote(uiState) }) {
             Icon(
                 imageVector = Icons.Default.Backup,
                 contentDescription = null,

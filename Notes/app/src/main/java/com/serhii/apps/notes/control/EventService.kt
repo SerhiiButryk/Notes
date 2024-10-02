@@ -5,15 +5,12 @@
 package com.serhii.apps.notes.control
 
 import android.content.Context
-import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.AuthManager
 import com.serhii.apps.notes.control.auth.base.IEventService
-import com.serhii.apps.notes.control.auth.types.AuthResult
 import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
-import com.serhii.core.security.Hash
 import javax.crypto.Cipher
 
 /**
@@ -77,7 +74,7 @@ object EventService : IEventService {
     }
 
     /**
-     * Handle registration event
+     * Handle registration done event
      */
     override fun onRegistrationDone(
         completedSuccessfully: Boolean,
@@ -137,33 +134,31 @@ object EventService : IEventService {
     }
 
     /**
-     * Handle change password event
-     *
-     * TODO: Improve to work with KeyMater
+     * Handle password change event
      */
-    // TODO: Get rid of UI actions here
     override fun onChangePassword(
         oldPassword: String,
         newPassword: String,
         showMessage: (id: Int) -> Unit
     ): Boolean {
         var result = false
-        val success = NativeBridge.verifyPassword(Hash.hashMD5(oldPassword))
-        if (!success) {
-            showMessage(R.string.change_password_toast_not_correct_password)
-        } else {
-            result = NativeBridge.setNewPassword(Hash.hashMD5(newPassword))
-            if (result) {
-                showMessage(R.string.change_password_toast_password_set)
-            } else {
-                showMessage(R.string.change_password_toast_password_error)
-            }
-        }
+// TODO: Handle this
+//        val success = NativeBridge.verifyPassword(Hash.hashMD5(oldPassword))
+//        if (!success) {
+//            showMessage(R.string.change_password_toast_not_correct_password)
+//        } else {
+//            result = NativeBridge.setNewPassword(Hash.hashMD5(newPassword))
+//            if (result) {
+//                showMessage(R.string.change_password_toast_password_set)
+//            } else {
+//                showMessage(R.string.change_password_toast_password_error)
+//            }
+//        }
         return result
     }
 
     /**
-     * Handle change login limit event
+     * Handle login limit change event
      */
     override fun onChangeLoginLimit(newLimit: Int) {
         NativeBridge.unlockLimit = newLimit

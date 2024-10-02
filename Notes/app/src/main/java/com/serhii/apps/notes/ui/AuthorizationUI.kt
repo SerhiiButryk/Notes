@@ -118,7 +118,9 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(bottom = dimensionResource(id = R.dimen.padding_small))
-                    .clickable { },
+                    .clickable {
+                        viewModel.proceed(UIRequestType.FORGOT_PASSWORD_UI, context)
+                    },
                 color = MaterialTheme.colorScheme.secondary
             )
         }
@@ -165,123 +167,6 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
     if (openDialog && !uiState.dialogState.isOpen) {
         BasicDialogUI(dialogState = uiState.dialogState)
     }
-}
-
-@Composable
-private fun EmailFieldUI(
-    label: String,
-    hint: String,
-    getValue: () -> String,
-    modifier: Modifier,
-    onValueChanged: (String) -> Unit
-) {
-
-    var inputValue by rememberSaveable { mutableStateOf("") }
-
-    inputValue = getValue()
-
-    val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
-
-    val defaultModifiers = Modifier
-        .padding(bottom = bottomPadding)
-        .fillMaxWidth()
-
-    val textStyle = MaterialTheme.typography.bodyMedium
-    val labelStyle = MaterialTheme.typography.bodySmall
-
-    OutlinedTextField(
-        modifier = defaultModifiers.then(modifier),
-        value = inputValue,
-        onValueChange = { newText ->
-            inputValue = newText
-            onValueChanged(newText)
-        },
-        label = {
-            Text(text = label, style = labelStyle)
-        },
-        textStyle = textStyle,
-        singleLine = true,
-        maxLines = 1,
-        placeholder = {
-            Text(text = hint, style = labelStyle)
-        },
-        shape = RoundedCornerShape(percent = 20),
-        keyboardOptions = KeyboardOptions(
-            autoCorrect = false,
-            keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next
-        ),
-    )
-}
-
-@Composable
-private fun PasswordFieldUI(
-    label: String, modifier: Modifier? = null,
-    doneAction: (() -> Unit)? = null, actionKeyboard: ImeAction = ImeAction.Next,
-    hint: String, getValue: () -> String, onValueChanged: (String) -> Unit
-) {
-
-    var showPassword by rememberSaveable { mutableStateOf(false) }
-    var inputValue by rememberSaveable { mutableStateOf("") }
-
-    inputValue = getValue()
-
-    val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
-
-    val defaultModifiers = Modifier
-        .padding(bottom = bottomPadding)
-        .fillMaxWidth()
-
-    val textStyle = MaterialTheme.typography.bodyMedium
-    val labelStyle = MaterialTheme.typography.bodySmall
-
-    OutlinedTextField(
-        modifier = if (modifier != null) defaultModifiers.then(modifier) else defaultModifiers,
-        value = inputValue,
-        onValueChange = { newText ->
-            inputValue = newText
-            onValueChanged(newText)
-        },
-        label = {
-            Text(text = label, style = labelStyle)
-        },
-        textStyle = textStyle,
-        singleLine = true,
-        maxLines = 1,
-        placeholder = {
-            Text(text = hint, style = labelStyle)
-        },
-        shape = RoundedCornerShape(percent = 20),
-        // Setup password filed transformation
-        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-        // Setup additional keyboard mode
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            autoCorrect = false,
-            imeAction = actionKeyboard
-        ),
-        // Setup password eye icon
-        trailingIcon = {
-            val onClick = { showPassword = !showPassword }
-            if (showPassword) {
-                IconButton(onClick = onClick) {
-                    Icon(
-                        imageVector = Icons.Filled.Visibility,
-                        contentDescription = ""
-                    )
-                }
-            } else {
-                IconButton(onClick = onClick) {
-                    Icon(
-                        imageVector = Icons.Filled.VisibilityOff,
-                        contentDescription = ""
-                    )
-                }
-            }
-        },
-        // Setup additional keyboard actions
-        keyboardActions = KeyboardActions(onDone = { doneAction?.invoke() })
-    )
 }
 
 @Preview(

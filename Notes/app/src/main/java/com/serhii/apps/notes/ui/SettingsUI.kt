@@ -7,6 +7,7 @@ package com.serhii.apps.notes.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,21 +17,29 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.ui.state_holders.SettingsViewModel
@@ -68,19 +78,27 @@ fun SettingsUI(viewModel: SettingsViewModel) {
                 }
             )
         }
-    ) {  innerPadding ->
+    ) { innerPadding ->
 
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
         val settingsItems = uiState.value.items
 
         SettingsListUI(innerPadding, settingsItems)
+
+        val openDialog = uiState.value.openDialog
+        if (openDialog && !uiState.value.dialogState.isOpen) {
+            OptionsListDialog(uiState.value.dialogState)
+        }
     }
 }
 
-class SettingItem(val imageVector: ImageVector,
-                  val onClick: () -> Unit,
-                  val titleString: String,
-                  val subTitleString: String)
+class SettingItem(
+    val imageVector: ImageVector? = null,
+    val onClick: () -> Unit = {},
+    val titleString: String,
+    val subTitleString: String,
+    val hasSwitch: Boolean = false
+)
 
 @Composable
 fun SettingsListUI(innerPadding: PaddingValues, settingsItems: List<SettingItem>) {
@@ -116,7 +134,8 @@ fun SettingsItemUI(item: SettingItem) {
         ),
         modifier = Modifier
             .padding(start = 20.dp, end = 10.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { item.onClick() },
         shape = RoundedCornerShape(percent = 20)
     ) {
 
@@ -127,12 +146,26 @@ fun SettingsItemUI(item: SettingItem) {
             horizontalArrangement = Arrangement.Start
         ) {
 
-            Icon(
-                modifier = Modifier
-                    .padding(end = 18.dp),
-                imageVector = item.imageVector,
-                contentDescription = ""
-            )
+            if (item.hasSwitch) {
+                var checked by remember { mutableStateOf(true) }
+
+                Switch(
+                    modifier = Modifier
+                        .padding(end = 18.dp),
+                    checked = checked,
+                    onCheckedChange = {
+                        checked = it
+                    }
+                )
+            } else {
+
+                Icon(
+                    modifier = Modifier
+                        .padding(end = 18.dp),
+                    imageVector = item.imageVector!!,
+                    contentDescription = ""
+                )
+            }
 
             Column {
 
@@ -149,6 +182,81 @@ fun SettingsItemUI(item: SettingItem) {
 
             }
 
+        }
+    }
+}
+
+@Composable
+fun OptionsListDialog(dialogState: DialogUIState) {
+
+    val optionsDialogState = dialogState as SettingsViewModel.OptionsListDialogUIState
+
+    Dialog(onDismissRequest = {
+        optionsDialogState.onCancel()
+    }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp)
+        )
+        {
+            Text(
+                modifier = Modifier.padding(18.dp),
+                text = stringResource(dialogState.title),
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+            ) {
+
+                val options = optionsDialogState.listOptions
+
+                for ((index, option) in options.withIndex()) {
+
+                    item(index) {
+
+                        Row(
+                            modifier = Modifier.padding(
+                                start = 18.dp,
+                                end = 18.dp,
+                                top = 6.dp,
+                                bottom = 6.dp
+                            ),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+
+                            var selected by remember { mutableStateOf(false) }
+
+                            RadioButton(selected = selected, onClick = {
+                                selected = !selected
+                            })
+
+                            Text(
+                                text = stringResource(id = option.text),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                    }
+                }
+
+                item {
+                    Button(
+                        onClick = { optionsDialogState.onSelected(0) },
+                        modifier = Modifier.padding(bottom = 10.dp, start = 18.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = optionsDialogState.positiveBtn),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+            }
         }
     }
 }

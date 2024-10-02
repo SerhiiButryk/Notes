@@ -8,10 +8,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.serhii.apps.notes.R
+import com.serhii.apps.notes.activities.NotesViewActivity
+import com.serhii.apps.notes.activities.NotesViewActivity.Companion
 import com.serhii.apps.notes.activities.SettingsActivity
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.common.App.BACKGROUND_DISPATCHER
 import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.database.UserNotesDatabase
@@ -22,7 +26,8 @@ import com.serhii.core.log.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
+import java.io.FileNotFoundException
+import java.io.OutputStream
 
 /**
  *  View model for managing UI state and business logic of NotesViewActivity
@@ -36,7 +41,7 @@ class NotesViewModel : AppViewModel() {
     val uiState: StateFlow<BaseUIState> = _uiState
 
     private var cachedNotesData: List<NoteModel> = emptyList()
-    var editorState: RichTextState? = null
+    private var editorState: RichTextState? = null
 
     ///////////////////////////// UI State class /////////////////////////////
 
@@ -47,8 +52,10 @@ class NotesViewModel : AppViewModel() {
 
     class NotesMainUIState(val notes: List<NoteModel> = emptyList()) : BaseUIState()
 
-    class NotesEditorUIState(var note: NoteModel = NoteModel(),
-                             var isExistingNote: Boolean = false) : BaseUIState()
+    class NotesEditorUIState(
+        var note: NoteModel = NoteModel(),
+        var isExistingNote: Boolean = false
+    ) : BaseUIState()
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -70,10 +77,10 @@ class NotesViewModel : AppViewModel() {
         Log.info(TAG, "NotesViewModel(), instance is created")
     }
 
-    override fun initViewModel(context: Context) {
-        super.initViewModel(context)
+    override fun initViewModel(activity: Activity) {
+        super.initViewModel(activity)
         // Init database
-        UserNotesDatabase.init(context.applicationContext)
+        UserNotesDatabase.init(activity.applicationContext)
     }
 
     override fun onCleared() {
@@ -89,6 +96,10 @@ class NotesViewModel : AppViewModel() {
 
             cachedNotesData = notesList
 
+            // This might be called when we log in the first time
+            // or do restore from settings or delete a note or close an note editor
+            // In each case we should show Preview UI
+            // So main state should be fine to set up here
             _uiState.value = createNotesMainUIState()
 
             Log.info(TAG, "reloadData()")
@@ -128,10 +139,8 @@ class NotesViewModel : AppViewModel() {
 
     fun saveNote(uiState: NotesEditorUIState) {
 
-        val editor = editorState
-        if (editor != null) {
-            val textNote = editor.toText()
-            uiState.note.plainText = textNote
+        if (editorState != null) {
+            updateNote(uiState)
         } else {
             Log.info(TAG, "saveNote() failed editor is null")
             return
@@ -184,8 +193,21 @@ class NotesViewModel : AppViewModel() {
         )
     }
 
-    fun backupNote() {
-        TODO("Not yet implemented")
+    private fun updateNote(uiState: NotesEditorUIState) {
+        val textNote = editorState!!.toText()
+        uiState.note.plainText = textNote
+    }
+
+    override fun backupNote(uiState: NotesEditorUIState) {
+
+        if (editorState != null) {
+            updateNote(uiState)
+        } else {
+            Log.error(TAG, "backupNote() failed editor is null")
+            return
+        }
+
+        super.backupNote(uiState)
     }
 
     fun openNoteEditorUI(noteModel: NoteModel? = null) {
@@ -201,11 +223,36 @@ class NotesViewModel : AppViewModel() {
 
         if (currentUIState is NotesEditorUIState) {
             // Go to previous screen
-            _uiState.value = createNotesMainUIState()
+            reloadData()
             return true
         }
 
         return false
+    }
+
+    fun extractNote(context: Context, intent: Intent) {
+        val noteId = (uiState.value as NotesEditorUIState).note.id
+
+        if (noteId.isEmpty()) {
+            Log.error(TAG, "extractNote() didn't get note id, return")
+            return
+        }
+
+        val outputStream: OutputStream? = try {
+            context.contentResolver.openOutputStream(intent.data!!)
+        } catch (e: FileNotFoundException) {
+            Log.error(TAG, "extractNote() failed to get output stream, error: $e")
+            e.printStackTrace()
+            return
+        }
+
+        // Start an extract
+        viewModelScope.launch(App.BACKGROUND_DISPATCHER) {
+            val note = UserNotesDatabase.getRecord(noteId)
+            BackupManager.extractNotes(outputStream, listOf(note)) { result ->
+                showStatusMessage(context, result)
+            }
+        }
     }
 
     fun openSettings(activity: Activity) {

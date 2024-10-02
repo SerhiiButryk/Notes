@@ -5,18 +5,21 @@
 
 package com.serhii.apps.notes.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DockedSearchBar
@@ -27,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,18 +38,25 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.serhii.apps.notes.R
 
 @Composable
 fun ButtonUI(
     text: String,
-    @SuppressLint("ModifierParameter") modifier: Modifier,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(
@@ -99,6 +110,7 @@ fun SearchUI(
         DockedSearchBar(
             inputField = {
                 SearchBarDefaults.InputField(
+                    modifier = Modifier.fillMaxWidth(),
                     query = query,
                     onQueryChange = {
                         query = it
@@ -180,7 +192,10 @@ fun Menu(menuOptionsList: List<MenuOptions>) {
 
                 DropdownMenuItem(
                     text = { Text(text = stringResource(id = option.textId), style = MaterialTheme.typography.bodySmall) },
-                    onClick = { option.onClick() },
+                    onClick = {
+                        option.onClick()
+                        expanded = false
+                    },
                     leadingIcon = {
                         Icon(option.icon, contentDescription = null)
                     }
@@ -195,7 +210,7 @@ fun Menu(menuOptionsList: List<MenuOptions>) {
 }
 
 @Stable
-class DialogUIState(
+open class DialogUIState(
     val title: Int = -1,
     val message: Int = -1,
     val dialogDismissible: Boolean = true,
@@ -262,5 +277,122 @@ fun BasicDialogUI(dialogState: DialogUIState) {
                 )
             }
         }
+    )
+}
+
+@Composable
+fun PasswordFieldUI(
+    label: String, modifier: Modifier? = null,
+    doneAction: (() -> Unit)? = null, actionKeyboard: ImeAction = ImeAction.Next,
+    hint: String, getValue: () -> String, onValueChanged: (String) -> Unit
+) {
+
+    var showPassword by rememberSaveable { mutableStateOf(false) }
+    var inputValue by rememberSaveable { mutableStateOf("") }
+
+    inputValue = getValue()
+
+    val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
+
+    val defaultModifiers = Modifier
+        .padding(bottom = bottomPadding)
+        .fillMaxWidth()
+
+    val textStyle = MaterialTheme.typography.bodyMedium
+    val labelStyle = MaterialTheme.typography.bodySmall
+
+    OutlinedTextField(
+        modifier = if (modifier != null) defaultModifiers.then(modifier) else defaultModifiers,
+        value = inputValue,
+        onValueChange = { newText ->
+            inputValue = newText
+            onValueChanged(newText)
+        },
+        label = {
+            Text(text = label, style = labelStyle)
+        },
+        textStyle = textStyle,
+        singleLine = true,
+        maxLines = 1,
+        placeholder = {
+            Text(text = hint, style = labelStyle)
+        },
+        shape = RoundedCornerShape(percent = 20),
+        // Setup password filed transformation
+        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+        // Setup additional keyboard mode
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            autoCorrect = false,
+            imeAction = actionKeyboard
+        ),
+        // Setup password eye icon
+        trailingIcon = {
+            val onClick = { showPassword = !showPassword }
+            if (showPassword) {
+                IconButton(onClick = onClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Visibility,
+                        contentDescription = ""
+                    )
+                }
+            } else {
+                IconButton(onClick = onClick) {
+                    Icon(
+                        imageVector = Icons.Filled.VisibilityOff,
+                        contentDescription = ""
+                    )
+                }
+            }
+        },
+        // Setup additional keyboard actions
+        keyboardActions = KeyboardActions(onDone = { doneAction?.invoke() })
+    )
+}
+
+@Composable
+fun EmailFieldUI(
+    label: String,
+    hint: String,
+    getValue: () -> String,
+    modifier: Modifier,
+    onValueChanged: (String) -> Unit
+) {
+
+    var inputValue by rememberSaveable { mutableStateOf("") }
+
+    inputValue = getValue()
+
+    val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
+
+    val defaultModifiers = Modifier
+        .padding(bottom = bottomPadding)
+        .fillMaxWidth()
+
+    val textStyle = MaterialTheme.typography.bodyMedium
+    val labelStyle = MaterialTheme.typography.bodySmall
+
+    OutlinedTextField(
+        modifier = defaultModifiers.then(modifier),
+        value = inputValue,
+        onValueChange = { newText ->
+            inputValue = newText
+            onValueChanged(newText)
+        },
+        label = {
+            Text(text = label, style = labelStyle)
+        },
+        textStyle = textStyle,
+        singleLine = true,
+        maxLines = 1,
+        placeholder = {
+            Text(text = hint, style = labelStyle)
+        },
+        shape = RoundedCornerShape(percent = 20),
+        keyboardOptions = KeyboardOptions(
+            autoCorrect = false,
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        ),
     )
 }

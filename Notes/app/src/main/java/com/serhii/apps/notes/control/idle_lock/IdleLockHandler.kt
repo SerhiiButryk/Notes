@@ -7,11 +7,10 @@ package com.serhii.apps.notes.control.idle_lock
 
 import android.content.Context
 import android.content.Intent
-import androidx.preference.PreferenceManager
-import com.serhii.apps.notes.R
 import com.serhii.apps.notes.activities.AuthorizationActivity
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.AppForegroundListener
+import com.serhii.apps.notes.control.preferences.PreferenceManager
 import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.detail
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -36,14 +35,14 @@ object IdleLockHandler {
 
     fun onUserInteraction(context: Context) {
         detail(TAG, "onUserInteraction()")
-        startLockTimeout(context, getTimeout(context))
+        startLockTimeout(context, PreferenceManager.getTimeout(context))
     }
 
     fun onActivityResumed(context: Context) {
         detail(TAG, "onActivityResumed()")
         // Check if timeout is received and start a job if not
         if (!hasIdleTimeout(context)) {
-            startLockTimeout(context, getTimeout(context))
+            startLockTimeout(context, PreferenceManager.getTimeout(context))
         }
     }
 
@@ -100,16 +99,6 @@ object IdleLockHandler {
         }
 
         return false
-    }
-
-    private fun getTimeout(context: Context) : Long {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val timeDefault = context.getString(R.string.preference_idle_lock_time_default)
-        val time = sharedPreferences.getString(context.getString(R.string.preference_idle_lock_timeout_key), timeDefault)
-
-        val timeoutTimeMillis = time?.toLong() ?: timeDefault.toLong()
-
-        return timeoutTimeMillis
     }
 
     private fun startAuthActivity(context: Context, flags: Int) {

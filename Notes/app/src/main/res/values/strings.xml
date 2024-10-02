@@ -130,13 +130,13 @@
     <string name="email_feedback_body">[Describe issue]\n[Share your thoughts]\n[Ask questions]</string>
 
     <string name="preference_idle_lock_timeout_key" translatable="false">idle_lock_time_out</string>
-    <string name="preference_idle_lock_timeout_title">Change idle lock</string>
+    <string name="preference_idle_lock_timeout_title">Change a timeout</string>
+    <string name="preference_idle_lock_timeout_subtitle">Set a new timeout</string>
 
-    <string-array name="preference_idle_lock_list">
-        <item>3 minutes</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
-    </string-array>
+    <string name="s_3_min">3 minutes</string>
+    <string name="s_5_min">5 minutes</string>
+    <string name="s_10_min">10 minutes</string>
+    <string name="never">Never</string>
 
     <string-array name="preference_idle_lock_list_values">
         <item>180000</item> <!--IN millis-->
@@ -173,7 +173,7 @@
     // Enter keyword dialog
     <string name="set_password_dialog_title">Enter a keyword to encrypt your data</string>
     <string name="set_password_dialog_hint_restore">Enter a keyword.\nPlease, make sure that this is the same keyword as you used to backup this notes. Otherwise this operation will fail.</string>
-    <string name="set_password_dialog_hint_backup">You should remember it to be able to restore your data.</string>
+    <string name="set_password_dialog_hint_backup">Make sure to remember it to be able to restore your data.</string>
 
     // BlockView
     <string name="block_title">Access is restricted</string>
@@ -219,5 +219,9 @@
     <string name="no">No</string>
 
     <string name="forgot_password">Forgot password ?</string>
+
+    <string name="forgot_password_title">Reset password</string>
+    <string name="type_password">Type password</string>
+    <string name="type_email">Type email</string>
 
 </resources>

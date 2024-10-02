@@ -80,7 +80,7 @@ object BackupManager {
         activity.startActivityForResult(createIntent(FILE_NAME_BACKUP_DATA), REQUEST_CODE_BACKUP_NOTES)
     }
 
-    fun openBackUpFile(activity: Activity) {
+    fun openFileChooser(activity: Activity) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         with(intent) {
             addCategory(Intent.CATEGORY_OPENABLE)

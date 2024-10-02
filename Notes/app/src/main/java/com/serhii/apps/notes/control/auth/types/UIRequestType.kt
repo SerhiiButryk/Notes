@@ -16,13 +16,15 @@ enum class UIRequestType(val description: String, val type: Int) {
 
     WELCOME_UI("WELCOME_UI", 105),
 
-    SHOW_DIALOG("SHOW_DIALOG", 106),
+    DIALOG_UI("SHOW_DIALOG", 106),
 
     BLOCK_UI("BLOCK_UI", 107),
 
     LOGIN_UI("LOGIN_UI", 108),
 
-    SHOW_BIOMETRICS_UI("SHOW_BIOMETRICS_UI", 109),
+    BIOMETRICS_UI("SHOW_BIOMETRICS_UI", 109),
+
+    FORGOT_PASSWORD_UI("FORGOT_PASSWORD_UI", 110),
 
     UN_SET("UN_SET", 1);
 }

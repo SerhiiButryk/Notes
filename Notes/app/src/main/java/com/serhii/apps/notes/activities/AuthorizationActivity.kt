@@ -5,6 +5,7 @@
 package com.serhii.apps.notes.activities
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.AuthorizationUI
+import com.serhii.apps.notes.ui.ForgotPasswordUI
 import com.serhii.apps.notes.ui.WelcomeUI
 import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
@@ -42,6 +44,15 @@ class AuthorizationActivity : AppBaseActivity() {
 
         viewModel.setupBiometrics(this)
 
+        // Handle back button clicks
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (!viewModel.navigateBack(applicationContext)) {
+                    moveTaskToBack(true)
+                }
+            }
+        })
+
         setupUI()
         initNative()
     }
@@ -63,6 +74,8 @@ class AuthorizationActivity : AppBaseActivity() {
                             AuthorizationUI(uiState = appUIState, viewModel)
                         } else if (appUIState is LoginViewModel.WelcomeUIState) {
                             WelcomeUI(uiState = appUIState, viewModel)
+                        } else if (appUIState is LoginViewModel.ForgotPasswordUIState) {
+                            ForgotPasswordUI(uiState = appUIState, viewModel = viewModel)
                         }
                     }
                 }
@@ -99,7 +112,7 @@ class AuthorizationActivity : AppBaseActivity() {
         Log.info(TAG, "showAlertDialog(), type $type")
         // Show a dialog
         viewModel.proceed(
-            requestType = UIRequestType.SHOW_DIALOG,
+            requestType = UIRequestType.DIALOG_UI,
             context = applicationContext,
             type = type
         )
