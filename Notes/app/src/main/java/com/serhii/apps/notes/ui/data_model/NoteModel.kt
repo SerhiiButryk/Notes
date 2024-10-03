@@ -4,7 +4,6 @@
  */
 package com.serhii.apps.notes.ui.data_model
 
-import com.serhii.apps.notes.ui.search.SearchInfo
 import com.serhii.core.log.Log
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.addJsonObject
@@ -27,8 +26,6 @@ data class NoteModel(var plainText: String = "", var title: String = "",
                       * Currently there can be only 1 item in list
                       */
                      val listNote: MutableList<NoteList> = mutableListOf()) {
-
-    var queryInfo: SearchInfo? = null
 
     /*
     * If this note has no user notes
@@ -182,14 +179,12 @@ data class NoteModel(var plainText: String = "", var title: String = "",
 
         fun getCopy(note: NoteModel): NoteModel {
             val copyNote = NoteModel(note.plainText, note.title, note.time, note.id, note.viewType, note.listNote)
-            copyNote.queryInfo = note.queryInfo
             return copyNote
         }
 
         fun getCopy(note: NoteModel, listNote: MutableList<NoteList>): NoteModel {
             val copyNote = NoteModel(note.plainText, note.title, note.time, note.id,
                 note.viewType, listNote)
-            copyNote.queryInfo = note.queryInfo
             return copyNote
         }
 

@@ -6,8 +6,8 @@ package com.serhii.apps.notes.control
 
 import android.content.Context
 import com.serhii.apps.notes.control.auth.AuthManager
+import com.serhii.apps.notes.control.auth.RequestType
 import com.serhii.apps.notes.control.auth.base.IEventService
-import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto

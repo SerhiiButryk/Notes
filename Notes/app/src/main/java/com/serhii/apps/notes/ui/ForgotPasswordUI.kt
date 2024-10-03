@@ -52,7 +52,7 @@ fun ForgotPasswordUI(uiState: LoginViewModel.ForgotPasswordUIState, viewModel: L
 
         PasswordFieldUI(label = uiState.passwordFiledLabel, hint = uiState.passwordFiledHint,
             actionKeyboard = ImeAction.Next,
-            getValue = { uiState.password }, modifier = focusModifierPassword
+            initValue = { uiState.password }, modifier = focusModifierPassword
         ) { newText ->
             uiState.password = newText
         }
@@ -60,7 +60,7 @@ fun ForgotPasswordUI(uiState: LoginViewModel.ForgotPasswordUIState, viewModel: L
         PasswordFieldUI(label = uiState.confirmPasswordFiledLabel, hint = uiState.confirmPasswordFiledHint,
             doneAction = doneAction,
             actionKeyboard = ImeAction.Done,
-            getValue = { uiState.confirmPassword }
+            initValue = { uiState.confirmPassword }
         ) { newText ->
             uiState.confirmPassword = newText
         }

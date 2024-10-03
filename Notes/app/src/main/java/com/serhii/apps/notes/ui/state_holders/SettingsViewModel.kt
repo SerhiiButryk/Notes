@@ -35,18 +35,47 @@ class SettingsViewModel : AppViewModel() {
 
     class SettingsUIState(
         val items: List<SettingItem>,
-        var openDialog: Boolean = false,
         var dialogState: DialogUIState = DialogUIState()
     )
 
     class DialogOption(val text: Int, var checked: Boolean = false)
 
-    class OptionsListDialogUIState(
+    class ListDialogUIState(
         val listOptions: List<DialogOption>,
         val onSelected: (Int) -> Unit,
         title: Int,
-        cancel: () -> Unit
-    ) : DialogUIState(title = title, onCancel = cancel)
+        onCancel: () -> Unit
+    ) : DialogUIState(title = title, onCancel = onCancel)
+
+    class TextInputDialogUIState(
+        var inputFirst: String = "",
+        var inputSecond: String = "",
+        title: Int,
+        onCancel: () -> Unit,
+        onConfirm: () -> Unit,
+        val firstHint: Int = R.string.pass_hint,
+        val firstLabel: Int = R.string.pass_label,
+        val secondHint: Int = R.string.conf_hint,
+        val secondLabel: Int = R.string.conf_label,
+        val hasSecondInput: Boolean = true,
+    ) : DialogUIState(title = title, onCancel = onCancel, onConfirm = onConfirm) {
+
+        fun checkInput(): Boolean {
+
+            // Basic check
+
+            if (!hasSecondInput && inputFirst.isNotEmpty())
+                return true
+
+            if (inputFirst.isEmpty() || inputSecond.isEmpty())
+                return false
+
+            if (inputFirst != inputSecond)
+                return false
+
+            return true
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -60,45 +89,8 @@ class SettingsViewModel : AppViewModel() {
         _uiState.value = createSettingsUIState()
     }
 
-    fun openOptionListDialog(listOptions: List<DialogOption>, onSelected: (Int) -> Unit) {
-
-        val newState = createSettingsUIState()
-        newState.openDialog = true
-
-        newState.dialogState = OptionsListDialogUIState(
-            listOptions = listOptions,
-            onSelected = {
-                // TODO: Doest not look good, might be revisited later
-                // A hack to close dialog
-                val state = createSettingsUIState()
-                state.openDialog = false
-                _uiState.value = state
-
-                onSelected(it)
-            },
-            title = R.string.preference_idle_lock_timeout_title,
-            cancel = {
-                // TODO: Doest not look good, might be revisited later
-                // A hack to close dialog
-                val state = createSettingsUIState()
-                state.openDialog = false
-                _uiState.value = state
-            }
-        )
-
-        _uiState.value = newState
-    }
-
     private fun createSettingsUIState(): SettingsUIState {
         return SettingsUIState(items!!)
-    }
-
-    fun openKeywordSetDialog() {
-        // TODO: Show dialog
-    }
-
-    fun openKeywordRequestDialog() {
-        // TODO: Show dialog
     }
 
     ///////////////////////////////////// Settings options ///////////////////////////////////////
@@ -177,5 +169,98 @@ class SettingsViewModel : AppViewModel() {
     }
 
     ////////////////////////////////////////////////////////////////////////////
+
+    // DIALOGS
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    private fun closeDialog() {
+        // TODO: Doest not look good, might be revisited later
+        // A hack to close dialog
+        val state = createSettingsUIState().apply {
+            dialogState.openDialog = false
+        }
+        _uiState.value = state
+    }
+
+    fun openKeywordSetDialog(context: Context, intent: Intent) {
+        Log.info("SettingsViewModel", "openKeywordSetDialog()")
+        openDialog(TextInputDialogUIState(
+            title = R.string.set_password_dialog_title,
+            onCancel = {
+                closeDialog()
+            },
+            onConfirm = {
+
+                val dialogState = (uiState.value.dialogState as TextInputDialogUIState)
+                val result = dialogState.checkInput()
+
+                if (result) {
+                    Log.info("SettingsViewModel", "TextInputDialogUIState::onConfirm() 1")
+                    closeDialog()
+                    // Start backup
+                    onBackup(context, dialogState.inputFirst, intent)
+                } else {
+                    Log.info("SettingsViewModel", "TextInputDialogUIState::onConfirm() 0")
+                    // TODO:
+                    // Localize
+                    showMessage(context, "Keywords do not match or fields ar empty")
+                }
+            }
+        ))
+    }
+
+    private fun openDialog(state: DialogUIState) {
+
+        val newState = createSettingsUIState()
+
+        newState.dialogState = state
+
+        newState.dialogState.openDialog = true
+        _uiState.value = newState
+    }
+
+    fun openKeywordRequestDialog(context: Context, intent: Intent) {
+        Log.info("SettingsViewModel", "openKeywordRequestDialog()")
+        openDialog(TextInputDialogUIState(
+            title = R.string.keyword_dialog_title,
+            onCancel = {
+                closeDialog()
+            },
+            onConfirm = {
+
+                val dialogState = (uiState.value.dialogState as TextInputDialogUIState)
+                val result = dialogState.checkInput()
+
+                if (result) {
+                    Log.info("SettingsViewModel", "TextInputDialogUIState::onConfirm() 1")
+                    closeDialog()
+                    // Start restore
+                    onRestore(context, dialogState.inputFirst, intent)
+                } else {
+                    Log.info("SettingsViewModel", "TextInputDialogUIState::onConfirm() 0")
+                    // TODO:
+                    // Localize
+                    showMessage(context, "Keywords do not match or fields ar empty")
+                }
+            },
+            hasSecondInput = false
+        ))
+    }
+
+
+    fun openOptionListDialog(listOptions: List<DialogOption>, onSelected: (Int) -> Unit) {
+        openDialog(ListDialogUIState(
+            listOptions = listOptions,
+            onSelected = {
+                closeDialog()
+                onSelected(it)
+            },
+            title = R.string.preference_idle_lock_timeout_title,
+            onCancel = {
+                closeDialog()
+            }
+        ))
+    }
 
 }

@@ -12,7 +12,7 @@ import com.serhii.core.log.Log
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
 import com.serhii.core.security.Crypto
-import com.serhii.core.utils.GoodUtils.Companion.currentTimeToString
+import com.serhii.core.utils.currentTimeToString
 
 /**
  * This is an access point into application notes database.
@@ -22,13 +22,9 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
 
     private const val TAG = "UserNotesDatabase"
 
-    private val impl: DatabaseImpl
+    // Set an implementation class
+    private val impl: DatabaseImpl = NotesDatabaseIml
     private val crypto = Crypto()
-
-    init {
-        // Set an implementation class
-        impl = NotesDatabaseIml
-    }
 
     override fun init(context: Context) {
         impl.initDbImpl(context)

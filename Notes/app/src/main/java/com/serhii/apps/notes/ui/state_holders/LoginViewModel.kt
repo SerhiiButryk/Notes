@@ -17,10 +17,8 @@ import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.DialogHelper
 import com.serhii.apps.notes.ui.DialogUIState
 import com.serhii.apps.notes.ui.data_model.AuthModel
-import com.serhii.apps.notes.ui.state_holders.NotesViewModel.NotesEditorUIState
 import com.serhii.core.log.Log
 import com.serhii.core.security.BiometricAuthenticator
-import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -125,7 +123,7 @@ class LoginViewModel : AppViewModel() {
                 UIRequestType.BIOMETRIC_LOGIN -> {
                     EventService.onBiometricLogin(authModel) {
                         withContext(App.UI_DISPATCHER) {
-                            GoodUtils.showToast(context, R.string.biometric_toast_message)
+                            showMessage(context, R.string.biometric_toast_message)
                         }
                     }
                 }

@@ -8,6 +8,7 @@ package com.serhii.apps.notes.ui.state_holders
 import android.app.Activity
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,14 +18,12 @@ import com.serhii.apps.notes.control.backup.BackupManager
 import com.serhii.apps.notes.ui.DialogUIState
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel.NotesEditorUIState
 import com.serhii.core.log.Log
-import com.serhii.core.utils.GoodUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalStateException
 import java.lang.ref.WeakReference
 
 /**
- *  View model for reusing UI logic of application
+ *  View model for reusing UI logic of the application
  */
 
 private const val TAG = "AppViewModel"
@@ -86,11 +85,16 @@ open class AppViewModel : ViewModel() {
 
     suspend fun showStatusMessage(context: Context, result: Boolean) {
         withContext(App.UI_DISPATCHER) {
-            if (result) {
-                GoodUtils.showToast(context, R.string.result_success)
-            } else {
-                GoodUtils.showToast(context, R.string.result_failed)
-            }
+            val message = if (result) R.string.result_success else R.string.result_failed
+            showMessage(context, message)
         }
+    }
+
+    fun showMessage(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun showMessage(context: Context, stringId: Int) {
+        Toast.makeText(context, context.getString(stringId), Toast.LENGTH_SHORT).show()
     }
 }

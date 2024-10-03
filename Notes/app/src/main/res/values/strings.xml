@@ -12,30 +12,17 @@
     <string name="ms_no_search_results">Nothing found. Sorry.</string>
 
     // Alert Dialog
-    <string name="ms_no_user_account">This user account is not authorized. Please, authorize your user.</string>
-    <string name="title_no_user_account">Authorize error</string>
-
-    <string name="ms_wrong_password">Password is wrong. Please, try again.</string>
-    <string name="title_wrong_password">Authorize error</string>
-
-    <string name="ms_empty_field">Empty password or user name. \nPlease enter valid credentials.</string>
-    <string name="title_empty_field">Authorize error</string>
-
-    <string name="ms_user_exists" translatable="false">User name has already been existed. \nPlease chose different name.</string>
-
-    <string name="ms_password_differs">Passwords do not match. \nPlease enter password again.</string>
-
-    <string name="ms_space_contain">Spaces are not allowed. \nPlease enter your credentials again.</string>
-
-    <string name="ms_unlock_key_invalid">Entered key is incorrect. \nPlease try again.</string>
-    <string name="title_unlock_key_invalid">Authorize error</string>
+    <string name="ms_no_user_account">This user account doesn\'t exist. Please, create your user account.</string>
+    <string name="ms_wrong_password">Sorry, password is wrong. Please, try again.</string>
+    <string name="ms_empty_field">Empty password or user name. \nPlease, try again.</string>
+    <string name="ms_password_differs">Passwords do not match. \nPlease, try again.</string>
+    <string name="ms_space_contain">Spaces are not allowed. \nPlease, try again.</string>
 
     <string name="ms_extract_data">No data available.</string>
-    <string name="title_extract_data">Error</string>
 
     <string name="title_error">Error</string>
     <string name="ms_password_is_short">Password is short or empty. Please, enter password longer than 5 characters.</string>
-    <string name="ms_email_is_not_valid">Your entered invalid email. Please, try again.</string>
+    <string name="ms_email_is_not_valid">You have entered invalid email. Please, try again.</string>
 
     // Login Activity
     <string name="text_description">Welcome to note app. Manage all your notes here. Firstly you need to create a user. Click \"Continue\" button to proceed.</string>
@@ -63,17 +50,14 @@
     <string name="time_date_label">Updated: %s</string>
     <string name="title_toolbar">Editor</string>
 
-    <string name="toast_action_message">Note is saved</string>
-    <string name="toast_action_deleted_message">Note is deleted</string>
+    <string name="toast_action_message">Your note is saved</string>
+    <string name="toast_action_deleted_message">Your note is deleted</string>
     <string name="toast_action_deleted_message_no_note">No note to delete</string>
     <string name="toast_action_delete_error_note">Can\'t delete an empty note</string>
     <string name="toast_action_delete_error_first_note">Can\'t delete a note.</string>
     <string name="toast_action_error_note_is_not_changed">Nothing to save</string>
     <string name="toast_action_error_note_is_empty">Empty note can\'t be saved</string>
     <string name="toast_action_error_note_nothing_to_clear">Nothing to clear</string>
-
-    <string name="edit_hint_note_item">Add new list item</string>
-    <string name="edit_hint_note_content">Note</string>
 
     // Menu
     <string name="delete_note_item">Delete note</string>
@@ -96,27 +80,14 @@
     <string name="preference_category_title_backup">Backup and restore</string>
 
     <string name="preference_category_title_debug">Diagnostics</string>
-    <string name="preference_category_message_detail_logs">Enable detail logs</string>
-    <string name="preference_category_message_detail_logs_sub">Enable detail logs</string>
+    <string name="preference_category_message_detail_logs">Detailed logs</string>
+    <string name="preference_category_message_detail_logs_sub">Detailed logs are helpful for analysis of issues</string>
     <string name="preference_category_key_detail_logs" translatable="false">detail logs</string>
 
     <string name="preference_login_limit_key" translatable="false">login_limit</string>
     <string name="preference_login_limit_title">Change login limit</string>
     <string name="preference_login_limit_summary">After %s unsuccessful login attempts the app will be blocked</string>
-
     <string name="preference_login_limit_default" translatable="false">5</string>
-
-    <string-array name="preference_login_limit_list">
-        <item>3</item>
-        <item>5</item>
-        <item>10</item>
-    </string-array>
-
-    <string-array name="preference_login_limit_list_values">
-        <item>3</item>
-        <item>5</item>
-        <item>10</item>
-    </string-array>
 
     <string name="preference_about_version_key" translatable="false">about_version</string>
     <string name="preference_about_version_title">Version</string>
@@ -158,9 +129,6 @@
     <string name="preference_restore_note_title">Restore your notes</string>
     <string name="preference_restore_note_decs">Select backup file to restore your notes.</string>
 
-    <string name="preference_unlock_note_key" translatable="false">unlock_note_key</string>
-    <string name="preference_unlock_note_title">Unlock key</string>
-
     // Change password dialog
     <string name="hint_new_password">New password</string>
     <string name="hint_old_password">Current password</string>
@@ -174,11 +142,6 @@
     <string name="set_password_dialog_title">Enter a keyword to encrypt your data</string>
     <string name="set_password_dialog_hint_restore">Enter a keyword.\nPlease, make sure that this is the same keyword as you used to backup this notes. Otherwise this operation will fail.</string>
     <string name="set_password_dialog_hint_backup">Make sure to remember it to be able to restore your data.</string>
-
-    // BlockView
-    <string name="block_title">Access is restricted</string>
-    <string name="block_message">You need unlock key to restore your application</string>
-    <string name="block_hint">Unlock key</string>
 
     // Biometric prompt
     <string name="biometric_prompt_title">Biometric login</string>
@@ -199,19 +162,17 @@
     <string name="title_info">Info</string>
 
     <string name="empty_login">Empty username or password</string>
-    <string name="wrong_pass">Sorry, password is wrong. Please, retry.</string>
+    <string name="wrong_pass">Sorry, password is wrong. Please, try again.</string>
 
     <string name="info_author">Author</string>
     <string name="info_author_sub">Serhii Butryk</string>
 
     <string name="search_title">Search</string>
-    <string name="message_email_app_not_found">Sorry, you don\'t have email app. Cannot complete this action.</string>
+    <string name="message_email_app_not_found">Sorry, you don\'t have an email app. Cannot complete this action.</string>
 
     <string name="save_note_in_file">Extract note as plain text</string>
 
-    <string name="toast_unlock_key_copied">Unlock key is copied to the clipboard</string>
-
-    <string name="biometric_dialog_title">Biometric authentication</string>
+    <string name="biometric_dialog_title">Biometrics authentication</string>
     <string name="biometric_dialog_message">Would you like to retry ? If you disagree you will not be able to use biometrics to login in this app</string>
     <string name="biometric_toast_message">Sorry, failed to login with biometrics</string>
 
@@ -223,5 +184,12 @@
     <string name="forgot_password_title">Reset password</string>
     <string name="type_password">Type password</string>
     <string name="type_email">Type email</string>
+
+    <string name="pass_label">Keyword</string>
+    <string name="pass_hint">Type your Keyword</string>
+    <string name="conf_label">Confirm keyword</string>
+    <string name="conf_hint">Confirm your keyword</string>
+
+    <string name="keyword_dialog_title">Enter your keyword</string>
 
 </resources>

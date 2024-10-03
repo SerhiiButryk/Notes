@@ -219,8 +219,11 @@ open class DialogUIState(
     val onCancel: () -> Unit = {},
     val positiveBtn: Int = android.R.string.ok,
     val negativeBtn: Int = android.R.string.cancel,
-    var isOpen: Boolean = false
-)
+    var isOpen: Boolean = false,
+    var openDialog: Boolean = false
+) {
+    fun canOpen() = openDialog && !isOpen
+}
 
 @Composable
 fun BasicDialogUI(dialogState: DialogUIState) {
@@ -284,13 +287,13 @@ fun BasicDialogUI(dialogState: DialogUIState) {
 fun PasswordFieldUI(
     label: String, modifier: Modifier? = null,
     doneAction: (() -> Unit)? = null, actionKeyboard: ImeAction = ImeAction.Next,
-    hint: String, getValue: () -> String, onValueChanged: (String) -> Unit
+    hint: String, initValue: () -> String, onValueChanged: (String) -> Unit
 ) {
 
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf("") }
 
-    inputValue = getValue()
+    inputValue = initValue()
 
     val bottomPadding = dimensionResource(R.dimen.bottom_input_field_padding)
 

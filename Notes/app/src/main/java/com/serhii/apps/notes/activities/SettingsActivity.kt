@@ -170,7 +170,7 @@ class SettingsActivity : AppBaseActivity() {
         } else if (requestCode == BackupManager.REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
             Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES")
             if (data != null) {
-                viewModel.openKeywordSetDialog()
+                viewModel.openKeywordSetDialog(applicationContext, data)
             } else {
                 // Should not happen
                 Log.error(TAG, "onActivityResult() data is null")
@@ -178,7 +178,7 @@ class SettingsActivity : AppBaseActivity() {
         } else if (requestCode == BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
             Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE")
             if (data != null) {
-                viewModel.openKeywordRequestDialog()
+                viewModel.openKeywordRequestDialog(application, data)
             } else {
                 // Should not happen
                 Log.error(TAG, "onActivityResult() data is null")

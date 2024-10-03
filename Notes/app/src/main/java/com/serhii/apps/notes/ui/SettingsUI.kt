@@ -85,9 +85,13 @@ fun SettingsUI(viewModel: SettingsViewModel) {
 
         SettingsListUI(innerPadding, settingsItems)
 
-        val openDialog = uiState.value.openDialog
-        if (openDialog && !uiState.value.dialogState.isOpen) {
-            OptionsListDialog(uiState.value.dialogState)
+        val dialogState = uiState.value.dialogState
+        if (dialogState.canOpen()) {
+            if (dialogState is SettingsViewModel.ListDialogUIState) {
+                OptionsListDialog(dialogState = dialogState)
+            } else if (dialogState is SettingsViewModel.TextInputDialogUIState) {
+                TextInputDialog(dialogState = dialogState)
+            }
         }
     }
 }
@@ -189,10 +193,10 @@ fun SettingsItemUI(item: SettingItem) {
 @Composable
 fun OptionsListDialog(dialogState: DialogUIState) {
 
-    val optionsDialogState = dialogState as SettingsViewModel.OptionsListDialogUIState
+    val state = dialogState as SettingsViewModel.ListDialogUIState
 
     Dialog(onDismissRequest = {
-        optionsDialogState.onCancel()
+        state.onCancel()
     }) {
         Card(
             modifier = Modifier
@@ -212,7 +216,7 @@ fun OptionsListDialog(dialogState: DialogUIState) {
                 horizontalAlignment = Alignment.Start,
             ) {
 
-                val options = optionsDialogState.listOptions
+                val options = state.listOptions
 
                 for ((index, option) in options.withIndex()) {
 
@@ -246,11 +250,69 @@ fun OptionsListDialog(dialogState: DialogUIState) {
 
                 item {
                     Button(
-                        onClick = { optionsDialogState.onSelected(0) },
+                        onClick = { state.onSelected(0) },
                         modifier = Modifier.padding(bottom = 10.dp, start = 18.dp)
                     ) {
                         Text(
-                            text = stringResource(id = optionsDialogState.positiveBtn),
+                            text = stringResource(id = state.positiveBtn),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
+fun TextInputDialog(dialogState: DialogUIState) {
+
+    val state = dialogState as SettingsViewModel.TextInputDialogUIState
+
+    Dialog(onDismissRequest = {
+        state.onCancel()
+    }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp)
+        )
+        {
+            Text(
+                modifier = Modifier.padding(18.dp),
+                text = stringResource(dialogState.title),
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            LazyColumn(
+                modifier = Modifier.padding(start = 18.dp, end = 18.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                item {
+
+                    PasswordFieldUI(label = stringResource(state.firstLabel),
+                        hint = stringResource(state.firstHint),
+                        initValue = { state.inputFirst }) { newText ->
+                        state.inputFirst = newText
+                    }
+
+                    if (dialogState.hasSecondInput) {
+                        PasswordFieldUI(label = stringResource(state.secondLabel),
+                            hint = stringResource(state.secondHint),
+                            initValue = { state.inputSecond }) { newText ->
+                            state.inputSecond = newText
+                        }
+                    }
+
+                    Button(
+                        onClick = { state.onConfirm() },
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = state.positiveBtn),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }

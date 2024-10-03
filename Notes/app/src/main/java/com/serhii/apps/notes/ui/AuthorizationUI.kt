@@ -14,25 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -41,9 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.control.auth.types.UIRequestType
@@ -100,7 +84,7 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
         PasswordFieldUI(label = uiState.passwordFiledLabel, hint = uiState.passwordFiledHint,
             doneAction = if (isRegistrationUI) null else doneAction,
             actionKeyboard = if (isRegistrationUI) ImeAction.Next else ImeAction.Done,
-            getValue = { viewModel.authModel.password }, modifier = focusModifierPassword
+            initValue = { viewModel.authModel.password }, modifier = focusModifierPassword
         ) { newText ->
             viewModel.authModel.password = newText
         }
@@ -109,7 +93,7 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
             PasswordFieldUI(label = uiState.confirmPasswordFiledLabel,
                 doneAction = doneAction, actionKeyboard = ImeAction.Done,
                 hint = uiState.confirmPasswordFiledHint,
-                getValue = { viewModel.authModel.confirmPassword }) { newText ->
+                initValue = { viewModel.authModel.confirmPassword }) { newText ->
                 viewModel.authModel.confirmPassword = newText
             }
         } else {

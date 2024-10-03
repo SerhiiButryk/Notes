@@ -5,7 +5,6 @@
 package com.serhii.apps.notes.control.auth
 
 import com.serhii.apps.notes.control.auth.types.UIRequestType
-import com.serhii.apps.notes.control.auth.types.RequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
@@ -13,6 +12,15 @@ import com.serhii.core.security.Hash
 /**
  * Performs app authorization request processing
  */
+
+enum class RequestType(var description: String, var type: Int) {
+    REQ_AUTHORIZE("REQ_AUTHORIZE", 1), REQ_REGISTER(
+        "REQ_REGISTER",
+        2
+    ),
+    REQ_BIOMETRIC_LOGIN("REQ_BIOMETRIC_LOGIN", 3);
+}
+
 class AuthManager {
 
     fun handleRequest(type: RequestType, data: AuthModel): Boolean {
