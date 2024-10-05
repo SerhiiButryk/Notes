@@ -97,8 +97,6 @@ object BackupManager {
                 val builder = StringBuilder()
                 for (note in notes) {
                     builder.append("\n")
-                        .append(note.title.trim())
-                        .append("\n\n")
                         .append(note.plainText.trim())
                         .append("\n")
                 }

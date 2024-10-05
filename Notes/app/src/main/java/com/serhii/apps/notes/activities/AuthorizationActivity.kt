@@ -14,17 +14,13 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.common.App
-import com.serhii.apps.notes.control.EventService
 import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.AuthorizationUI
-import com.serhii.apps.notes.ui.ForgotPasswordUI
 import com.serhii.apps.notes.ui.WelcomeUI
 import com.serhii.apps.notes.ui.state_holders.LoginViewModel
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.core.log.Log
-import kotlinx.coroutines.launch
 
 /**
  * Activity which performs user authorization
@@ -63,19 +59,17 @@ class AuthorizationActivity : AppBaseActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(Modifier.safeDrawingPadding()) {
 
-                        // Convert from State Flow to a State observable holder
+                        // Convert from State Flow to a state observable holder
                         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
                         val appUIState = uiState.value
 
-                        // AuthorizationUI handles LoginUIState and RegistrationUIState states
                         if (appUIState is LoginViewModel.LoginUIState ||
-                            appUIState is LoginViewModel.RegistrationUIState
+                            appUIState is LoginViewModel.RegistrationUIState ||
+                            appUIState is LoginViewModel.ForgotPasswordUIState
                         ) {
                             AuthorizationUI(uiState = appUIState, viewModel)
                         } else if (appUIState is LoginViewModel.WelcomeUIState) {
                             WelcomeUI(uiState = appUIState, viewModel)
-                        } else if (appUIState is LoginViewModel.ForgotPasswordUIState) {
-                            ForgotPasswordUI(uiState = appUIState, viewModel = viewModel)
                         }
                     }
                 }
@@ -97,12 +91,7 @@ class AuthorizationActivity : AppBaseActivity() {
      */
     fun userRegistered() {
         Log.info(TAG, "userRegistered()")
-
         viewModel.proceed(requestType = UIRequestType.LOGIN_UI, context = applicationContext)
-
-        lifecycleScope.launch(App.BACKGROUND_DISPATCHER) {
-            EventService.onRegistrationDone(applicationContext)
-        }
     }
 
     /**

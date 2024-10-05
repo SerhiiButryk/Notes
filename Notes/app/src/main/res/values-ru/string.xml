@@ -162,7 +162,8 @@
     <string name="set_password_dialog_hint_restore">Введите ключевое слово.\nПожалуйста, убедитесь, что это то же ключевое слово, которое вы использовали для резервного копирования этой заметки. В противном случае эта операция не удастся.</string>
     <string name="set_password_dialog_hint_backup">Вы должны запомнить его, чтобы иметь возможность восстановить свои данные.</string>
 
-    <string name="info_author">Автор: Сергей Бутрик</string>
+    <string name="info_author">Автор</string>
+    <string name="info_author_sub">Сергей Бутрик</string>
 
     <string name="search_title">Поиск</string>
 

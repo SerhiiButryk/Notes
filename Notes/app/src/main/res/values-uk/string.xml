@@ -13,40 +13,28 @@
 
     // Alter Dialog
     <string name="ms_no_user_account">Ваш акаунт не знайдений. \nБудь ласка, створіть акаунт.</string>
-    <string name="title_no_user_account">Помилка авторизації</string>
-
     <string name="ms_wrong_password">Пароль неправильний. Будь ласка, спробуйте ще раз.</string>
-    <string name="title_wrong_password">Помилка авторизації</string>
-
     <string name="ms_empty_field">Порожній пароль чи ім\'я користувача. \nБудь ласка спробуйте ще раз.</string>
-    <string name="title_empty_field">Помилка авторизації</string>
-
-    <string name="ms_password_differs">Паролі не збігаються. \nБудь ласка уведіть пароль ще раз.</string>
-
-    <string name="ms_space_contain">Пропуски не дозволяються у паролі. \n.Будь ласка уведіть пароль ще раз.</string>
-
-    <string name="ms_unlock_key_invalid">Введений ключ не правильний. \nБудь ласка спробуйте знову.</string>
-    <string name="title_unlock_key_invalid">Помилка авторизації</string>
-
+    <string name="ms_password_differs">Паролі не збігаються. \nБудь ласка повтори пароль ще раз.</string>
+    <string name="ms_space_contain">Пропуски не дозволяються у паролі. \n.Будь ласка повтори пароль ще раз.</string>
     <string name="ms_extract_data">Не має доступних даних.</string>
-    <string name="title_extract_data">Помилка</string>
 
     <string name="title_error">Помилка</string>
-    // TODO: Remove a hardcoded number
+
     <string name="ms_password_is_short">Пароль короткий або пустий. Будь ласка виберіть пароль довший за 5 символів.</string>
     <string name="ms_email_is_not_valid">Введена вами електронна адреса є недійсною. Будь ласка спробуйте ще раз.</string>
 
     // Login Activity
-    <string name="text_description">Ласкаво просимо до додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створіть користувача. Натисніть \"Далі\" щоб продовжити.</string>
+    <string name="text_description">Ласкаво просим до додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створи користувача. Натисни \"Далі\" щоб продовжити.</string>
     <string name="btn_continue">Далі</string>
     <string name="login_btn">Вхід</string>
     <string name="create_account_bnt">Далі</string>
     <string name="usr_psw">Пароль</string>
     <string name="usr_email">Пошта</string>
     <string name="usr_new_psw">Пароль</string>
-    <string name="usr_approve_new_psw">Повторіть пароль</string>
+    <string name="usr_approve_new_psw">Повтори пароль</string>
     <string name="usr_new_email">Пошта</string>
-    <string name="title_login">Ласкаво просимо</string>
+    <string name="title_login">Ласкаво просим</string>
     <string name="title_reg">Реєстрація</string>
     <string name="login_with_biometric">Війти через біометрику</string>
 
@@ -71,9 +59,6 @@
     <string name="toast_action_error_note_is_empty">Пуста нотатка не може бути збережена</string>
     <string name="toast_action_error_note_nothing_to_clear">Не має даних для очищення</string>
 
-    <string name="edit_hint_note_item">Додати новий елемент</string>
-    <string name="edit_hint_note_content">Нотатка</string>
-
     // Menu
     <string name="delete_note_item">Видалити нотатку</string>
     <string name="save_note_item">Зберегти нотатку</string>
@@ -95,21 +80,21 @@
 
     <string name="preference_about_version_title">Версія</string>
 
-    <string name="preference_idle_lock_timeout_title">Час неактивності</string>
+    <string name="preference_idle_lock_timeout_title">Час блокування</string>
+    <string name="preference_idle_lock_timeout_subtitle">Встановити час блокування додатка</string>
 
-    <string-array name="preference_idle_lock_list">
-        <item>3 хвилини</item>
-        <item>5 хвилини</item>
-        <item>10 хвилини</item>
-    </string-array>
+    <string name="s_3_min">3 хвилини</string>
+    <string name="s_5_min">5 хвилини</string>
+    <string name="s_10_min">10 хвилини</string>
+    <string name="never">Ніколи</string>
 
-    <string name="preference_extract_title">Зберегти нотатки</string>
+    <string name="preference_extract_title">Збереження</string>
     <string name="preference_extract_desc">Зберегти нотатки як текст на цьому пристрої</string>
 
-    <string name="preference_backup_title">Зберегти нотатки</string>
+    <string name="preference_backup_title">Збереження</string>
     <string name="preference_backup_desc">Зберегти нотатки як зашифрований файл на цьому пристрої</string>
 
-    <string name="preference_restore_note_title">Відновити нотатки</string>
+    <string name="preference_restore_note_title">Відновлення</string>
     <string name="preference_restore_note_decs">Відновити нотатки з зашифрованого файлу на цьому пристрої</string>
 
     <string name="preference_category_title_debug">Діагностика</string>
@@ -130,22 +115,17 @@
     <string name="change_password_toast_password_set">Пароль встановлено</string>
     <string name="change_password_toast_password_error">Сталася помилка. Вибачте.</string>
 
-    // BlockView
-    <string name="block_title">Доступ обмежений</string>
-    <string name="block_message">Необхідно ключ розблокування що вказаний у налаштуваннях додатку</string>
-    <string name="block_hint">Ключ розблокування</string>
-
     // Biometric prompt
-    <string name="biometric_prompt_title">Увійти через біометрику</string>
-    <string name="biometric_prompt_subtitle">Увійдіть через біометричний ключ</string>
+    <string name="biometric_prompt_title">Біометрика</string>
+    <string name="biometric_prompt_subtitle">Увійди через біометрику</string>
 
     // Confirm dialog
     <string name="confirm_dialog_delete_note_title">Видалити нотаку</string>
-    <string name="confirm_dialog_delete_note_message">Ви упевнені що хочете видалити нотатку ?</string>
+    <string name="confirm_dialog_delete_note_message">Упевнений що хочете видалити нотатку ?</string>
     <string name="confirm_dialog_save_note_title">Зберегти нотаку</string>
-    <string name="confirm_dialog_save_note_message">Ви упевнені що хочете зберегти нотатку ?</string>
+    <string name="confirm_dialog_save_note_message">Упевнений що хочете зберегти нотатку ?</string>
     <string name="confirm_dialog_clear_note_title">Очитстити нотаку</string>
-    <string name="confirm_dialog_clear_note_message">Ви упевнені що хочете очистити ведену нотатку ?</string>
+    <string name="confirm_dialog_clear_note_message">Упевнений що хочете очистити ведену нотатку ?</string>
 
     // Errors / Info
     <string name="result_success">Успіх</string>
@@ -157,11 +137,10 @@
     <string name="wrong_pass">Вибачте пароль не правильний. Будь ласка спробуйте ще разю</string>
 
     // Enter keyword dialog
-    <string name="set_password_dialog_title">Уведіть ключове слово для шифрування даних</string>
-    <string name="set_password_dialog_hint_restore">Уведіть ключове слово.\nБудь ласка, переконайтеся, що це те саме ключове слово, яке ви використали для резервного копіювання цих нотаток. Інакше ця операція буде невдалою.</string>
-    <string name="set_password_dialog_hint_backup">Обов\'язково запам\'ятай його, щоб мати можливість відновити свої дані</string>
+    <string name="set_password_dialog_title">Уведи ключове слово для шифрування даних</string>
 
-    <string name="info_author">Автор: Сергій Бутрик</string>
+    <string name="info_author">Автор</string>
+    <string name="info_author_sub">Сергій Бутрик</string>
 
     <string name="search_title">Пошук</string>
 
@@ -170,10 +149,29 @@
 
     <string name="save_note_in_file">Зберегти у файл</string>
 
-    <string name="biometric_dialog_title">Невдалося встановити біометрику</string>
-    <string name="biometric_dialog_message">Спробувати ще раз ? Якщо Ви відмовитеся то біометрика не буде встановлена і вхід з біометрикою не буде доступний</string>
+    <string name="biometric_dialog_title">Біометрика не встановлена</string>
+    <string name="biometric_dialog_message">Спробувати ще раз ? Якщо ти відмовишся то біометрика не буде встановлена і вхід з біометрикою не буде доступний</string>
     <string name="biometric_toast_message">Вибачте не вдалося увійти з біометрикою</string>
 
-    <string name="toast_unlock_key_copied">Ключ скопійований</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+
+    <string name="forgot_password">Не пам\'ятаєш пароль ?</string>
+
+    <string name="forgot_password_title">Зміна пароля</string>
+    <string name="type_password">Уведи пароль</string>
+    <string name="type_email">Уведи електронну пошту</string>
+
+    <string name="pass_label">Ключове слово</string>
+    <string name="pass_hint">Уведи ключове слово</string>
+    <string name="conf_label">Підтвердіть ключове слово</string>
+    <string name="conf_hint">Уведи ключове слово повторно</string>
+
+    <string name="keyword_dialog_title">Уведи ключове слово для розшифровки даних</string>
+
+    <string name="confirm_pass_reset_title">Будь ласка зверни увагу!</string>
+    <string name="confirm_pass_reset_message">Якщо продовжимо то усі дані чи нотатки що є у додатку будуть видалені після зміни пароля. Продовжити ?</string>
+
+    <string name="search_notes_here">Пошук нотатків</string>
 
 </resources>

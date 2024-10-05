@@ -335,6 +335,22 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1setUnlockK
     Log::Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
+JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1clear(JNIEnv *env, jobject thiz)
+{
+    Log::Info("JNI", " %s IN", __FUNCTION__ );
+
+    SystemStorage ss;
+
+    if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
+        Log::Error("JNI", "%s no file", __FUNCTION__);
+        return;
+    }
+
+    ss.clearData(K_CORE_DATA_FILE);
+
+    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+}
+
 #ifdef __cplusplus
 }
 #endif

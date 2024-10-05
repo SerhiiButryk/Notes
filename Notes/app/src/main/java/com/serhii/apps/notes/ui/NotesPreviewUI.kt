@@ -56,7 +56,7 @@ fun NotesPreviewUI(uiState: NotesViewModel.NotesMainUIState, viewModel: NotesVie
         val noNotesYet = uiState.notes.isEmpty()
 
         Column {
-            SearchUI(hint = "Search notes here", menuOptionsList = menuOptionsList)
+            SearchUI(hint = stringResource(R.string.search_notes_here), menuOptionsList = menuOptionsList)
             if (noNotesYet) {
                 NoNotesYetUI()
             } else {

@@ -19,7 +19,7 @@ interface IEventService {
         model: AuthModel, hasBiometric: Boolean, requestBiometricDialog: suspend () -> Unit
     )
 
-    fun onRegistrationDone(
+    fun onBiometricsDone(
         completedSuccessfully: Boolean,
         cipher: Cipher? = null,
         authModel: AuthModel
@@ -27,15 +27,14 @@ interface IEventService {
 
     suspend fun onBiometricLogin(authModel: AuthModel, requestMessage: suspend () -> Unit = {})
 
-    fun onRegistrationDone(context: Context)
-
-    fun onChangePassword(
-        oldPassword: String,
-        newPassword: String,
-        showMessage: (id: Int) -> Unit
-    ): Boolean
-
     fun onChangeLoginLimit(newLimit: Int)
 
     fun onErrorState()
+
+    suspend fun onPasswordChange(
+        context: Context,
+        model: AuthModel,
+        hasBiometric: Boolean,
+        requestBiometricDialog: suspend () -> Unit
+    )
 }

@@ -192,4 +192,9 @@
 
     <string name="keyword_dialog_title">Enter your keyword</string>
 
+    <string name="confirm_pass_reset_title">Attention please !</string>
+    <string name="confirm_pass_reset_message">If you continue we want be able to keep your data. All your notes will be lost.\nDo you really want to continue ?</string>
+
+    <string name="search_notes_here">Search notes here</string>
+
 </resources>

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.backup.BackupManager
+import com.serhii.apps.notes.control.preferences.PreferenceManager
 import com.serhii.apps.notes.ui.SettingItem
 import com.serhii.apps.notes.ui.SettingsUI
 import com.serhii.apps.notes.ui.state_holders.SettingsViewModel
@@ -109,9 +110,12 @@ class SettingsActivity : AppBaseActivity() {
 
             SettingItem(
                 hasSwitch = true,
-                onClick = {
-                }, titleString = getString(R.string.preference_category_message_detail_logs),
-                subTitleString = getString(R.string.preference_category_message_detail_logs_sub)
+                onSwitch = { checked ->
+                    Log.enableDetailedLogs(checked)
+                    PreferenceManager.setDetailedLogs(applicationContext, checked)
+                },
+                titleString = getString(R.string.preference_category_title_debug),
+                subTitleString = getString(R.string.preference_category_message_detail_logs)
             ),
 
             SettingItem(

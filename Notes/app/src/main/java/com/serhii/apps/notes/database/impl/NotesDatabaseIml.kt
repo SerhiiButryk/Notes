@@ -10,7 +10,7 @@ import android.content.Context
 import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import com.serhii.apps.notes.database.impl.database.DatabaseImpl
-import com.serhii.apps.notes.database.impl.tables.NoteTableModel.QUERY_DROP_USER_NOTES_TABLE
+import com.serhii.apps.notes.database.impl.tables.NoteTableModel.QUERY_CLEAR_TABLE
 import com.serhii.apps.notes.database.impl.tables.NoteTableModel.UserNotesEntry
 import com.serhii.core.log.Log.Companion.error
 import com.serhii.core.log.Log.Companion.info
@@ -39,7 +39,7 @@ object NotesDatabaseIml : DatabaseImpl() {
 
     override fun clearDatabaseImpl() {
         super.clearDatabaseImpl()
-        databaseWrite!!.execSQL(QUERY_DROP_USER_NOTES_TABLE)
+        databaseWrite!!.execSQL(QUERY_CLEAR_TABLE)
     }
 
     override fun addRecordImpl(data: String): Int {

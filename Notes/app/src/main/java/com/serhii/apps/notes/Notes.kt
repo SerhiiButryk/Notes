@@ -19,7 +19,7 @@ class Notes : Application() {
         super.onCreate()
         // Setup log settings
         Log.tag = App.APP_LOG_TAG
-        val enabled = PreferenceManager.detailLogsEnabled(this)
+        val enabled = PreferenceManager.detailedLogsEnabled(applicationContext)
         Log.enableDetailedLogs(enabled)
         Log.setVersionCode(BuildConfig.VERSION_NAME)
         // Setup file system settings

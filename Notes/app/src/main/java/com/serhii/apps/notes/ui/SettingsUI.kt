@@ -101,7 +101,8 @@ class SettingItem(
     val onClick: () -> Unit = {},
     val titleString: String,
     val subTitleString: String,
-    val hasSwitch: Boolean = false
+    val hasSwitch: Boolean = false,
+    val onSwitch: (Boolean) -> Unit = {}
 )
 
 @Composable
@@ -159,6 +160,7 @@ fun SettingsItemUI(item: SettingItem) {
                     checked = checked,
                     onCheckedChange = {
                         checked = it
+                        item.onSwitch(checked)
                     }
                 )
             } else {

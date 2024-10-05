@@ -35,9 +35,6 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
     }
 
     override fun addRecord(data: NoteModel): Int {
-        // Save the saving time for note
-        data.time = currentTimeToString()
-
         // Create and insert empty string before real data
         // This is a workaround to know row id beforehand
         val index = impl.addRecordImpl("")
@@ -65,8 +62,6 @@ object UserNotesDatabase : DatabaseProvider<NoteModel> {
     }
 
     override fun updateRecord(id: String, data: NoteModel): Boolean {
-        // Save the saving time for note
-        data.time = currentTimeToString()
         data.id = id
 
         val noteEnc = encrypt(data)

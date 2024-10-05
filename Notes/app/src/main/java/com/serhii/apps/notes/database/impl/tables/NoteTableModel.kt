@@ -16,12 +16,12 @@ object NoteTableModel {
     /**
      * Db queries
      */
-    const val QUERY_CREATE_USER_NOTES_TABLE = ("CREATE TABLE "
+    const val QUERY_CREATE_TABLE = ("CREATE TABLE "
             + UserNotesEntry.TABLE_NAME + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + UserNotesEntry.COLUMN_NAME_NOTE + " TEXT NOT NULL );")
 
-    const val QUERY_DROP_USER_NOTES_TABLE = "DROP TABLE IF EXISTS " + UserNotesEntry.TABLE_NAME
+    const val QUERY_CLEAR_TABLE = "DELETE FROM " + UserNotesEntry.TABLE_NAME
 
     /**
      * Db table description for user notes

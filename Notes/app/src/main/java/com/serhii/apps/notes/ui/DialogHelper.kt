@@ -36,6 +36,8 @@ object DialogHelper {
             title = R.string.title_error
         else if (type == AppErrors.EMAIL_INVALID.typeId)
             title = R.string.title_error
+        else if (type == AppErrors.CONFIRM_PASS_RESET.typeId)
+            title = R.string.confirm_pass_reset_title
 
         return title
     }
@@ -65,6 +67,8 @@ object DialogHelper {
             message = R.string.ms_password_is_short
         } else if (type == AppErrors.EMAIL_INVALID.typeId) {
             message = R.string.ms_email_is_not_valid
+        } else if (type == AppErrors.CONFIRM_PASS_RESET.typeId) {
+            message = R.string.confirm_pass_reset_message
         }
 
         return message

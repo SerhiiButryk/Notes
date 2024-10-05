@@ -4,9 +4,7 @@
  */
 package com.serhii.apps.notes.control.auth
 
-import com.serhii.apps.notes.control.auth.types.UIRequestType
 import com.serhii.apps.notes.ui.data_model.AuthModel
-import com.serhii.core.security.Crypto
 import com.serhii.core.security.Hash
 
 /**
@@ -26,15 +24,6 @@ class AuthManager {
     fun handleRequest(type: RequestType, data: AuthModel): Boolean {
 
         return when {
-            type == RequestType.REQ_AUTHORIZE && data.authType == UIRequestType.UNLOCK -> {
-
-                val crypto = Crypto()
-                crypto.getKeyMaster().initUnlockKey(data.password)
-
-                requestUnlock(data.password, crypto.getKeyMaster().getUnlockKey())
-                // Return result
-                true
-            }
 
             type == RequestType.REQ_AUTHORIZE -> {
                 /*

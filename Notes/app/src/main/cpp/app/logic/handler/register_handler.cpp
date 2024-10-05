@@ -39,11 +39,10 @@ namespace APP
         {
             if (AuthUtils::isUserAccountExists(username))
             {
-                ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::USER_NAME_EXISTS);
-
-                return false;
+                Log::Info(TAG, "handleEvent() : user is already present");
             }
 
+            ss.clearData(kFileSystemData);
             ss.addData(kFileSystemData, data);
 
         } else {

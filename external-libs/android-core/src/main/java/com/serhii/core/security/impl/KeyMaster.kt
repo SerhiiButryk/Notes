@@ -233,6 +233,15 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
         DERIVED_KEY_3 = ByteArray(0)
     }
 
+    fun clearData() {
+
+        _clear()
+
+        DERIVED_KEY_1 = ByteArray(0)
+        DERIVED_KEY_2 = ByteArray(0)
+        DERIVED_KEY_3 = ByteArray(0)
+    }
+
     // Saves app key to a file storage
     private external fun _save(value: String)
     private external fun _save2(value: String)
@@ -247,4 +256,5 @@ class KeyMaster internal constructor(private val providerOpenssl: Openssl) {
     private external fun _get5(): String
     private external fun _getUnlockKey(): String
     private external fun _setUnlockKey(unlockKey: String)
+    private external fun _clear()
 }

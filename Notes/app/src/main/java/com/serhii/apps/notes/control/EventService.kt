@@ -8,6 +8,7 @@ import android.content.Context
 import com.serhii.apps.notes.control.auth.AuthManager
 import com.serhii.apps.notes.control.auth.RequestType
 import com.serhii.apps.notes.control.auth.base.IEventService
+import com.serhii.apps.notes.database.UserNotesDatabase
 import com.serhii.apps.notes.ui.data_model.AuthModel
 import com.serhii.core.log.Log
 import com.serhii.core.security.Crypto
@@ -74,19 +75,19 @@ object EventService : IEventService {
     }
 
     /**
-     * Handle registration done event
+     * Handle biometrics done event
      */
-    override fun onRegistrationDone(
+    override fun onBiometricsDone(
         completedSuccessfully: Boolean,
         cipher: Cipher?,
         authModel: AuthModel
     ) {
         if (completedSuccessfully) {
-            Log.detail(TAG, "onRegistrationDone() result is success")
+            Log.detail(TAG, "onBiometricsDone() result is success")
             val keyMaster = crypto.getKeyMaster()
             keyMaster.createKey(cipher!!)
         } else {
-            Log.info(TAG, "onRegistrationDone() failure or canceled")
+            Log.info(TAG, "onBiometricsDone() failure or canceled")
         }
         // Finish
         authManager.handleRequest(RequestType.REQ_REGISTER, authModel)
@@ -98,7 +99,10 @@ object EventService : IEventService {
     /**
      * Handle biometric login event
      */
-    override suspend fun onBiometricLogin(authModel: AuthModel, requestMessage: suspend () -> Unit) {
+    override suspend fun onBiometricLogin(
+        authModel: AuthModel,
+        requestMessage: suspend () -> Unit
+    ) {
         Log.info(TAG, "onBiometricLogin()")
 
         // Safe check. Should not happen in a normal case.
@@ -125,36 +129,36 @@ object EventService : IEventService {
     }
 
     /**
-     * Handle registration done event
-     */
-    override fun onRegistrationDone(context: Context) {
-        Log.info(TAG, "onRegistrationDone()")
-        crypto.getKeyMaster().createUnlockKey()
-        NativeBridge.resetLoginLimitLeft(context)
-    }
-
-    /**
      * Handle password change event
      */
-    override fun onChangePassword(
-        oldPassword: String,
-        newPassword: String,
-        showMessage: (id: Int) -> Unit
-    ): Boolean {
-        var result = false
-// TODO: Handle this
-//        val success = NativeBridge.verifyPassword(Hash.hashMD5(oldPassword))
-//        if (!success) {
-//            showMessage(R.string.change_password_toast_not_correct_password)
-//        } else {
-//            result = NativeBridge.setNewPassword(Hash.hashMD5(newPassword))
-//            if (result) {
-//                showMessage(R.string.change_password_toast_password_set)
-//            } else {
-//                showMessage(R.string.change_password_toast_password_error)
-//            }
-//        }
-        return result
+    override suspend fun onPasswordChange(
+        context: Context,
+        model: AuthModel,
+        hasBiometric: Boolean,
+        requestBiometricDialog: suspend () -> Unit
+    ) {
+        Log.info(TAG, "onPasswordChange()")
+        // Clear all data
+        UserNotesDatabase.clear()
+        UserNotesDatabase.close()
+        UserNotesDatabase.init(context)
+
+        // Clear all keys
+        val keyMaster = crypto.getKeyMaster()
+        keyMaster.clear()
+
+        // Recreate keys
+        keyMaster.createKey(model.password)
+
+        // Ask for biometrics if available
+        if (!hasBiometric) {
+            // For safety
+            model.confirmPassword = ""
+            model.password = ""
+            return
+        } else {
+            requestBiometricDialog()
+        }
     }
 
     /**
@@ -170,6 +174,9 @@ object EventService : IEventService {
     override fun onErrorState() {
         Log.info(TAG, "onErrorState()")
     }
+
+    fun checkPassword(model: AuthModel) =
+        authManager.checkInput(model.password, model.confirmPassword, NativeBridge.userName)
 
     private const val TAG = "EventService"
 }

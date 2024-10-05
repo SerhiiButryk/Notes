@@ -66,37 +66,49 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
         val context = LocalContext.current
 
         val isRegistrationUI = uiState is LoginViewModel.RegistrationUIState
+        val isForgotPasswordUI = uiState is LoginViewModel.ForgotPasswordUIState
+        val isLoginUI = uiState is LoginViewModel.LoginUIState
 
         val doneAction = {
-            val requestType =
-                if (isRegistrationUI) UIRequestType.REGISTRATION else UIRequestType.PASSWORD_LOGIN
+            var requestType = UIRequestType.PASSWORD_LOGIN
+
+            if (isRegistrationUI)
+                requestType = UIRequestType.REGISTRATION
+
+            if (isForgotPasswordUI)
+                requestType = UIRequestType.FORGOT_PASSWORD
+
             viewModel.proceed(requestType, context, authModel = viewModel.authModel)
         }
 
         TitleUI(title = uiState.title)
 
-        EmailFieldUI(label = uiState.emailFiledLabel, hint = uiState.emailFiledHint,
-            getValue = { viewModel.authModel.email }, modifier = focusModifierEmail
-        ) { newText ->
-            viewModel.authModel.email = newText
+        if (uiState is LoginViewModel.LoginUIState || uiState is LoginViewModel.RegistrationUIState) {
+            EmailFieldUI(label = uiState.emailFiledLabel, hint = uiState.emailFiledHint,
+                getValue = { viewModel.authModel.email }, modifier = focusModifierEmail
+            ) { newText ->
+                viewModel.authModel.email = newText
+            }
         }
 
         PasswordFieldUI(label = uiState.passwordFiledLabel, hint = uiState.passwordFiledHint,
-            doneAction = if (isRegistrationUI) null else doneAction,
-            actionKeyboard = if (isRegistrationUI) ImeAction.Next else ImeAction.Done,
+            doneAction = if (isLoginUI) doneAction else null,
+            actionKeyboard = if (isLoginUI) ImeAction.Done else ImeAction.Next,
             initValue = { viewModel.authModel.password }, modifier = focusModifierPassword
         ) { newText ->
             viewModel.authModel.password = newText
         }
 
-        if (uiState is LoginViewModel.RegistrationUIState) {
+        if (isRegistrationUI || isForgotPasswordUI) {
             PasswordFieldUI(label = uiState.confirmPasswordFiledLabel,
                 doneAction = doneAction, actionKeyboard = ImeAction.Done,
                 hint = uiState.confirmPasswordFiledHint,
                 initValue = { viewModel.authModel.confirmPassword }) { newText ->
                 viewModel.authModel.confirmPassword = newText
             }
-        } else {
+        }
+
+        if (isLoginUI) {
             Text(
                 text = stringResource(id = R.string.forgot_password),
                 style = MaterialTheme.typography.bodyMedium,
@@ -185,7 +197,7 @@ private fun AuthorizationUIForPreview() {
         buttonText = "Login",
         hasBiometric = true,
         biometricButtonText = "Biometrics",
-        uiRequestType = UIRequestType.UNLOCK
+        uiRequestType = UIRequestType.LOGIN_UI
     )
 
     AppMaterialTheme {

@@ -22,6 +22,8 @@ JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1get5(JN
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1getUnlockKey(JNIEnv *, jobject);
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1setUnlockKey(JNIEnv *env, jobject thiz, jstring unlock_key);
 
+JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1clear(JNIEnv *env, jobject thiz);
+
 #ifdef __cplusplus
 }
 #endif
