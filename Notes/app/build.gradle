@@ -33,6 +33,8 @@ android {
     defaultConfig {
         applicationId "com.serhii.apps.notes"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        resConfigs "en", "ru", "uk", "fr", "zh-rcn", "de", "es", "it"
     }
 
     buildTypes {

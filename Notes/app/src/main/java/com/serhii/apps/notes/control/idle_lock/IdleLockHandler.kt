@@ -55,6 +55,11 @@ object IdleLockHandler {
     @OptIn(DelicateCoroutinesApi::class)
     private fun startLockTimeout(context: Context, time: Long) {
 
+        if (time == 0L) {
+            Log.detail(TAG, "startLockTimeout(), timer is disabled")
+            return
+        }
+
         if (context is AuthorizationActivity) {
             Log.detail(TAG, "startLockTimeout(), ignore for this activity")
             // Stop timer job

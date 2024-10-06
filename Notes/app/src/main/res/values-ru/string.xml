@@ -4,32 +4,17 @@
   ~ Author: Serhii Butryk
   -->
 <resources>
-    <string name="app_name">Блокнот</string>
-    <string name="app_name_debug">БлокнотДев</string>
 
     // NotesView activity
     <string name="ms_no_notes">Нет еще заметки</string>
-    <string name="ms_no_search_results">Ничего не надено. Извините.</string>
 
     // Alter Dialog
     <string name="ms_no_user_account">Ваш аккаунт не найден. \тПожалуйста, создайте аккаунт.</string>
-    <string name="title_no_user_account">Ошибка авторизации</string>
-
     <string name="ms_wrong_password">Пароль неверен. Пожалуйста, попробуйте еще раз.</string>
-    <string name="title_wrong_password">Ошибка авторизации</string>
-
     <string name="ms_empty_field">Пустой пароль или имя пользователя. \nПожалуйста, попробуйте еще раз.</string>
-    <string name="title_empty_field">Ошибка авторизации</string>
-
     <string name="ms_password_differs">Пароли не совпадают. \nПожалуйста, введите пароль еще раз.</string>
-
     <string name="ms_space_contain">Пропуска не разрешаются в пароле. \n.Пожалуйста, введите пароль еще раз.</string>
-
-    <string name="ms_unlock_key_invalid">Ведомый ключ неверен. Пожалуйста, попробуйте снова.</string>
-    <string name="title_unlock_key_invalid">Ошибка авторизации</string>
-
     <string name="ms_extract_data">Нет доступных данных.</string>
-    <string name="title_extract_data">Ошибка</string>
 
     <string name="title_error">Ошибка</string>
     <string name="ms_password_is_short">Пароль короткий или пустой. Пожалуйста, выберите пароль более 5 символов.</string>
@@ -39,68 +24,23 @@
     <string name="text_description">Добро пожаловать в приложение для записи заметок. Сохраняй все заметки здесь. Для начала создайте пользователя. Нажмите \"Далее\", чтобы продолжить.</string>
     <string name="btn_continue">Далее</string>
     <string name="login_btn">Войти</string>
-    <string name="create_account_bnt">Готово</string>
     <string name="usr_psw">Пароль</string>
     <string name="usr_email">Электронная почта</string>
-    <string name="usr_new_psw">Пароль</string>
     <string name="usr_approve_new_psw">Повторите пароль</string>
-    <string name="usr_new_email">Почта</string>
     <string name="title_login">Приветствуем</string>
     <string name="title_reg">Регистрация</string>
     <string name="login_with_biometric">Войти через биометрику</string>
 
-    // Default values
-    <string name="empty_note_text">Пустой</string>
-    <string name="template_note_title">Добавить заголовок</string>
-    <string name="template_short_note">Добавить заметку</string>
-    <string name="empty_string"> </string>
-
-    // NoteEditor
-    <string name="title_note">Заголовок заметки</string>
-    <string name="body_note">Заметка</string>
-    <string name="time_date_label">Обновлено: %s</string>
-    <string name="title_toolbar">Редактор</string>
-
-    <string name="toast_action_message">Заметка сохранена</string>
-    <string name="toast_action_deleted_message">Заметка удалена</string>
-    <string name="toast_action_deleted_message_no_note">Нет заметок для удаления</string>
-    <string name="toast_action_delete_error_note">Невозможно удалить пустую заметку</string>
-    <string name="toast_action_delete_error_first_note">Невозможно удалить заметку</string>
-    <string name="toast_action_error_note_is_not_changed">Нет новых данных для сохранения</string>
-    <string name="toast_action_error_note_is_empty">Пустая заметка не может быть сохранена</string>
-    <string name="toast_action_error_note_nothing_to_clear">Нет данных для очистки</string>
-
-    <string name="edit_hint_note_item">Добавить новый элемент</string>
-    <string name="edit_hint_note_content">Заметка</string>
-
     // Menu
     <string name="delete_note_item">Удалить заметку</string>
     <string name="save_note_item">Сохранить заметку</string>
-    <string name="clear_note_item">Очистить заметку</string>
     <string name="settings_item">Настройка</string>
 
     // PreferenceActivity
-    <string name="preference_title">Настройки</string>
-
-    <string name="preference_change_password_title">Изменить пароль</string>
-    <string name="preference_change_password_desc">Изменить пароль для входа в приложение.</string>
-
-    <string name="preference_category_title">Безопасность</string>
-    <string name="preference_category_title_about">О приложении</string>
-    <string name="preference_category_title_backup">Сохранение и восстановление данных</string>
-
-    <string name="preference_login_limit_title">Сменить лимит для ведения пароля</string>
-    <string name="preference_login_limit_summary">После %s неуспешных попыток ведения пароля приложение будет заблокировано</string>
 
     <string name="preference_about_version_title">Версия</string>
 
     <string name="preference_idle_lock_timeout_title">Изменить время блокировки после неактивности</string>
-
-    <string-array name="preference_idle_lock_list">
-        <item>3 минуты</item>
-        <item>5 минуты</item>
-        <item>10 минуты</item>
-    </string-array>
 
     <string name="preference_extract_title">Сохранить заметки</string>
     <string name="preference_extract_desc">Сохранить примечания как нешифрованный текст.</string>
@@ -111,8 +51,6 @@
     <string name="preference_restore_note_title">Восстановить заметки</string>
     <string name="preference_restore_note_decs">Выберите файл с сохраненным файлом с заметками, чтобы восстановить заметки в приложении.</string>
 
-    <string name="preference_unlock_note_title">Ключ разблокировки</string>
-
     <string name="preference_category_title_debug">Диагностика</string>
     <string name="preference_category_message_detail_logs">Включить подробные логи</string>
 
@@ -121,20 +59,6 @@
 
     <string name="email_feedback_title">[NotesApp][Feedback] (Добавьте заголовок здесь)]</string>
     <string name="email_feedback_body">[Нашли проблему ? - Опишите]\n[Имеете идеи ? - Поделитесь ими]\n[Имеете вопрос ? - Задайте]</string>
-
-    // Change password dialog
-    <string name="hint_new_password">Новый пароль</string>
-    <string name="hint_old_password">Текущий пароль</string>
-    <string name="change_password_title_dialog">Изменить пароль</string>
-
-    <string name="change_password_toast_not_correct_password">Введенный текущий пароль неверен</string>
-    <string name="change_password_toast_password_set">Пароль установлен</string>
-    <string name="change_password_toast_password_error">Произошла ошибка. Извените.</string>
-
-    // BlockView
-    <string name="block_title">Доступ ограничен</string>
-    <string name="block_message">Необходим ключ разблокировки указанный в настройках приложения</string>
-    <string name="block_hint">Ключ разблокировки</string>
 
     // Biometric prompt
     <string name="biometric_prompt_title">Войти через биометрику</string>
@@ -145,30 +69,17 @@
     <string name="confirm_dialog_delete_note_message">Вы уверены что хотите удалить заметку?</string>
     <string name="confirm_dialog_save_note_title">Сохранить заметку</string>
     <string name="confirm_dialog_save_note_message">Вы уверены что хотите сохранить заметку?</string>
-    <string name="confirm_dialog_clear_note_title">Очистить заметку</string>
-    <string name="confirm_dialog_clear_note_message">Вы уверены что хотите очистить ведомую заметку?</string>
 
     // Errors / Info
     <string name="result_success">Успех</string>
     <string name="result_failed">Ошибка</string>
-    <string name="result_canceled">Отмена</string>
     <string name="title_info">Сообщение</string>
-
-    <string name="empty_login">Пустый пароль или имя пользователя</string>
-    <string name="wrong_pass">Простите пароль неправильный. Пожалуйста попробуйте еще раз</string>
 
     // Enter keyword dialog
     <string name="set_password_dialog_title">Введите ключевое слово для шифрования ваших данных</string>
-    <string name="set_password_dialog_hint_restore">Введите ключевое слово.\nПожалуйста, убедитесь, что это то же ключевое слово, которое вы использовали для резервного копирования этой заметки. В противном случае эта операция не удастся.</string>
-    <string name="set_password_dialog_hint_backup">Вы должны запомнить его, чтобы иметь возможность восстановить свои данные.</string>
 
     <string name="info_author">Автор</string>
     <string name="info_author_sub">Сергей Бутрик</string>
-
-    <string name="search_title">Поиск</string>
-
-    <string name="action_convert_to_list">Изменить формат</string>
-    <string name="message_email_app_not_found">К сожалению, у вас нет приложения почты. Невозможно выполнить это действие.</string>
 
     <string name="save_note_in_file">Сохранить как файл</string>
 
@@ -176,6 +87,32 @@
     <string name="biometric_dialog_message">Попробовать еще раз? Если Вы отказаться, то виометрика не будет установлена и вход с биометрикой не будет доступен</string>
     <string name="biometric_toast_message">Извините, не удалось войти с биометрикой</string>
 
-    <string name="toast_unlock_key_copied">Ключ скопирован</string>
+    <string name="preference_idle_lock_timeout_subtitle">Установите время блокировки</string>
+
+    <string name="s_3_min">3 минуты</string>
+    <string name="s_5_min">5 минуты</string>
+    <string name="s_10_min">10 минуты</string>
+    <string name="never">Никогда</string>
+
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+
+    <string name="forgot_password">Забыли пароль?</string>
+
+    <string name="forgot_password_title">Сброс пароля</string>
+    <string name="type_password">Введите пароль</string>
+    <string name="type_email">Введите email</string>
+
+    <string name="pass_label">Ключевое слово</string>
+    <string name="pass_hint">Введите ваше ключевое слово</string>
+    <string name="conf_label">Подтвердите ключевое слово</string>
+    <string name="conf_hint">Подтвердите ваше ключевое слово</string>
+
+    <string name="keyword_dialog_title">Введите ваше ключевое слово</string>
+
+    <string name="confirm_pass_reset_title">Внимание!</string>
+    <string name="confirm_pass_reset_message">Если вы продолжите, мы не сможем сохранить ваши данные. Все ваши заметки будут потеряны.\nВы действительно хотите продолжить?</string>
+
+    <string name="search_notes_here">Искать заметки здесь</string>
 
 </resources>

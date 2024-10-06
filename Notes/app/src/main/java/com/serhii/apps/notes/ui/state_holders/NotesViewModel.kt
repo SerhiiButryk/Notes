@@ -137,7 +137,7 @@ class NotesViewModel : AppViewModel() {
         )
     }
 
-    fun saveNote(uiState: NotesEditorUIState) {
+    fun saveNote(uiState: NotesEditorUIState, context: Context) {
 
         if (editorState != null) {
             updateNote(uiState)
@@ -158,8 +158,10 @@ class NotesViewModel : AppViewModel() {
                         val note = notesRepository.get(newId.toString())
                         uiState.note = note
 
+                        showStatusMessage(context, true)
                         Log.info(TAG, "saveNote() success")
                     } else {
+                        showStatusMessage(context, false)
                         Log.info(TAG, "saveNote() failed")
                     }
 
@@ -171,6 +173,8 @@ class NotesViewModel : AppViewModel() {
                     Log.info(TAG, "saveNote() updated note by id = $id")
                 else
                     Log.info(TAG, "saveNote() failed to update note by id = $id")
+
+                showStatusMessage(context, result)
 
             }
         }

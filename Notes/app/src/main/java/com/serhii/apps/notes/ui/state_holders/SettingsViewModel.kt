@@ -38,11 +38,10 @@ class SettingsViewModel : AppViewModel() {
         var dialogState: DialogUIState = DialogUIState()
     )
 
-    class DialogOption(val text: Int, var checked: Boolean = false)
+    class DialogOption(val text: Int, val isSelected: Boolean = false, val onSelected: () -> Unit)
 
     class ListDialogUIState(
         val listOptions: List<DialogOption>,
-        val onSelected: (Int) -> Unit,
         title: Int,
         onCancel: () -> Unit
     ) : DialogUIState(title = title, onCancel = onCancel)
@@ -174,7 +173,7 @@ class SettingsViewModel : AppViewModel() {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private fun closeDialog() {
+    fun closeDialog() {
         // TODO: Doest not look good, might be revisited later
         // A hack to close dialog
         val state = createSettingsUIState().apply {
@@ -249,13 +248,9 @@ class SettingsViewModel : AppViewModel() {
     }
 
 
-    fun openOptionListDialog(listOptions: List<DialogOption>, onSelected: (Int) -> Unit) {
+    fun openOptionListDialog(listOptions: List<DialogOption>) {
         openDialog(ListDialogUIState(
             listOptions = listOptions,
-            onSelected = {
-                closeDialog()
-                onSelected(it)
-            },
             title = R.string.preference_idle_lock_timeout_title,
             onCancel = {
                 closeDialog()

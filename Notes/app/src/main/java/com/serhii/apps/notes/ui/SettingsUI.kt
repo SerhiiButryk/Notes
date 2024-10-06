@@ -29,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -44,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,7 +103,9 @@ class SettingItem(
     val titleString: String,
     val subTitleString: String,
     val hasSwitch: Boolean = false,
-    val onSwitch: (Boolean) -> Unit = {}
+    val switchState: Boolean = false,
+    val onSwitch: (Boolean) -> Unit = {},
+    val imageId: Int = -1
 )
 
 @Composable
@@ -152,7 +155,7 @@ fun SettingsItemUI(item: SettingItem) {
         ) {
 
             if (item.hasSwitch) {
-                var checked by remember { mutableStateOf(true) }
+                var checked by remember { mutableStateOf(item.switchState) }
 
                 Switch(
                     modifier = Modifier
@@ -168,7 +171,7 @@ fun SettingsItemUI(item: SettingItem) {
                 Icon(
                     modifier = Modifier
                         .padding(end = 18.dp),
-                    imageVector = item.imageVector!!,
+                    imageVector = item.imageVector ?: ImageVector.vectorResource(item.imageId),
                     contentDescription = ""
                 )
             }
@@ -221,44 +224,21 @@ fun OptionsListDialog(dialogState: DialogUIState) {
                 val options = state.listOptions
 
                 for ((index, option) in options.withIndex()) {
-
                     item(index) {
-
                         Row(
-                            modifier = Modifier.padding(
-                                start = 18.dp,
-                                end = 18.dp,
-                                top = 6.dp,
-                                bottom = 6.dp
-                            ),
+                            modifier = Modifier.clickable { option.onSelected() }
+                                .fillMaxWidth()
+                                .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start
                         ) {
-
-                            var selected by remember { mutableStateOf(false) }
-
-                            RadioButton(selected = selected, onClick = {
-                                selected = !selected
-                            })
-
                             Text(
+                                modifier = Modifier.padding(16.dp),
                                 text = stringResource(id = option.text),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (option.isSelected) FontWeight.Bold else null
                             )
                         }
-
-                    }
-                }
-
-                item {
-                    Button(
-                        onClick = { state.onSelected(0) },
-                        modifier = Modifier.padding(bottom = 10.dp, start = 18.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = state.positiveBtn),
-                            style = MaterialTheme.typography.bodySmall
-                        )
                     }
                 }
 

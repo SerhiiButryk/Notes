@@ -95,22 +95,30 @@ class LoginViewModel : AppViewModel() {
 
             Log.detail(TAG, "proceed() >>")
 
-            val showBiometrics = suspend {
-                withContext(App.UI_DISPATCHER) {
-                    requestBiometricDialog(context, RegistrationUIState.create(context))
+            val createNewUiState = { context: Context ->
+                // TODO: Doest not look good, might be revisited later
+                when (uiState.value) {
+                    is LoginUIState -> {
+                        LoginUIState.create(context)
+                    }
+
+                    is RegistrationUIState -> {
+                        RegistrationUIState.create(context)
+                    }
+
+                    is ForgotPasswordUIState -> {
+                        ForgotPasswordUIState.create(context)
+                    }
+
+                    else -> {
+                        throw IllegalStateException("Invalid UI state")
+                    }
                 }
             }
 
-            val createNewUiState = {
-                // TODO: Doest not look good, might be revisited later
-                if (uiState.value is LoginUIState) {
-                    LoginUIState.create(context)
-                } else if (uiState.value is RegistrationUIState) {
-                    RegistrationUIState.create(context)
-                } else if (uiState.value is ForgotPasswordUIState) {
-                    ForgotPasswordUIState.create(context)
-                } else {
-                    throw IllegalStateException("Invalid UI state")
+            val showBiometrics = suspend {
+                withContext(App.UI_DISPATCHER) {
+                    requestBiometricDialog(context, createNewUiState(context))
                 }
             }
 
@@ -133,12 +141,28 @@ class LoginViewModel : AppViewModel() {
                     EventService.onPasswordLogin(context, authModel)
                 }
 
-                UIRequestType.BIOMETRIC_LOGIN -> {
-                    EventService.onBiometricLogin(authModel) {
-                        withContext(App.UI_DISPATCHER) {
-                            showMessage(context, R.string.biometric_toast_message)
-                        }
+                UIRequestType.BIOMETRIC_LOGIN_UI -> {
+
+                    viewModelScope.launch(App.UI_DISPATCHER) {
+                        biometricAuthManager?.authenticate(object :
+                            BiometricAuthenticator.Listener {
+
+                            override fun onSuccess(cipher: Cipher) {
+                                Log.info(TAG, "BiometricAuthenticator::onSuccess()")
+                                authModel.cipher = cipher
+
+                                viewModelScope.launch(App.BACKGROUND_DISPATCHER) {
+                                    EventService.onBiometricLogin(authModel)
+                                }
+                            }
+
+                            override fun onFailure() {
+                                Log.info(TAG, "BiometricAuthenticator::onFailure()")
+                                showMessage(context, R.string.biometric_toast_message)
+                            }
+                        })
                     }
+
                 }
 
                 UIRequestType.UN_SET -> {
@@ -149,12 +173,12 @@ class LoginViewModel : AppViewModel() {
                     openDialog(DialogHelper.getTitleFor(type), DialogHelper.getMessageFor(type), {
                         // TODO: Doest not look good, might be revisited later
                         // A hack to close dialog
-                        _uiState.value = createNewUiState()
+                        _uiState.value = createNewUiState(context)
                     }, {
                         // TODO: Doest not look good, might be revisited later
                         // A hack to close dialog
-                        _uiState.value = createNewUiState()
-                    }, uiState = createNewUiState()
+                        _uiState.value = createNewUiState(context)
+                    }, uiState = createNewUiState(context)
                     )
                 }
 
@@ -163,7 +187,7 @@ class LoginViewModel : AppViewModel() {
                     _uiState.value = LoginUIState.create(context)
                 }
 
-                UIRequestType.BIOMETRICS_UI -> {
+                UIRequestType.SETUP_BIOMETRICS_UI -> {
                     showBiometrics()
                 }
 
@@ -173,12 +197,13 @@ class LoginViewModel : AppViewModel() {
 
                     if (result) {
                         // Show confirmation dialog
-                        openDialog(DialogHelper.getTitleFor(AppErrors.CONFIRM_PASS_RESET.typeId),
+                        openDialog(
+                            DialogHelper.getTitleFor(AppErrors.CONFIRM_PASS_RESET.typeId),
                             DialogHelper.getMessageFor(AppErrors.CONFIRM_PASS_RESET.typeId),
                             onConfirm = {
                                 // TODO: Doest not look good, might be revisited later
                                 // A hack to close dialog
-                                _uiState.value = createNewUiState()
+                                _uiState.value = createNewUiState(context)
 
                                 viewModelScope.launch(App.BACKGROUND_DISPATCHER) {
                                     EventService.onPasswordChange(
@@ -193,12 +218,12 @@ class LoginViewModel : AppViewModel() {
                             onCancel = {
                                 // TODO: Doest not look good, might be revisited later
                                 // A hack to close dialog
-                                _uiState.value = createNewUiState()
+                                _uiState.value = createNewUiState(context)
                             },
                             hasCancelButton = true,
                             positiveBtn = R.string.yes,
                             negativeBtn = R.string.no,
-                            uiState = createNewUiState()
+                            uiState = createNewUiState(context)
                         )
                     }
                 }
@@ -235,7 +260,7 @@ class LoginViewModel : AppViewModel() {
                     message = R.string.biometric_dialog_message,
                     onConfirm = {
                         Log.info(TAG, "BiometricAuthenticator.Listener: re-open")
-                        proceed(UIRequestType.BIOMETRICS_UI, context)
+                        proceed(UIRequestType.SETUP_BIOMETRICS_UI, context)
                     },
                     onCancel = {
                         Log.info(TAG, "BiometricAuthenticator.Listener: cancel biometric")

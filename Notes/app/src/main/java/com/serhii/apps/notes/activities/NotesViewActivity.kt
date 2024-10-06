@@ -118,7 +118,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
         // Save
         menuOptionsEditor.add(
             MenuOptions(textId = R.string.save_note_item, icon = Icons.Default.Save, onClick = {
-                viewModel.saveNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState)
+                viewModel.saveNote(viewModel.uiState.value as NotesViewModel.NotesEditorUIState, applicationContext)
             })
         )
         // Delete

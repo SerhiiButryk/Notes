@@ -147,7 +147,7 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
                 .fillMaxWidth()
 
             ButtonUI(text = uiState.biometricButtonText, modifier = biometricButtonModifiers) {
-                viewModel.proceed(UIRequestType.BIOMETRIC_LOGIN, context)
+                viewModel.proceed(UIRequestType.BIOMETRIC_LOGIN_UI, context)
             }
         }
 

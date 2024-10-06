@@ -4,12 +4,9 @@
   ~ Author: Serhii Butryk
   -->
 <resources>
-    <string name="app_name">Блокнот</string>
-    <string name="app_name_debug">БлокнотДев</string>
 
     // NotesView activity
     <string name="ms_no_notes">Не має ще щодної нотатки</string>
-    <string name="ms_no_search_results">Нічого не знайдено. Вибачте.</string>
 
     // Alter Dialog
     <string name="ms_no_user_account">Ваш акаунт не знайдений. \nБудь ласка, створіть акаунт.</string>
@@ -28,55 +25,23 @@
     <string name="text_description">Ласкаво просимо до додатку для запису нотатків. Зберігай усі нотаки тут. Для початку створи користувача. Натисни \"Далі\" щоб продовжити.</string>
     <string name="btn_continue">Далі</string>
     <string name="login_btn">Вхід</string>
-    <string name="create_account_bnt">Далі</string>
     <string name="usr_psw">Пароль</string>
     <string name="usr_email">Пошта</string>
-    <string name="usr_new_psw">Пароль</string>
     <string name="usr_approve_new_psw">Повтори пароль</string>
-    <string name="usr_new_email">Пошта</string>
     <string name="title_login">Ласкаво просимо</string>
     <string name="title_reg">Реєстрація</string>
     <string name="login_with_biometric">Війти через біометрику</string>
 
     // Default values
-    <string name="empty_note_text">Порожній</string>
-    <string name="template_note_title">Додати заголовок</string>
-    <string name="template_short_note">Додати нотатку</string>
-    <string name="empty_string"> </string>
 
     // NoteEditor
-    <string name="title_note">Заголовок</string>
-    <string name="body_note">Нотатка</string>
-    <string name="time_date_label">Оновлено: %s</string>
-    <string name="title_toolbar">Редактор</string>
-
-    <string name="toast_action_message">Нотатка збережена</string>
-    <string name="toast_action_deleted_message">Нотатка видалена</string>
-    <string name="toast_action_deleted_message_no_note">Не має нотаток для видалення</string>
-    <string name="toast_action_delete_error_note">Не можливо видалити пусту нотатку</string>
-    <string name="toast_action_delete_error_first_note">Не можливо видалити нотатку</string>
-    <string name="toast_action_error_note_is_not_changed">Не має нових даних для збереження</string>
-    <string name="toast_action_error_note_is_empty">Пуста нотатка не може бути збережена</string>
-    <string name="toast_action_error_note_nothing_to_clear">Не має даних для очищення</string>
 
     // Menu
     <string name="delete_note_item">Видалити нотатку</string>
     <string name="save_note_item">Зберегти нотатку</string>
-    <string name="clear_note_item">Очистити нотатку</string>
     <string name="settings_item">Налаштування</string>
 
     // PreferenceActivity
-    <string name="preference_title">Налаштування</string>
-
-    <string name="preference_change_password_title">Змінити пароль</string>
-    <string name="preference_change_password_desc">Змінити пароль для входу у додаток.</string>
-
-    <string name="preference_category_title">Безпека</string>
-    <string name="preference_category_title_about">Про додаток</string>
-    <string name="preference_category_title_backup">Збереження і відновлення даних</string>
-
-    <string name="preference_login_limit_title">Змінити ліміт для ведення пароля</string>
-    <string name="preference_login_limit_summary">Після %s неуспішних спроб ведення пароля додаток буде заблокований</string>
 
     <string name="preference_about_version_title">Версія</string>
 
@@ -107,13 +72,6 @@
     <string name="email_feedback_body">[Знайшли проблему ? - Опишіть]\n[Маєте ідеї ? - Поділіться ними]\n[Маєте питання ? - Задайте]</string>
 
     // Change password dialog
-    <string name="hint_new_password">Новий пароль</string>
-    <string name="hint_old_password">Поточний пароль</string>
-    <string name="change_password_title_dialog">Змінити пароль</string>
-
-    <string name="change_password_toast_not_correct_password">Ведений поточний пароль не правильний</string>
-    <string name="change_password_toast_password_set">Пароль встановлено</string>
-    <string name="change_password_toast_password_error">Сталася помилка. Вибачте.</string>
 
     // Biometric prompt
     <string name="biometric_prompt_title">Біометрика</string>
@@ -121,31 +79,20 @@
 
     // Confirm dialog
     <string name="confirm_dialog_delete_note_title">Видалити нотаку</string>
-    <string name="confirm_dialog_delete_note_message">Упевнений що хочете видалити нотатку ?</string>
+    <string name="confirm_dialog_delete_note_message">Упевнений що хочеш видалити нотатку ?</string>
     <string name="confirm_dialog_save_note_title">Зберегти нотаку</string>
-    <string name="confirm_dialog_save_note_message">Упевнений що хочете зберегти нотатку ?</string>
-    <string name="confirm_dialog_clear_note_title">Очитстити нотаку</string>
-    <string name="confirm_dialog_clear_note_message">Упевнений що хочете очистити ведену нотатку ?</string>
+    <string name="confirm_dialog_save_note_message">Упевнений що хочеш зберегти нотатку ?</string>
 
     // Errors / Info
     <string name="result_success">Успіх</string>
     <string name="result_failed">Помилка</string>
-    <string name="result_canceled">Відмова</string>
     <string name="title_info">Повідомлення</string>
-
-    <string name="empty_login">Пустий пароль чи ім\'я користувача</string>
-    <string name="wrong_pass">Вибачте пароль не правильний. Будь ласка спробуйте ще разю</string>
 
     // Enter keyword dialog
     <string name="set_password_dialog_title">Уведи ключове слово для шифрування даних</string>
 
     <string name="info_author">Автор</string>
     <string name="info_author_sub">Сергій Бутрик</string>
-
-    <string name="search_title">Пошук</string>
-
-    <string name="action_convert_to_list">Змінити вигляд</string>
-    <string name="message_email_app_not_found">Вибачте додаток пошти відсутній. Не можливо виконати цю дію.</string>
 
     <string name="save_note_in_file">Зберегти у файл</string>
 
@@ -164,7 +111,7 @@
 
     <string name="pass_label">Ключове слово</string>
     <string name="pass_hint">Уведи ключове слово</string>
-    <string name="conf_label">Підтвердіть ключове слово</string>
+    <string name="conf_label">Підтверди ключове слово</string>
     <string name="conf_hint">Уведи ключове слово повторно</string>
 
     <string name="keyword_dialog_title">Уведи ключове слово для розшифровки даних</string>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2023. Happy coding ! :)
+  ~ Author: Serhii Butryk
+  -->
+<resources>
+
+    // NotesView activity
+    <string name="ms_no_notes">Pas encore de notes</string>
+
+    // Alert Dialog
+    <string name="ms_no_user_account">Ce compte utilisateur n\'existe pas. Veuillez créer un compte utilisateur.</string>
+    <string name="ms_wrong_password">Désolé, le mot de passe est incorrect. Veuillez réessayer.</string>
+    <string name="ms_empty_field">Le mot de passe ou le nom d\'utilisateur est vide. \nVeuillez réessayer.</string>
+    <string name="ms_password_differs">Les mots de passe ne correspondent pas. \nVeuillez réessayer.</string>
+    <string name="ms_space_contain">Les espaces ne sont pas autorisés. \nVeuillez réessayer.</string>
+
+    <string name="ms_extract_data">Aucune donnée disponible.</string>
+
+    <string name="title_error">Erreur</string>
+    <string name="ms_password_is_short">Le mot de passe est trop court ou vide. Veuillez entrer un mot de passe de plus de 5 caractères.</string>
+    <string name="ms_email_is_not_valid">Vous avez saisi un e-mail invalide. Veuillez réessayer.</string>
+
+    // Login Activity
+    <string name="text_description">Bienvenue dans l\'application de notes. Gérez toutes vos notes ici. Vous devez d\'abord créer un utilisateur. Cliquez sur le bouton "Continuer" pour procéder.</string>
+    <string name="btn_continue">Continuer</string>
+    <string name="login_btn">Connexion</string>
+    <string name="usr_psw">Mot de passe</string>
+    <string name="usr_email">E-mail</string>
+    <string name="usr_approve_new_psw">Confirmer le mot de passe</string>
+    <string name="title_login">Bienvenue</string>
+    <string name="title_reg">Inscription</string>
+    <string name="login_with_biometric">Se connecter avec la biométrie</string>
+
+    // Menu
+    <string name="delete_note_item">Supprimer la note</string>
+    <string name="save_note_item">Enregistrer la note</string>
+    <string name="settings_item">Paramètres</string>
+
+    // PreferenceActivity
+
+    <string name="preference_category_title_debug">Diagnostic</string>
+    <string name="preference_category_message_detail_logs">Journaux détaillés</string>
+    <string name="preference_category_key_detail_logs" translatable="false">journaux détaillés</string>
+
+    <string name="preference_login_limit_key" translatable="false">limite_connexion</string>
+    <string name="preference_login_limit_default" translatable="false">5</string>
+
+    <string name="preference_about_version_title">Version</string>
+
+    <string name="preference_feedback_title" >Envoyer des retours</string>
+    <string name="preference_feedback_message" >Partagez vos idées, problèmes ou suggestions pour cette application</string>
+
+    <string name="email_feedback_title">[NotesApp][Feedback] (Mettez votre titre ici)]</string>
+    <string name="email_feedback_body">[Décrire le problème]\n[Partager vos idées]\n[Poser des questions]</string>
+
+    <string name="preference_idle_lock_timeout_key" translatable="false">délai_verrouillage_inactivité</string>
+    <string name="preference_idle_lock_timeout_title">Modifier le délai d\'inactivité</string>
+    <string name="preference_idle_lock_timeout_subtitle">Définir un nouveau délai d\'inactivité</string>
+
+    <string name="s_3_min">3 minutes</string>
+    <string name="s_5_min">5 minutes</string>
+    <string name="s_10_min">10 minutes</string>
+    <string name="never">Jamais</string>
+
+    <string name="preference_extract_title">Exporter vos notes</string>
+    <string name="preference_extract_desc">Exporter vos notes en texte brut.</string>
+
+    <string name="preference_backup_title">Sauvegarder vos notes</string>
+    <string name="preference_backup_desc">Créer un fichier de sauvegarde avec vos notes.</string>
+
+    <string name="preference_restore_note_title">Restaurer vos notes</string>
+    <string name="preference_restore_note_decs">Sélectionnez un fichier de sauvegarde pour restaurer vos notes.</string>
+
+    // Enter keyword dialog
+    <string name="set_password_dialog_title">Entrez un mot-clé pour chiffrer vos données</string>
+
+    // Biometric prompt
+    <string name="biometric_prompt_title">Connexion biométrique</string>
+    <string name="biometric_prompt_subtitle">Connectez-vous en utilisant vos données biométriques</string>
+
+    // Confirm dialog
+    <string name="confirm_dialog_delete_note_title">Supprimer la note</string>
+    <string name="confirm_dialog_delete_note_message">Êtes-vous sûr de vouloir supprimer cette note ?</string>
+    <string name="confirm_dialog_save_note_title">Enregistrer la note</string>
+    <string name="confirm_dialog_save_note_message">Êtes-vous sûr de vouloir enregistrer cette note ?</string>
+
+    // Errors / Info
+    <string name="result_success">Succès</string>
+    <string name="result_failed">Échec</string>
+    <string name="title_info">Information</string>
+
+    <string name="info_author">Auteur</string>
+    <string name="info_author_sub">Serhii Butryk</string>
+
+    <string name="save_note_in_file">Exporter la note en texte brut</string>
+
+    <string name="biometric_dialog_title">Authentification biométrique</string>
+    <string name="biometric_dialog_message">Souhaitez-vous réessayer ? Si vous refusez, vous ne pourrez pas utiliser la biométrie pour vous connecter à cette application</string>
+    <string name="biometric_toast_message">Désolé, échec de la connexion avec la biométrie</string>
+
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+
+    <string name="forgot_password">Mot de passe oublié ?</string>
+
+    <string name="forgot_password_title">Réinitialiser le mot de passe</string>
+    <string name="type_password">Entrez le mot de passe</string>
+    <string name="type_email">Entrez l\'e-mail</string>
+
+    <string name="pass_label">Mot-clé</string>
+    <string name="pass_hint">Entrez votre mot-clé</string>
+    <string name="conf_label">Confirmer le mot-clé</string>
+    <string name="conf_hint">Confirmez votre mot-clé</string>
+
+    <string name="keyword_dialog_title">Entrez votre mot-clé</string>
+
+    <string name="confirm_pass_reset_title">Attention !</string>
+    <string name="confirm_pass_reset_message">Si vous continuez, nous ne pourrons pas conserver vos données. Toutes vos notes seront perdues.\nVoulez-vous vraiment continuer ?</string>
+
+    <string name="search_notes_here">Rechercher des notes ici</string>
+
+</resources>

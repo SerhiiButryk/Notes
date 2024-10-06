@@ -22,24 +22,24 @@ object PreferenceManager {
         )
     }
 
-    fun setDetailedLogs(context: Context, value: Boolean): Boolean {
+    fun setDetailedLogs(context: Context, value: Boolean) {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return preferences.edit()
+        preferences.edit()
             .putBoolean(context.getString(R.string.preference_category_key_detail_logs), value)
-            .commit()
+            .apply()
     }
 
     fun getTimeout(context: Context): Long {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val timeDefault = context.getString(R.string.preference_idle_lock_time_default)
-        val time = sharedPreferences.getString(
-            context.getString(R.string.preference_idle_lock_timeout_key),
-            timeDefault
-        )
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val timeDefault = 3*60*1000L
+        return preferences.getLong(context.getString(R.string.preference_idle_lock_timeout_key), timeDefault)
+    }
 
-        val timeoutTimeMillis = time?.toLong() ?: timeDefault.toLong()
-
-        return timeoutTimeMillis
+    fun setTimeout(context: Context, value: Long) {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        preferences.edit()
+            .putLong(context.getString(R.string.preference_idle_lock_timeout_key), value)
+            .apply()
     }
 
 }

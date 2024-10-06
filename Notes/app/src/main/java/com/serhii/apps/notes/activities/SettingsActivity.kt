@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
-import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.backup.BackupManager
@@ -29,6 +29,13 @@ import com.serhii.apps.notes.ui.SettingsUI
 import com.serhii.apps.notes.ui.state_holders.SettingsViewModel
 import com.serhii.apps.notes.ui.theme.AppMaterialTheme
 import com.serhii.core.log.Log
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+private const val TIME_3_MIN = 3 * 60 * 1000L
+private const val TIME_5_MIN = 5 * 60 * 1000L
+private const val TIME_10_MIN = 10 * 60 * 1000L
+private const val TIME_NEVER = 0L
 
 /**
  * Activity for app settings
@@ -63,22 +70,45 @@ class SettingsActivity : AppBaseActivity() {
         val settingItemList = mutableListOf(
 
             SettingItem(
-                Icons.Default.Lock,
-                {
+                imageId = R.drawable.shield_lock,
+                onClick = {
+                    val timeout = PreferenceManager.getTimeout(applicationContext)
+
                     val options = listOf(
-                        SettingsViewModel.DialogOption(R.string.s_3_min),
-                        SettingsViewModel.DialogOption(R.string.s_5_min),
-                        SettingsViewModel.DialogOption(R.string.s_10_min),
-                        SettingsViewModel.DialogOption(R.string.never)
+                        SettingsViewModel.DialogOption(R.string.s_3_min, isSelected = timeout == TIME_3_MIN) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_3_MIN)
+                                viewModel.closeDialog()
+                            }
+                        },
+                        SettingsViewModel.DialogOption(R.string.s_5_min, isSelected = timeout == TIME_5_MIN) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_5_MIN)
+                                viewModel.closeDialog()
+                            }
+                        },
+                        SettingsViewModel.DialogOption(R.string.s_10_min, isSelected = timeout == TIME_10_MIN) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_10_MIN)
+                                viewModel.closeDialog()
+                            }
+                        },
+                        SettingsViewModel.DialogOption(R.string.never, isSelected = timeout == TIME_NEVER) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_NEVER)
+                                viewModel.closeDialog()
+                            }
+                        }
                     )
 
-                    viewModel.openOptionListDialog(options) { index ->
-                        // TODO
-                        // Handle selected options
-                    }
+                    viewModel.openOptionListDialog(options)
                 },
-                getString(R.string.preference_idle_lock_timeout_title),
-                getString(R.string.preference_idle_lock_timeout_subtitle)
+                titleString = getString(R.string.preference_idle_lock_timeout_title),
+                subTitleString = getString(R.string.preference_idle_lock_timeout_subtitle)
             ),
 
             SettingItem(
@@ -91,7 +121,7 @@ class SettingsActivity : AppBaseActivity() {
             ),
 
             SettingItem(
-                Icons.Default.Backup,
+                Icons.Default.Lock,
                 {
                     BackupManager.openDirectoryChooserForBackup(this)
                 },
@@ -115,12 +145,13 @@ class SettingsActivity : AppBaseActivity() {
                     PreferenceManager.setDetailedLogs(applicationContext, checked)
                 },
                 titleString = getString(R.string.preference_category_title_debug),
-                subTitleString = getString(R.string.preference_category_message_detail_logs)
+                subTitleString = getString(R.string.preference_category_message_detail_logs),
+                switchState = PreferenceManager.detailedLogsEnabled(applicationContext)
             ),
 
             SettingItem(
-                Icons.Default.Feedback,
-                {
+                imageId = R.drawable.help,
+                onClick = {
                     // Open email client app for sending feedback
                     val mailto = Uri.parse(
                         "mailto:${App.DEV_EMAIL}?" +
@@ -139,21 +170,20 @@ class SettingsActivity : AppBaseActivity() {
                         Log.error(TAG, "openEmailClientApp() error: $e")
                     }
                 },
-                getString(R.string.preference_feedback_title),
-                getString(R.string.preference_feedback_message)
+                titleString = getString(R.string.preference_feedback_title),
+                subTitleString = getString(R.string.preference_feedback_message)
             ),
 
             SettingItem(
                 Icons.Default.Info,
                 {},
                 getString(R.string.preference_about_version_title),
-                App.VERSION_LIBRARY
+                App.VERSION
             ),
             SettingItem(
-                Icons.Default.Info,
-                {},
-                getString(R.string.info_author),
-                getString(R.string.info_author_sub)
+                imageId = R.drawable.info,
+                titleString = getString(R.string.info_author),
+                subTitleString = getString(R.string.info_author_sub)
             )
         )
 
