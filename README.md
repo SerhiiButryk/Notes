@@ -3,8 +3,7 @@
 # Overview
 
 This application is developed for keeping and accessing all your notes securely on a device. 
-The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication
-Also it provides simple and beautiful interface.
+The app encryptes your notes before saving it to the storage. So, it couldn't be extracted and read easily. The app protects data with authentication and provides simple and beautiful interface.
 
 # Get on Google Play
 
@@ -12,9 +11,9 @@ Also it provides simple and beautiful interface.
 
 # Features
 
-- User authentication
-- Basic text edit
-- Application idle lock (UI app screen lock after a timeout)
+- Password & biometric authentication
+- Basic text editing
+- Application screen lock (the app gets locked after some timeout)
 - Secure data storage
 - Backup/restore support
 - A search across all your notes
@@ -37,7 +36,7 @@ Also it provides simple and beautiful interface.
 3) CSCRYPTO - https://www.copperspice.com/docs/cs_crypto/basic_what.html
 
 - Build tools: NDK, Gradle
-- Android conponents/libraries: Jatpack Compose, Fragments, ViewModel, SQL database.
+- Android conponents/libraries: Jatpack Compose, MVVM, SQL database.
 
 # Supported platforms
 
@@ -49,6 +48,11 @@ Also it provides simple and beautiful interface.
 - ua (Ukraine)
 - ru (Russia)
 - uk (English)
+- it (Italian)
+- fr (France)
+- es (Espana)
+- de (Germany)
+- zh-rcn (China)
 
 # Build instructions
 
