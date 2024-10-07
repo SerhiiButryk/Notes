@@ -40,7 +40,7 @@ The app encryptes your notes before saving it to the storage. So, it couldn't be
 
 # Supported platforms
 
-- Android OS: Android 8 - Android 14
+- Android OS: Android 8 - Android 15
 - ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
 
 # Localization

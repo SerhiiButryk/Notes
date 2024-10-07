@@ -134,8 +134,8 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:1.7.3"
 
     // Compose Preview support
-    debugImplementation("androidx.compose.ui:ui-tooling:1.7.3")
-    debugImplementation("androidx.compose.ui:ui-tooling-preview:1.7.3")
+    implementation("androidx.compose.ui:ui-tooling:1.7.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.7.3")
 
     // Rich Text Editor
     // https://github.com/MohamedRejeb/compose-rich-editor
