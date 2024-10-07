@@ -13,21 +13,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: set up JDK 17
+    - name: Seting up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'zulu'
         cache: gradle
     
-    - name: set up NDK 21
+    - name: Seting up NDK 21
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with:
         ndk-version: r21d
         link-to-sdk: true
 
-    - name: Build with Gradle
-      run: chmod +x gradlew
-      run: ./gradlew assemble
+    - name: Building application
+      run: |
+        chmod +x gradlew
+        ./gradlew assemble
       working-directory: Notes
