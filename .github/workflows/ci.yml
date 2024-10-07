@@ -28,7 +28,5 @@ jobs:
         link-to-sdk: true
 
     - name: Building application
-      run: |
-        chmod +x gradlew
-        ./gradlew assemble
+      run: chmod +x gradlew
       working-directory: Notes
