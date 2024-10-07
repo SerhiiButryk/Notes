@@ -85,12 +85,12 @@ fun NotesEditorUI(
                     .fillMaxHeight()
                     .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 4.dp)
                     .focusRequester(inputFocusEditor)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .clip(RoundedCornerShape(16.dp))
             )
 
-            LaunchedEffect("Test") {
+            LaunchedEffect("Test") { // To execute code only once
                 CoroutineScope(App.UI_DISPATCHER).launch {
-                    // User opened a note from preview screen so set its content
+                    // User opens a note so set its content
                     if (uiState.isExistingNote) {
                         state.setText(uiState.note.plainText)
                         // TODO: Revisit this is incorrect

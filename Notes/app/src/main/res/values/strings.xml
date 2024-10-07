@@ -4,7 +4,7 @@
   ~ Author: Serhii Butryk
   -->
 <resources>
-    <string name="app_name_debug">NotesDev</string>
+    <string name="app_name_debug" translatable="false">NotesDev</string>
 
     // NotesView activity
     <string name="ms_no_notes">No notes yet</string>
@@ -49,14 +49,14 @@
 
     <string name="preference_about_version_title">Version</string>
 
-    <string name="preference_feedback_title" >Send a feedback</string>
+    <string name="preference_feedback_title" >Send feedback</string>
     <string name="preference_feedback_message" >Share your thoughts, issues or ideas for this app</string>
 
     <string name="email_feedback_title">[NotesApp][Feedback] (Put your title here)]</string>
     <string name="email_feedback_body">[Describe issue]\n[Share your thoughts]\n[Ask questions]</string>
 
     <string name="preference_idle_lock_timeout_key" translatable="false">idle_lock_time_out</string>
-    <string name="preference_idle_lock_timeout_title">Change a timeout</string>
+    <string name="preference_idle_lock_timeout_title">Change lock time</string>
     <string name="preference_idle_lock_timeout_subtitle">Set a new timeout</string>
 
     <string name="s_3_min">3 minutes</string>
@@ -92,7 +92,7 @@
     <string name="title_info">Info</string>
 
     <string name="info_author">Author</string>
-    <string name="info_author_sub">Serhii Butryk</string>
+    <string name="info_author_sub" translatable="false">Serhii Butryk</string>
 
     <string name="save_note_in_file">Extract note as plain text</string>
 

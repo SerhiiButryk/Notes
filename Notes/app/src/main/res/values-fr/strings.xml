@@ -91,7 +91,6 @@
     <string name="title_info">Information</string>
 
     <string name="info_author">Auteur</string>
-    <string name="info_author_sub">Serhii Butryk</string>
 
     <string name="save_note_in_file">Exporter la note en texte brut</string>
 
