@@ -5,6 +5,8 @@
   -->
 <resources>
 
+    <string name="app_name">Notas</string>
+
     // NotesView activity
     <string name="ms_no_notes">Aún no hay notas</string>
 

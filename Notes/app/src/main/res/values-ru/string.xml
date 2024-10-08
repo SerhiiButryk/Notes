@@ -5,6 +5,8 @@
   -->
 <resources>
 
+    <string name="app_name">Блокнот</string>
+
     // NotesView activity
     <string name="ms_no_notes">Нет еще заметки</string>
 

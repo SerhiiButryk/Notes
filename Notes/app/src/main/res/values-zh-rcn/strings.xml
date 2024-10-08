@@ -5,6 +5,8 @@
   -->
 <resources>
 
+    <string name="app_name">笔记</string>
+
     // NotesView activity
     <string name="ms_no_notes">还没有笔记</string>
 

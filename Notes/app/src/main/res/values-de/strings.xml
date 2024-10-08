@@ -4,6 +4,8 @@
   ~ Author: Serhii Butryk
   -->
 <resources>
+    <string name="app_name">Hinweise</string>
+
     // NotesView activity
     <string name="ms_no_notes">Noch keine Notizen</string>
 
