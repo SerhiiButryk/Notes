@@ -1,0 +1,36 @@
+name: CI rel-4_0
+
+on:
+  push:
+    branches: [ "rel-4_0" ]
+  pull_request:
+    branches: [ "rel-4_0" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checking out
+      uses: actions/checkout@v4
+
+    - name: Setting up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'zulu'
+        cache: gradle
+
+    - name: Setting up NDK 21
+      uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r21d
+        link-to-sdk: true
+
+    - name: Building
+      run: |
+        chmod +x gradlew
+        ./gradlew --console plain clean assemble
+      working-directory: Notes

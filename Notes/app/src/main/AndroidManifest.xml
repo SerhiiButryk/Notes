@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.serhii.apps.notes">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <queries>
         <intent>
@@ -24,16 +23,16 @@
         <activity
             android:name="com.serhii.apps.notes.activities.SettingsActivity"
             android:exported="false"
-            android:theme="@style/AppSettingsThemeNoActionbarTheme" />
+            android:theme="@style/NoActionbarTheme" />
 
         <activity
             android:name="com.serhii.apps.notes.activities.AuthorizationActivity"
             android:exported="false"
-            android:theme="@style/AppThemeNoActionbarTheme"
-            android:windowSoftInputMode="adjustPan" />
+            android:theme="@style/NoActionbarTheme"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity android:name="com.serhii.apps.notes.activities.NotesViewActivity"
-            android:theme="@style/AppThemeNoActionbarTheme"
+            android:theme="@style/NoActionbarTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,11 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- App services  -->
-        <service android:name="com.serhii.apps.notes.control.background_work.BackgroundWorkService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false"/>
 
     </application>
 

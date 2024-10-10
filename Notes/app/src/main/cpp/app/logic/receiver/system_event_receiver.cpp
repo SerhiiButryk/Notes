@@ -12,15 +12,17 @@ namespace APP
         return &requestDispatcher;
     }
 
-    void SystemEventReceiver::forward(const Event<SYSTEM_EVENT>& event)
+    bool SystemEventReceiver::forward(const Event<SYSTEM_EVENT>& event)
     {
         for (auto& r : receivers)
         {
             if (r->getEventType() == event.getEventType())
             {
-                r->handleEvent(event);
+                return r->handleEvent(event);
             }
         }
+
+        return false;
     }
 
     void SystemEventReceiver::addReceiver(EventHandlerBase<SYSTEM_EVENT>* receiver)

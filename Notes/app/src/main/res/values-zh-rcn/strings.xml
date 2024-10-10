@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2023. Happy coding ! :)
+  ~ Author: Serhii Butryk
+  -->
+<resources>
+
+    <string name="app_name">笔记</string>
+
+    // NotesView activity
+    <string name="ms_no_notes">还没有笔记</string>
+
+    // Alert Dialog
+    <string name="ms_no_user_account">该用户账户不存在。请创建一个用户账户。</string>
+    <string name="ms_wrong_password">抱歉，密码错误。请重试。</string>
+    <string name="ms_empty_field">密码或用户名为空。\n请重试。</string>
+    <string name="ms_password_differs">密码不匹配。\n请重试。</string>
+    <string name="ms_space_contain">不允许使用空格。\n请重试。</string>
+
+    <string name="ms_extract_data">无可用数据。</string>
+
+    <string name="title_error">错误</string>
+    <string name="ms_password_is_short">密码过短或为空。请输入长度超过5个字符的密码。</string>
+    <string name="ms_email_is_not_valid">您输入的电子邮件无效。请重试。</string>
+
+    // Login Activity
+    <string name="text_description">欢迎使用笔记应用程序。在此管理您的所有笔记。首先，您需要创建一个用户。点击“继续”按钮以继续。</string>
+    <string name="btn_continue">继续</string>
+    <string name="login_btn">登录</string>
+    <string name="usr_psw">密码</string>
+    <string name="usr_email">电子邮件</string>
+    <string name="usr_approve_new_psw">确认密码</string>
+    <string name="title_login">欢迎</string>
+    <string name="title_reg">注册</string>
+    <string name="login_with_biometric">使用生物识别登录</string>
+
+    // Menu
+    <string name="delete_note_item">删除笔记</string>
+    <string name="save_note_item">保存笔记</string>
+    <string name="settings_item">设置</string>
+
+    // PreferenceActivity
+
+    <string name="preference_category_title_debug">诊断</string>
+    <string name="preference_category_message_detail_logs">详细日志</string>
+    <string name="preference_category_key_detail_logs" translatable="false">详细日志</string>
+
+    <string name="preference_login_limit_key" translatable="false">登录限制</string>
+    <string name="preference_login_limit_default" translatable="false">5</string>
+
+    <string name="preference_about_version_title">版本</string>
+
+    <string name="preference_feedback_title">发送反馈</string>
+    <string name="preference_feedback_message">分享您的想法、问题或对该应用程序的建议</string>
+
+    <string name="email_feedback_title">[NotesApp][反馈]（请在此处输入标题）</string>
+    <string name="email_feedback_body">[描述问题]\n[分享您的想法]\n[提出问题]</string>
+
+    <string name="preference_idle_lock_timeout_key" translatable="false">空闲锁定超时</string>
+    <string name="preference_idle_lock_timeout_title">更改超时时间</string>
+    <string name="preference_idle_lock_timeout_subtitle">设置新的超时时间</string>
+
+    <string name="s_3_min">3分钟</string>
+    <string name="s_5_min">5分钟</string>
+    <string name="s_10_min">10分钟</string>
+    <string name="never">从不</string>
+
+    <string name="preference_extract_title">导出您的笔记</string>
+    <string name="preference_extract_desc">将您的笔记导出为纯文本。</string>
+
+    <string name="preference_backup_title">备份您的笔记</string>
+    <string name="preference_backup_desc">创建包含笔记的备份文件。</string>
+
+    <string name="preference_restore_note_title">恢复您的笔记</string>
+    <string name="preference_restore_note_decs">选择备份文件以恢复您的笔记。</string>
+
+    // Enter keyword dialog
+    <string name="set_password_dialog_title">输入一个关键词以加密您的数据</string>
+
+    // Biometric prompt
+    <string name="biometric_prompt_title">生物识别登录</string>
+    <string name="biometric_prompt_subtitle">使用您的生物识别凭证登录</string>
+
+    // Confirm dialog
+    <string name="confirm_dialog_delete_note_title">删除笔记</string>
+    <string name="confirm_dialog_delete_note_message">您确定要删除此笔记吗？</string>
+    <string name="confirm_dialog_save_note_title">保存笔记</string>
+    <string name="confirm_dialog_save_note_message">您确定要保存此笔记吗？</string>
+
+    // Errors / Info
+    <string name="result_success">成功</string>
+    <string name="result_failed">失败</string>
+    <string name="title_info">信息</string>
+
+    <string name="info_author">作者</string>
+
+    <string name="save_note_in_file">将笔记导出为纯文本</string>
+
+    <string name="biometric_dialog_title">生物识别认证</string>
+    <string name="biometric_dialog_message">您想要重试吗？如果您不同意，您将无法使用生物识别技术登录该应用程序</string>
+    <string name="biometric_toast_message">抱歉，生物识别登录失败</string>
+
+    <string name="yes">是</string>
+    <string name="no">否</string>
+
+    <string name="forgot_password">忘记密码？</string>
+
+    <string name="forgot_password_title">重置密码</string>
+    <string name="type_password">输入密码</string>
+    <string name="type_email">输入电子邮件</string>
+
+    <string name="pass_label">关键词</string>
+    <string name="pass_hint">输入您的关键词</string>
+    <string name="conf_label">确认关键词</string>
+    <string name="conf_hint">确认您的关键词</string>
+
+    <string name="keyword_dialog_title">输入您的关键词</string>
+
+    <string name="confirm_pass_reset_title">请注意！</string>
+    <string name="confirm_pass_reset_message">如果继续，我们将无法保存您的数据。您所有的笔记都将丢失。\n您确定要继续吗？</string>
+
+    <string name="search_notes_here">在这里搜索笔记</string>
+
+</resources>

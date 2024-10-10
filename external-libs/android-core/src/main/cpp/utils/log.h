@@ -24,7 +24,7 @@ namespace MYLIB
              * Detailed logs
              */
             JNIEXPORT static bool isDetailedLogsEnabled();
-            JNIEXPORT static void setIsDetailedLogsEnabled(bool isDetailedLogsEnabled);
+            JNIEXPORT static void setDetailedLogsEnabled(bool isDetailedLogsEnabled);
 
         /**
          * Sets tag for log filtering

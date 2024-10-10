@@ -13,7 +13,7 @@ namespace APP
         public:
             AuthorizeHandler();
 
-            void handleEvent(const Event<SYSTEM_EVENT>& event) override;
+            bool handleEvent(const Event<SYSTEM_EVENT>& event) override;
     };
 
 }

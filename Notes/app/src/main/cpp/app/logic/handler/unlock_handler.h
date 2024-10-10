@@ -9,7 +9,7 @@ namespace APP
         public:
             UnlockHandler();
 
-            void handleEvent(const Event<SYSTEM_EVENT>& event) override;
+            bool handleEvent(const Event<SYSTEM_EVENT>& event) override;
 
     };
 }

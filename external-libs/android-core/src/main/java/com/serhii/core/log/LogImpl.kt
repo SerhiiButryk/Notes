@@ -10,7 +10,6 @@ import com.serhii.core.CoreEngine.loadNativeLibrary
 
 internal object LogImpl : ILog {
 
-    // Default values
     private var TAG: String = ""
     private const val DELIMITER = " "
 
@@ -20,7 +19,12 @@ internal object LogImpl : ILog {
 
     private var VERSION_CODE = ""
 
-    private var isFirstCall = false
+    private var versionCodeInfoSet = false
+    private var firstCall = false
+
+    fun init() {
+        setDetailedLogsIfDebug()
+    }
 
     override fun info(tag: String, message: String) {
         logInternal(tag, message, INFO)
@@ -36,34 +40,38 @@ internal object LogImpl : ILog {
         logInternal(tag, message, ERROR)
     }
 
+    // TODO: Should delegate calls to native
     private fun logInternal(tag: String, message:  String, level: Int) {
 
-        val predicate: String = when (level) {
-            ERROR, INFO -> DELIMITER + tag + DELIMITER
-            DETAIL -> "DETAIL$DELIMITER$tag$DELIMITER"
-            else -> ""
+        if (versionCodeInfoSet && !firstCall) {
+            // Log this info once
+            Log.i(TAG, getDebugInformation())
+            firstCall = true
         }
 
-        val messageFormatted = predicate + message;
+        val predicate: String = tag + DELIMITER
+        val messageFormatted = predicate + message
+
+        var appTag = TAG
+        if (level == DETAIL) {
+            appTag += "-DETAIL"
+        }
 
         when (level) {
             ERROR -> {
-                Log.e(TAG, messageFormatted)
+                Log.e(appTag, messageFormatted)
             }
-            INFO, DETAIL -> {
-                Log.i(TAG, messageFormatted)
+            INFO -> {
+                Log.i(appTag, messageFormatted)
+            }
+            DETAIL -> {
+                Log.v(appTag, messageFormatted)
             }
         }
     }
 
     override fun setVersionCode(versionCode: String) {
         VERSION_CODE = versionCode
-
-        // Log debug information once
-        if (!isFirstCall) {
-            Log.i("", getDebugInformation())
-            isFirstCall = true
-        }
     }
 
     override var tag: String
@@ -73,20 +81,16 @@ internal object LogImpl : ILog {
             _setTag(tag)
         }
 
-    fun setDetailedLogs(isEnabled: Boolean) {
-        _setDetailLog(isEnabled)
+    fun setDetailedLogs(enabled: Boolean) {
+        _setDetailLog(enabled)
     }
 
-    fun setDetailedLogsForDebug() {
-        try {
-            // Can throw exception if running on release build
-            _enableDetailLogForDebug()
-        } catch (e: ClassNotFoundException) {
-        }
+    private fun setDetailedLogsIfDebug() {
+        _enableDetailLogIfDebug()
     }
 
     private fun isDetailedLogsEnabled(): Boolean {
-        return _getDetailLog()
+        return _isDetailLogEnabled()
     }
 
     private fun getDebugInformation(): String {
@@ -101,6 +105,6 @@ internal object LogImpl : ILog {
 
     private external fun _setTag(tag: String)
     private external fun _setDetailLog(enable: Boolean)
-    private external fun _getDetailLog(): Boolean
-    private external fun _enableDetailLogForDebug()
+    private external fun _isDetailLogEnabled(): Boolean
+    private external fun _enableDetailLogIfDebug(): Boolean
 }

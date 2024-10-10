@@ -3,8 +3,7 @@
 # Overview
 
 This application is developed for keeping and accessing all your notes securely on a device. 
-The app encryptes your notes before saving it to storage. So, it couldn't be extracted and read easily. The app protects data with authentication
-and it provides simple interface for use.
+The app encryptes your notes before saving it to the storage. So, it couldn't be extracted and read easily. The app protects data with authentication and provides simple and beautiful interface.
 
 # Get on Google Play
 
@@ -12,20 +11,19 @@ and it provides simple interface for use.
 
 # Features
 
-- User authentication
+- Password & biometric authentication
 - Basic text editing
-- Limitation of user login attempts
-- Application inactivity lock (UI app lock after a timeout)
+- Application screen lock (the app gets locked after some timeout)
 - Secure data storage
 - Backup/restore support
 - A search across all your notes
 
 # Repository structure
 
-- external-libs/ - libraries folder
-- Notes/ - app root folder
-- tools/ - helper scripts
-- gradle_configs/ - common project gradle settings
+- external-libs/ - additinal libraries which the app is using
+- Notes/ - the app project folder
+- tools/ - utility scripts
+- gradle_configs/ - utility project gradle settings
 
 # Used technologies
 
@@ -38,28 +36,33 @@ and it provides simple interface for use.
 3) CSCRYPTO - https://www.copperspice.com/docs/cs_crypto/basic_what.html
 
 - Build tools: NDK, Gradle
-- Android conponents/libraries: Jatpack libraries, fragments, view model, SQL database.
+- Android conponents/libraries: Jatpack Compose, MVVM, SQL database.
 
 # Supported platforms
 
-- Android version: Android 8 - Android 13
-- Supported ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
+- Android OS: Android 8 - Android 15
+- ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
 
-# Localization support
+# Localization
 
 - ua (Ukraine)
 - ru (Russia)
 - uk (English)
+- it (Italian)
+- fr (France)
+- es (Espana)
+- de (Germany)
+- zh-rcn (China)
 
 # Build instructions
 
 Required tools:
 
-1) NDK verions: 21.4.7075529
-2) Java version: 11
-2) Kotlin version: 1.6
+1) NDK verions: 26
+2) Java version: 17
+2) Kotlin version: 2.0
 
-Use gradlew or Android Studio ('Build' menu) to build this application
+Use gradlew or Android Studio 'Build' menu to build this project
 
 # Unit Tests
 
@@ -68,11 +71,8 @@ Find tests under 'Notes/app/src/androidTest' folder.
 # App designs
 
 <img src="images/Screenshot_1.png" height="420" width="220"> <img src="images/Screenshot_2.png" height="420" width="220">
-<img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220"> 
-<img src="images/Screenshot_5.png" height="420" width="220"> <img src="images/Screenshot_6.png" height="420" width="220">
-<img src="images/Screenshot_7.png" height="420" width="220"> <img src="images/Screenshot_8.png" height="420" width="220">
-<img src="images/Screenshot_9.png" height="420" width="220">
+<img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220">
 
-# Contacts or questions
+# Questions or help
 
 Reach out to me: sergeybutr@gmail.com.

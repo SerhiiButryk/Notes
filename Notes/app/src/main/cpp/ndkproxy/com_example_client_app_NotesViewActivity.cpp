@@ -20,13 +20,9 @@ extern "C" {
 #endif
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_initNativeConfigs
-  (JNIEnv* env, jobject obj, jstring jstr)
+  (JNIEnv* env, jobject obj)
 {
     Log::Info("JNI", " %s IN", __FUNCTION__ );
-
-    JString filePath(env, jstr);
-
-    FileSystem::getInstance()->initFilePath(filePath);
 
     jclass clz = env->GetObjectClass(obj);
 

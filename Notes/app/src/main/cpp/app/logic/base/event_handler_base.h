@@ -15,7 +15,7 @@ namespace APP
 
             T getEventType() const;
 
-            virtual void handleEvent(const Event<T>& event) = 0;
+            virtual bool handleEvent(const Event<T>& event) = 0;
 
         private:
             T event;

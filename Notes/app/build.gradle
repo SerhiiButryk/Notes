@@ -4,11 +4,19 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.spotbugs'
 apply plugin: 'jacoco'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 apply from: '../../gradle_configs/common_ndk_version.gradle'
 apply from: '../../gradle_configs/common_android_versions.gradle'
 
 android {
+
+    namespace = "com.serhii.apps.notes"
+
+    buildFeatures {
+        buildConfig true
+        compose true
+    }
 
     signingConfigs {
         release {
@@ -25,6 +33,8 @@ android {
     defaultConfig {
         applicationId "com.serhii.apps.notes"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        resConfigs "en", "ru", "uk", "fr", "zh-rcn", "de", "es", "it"
     }
 
     buildTypes {
@@ -56,17 +66,14 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
 }
 
 // SpotBugs tasks
+// Run "./gradlew check" to execute these checks
 tasks.withType(SpotBugsTask) {
     // Dependent tasks
     dependsOn 'assembleDebug'
@@ -102,30 +109,37 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Android library dependency
+    // Internal Android library dependency
     implementation project(":LibCoreAndroid")
 
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.preference:preference:1.1.1'
-    implementation 'androidx.biometric:biometric:1.0.1'
-
+    // Android ui
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.navigation:navigation-fragment:2.1.0'
-    implementation 'androidx.navigation:navigation-ui:2.1.0'
 
-    // JSON library - https://github.com/square/moshi
-    // Stopped using it as it creates issues for release build
-    // implementation("com.squareup.moshi:moshi-kotlin:1.9.1")
-
-    // Kotlin Json lib
+    // Kotlin Json
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
 
-    // Kotlin
-    implementation "androidx.core:core-ktx:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
+
+    // Compose
+    implementation 'androidx.compose.ui:ui:1.7.3'
+    implementation 'androidx.activity:activity-compose:1.9.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose-android:2.8.6'
+
+    // Compose Material Design 3
+    implementation 'androidx.compose.material3:material3:1.3.0'
+    implementation "androidx.compose.material:material-icons-extended:1.7.3"
+
+    // Compose Preview support
+    implementation("androidx.compose.ui:ui-tooling:1.7.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.7.3")
+
+    // Rich Text Editor
+    // https://github.com/MohamedRejeb/compose-rich-editor
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc06")
 
     // Tests dependencies
     androidTestImplementation 'junit:junit:4.13.2'

@@ -7,16 +7,14 @@ package com.serhii.apps.notes
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 import org.junit.runners.Suite.SuiteClasses
-import com.serhii.apps.notes.CipherTests
-import com.serhii.apps.notes.DatabaseTests
 
 /**
- * Suite contains all available tests for the app
+ * Run all tests for the app
  */
 @RunWith(Suite::class)
 @SuiteClasses(
-    CipherTests::class,
+    CryptoTests::class,
     DatabaseTests::class,
-    AppTests::class
+    BasicTests::class
 )
 class AllTests

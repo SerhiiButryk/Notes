@@ -145,38 +145,6 @@ JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1isA
     return static_cast<jboolean>( !(result.empty() || result == FALSE) );
 }
 
-JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getUnlockKey
-        (JNIEnv* env, jobject)
-{
-    Log::Info("JNI", " %s IN", __FUNCTION__ );
-
-    SystemStorage ss;
-    std::string result = ss.getDataByKey(kFileSystemData, kUnlockKey);
-
-    return env->NewStringUTF(result.c_str());
-}
-
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setUnlockKey(JNIEnv *env, jobject thiz, jstring unlock_key)
-{
-    Log::Info("JNI", " %s IN", __FUNCTION__ );
-
-    JString unlockKeyString(env, unlock_key);
-    SystemStorage ss;
-
-    if (ss.doesKeyExist(kFileSystemData, kUnlockKey))
-    {
-        ss.updateData(kFileSystemData, kUnlockKey, unlockKeyString);
-    } else {
-
-        std::map<std::string, std::string> value;
-        value.insert(std::make_pair(kUnlockKey, (std::string) unlockKeyString));
-
-        ss.addData(kFileSystemData, value);
-    }
-
-    Log::Info("JNI", " %s OUT", __FUNCTION__ );
-}
-
 #ifdef __cplusplus
 }
 #endif

@@ -1,36 +1,23 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-
-    apply from: '../gradle_configs/common_build_script_versions.gradle'
-
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
-        // SpotBugs repository location
-        // See: https://plugins.gradle.org/plugin/com.github.spotbugs
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-
-    dependencies {
-        // Android Gradle Plugin dependency
-        classpath "com.android.tools.build:gradle:$gradle_plugin_version"
-        // Kotlin Gradle Plugin dependency
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // SpotBugs Gradle Plugin dependency
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.3.0"
-        // JaCoCo Gradle Plugin dependency
-        classpath "org.jacoco:org.jacoco.core:0.8.4"
-    }
+    // Kotlin version
+    ext.kotlin_version = '2.0.0'
 }
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+plugins {
+    // Android Gradle plugin
+    id 'com.android.application' version "8.4.0" apply false
+    // Kotlin Gradle plugin
+    id 'org.jetbrains.kotlin.android' version '2.0.0' apply false
+    // Spotbugs Gradle plugin
+    id 'com.github.spotbugs' version "4.3.0" apply false
+    // Jacoco Gradle plugin
+    id 'jacoco'
+    // Kotlin KSP
+    // [GitHub] https://github.com/google/ksp
+    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
+    // Compose UI.
+    // [Documentation] https://developer.android.com/develop/ui/compose/compiler
+    // [RootClasspath] org.jetbrains.kotlin:compose-compiler-gradle-plugin:...
+    id("org.jetbrains.kotlin.plugin.compose") version '2.0.0' apply false
 }

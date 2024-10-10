@@ -31,12 +31,6 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1execute
 JNIEXPORT jboolean JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1isAppBlocked
         (JNIEnv *, jobject);
 
-JNIEXPORT jstring JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1getUnlockKey
-        (JNIEnv *, jobject);
-
-JNIEXPORT void JNICALL Java_com_serhii_apps_notes_control_NativeBridge__1setUnlockKey
-        (JNIEnv *env, jobject thiz, jstring unlock_key);
-
 #ifdef __cplusplus
 }
 #endif

@@ -6,6 +6,7 @@ namespace MYLIB
 {
     JNIEXPORT std::mutex Log::_mutex_log_guard;
     JNIEXPORT std::string Log::_TAG_APP_ = "";
+
     bool Log::detailedLogsEnabled = false;
 
     void Log::log(int LOG_LEVEL, const std::string& TAG, const std::string& formattedMessage) {
@@ -32,12 +33,18 @@ namespace MYLIB
         _TAG_APP_ = tag;
     }
 
-    JNIEXPORT bool Log::isDetailedLogsEnabled() {
+    JNIEXPORT bool Log::isDetailedLogsEnabled()
+    {
+        std::lock_guard guard(_mutex_log_guard);
+
         return detailedLogsEnabled;
     }
 
-    JNIEXPORT void Log::setIsDetailedLogsEnabled(bool logsEnabled) {
-        Log::detailedLogsEnabled = logsEnabled;
+    JNIEXPORT void Log::setDetailedLogsEnabled(bool logsEnabled)
+    {
+        std::lock_guard guard(_mutex_log_guard);
+
+        detailedLogsEnabled = logsEnabled;
     }
 
 }

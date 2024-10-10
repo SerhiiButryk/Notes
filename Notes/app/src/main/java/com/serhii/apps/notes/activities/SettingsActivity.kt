@@ -4,158 +4,224 @@
  */
 package com.serhii.apps.notes.activities
 
-import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.appcompat.widget.Toolbar
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.serhii.apps.notes.R
-import com.serhii.apps.notes.control.background_work.BackgroundWorkHandler
-import com.serhii.apps.notes.control.background_work.WorkId
-import com.serhii.apps.notes.control.background_work.WorkItem
+import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.control.backup.BackupManager
-import com.serhii.apps.notes.ui.EnterPasswordDialogUI
-import com.serhii.apps.notes.ui.dialogs.DialogHelper
-import com.serhii.apps.notes.ui.fragments.SettingsFragment
-import com.serhii.core.log.Log.Companion.error
-import com.serhii.core.log.Log.Companion.info
+import com.serhii.apps.notes.control.preferences.PreferenceManager
+import com.serhii.apps.notes.ui.SettingItem
+import com.serhii.apps.notes.ui.SettingsUI
+import com.serhii.apps.notes.ui.state_holders.SettingsViewModel
+import com.serhii.apps.notes.ui.theme.AppMaterialTheme
+import com.serhii.core.log.Log
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+private const val TIME_3_MIN = 3 * 60 * 1000L
+private const val TIME_5_MIN = 5 * 60 * 1000L
+private const val TIME_10_MIN = 10 * 60 * 1000L
+private const val TIME_NEVER = 0L
 
 /**
  * Activity for app settings
  */
 class SettingsActivity : AppBaseActivity() {
 
-    private var toolbar: Toolbar? = null
+    private val viewModel: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setLoggingTagForActivity(TAG)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
-
-        toolbar = findViewById(R.id.toolbar)
-        toolbar?.setNavigationOnClickListener { onBackPressed() }
 
         if (savedInstanceState == null) {
-            addFragment()
+            viewModel.initViewModel(this)
+            setupData()
         }
 
-        setActionBar()
-    }
-
-    private fun addFragment() {
-        supportFragmentManager.beginTransaction()
-            .setReorderingAllowed(true) // Needed for optimization
-            .replace(R.id.container, SettingsFragment(), SETTINGS_FRAGMENT_TAG)
-            .commit()
-    }
-
-    private fun setActionBar() {
-        setSupportActionBar(toolbar)
-        if (supportActionBar != null) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.preference_title)
+        setContent {
+            AppMaterialTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Box(Modifier.safeDrawingPadding()) {
+                        SettingsUI(viewModel = viewModel)
+                    }
+                }
+            }
         }
+
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+    private fun setupData() {
+
+        val settingItemList = mutableListOf(
+
+            SettingItem(
+                imageId = R.drawable.shield_lock,
+                onClick = {
+                    val timeout = PreferenceManager.getTimeout(applicationContext)
+
+                    val options = listOf(
+                        SettingsViewModel.DialogOption(R.string.s_3_min, isSelected = timeout == TIME_3_MIN) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_3_MIN)
+                                viewModel.closeDialog()
+                            }
+                        },
+                        SettingsViewModel.DialogOption(R.string.s_5_min, isSelected = timeout == TIME_5_MIN) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_5_MIN)
+                                viewModel.closeDialog()
+                            }
+                        },
+                        SettingsViewModel.DialogOption(R.string.s_10_min, isSelected = timeout == TIME_10_MIN) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_10_MIN)
+                                viewModel.closeDialog()
+                            }
+                        },
+                        SettingsViewModel.DialogOption(R.string.never, isSelected = timeout == TIME_NEVER) {
+                            lifecycleScope.launch(App.UI_DISPATCHER) {
+                                delay(1*500) // Small delay so user can see click animation
+                                PreferenceManager.setTimeout(applicationContext, TIME_NEVER)
+                                viewModel.closeDialog()
+                            }
+                        }
+                    )
+
+                    viewModel.openOptionListDialog(options)
+                },
+                titleString = getString(R.string.preference_idle_lock_timeout_title),
+                subTitleString = getString(R.string.preference_idle_lock_timeout_subtitle)
+            ),
+
+            SettingItem(
+                Icons.Default.Backup,
+                {
+                    BackupManager.openDirectoryChooserForExtractData(this)
+                },
+                getString(R.string.preference_extract_title),
+                getString(R.string.preference_extract_desc)
+            ),
+
+            SettingItem(
+                Icons.Default.Lock,
+                {
+                    BackupManager.openDirectoryChooserForBackup(this)
+                },
+                getString(R.string.preference_backup_title),
+                getString(R.string.preference_backup_desc)
+            ),
+
+            SettingItem(
+                Icons.Default.Restore,
+                {
+                    BackupManager.openFileChooser(this)
+                },
+                getString(R.string.preference_restore_note_title),
+                getString(R.string.preference_restore_note_decs)
+            ),
+
+            SettingItem(
+                hasSwitch = true,
+                onSwitch = { checked ->
+                    Log.enableDetailedLogs(checked)
+                    PreferenceManager.setDetailedLogs(applicationContext, checked)
+                },
+                titleString = getString(R.string.preference_category_title_debug),
+                subTitleString = getString(R.string.preference_category_message_detail_logs),
+                switchState = PreferenceManager.detailedLogsEnabled(applicationContext)
+            ),
+
+            SettingItem(
+                imageId = R.drawable.help,
+                onClick = {
+                    // Open email client app for sending feedback
+                    val mailto = Uri.parse(
+                        "mailto:${App.DEV_EMAIL}?" +
+                                "subject=" +
+                                getString(R.string.email_feedback_title) +
+                                "&body=" +
+                                getString(R.string.email_feedback_body)
+                    )
+
+                    val intent = Intent(Intent.ACTION_SENDTO, mailto)
+
+                    try {
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.error(TAG, "openEmailClientApp() error: $e")
+                    }
+                },
+                titleString = getString(R.string.preference_feedback_title),
+                subTitleString = getString(R.string.preference_feedback_message)
+            ),
+
+            SettingItem(
+                Icons.Default.Info,
+                {},
+                getString(R.string.preference_about_version_title),
+                App.VERSION
+            ),
+            SettingItem(
+                imageId = R.drawable.info,
+                titleString = getString(R.string.info_author),
+                subTitleString = getString(R.string.info_author_sub)
+            )
+        )
+
+        viewModel.updateState(settingItemList)
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (BackupManager.REQUEST_CODE_EXTRACT_NOTES == requestCode && resultCode == RESULT_OK) {
-            info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
+            Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_EXTRACT_NOTES")
             if (data != null) {
-
-                val workItem = WorkItem(WorkId.EXTRACT_DATA_WORK_ID, 0, { ctx, workItem ->
-                    BackupManager.extractNotes(workItem.extraData as Intent, ctx)
-                }, null, null)
-
-                workItem.extraData = data
-
-                BackgroundWorkHandler.putWork(workItem, this)
+                viewModel.onExtract(applicationContext, data)
             } else {
                 // Should not happen
-                error(TAG, "onActivityResult() data is null")
+                Log.error(TAG, "onActivityResult() data is null")
             }
         } else if (requestCode == BackupManager.REQUEST_CODE_BACKUP_NOTES && resultCode == RESULT_OK) {
-            info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES")
+            Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_BACKUP_NOTES")
             if (data != null) {
-
-                val title = getString(R.string.set_password_dialog_title)
-                val hint = getString(R.string.set_password_dialog_hint_backup)
-
-                // Ask for keyword
-                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
-
-                    override fun onOkClicked(enteredText: String?, context: Context?) {
-                        if (enteredText != null) {
-
-                            val workItem = WorkItem(WorkId.BACKUP_DATA_WORK_ID, 0, { ctx, workItem ->
-                                // Backup data
-                                BackupManager.backupNotes(workItem.extraData as Intent, enteredText, ctx)
-                            }, null, null)
-
-                            workItem.extraData = data
-
-                            BackgroundWorkHandler.putWork(workItem, context!!)
-                        }
-                    }
-
-                    override fun onCancelClicked(context: Context?) {
-                    }
-                }, title, hint)
-
+                viewModel.openKeywordSetDialog(applicationContext, data)
             } else {
                 // Should not happen
-                error(TAG, "onActivityResult() data is null")
+                Log.error(TAG, "onActivityResult() data is null")
             }
         } else if (requestCode == BackupManager.REQUEST_CODE_OPEN_BACKUP_FILE && resultCode == RESULT_OK) {
-            info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE")
+            Log.info(TAG, "onActivityResult() got result for REQUEST_CODE_OPEN_BACKUP_FILE")
             if (data != null) {
-
-                val title = getString(R.string.set_password_dialog_title)
-                val hint = getString(R.string.set_password_dialog_hint_restore)
-
-                // Ask for keyword
-                DialogHelper.showEnterPasswordField(this, object : EnterPasswordDialogUI.DialogListener {
-
-                    override fun onOkClicked(enteredText: String?, context: Context?) {
-                        if (enteredText != null) {
-
-                            val workItem = WorkItem(WorkId.RESTORE_DATA_WORK_ID, 0, { ctx, workItem ->
-                                BackupManager.restoreNotes(workItem.extraData as Intent, enteredText, ctx)
-                            }, null, null)
-
-                            workItem.extraData = data
-
-                            BackgroundWorkHandler.putWork(workItem, context!!)
-                        }
-
-                    }
-
-                    override fun onCancelClicked(context: Context?) {
-                    }
-                }, title, hint)
-
-
+                viewModel.openKeywordRequestDialog(application, data)
             } else {
                 // Should not happen
-                error(TAG, "onActivityResult() data is null")
+                Log.error(TAG, "onActivityResult() data is null")
             }
         }
-
     }
 
     companion object {
         private const val TAG = "SettingsActivity"
-        private const val SETTINGS_FRAGMENT_TAG = "SettingsActivityTAG"
     }
 
 }

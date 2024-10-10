@@ -15,7 +15,7 @@ namespace APP
 
     }
 
-    void UnlockHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
+    bool UnlockHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
     {
         std::string unlockKey = event.getData(UNLOCK_KEY);
         std::string currentUnlockKey = event.getData(CURRENT_UNLOCK_KEY);
@@ -30,8 +30,11 @@ namespace APP
             ss.updateData(kFileSystemData, kIsUserBlocked, FALSE);
 
             ActionDispatcher::getInstance()->sendMessage(SYSTEM_MESSAGE::UNLOCK_DONE);
+
+            return true;
         }
 
+        return false;
     }
 
 }

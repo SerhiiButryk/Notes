@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_initNativeConfigs
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }
