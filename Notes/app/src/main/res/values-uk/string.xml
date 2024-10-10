@@ -122,5 +122,6 @@
     <string name="confirm_pass_reset_message">Якщо продовжимо то усі дані чи нотатки що є у додатку будуть видалені після зміни пароля. Продовжити ?</string>
 
     <string name="search_notes_here">Пошук нотатків</string>
+    <string name="search_text_here">Пошук тексту</string>
 
 </resources>

@@ -68,13 +68,11 @@ Use gradlew or Android Studio 'Build' menu to build this project
 
 Find tests under 'Notes/app/src/androidTest' folder.
 
-# App designs [This is not up-to-date]
+# App designs
 
 <img src="images/Screenshot_1.png" height="420" width="220"> <img src="images/Screenshot_2.png" height="420" width="220">
 <img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220"> 
-<img src="images/Screenshot_5.png" height="420" width="220"> <img src="images/Screenshot_6.png" height="420" width="220">
-<img src="images/Screenshot_7.png" height="420" width="220"> <img src="images/Screenshot_8.png" height="420" width="220">
-<img src="images/Screenshot_9.png" height="420" width="220">
+<img src="images/Screenshot_5.png" height="420" width="220">
 
 # Questions or help
 

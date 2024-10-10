@@ -116,5 +116,6 @@
     <string name="confirm_pass_reset_message">Если вы продолжите, мы не сможем сохранить ваши данные. Все ваши заметки будут потеряны.\nВы действительно хотите продолжить?</string>
 
     <string name="search_notes_here">Искать заметки здесь</string>
+    <string name="search_text_here">Искать текст здесь</string>
 
 </resources>

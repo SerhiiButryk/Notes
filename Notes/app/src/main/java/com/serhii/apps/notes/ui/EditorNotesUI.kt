@@ -36,10 +36,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.serhii.apps.notes.R
 import com.serhii.apps.notes.common.App
 import com.serhii.apps.notes.ui.state_holders.NotesViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +61,7 @@ fun NotesEditorUI(
     Scaffold(
         topBar = {
             SearchUI(
-                hint = "Search text here",
+                hint = stringResource(R.string.search_text_here),
                 hasBackButton = true,
                 backAction = { viewModel?.navigateBack() },
                 menuOptionsList = menuOptionsList

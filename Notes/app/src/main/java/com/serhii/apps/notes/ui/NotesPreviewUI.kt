@@ -12,11 +12,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
@@ -98,7 +98,7 @@ private fun NoNotesYetUI() {
 @Composable
 private fun NotesUI(uiState: NotesViewModel.NotesMainUIState, viewModel: NotesViewModel) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(120.dp),
+        columns = GridCells.Adaptive(150.dp),
         modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp)
     ) {
         items(uiState.notes.size) { index ->
@@ -108,7 +108,7 @@ private fun NotesUI(uiState: NotesViewModel.NotesMainUIState, viewModel: NotesVi
             Card(
                 modifier = Modifier
                     .padding(all = 4.dp)
-                    .defaultMinSize(minHeight = 120.dp)
+                    .sizeIn(maxHeight = 200.dp)
                     .clip(CardDefaults.shape)
                     .clickable {
                         viewModel.openNoteEditorUI(previewNote)
