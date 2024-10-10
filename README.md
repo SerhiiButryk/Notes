@@ -71,8 +71,7 @@ Find tests under 'Notes/app/src/androidTest' folder.
 # App designs
 
 <img src="images/Screenshot_1.png" height="420" width="220"> <img src="images/Screenshot_2.png" height="420" width="220">
-<img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220"> 
-<img src="images/Screenshot_5.png" height="420" width="220">
+<img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220">
 
 # Questions or help
 
