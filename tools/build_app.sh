@@ -93,8 +93,4 @@ cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ART
 rm -rf -v ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/sdk-dependencies
 rm -rf -v ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/logs
 
-# Make an archive
-zip -r ${SCRIPT_RELEVANT_PATH}/../App.zip ${SCRIPT_RELEVANT_PATH}/../Notes-App
-rm -rf -v ${SCRIPT_RELEVANT_PATH}/../Notes-App
-
 print_message "******** Finished *********"
