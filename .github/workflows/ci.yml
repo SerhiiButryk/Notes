@@ -32,4 +32,4 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
-      run: gh release create Notes-App/apk/debug/app-debug.apk Notes-App/apk/release/app-release.apk Notes-App/apk/bundle/release/app-release.aab Notes-App/reports/lint-results-debug.html --draft -n "Test release" -t "Test title"
+      run: gh release create Notes-App/apk/debug/app-debug.apk Notes-App/apk/release/app-release.apk Notes-App/bundle/release/app-release.aab Notes-App/reports/lint-results-debug.html --draft -n "Test release" -t "Test title"
