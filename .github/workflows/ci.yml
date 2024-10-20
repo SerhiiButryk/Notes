@@ -22,13 +22,6 @@ jobs:
         distribution: 'zulu'
         cache: gradle
 
-    - name: Setting up NDK 21
-      uses: nttld/setup-ndk@v1
-      id: setup-ndk
-      with:
-        ndk-version: r21d
-        link-to-sdk: true
-
     - name: Building
       run: |
         chmod +x build.sh

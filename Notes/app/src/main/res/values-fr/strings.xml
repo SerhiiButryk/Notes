@@ -120,5 +120,6 @@
     <string name="confirm_pass_reset_message">Si vous continuez, nous ne pourrons pas conserver vos données. Toutes vos notes seront perdues.\nVoulez-vous vraiment continuer ?</string>
 
     <string name="search_notes_here">Rechercher des notes ici</string>
+    <string name="search_text_here">Rechercher du texte ici</string>
 
 </resources>

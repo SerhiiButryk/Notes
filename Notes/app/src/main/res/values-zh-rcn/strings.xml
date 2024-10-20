@@ -120,5 +120,6 @@
     <string name="confirm_pass_reset_message">如果继续，我们将无法保存您的数据。您所有的笔记都将丢失。\n您确定要继续吗？</string>
 
     <string name="search_notes_here">在这里搜索笔记</string>
+    <string name="search_text_here">在此处搜索文本</string>
 
 </resources>

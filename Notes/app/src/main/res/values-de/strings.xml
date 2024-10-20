@@ -119,5 +119,6 @@
     <string name="confirm_pass_reset_message">Wenn Sie fortfahren, können wir Ihre Daten nicht speichern. Alle Ihre Notizen gehen verloren.\nMöchten Sie wirklich fortfahren?</string>
 
     <string name="search_notes_here">Notizen hier suchen</string>
+    <string name="search_text_here">Suchen Sie hier nach Text</string>
 
 </resources>

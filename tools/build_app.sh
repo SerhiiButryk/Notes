@@ -19,15 +19,10 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 
 PROJECT_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes"
-APK_FILES_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs/apk"
-BUNDLE_FILES_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs/bundle"
-MAPPING_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs/mapping/release"
+OUTPUT_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs"
 
 ARTIFACT_FOLDER_NAME="Notes-App"
-MAPPING_FOLDER_NAME="mapping"
 REPORTS_FOLDER_NAME="reports"
-DEBUGDATA_FOLDER_NAME="debugData"
-BUNDLDATA_FOLDER_NAME="bundle"
 
 BUILD_APK=false
 BUILD_BUNDLE=false
@@ -52,7 +47,7 @@ if [ "$BUILD_APK" == true ]; then
 
     # Build apk
     pushd ${PROJECT_FOLDER}
-    ./gradlew clean assemble
+    ./gradlew assemble
     popd
 fi
 
@@ -62,50 +57,40 @@ if [ "$BUILD_BUNDLE" == true ]; then
     
     # Build app bundle
     pushd ${PROJECT_FOLDER}
-    ./gradlew clean bundle
+    ./gradlew bundle
     popd
 fi
 
 print_message "******** Finished *********"
 
-# print_message "******** Running static analysis *********"
+print_message "******** Running static analysis *********"
 
-# # Run Lint and SpotBugs static analysis
-# # About Lint: https://developer.android.com/studio/write/lint
-# # About SpotBugs: https://spotbugs.github.io/
-# pushd ${PROJECT_FOLDER}
-# ./gradlew lint spotbugsDebug
-# popd
+# TODO: Add detect https://github.com/detekt/detekt
+# Run static analysis
+# About lint: https://developer.android.com/studio/write/lint
+pushd ${PROJECT_FOLDER}
+./gradlew lint
+popd
 
-# print_message "******** Finished *********"
+print_message "******** Finished *********"
 
-# print_message "******** Copying files *********"
+print_message "******** Copying files *********"
 
-# pushd ${SCRIPT_RELEVANT_PATH}/../
+pushd ${SCRIPT_RELEVANT_PATH}/../
+    # Clear if it exists
+    rm -rf ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME
+    # Create folder for artifacts 
+    mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
+popd
 
-# # Clear if it exists
-# rm -rf ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME
+# This will contains mappings, apk & bundle files and native symbols
+cp -rf -v ${PROJECT_FOLDER}/app/build/outputs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
-# # Create folder for artifacts 
-# mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
-# mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
-# mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
-# mkdir -p $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
-# mkdir -p $ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
-# popd 
+# Copy reports
+cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
 
-# cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
-# cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${MAPPING_FOLDER_NAME}
+# Remove some uneeded files
+rm -rf -v ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/sdk-dependencies
+rm -rf -v ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/logs
 
-# if [ "$BUILD_APK" == false ]
-# then
-#     cp -rf -v ${BUNDLE_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${BUNDLDATA_FOLDER_NAME}
-# fi  
-
-# # Copy reports
-# cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
-# cp -rf -v ${PROJECT_FOLDER}/app/build/spotbugs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/spotbugs
-
-# cp -rf -v ${PROJECT_FOLDER}/app/build/intermediates/ndkBuild/* $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
-
-# print_message "******** Finished *********"
+print_message "******** Finished *********"
