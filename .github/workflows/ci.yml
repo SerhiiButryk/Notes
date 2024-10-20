@@ -28,9 +28,8 @@ jobs:
         ./build.sh
       working-directory: tools
 
-    # - name: Create Draft Release
-    #   env:
-    #     GH_TOKEN: ${{ github.token }}
-    #     GH_REPO: ${{ github.repository }}
-    #   run: gh release create ./app/build/outputs/apk/debug/* --draft -n "Test release" -t "Test title"
-    #   working-directory: Notes
+    - name: Create Draft Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: gh release create Notes-App/* --draft -n "Test release" -t "Test title"
