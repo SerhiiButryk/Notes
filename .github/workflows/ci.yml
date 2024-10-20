@@ -34,3 +34,10 @@ jobs:
         chmod +x gradlew
         ./gradlew --console plain clean assemble
       working-directory: Notes
+
+    - name: Create Draft Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: gh release create v1.0.0 ./app/build/outputs/apk/debug/* --draft
+       working-directory: Notes

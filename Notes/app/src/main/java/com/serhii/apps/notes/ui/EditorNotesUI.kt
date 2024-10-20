@@ -102,7 +102,9 @@ fun NotesEditorUI(
             }
 
             viewModel?.saveEditorState(state)
-            viewModel?.requestKeyboard(inputFocusEditor)
+
+            if (uiState.note.plainText.isEmpty())
+                viewModel?.requestKeyboard(inputFocusEditor)
         }
     }
 
