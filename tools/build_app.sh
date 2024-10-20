@@ -89,8 +89,8 @@ cp -rf -v ${PROJECT_FOLDER}/app/build/outputs/* ${SCRIPT_RELEVANT_PATH}/../${ART
 # Copy reports
 cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
 
-# Remove some uneeded files
-rm -rf -v ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/sdk-dependencies
-rm -rf -v ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/logs
+# Print folder content
+print_message "******** Log output folder *********"
+ls -l ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 print_message "******** Finished *********"
