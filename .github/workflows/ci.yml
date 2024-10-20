@@ -40,4 +40,4 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
       run: gh release create v1.0.0 ./app/build/outputs/apk/debug/* --draft
-       working-directory: Notes
+      working-directory: Notes
