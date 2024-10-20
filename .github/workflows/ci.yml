@@ -32,4 +32,4 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
-      run: gh release create Notes-App/* --draft -n "Test release" -t "Test title"
+      run: gh release create App.zip --draft -n "Test release" -t "Test title"
