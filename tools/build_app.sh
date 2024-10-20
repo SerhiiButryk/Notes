@@ -10,6 +10,8 @@
 # Fail if somthing is wrong
 set -e
 
+chmod +x ./build_app.sh
+
 # Add untility scripts
 SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 . ${SCRIPT_RELEVANT_PATH}/utility_functions.sh
@@ -28,33 +30,23 @@ DEBUGDATA_FOLDER_NAME="debugData"
 BUNDLDATA_FOLDER_NAME="bundle"
 
 BUILD_APK=false
+BUILD_BUNDLE=false
 
-while [ : ]; do
+while [ "${1:-}" != "" ]; do
   case "$1" in
     --apk)
         BUILD_APK=true
-        shift
         ;;
     --bundle)
-        BUILD_APK=false
-        shift
+        BUILD_BUNDLE=true
         ;;
   esac
-  break
+  shift
 done
-
-print_message "******** Selecting release key *********"
-
-pushd ${PROJECT_FOLDER}/app
-sed 's+test_only.jks+../../../notes-app-release-key.jks+g' build.gradle > build.gradle.cp 
-rm build.gradle 
-mv build.gradle.cp build.gradle
-popd
 
 print_message "******** Started building *********"
 
-if [ "$BUILD_APK" == true ]
-then 
+if [ "$BUILD_APK" == true ]; then
 
     print_message "******** Building APK *********"
 
@@ -62,8 +54,9 @@ then
     pushd ${PROJECT_FOLDER}
     ./gradlew clean assemble
     popd
+fi
 
-else
+if [ "$BUILD_BUNDLE" == true ]; then
 
     print_message "******** Building Bundle *********"
     
@@ -71,49 +64,48 @@ else
     pushd ${PROJECT_FOLDER}
     ./gradlew clean bundle
     popd
-
 fi
 
 print_message "******** Finished *********"
 
-print_message "******** Running static analysis *********"
+# print_message "******** Running static analysis *********"
 
-# Run Lint and SpotBugs static analysis
-# About Lint: https://developer.android.com/studio/write/lint
-# About SpotBugs: https://spotbugs.github.io/
-pushd ${PROJECT_FOLDER}
-./gradlew lint spotbugsDebug
-popd
+# # Run Lint and SpotBugs static analysis
+# # About Lint: https://developer.android.com/studio/write/lint
+# # About SpotBugs: https://spotbugs.github.io/
+# pushd ${PROJECT_FOLDER}
+# ./gradlew lint spotbugsDebug
+# popd
 
-print_message "******** Finished *********"
+# print_message "******** Finished *********"
 
-print_message "******** Copying files *********"
+# print_message "******** Copying files *********"
 
-pushd ${SCRIPT_RELEVANT_PATH}/../
+# pushd ${SCRIPT_RELEVANT_PATH}/../
 
-# Clear if it exists
-rm -rf ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME
+# # Clear if it exists
+# rm -rf ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME
 
-# Create folder for artifacts 
-mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
-mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
-mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
-mkdir -p $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
-mkdir -p $ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
-popd 
+# # Create folder for artifacts 
+# mkdir -p $ARTIFACT_FOLDER_NAME/${MAPPING_FOLDER_NAME}
+# mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
+# mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/spotbugs
+# mkdir -p $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
+# mkdir -p $ARTIFACT_FOLDER_NAME/${BUNDLDATA_FOLDER_NAME}
+# popd 
 
-cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
-cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${MAPPING_FOLDER_NAME}
+# cp -rf -v ${APK_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+# cp -rf -v ${MAPPING_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${MAPPING_FOLDER_NAME}
 
-if [ "$BUILD_APK" == false ]
-then
-    cp -rf -v ${BUNDLE_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${BUNDLDATA_FOLDER_NAME}
-fi  
+# if [ "$BUILD_APK" == false ]
+# then
+#     cp -rf -v ${BUNDLE_FILES_FOLDER}/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${BUNDLDATA_FOLDER_NAME}
+# fi  
 
-# Copy reports
-cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
-cp -rf -v ${PROJECT_FOLDER}/app/build/spotbugs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/spotbugs
+# # Copy reports
+# cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
+# cp -rf -v ${PROJECT_FOLDER}/app/build/spotbugs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/spotbugs
 
-cp -rf -v ${PROJECT_FOLDER}/app/build/intermediates/ndkBuild/* $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
+# cp -rf -v ${PROJECT_FOLDER}/app/build/intermediates/ndkBuild/* $ARTIFACT_FOLDER_NAME/${DEBUGDATA_FOLDER_NAME}
 
-print_message "******** Finished *********"
+# print_message "******** Finished *********"

@@ -11,13 +11,6 @@
 # Fail if somthing is wrong
 set -e
 
-# Tests are not running on Jenkins, because emulator fails to launch on Jenkins.
-if [ "$JENKINS_CONTEXT" = true ]
-then
-    print_error "Skipping tests on Jenkins"
-    exit 0
-fi
-
 # Add untility scripts
 SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 . $SCRIPT_RELEVANT_PATH/utility_functions.sh

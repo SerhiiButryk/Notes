@@ -31,13 +31,13 @@ jobs:
 
     - name: Building
       run: |
-        chmod +x gradlew
-        ./gradlew --console plain clean assemble
-      working-directory: Notes
+        chmod +x build.sh
+        ./build.sh
+      working-directory: tools
 
-    - name: Create Draft Release
-      env:
-        GH_TOKEN: ${{ github.token }}
-        GH_REPO: ${{ github.repository }}
-      run: gh release create v1.0.0 ./app/build/outputs/apk/debug/* --draft
-      working-directory: Notes
+    # - name: Create Draft Release
+    #   env:
+    #     GH_TOKEN: ${{ github.token }}
+    #     GH_REPO: ${{ github.repository }}
+    #   run: gh release create ./app/build/outputs/apk/debug/* --draft -n "Test release" -t "Test title"
+    #   working-directory: Notes

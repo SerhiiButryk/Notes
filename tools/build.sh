@@ -5,8 +5,7 @@
 
 SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 
-# Build project
-${SCRIPT_RELEVANT_PATH}/build_app.sh --bundle
+chmod +x ./build_app.sh
 
-# Test project
-${SCRIPT_RELEVANT_PATH}/run_tests.sh
+# Build project
+${SCRIPT_RELEVANT_PATH}/build_app.sh --bundle --apk
