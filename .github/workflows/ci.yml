@@ -28,6 +28,14 @@ jobs:
         ./build.sh
       working-directory: tools
 
+    - name: Run tests
+      uses: emulator-wtf/run-tests@v0
+      with:
+        api-token: ${{ secrets.EW_API_TOKEN }}
+        app: ${{ github.workspace }}/Notes/app/build/outputs/apk/debug/app-debug.apk
+        test: ${{ github.workspace }}/Notes/app/build/outputs/apk/androidTest/app-debug-androidTest.apk
+        outputs-dir: ${{ github.workspace }}/Notes-App/test-results      
+
     - name: Upload Artifacts
       if: always()
       uses: actions/upload-artifact@v4

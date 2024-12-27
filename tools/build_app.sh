@@ -81,6 +81,8 @@ pushd ${SCRIPT_RELEVANT_PATH}/../
     rm -rf ${SCRIPT_RELEVANT_PATH}/$ARTIFACT_FOLDER_NAME
     # Create folder for artifacts 
     mkdir -p $ARTIFACT_FOLDER_NAME/${REPORTS_FOLDER_NAME}/lint
+    # Create folder for tests 
+    mkdir -p $ARTIFACT_FOLDER_NAME/test-results
 popd
 
 # This will contains mappings, apk & bundle files and native symbols
