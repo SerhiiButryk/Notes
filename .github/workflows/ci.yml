@@ -22,13 +22,13 @@ jobs:
         distribution: 'zulu'
         cache: gradle
 
-    - name: Building
+    - name: Building Notes app
       run: |
         chmod +x build.sh
         ./build.sh
       working-directory: tools
 
-    - name: Run tests
+    - name: Run Android tests
       uses: emulator-wtf/run-tests@v0
       with:
         api-token: ${{ secrets.EW_API_TOKEN }}
@@ -44,10 +44,3 @@ jobs:
         path: ${{ github.workspace }}/Notes-App
         overwrite: true
         if-no-files-found: error
-
-# Temprorary disabled
-    # - name: Create Draft Release
-    #   env:
-    #     GH_TOKEN: ${{ github.token }}
-    #     GH_REPO: ${{ github.repository }}
-    #   run: gh release create Notes-App/mapping/release/usage.txt Notes-App/apk/release/app-release.apk Notes-App/bundle/release/app-release.aab Notes-App/reports/lint/lint-results-debug.html Notes-App/apk/debug/app-debug.apk --draft -n "Test release" -t "Test title"

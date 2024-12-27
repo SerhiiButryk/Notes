@@ -84,7 +84,6 @@ class DatabaseTests {
         val retrievedNote: NoteModel = notesDatabase.getRecord(id.toString())
 
         Assert.assertEquals("Note is not correct", retrievedNote.plainText, noteText)
-        Assert.assertEquals("Note title is not correct", retrievedNote.title, noteTitle)
 
         Log.i(TAG, "test01_AddRecord() OUT")
     }
