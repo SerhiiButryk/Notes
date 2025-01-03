@@ -26,12 +26,6 @@ jobs:
         distribution: 'zulu'
         cache: gradle
 
-    # - name: Set up Android SDK
-    #   uses: android-actions/setup-android@v2
-    #   with:
-    #     api-level: 35
-    #     build-tools: 35    
-
     - name: Building app
       run: |
         chmod +x build.sh
@@ -66,8 +60,7 @@ jobs:
         working-directory: Notes/
         target: default
         arch: x86_64
-        # script: "./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests connectedDebugAndroidTest"
-        script: ./gradlew connectedAndroidTest
+        script: tools/run_tests.sh
 
     - name: Upload Artifacts
       if: always()
