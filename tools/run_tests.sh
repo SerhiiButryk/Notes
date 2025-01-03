@@ -125,7 +125,7 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
     # ./gradlew --console plain Project:task -Pandroid.testInstrumentationRunnerArguments.class=fullclassbname
     # ./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests jacocoTestReport
 
-    ./gradlew connectedDebugAndroidTest
+    ./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests connectedDebugAndroidTest
     
     popd > /dev/null
 
