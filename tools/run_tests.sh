@@ -123,7 +123,9 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 
     # This will run tests and create coverage report
     # ./gradlew --console plain Project:task -Pandroid.testInstrumentationRunnerArguments.class=fullclassbname
-    ./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests jacocoTestReport
+    # ./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests jacocoTestReport
+
+    ./gradlew connectedDebugAndroidTest
     
     popd > /dev/null
 
