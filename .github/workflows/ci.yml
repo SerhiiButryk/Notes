@@ -66,12 +66,12 @@ jobs:
     - name: Run Android tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        emulator-options: '-no-window -gpu swiftshader_indirect'
+        # emulator-options: '-no-window -gpu swiftshader_indirect'
 
         # api-level: ${{ matrix.api-level }}
         # arch: x86_64
         # force-avd-creation: false
-        # emulator-options: "-no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
+        emulator-options: "-no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
         # script: "./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests connectedDebugAndroidTest"
         working-directory: Notes/
         api-level: 35
