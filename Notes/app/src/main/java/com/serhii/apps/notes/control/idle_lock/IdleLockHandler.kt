@@ -72,9 +72,7 @@ object IdleLockHandler {
         lastJob = GlobalScope.launch(App.BACKGROUND_DISPATCHER) {
             Log.detail(TAG, "coroutine: started")
             delay(time)
-            Log.detail(TAG, "coroutine: time elapsed")
             onTimeout(context)
-            Log.detail(TAG, "coroutine: finished")
         }
     }
 

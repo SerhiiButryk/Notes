@@ -38,8 +38,11 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
 
     private val viewModel: NotesViewModel by viewModels()
 
+    init {
+        APP_BASE_TAG += NotesViewActivity.TAG
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        setLoggingTagForActivity(TAG)
         super.onCreate(savedInstanceState)
         Log.info(TAG, "onCreate()")
 
@@ -107,7 +110,7 @@ class NotesViewActivity : AppBaseActivity(), IAuthorizeUser {
     private fun setupUI() {
         // Add menu options
         val menuOptionsPreview = mutableListOf<MenuOptions>()
-        // Add 'Go to settings' option
+        // Add Settings' option
         menuOptionsPreview.add(
             MenuOptions(textId = R.string.settings_item, icon = Icons.Default.Settings, onClick = {
                 viewModel.openSettings(this)

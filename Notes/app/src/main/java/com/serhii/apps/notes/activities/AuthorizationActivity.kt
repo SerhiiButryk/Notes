@@ -29,8 +29,11 @@ class AuthorizationActivity : AppBaseActivity() {
 
     private val viewModel: LoginViewModel by viewModels()
 
+    init {
+        APP_BASE_TAG += AuthorizationActivity.TAG
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        setLoggingTagForActivity(TAG)
         super.onCreate(savedInstanceState)
         Log.info(TAG, "onCreate()")
 
@@ -91,7 +94,7 @@ class AuthorizationActivity : AppBaseActivity() {
      */
     fun userRegistered() {
         Log.info(TAG, "userRegistered()")
-        viewModel.proceed(requestType = UIRequestType.LOGIN_UI, context = applicationContext)
+        viewModel.sendAction(requestType = UIRequestType.LOGIN_UI, context = applicationContext)
     }
 
     /**
@@ -100,7 +103,7 @@ class AuthorizationActivity : AppBaseActivity() {
     private fun showAlertDialog(type: Int) {
         Log.info(TAG, "showAlertDialog(), type $type")
         // Show a dialog
-        viewModel.proceed(
+        viewModel.sendAction(
             requestType = UIRequestType.DIALOG_UI,
             context = applicationContext,
             type = type

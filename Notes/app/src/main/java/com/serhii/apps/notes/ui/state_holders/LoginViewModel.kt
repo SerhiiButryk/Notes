@@ -83,17 +83,17 @@ class LoginViewModel : AppViewModel() {
         }
     }
 
-    fun proceed(
+    fun sendAction(
         requestType: UIRequestType,
         context: Context,
         authModel: AuthModel = AuthModel(),
         type: Int = -1
     ) {
-        Log.info(TAG, "proceed()")
+        Log.info(TAG, "sendAction()")
 
         viewModelScope.launch(App.BACKGROUND_DISPATCHER) {
 
-            Log.detail(TAG, "proceed() >>")
+            Log.detail(TAG, "sendAction() >>")
 
             val createNewUiState = { context: Context ->
                 // TODO: Doest not look good, might be revisited later
@@ -234,7 +234,7 @@ class LoginViewModel : AppViewModel() {
                 }
             }
 
-            Log.detail(TAG, "proceed() <<")
+            Log.detail(TAG, "sendAction() <<")
         }
     }
 
@@ -260,7 +260,7 @@ class LoginViewModel : AppViewModel() {
                     message = R.string.biometric_dialog_message,
                     onConfirm = {
                         Log.info(TAG, "BiometricAuthenticator.Listener: re-open")
-                        proceed(UIRequestType.SETUP_BIOMETRICS_UI, context)
+                        sendAction(UIRequestType.SETUP_BIOMETRICS_UI, context)
                     },
                     onCancel = {
                         Log.info(TAG, "BiometricAuthenticator.Listener: cancel biometric")

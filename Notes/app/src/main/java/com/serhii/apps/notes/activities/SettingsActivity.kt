@@ -32,11 +32,6 @@ import com.serhii.core.log.Log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val TIME_3_MIN = 3 * 60 * 1000L
-private const val TIME_5_MIN = 5 * 60 * 1000L
-private const val TIME_10_MIN = 10 * 60 * 1000L
-private const val TIME_NEVER = 0L
-
 /**
  * Activity for app settings
  */
@@ -44,8 +39,11 @@ class SettingsActivity : AppBaseActivity() {
 
     private val viewModel: SettingsViewModel by viewModels()
 
+    init {
+        APP_BASE_TAG += SettingsActivity.TAG
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        setLoggingTagForActivity(TAG)
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
@@ -72,37 +70,29 @@ class SettingsActivity : AppBaseActivity() {
             SettingItem(
                 imageId = R.drawable.shield_lock,
                 onClick = {
+
                     val timeout = PreferenceManager.getTimeout(applicationContext)
 
-                    val options = listOf(
-                        SettingsViewModel.DialogOption(R.string.s_3_min, isSelected = timeout == TIME_3_MIN) {
+                    val createOptionDialog = { text: Int, time: Long ->
+                        SettingsViewModel.DialogOption(text, isSelected = timeout == time) {
                             lifecycleScope.launch(App.UI_DISPATCHER) {
                                 delay(1*500) // Small delay so user can see click animation
-                                PreferenceManager.setTimeout(applicationContext, TIME_3_MIN)
-                                viewModel.closeDialog()
-                            }
-                        },
-                        SettingsViewModel.DialogOption(R.string.s_5_min, isSelected = timeout == TIME_5_MIN) {
-                            lifecycleScope.launch(App.UI_DISPATCHER) {
-                                delay(1*500) // Small delay so user can see click animation
-                                PreferenceManager.setTimeout(applicationContext, TIME_5_MIN)
-                                viewModel.closeDialog()
-                            }
-                        },
-                        SettingsViewModel.DialogOption(R.string.s_10_min, isSelected = timeout == TIME_10_MIN) {
-                            lifecycleScope.launch(App.UI_DISPATCHER) {
-                                delay(1*500) // Small delay so user can see click animation
-                                PreferenceManager.setTimeout(applicationContext, TIME_10_MIN)
-                                viewModel.closeDialog()
-                            }
-                        },
-                        SettingsViewModel.DialogOption(R.string.never, isSelected = timeout == TIME_NEVER) {
-                            lifecycleScope.launch(App.UI_DISPATCHER) {
-                                delay(1*500) // Small delay so user can see click animation
-                                PreferenceManager.setTimeout(applicationContext, TIME_NEVER)
+                                PreferenceManager.setTimeout(applicationContext, time)
                                 viewModel.closeDialog()
                             }
                         }
+                    }
+
+                    val TIME_3_MIN = 3 * 60 * 1000L
+                    val TIME_5_MIN = 5 * 60 * 1000L
+                    val TIME_10_MIN = 10 * 60 * 1000L
+                    val TIME_NEVER = 0L
+
+                    val options = listOf(
+                        createOptionDialog(R.string.s_3_min, TIME_3_MIN),
+                        createOptionDialog(R.string.s_5_min, TIME_5_MIN),
+                        createOptionDialog(R.string.s_10_min, TIME_10_MIN),
+                        createOptionDialog(R.string.never, TIME_NEVER)
                     )
 
                     viewModel.openOptionListDialog(options)

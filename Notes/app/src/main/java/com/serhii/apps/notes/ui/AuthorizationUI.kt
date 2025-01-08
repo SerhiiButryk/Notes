@@ -78,7 +78,7 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
             if (isForgotPasswordUI)
                 requestType = UIRequestType.FORGOT_PASSWORD
 
-            viewModel.proceed(requestType, context, authModel = viewModel.authModel)
+            viewModel.sendAction(requestType, context, authModel = viewModel.authModel)
         }
 
         TitleUI(title = uiState.title)
@@ -115,7 +115,7 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
                 modifier = Modifier
                     .padding(bottom = dimensionResource(id = R.dimen.padding_small))
                     .clickable {
-                        viewModel.proceed(UIRequestType.FORGOT_PASSWORD_UI, context)
+                        viewModel.sendAction(UIRequestType.FORGOT_PASSWORD_UI, context)
                     },
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -147,7 +147,7 @@ fun AuthorizationUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewMod
                 .fillMaxWidth()
 
             ButtonUI(text = uiState.biometricButtonText, modifier = biometricButtonModifiers) {
-                viewModel.proceed(UIRequestType.BIOMETRIC_LOGIN_UI, context)
+                viewModel.sendAction(UIRequestType.BIOMETRIC_LOGIN_UI, context)
             }
         }
 

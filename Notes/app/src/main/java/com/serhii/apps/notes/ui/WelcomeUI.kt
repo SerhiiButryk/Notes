@@ -62,7 +62,7 @@ fun WelcomeUI(uiState: LoginViewModel.BaseUIState, viewModel: LoginViewModel) {
                 .padding(start = leftPadding, end = rightPadding, bottom = bottomPadding)
                 .align(alignment = Alignment.BottomCenter)
         ) {
-            viewModel.proceed(uiState.requestType, context)
+            viewModel.sendAction(uiState.requestType, context)
         }
     }
 }

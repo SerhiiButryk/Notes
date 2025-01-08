@@ -21,12 +21,12 @@ import com.serhii.core.log.Log
  */
 open class AppBaseActivity : AppCompatActivity() {
 
-    private var TAG = "AppBaseActivity-"
+    protected var APP_BASE_TAG = "AppBaseActivity-"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        Log.info(TAG, "onCreate()")
+        Log.info(APP_BASE_TAG, "onCreate()")
         // Enable secure screen content settings
         enableUnsecureScreenProtection(this)
         // Initialize lifecycle aware components
@@ -44,33 +44,29 @@ open class AppBaseActivity : AppCompatActivity() {
 
     override fun onUserInteraction() {
         super.onUserInteraction()
-        Log.info(TAG, "onUserInteraction()")
+        Log.info(APP_BASE_TAG, "onUserInteraction()")
         IdleLockHandler.onUserInteraction(this)
     }
 
     override fun onResume() {
         super.onResume()
-        Log.info(TAG, "onResume()")
+        Log.info(APP_BASE_TAG, "onResume()")
         IdleLockHandler.onActivityResumed(this)
     }
 
     override fun onStop() {
         super.onStop()
-        Log.info(TAG, "onStop()")
+        Log.info(APP_BASE_TAG, "onStop()")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.info(TAG, "onDestroy()")
-    }
-
-    protected fun setLoggingTagForActivity(tag: String) {
-        TAG += tag
+        Log.info(APP_BASE_TAG, "onDestroy()")
     }
 
     init {
         System.loadLibrary(RUNTIME_LIBRARY)
-        Log.info(TAG, "init()")
+        Log.info(APP_BASE_TAG, "init()")
     }
 
 }
