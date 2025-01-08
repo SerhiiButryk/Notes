@@ -7,7 +7,7 @@
 
 namespace {
     // For DEBUG
-    const std::string TAG = "JNIWrapper";
+    const char *TAG = "JNIWrapper";
 }
 
 namespace MYLIB
@@ -65,7 +65,7 @@ namespace MYLIB
         {
             javaVm->DetachCurrentThread();
 
-            Log::Info(TAG, "~JNIWrapper(): Thread is detached %p", this);
+            Info(TAG, "~JNIWrapper(): Thread is detached %p", this);
         }
 
     }
@@ -106,24 +106,24 @@ namespace MYLIB
 
         if (status != JNI_OK)
         {
-            Log::Error(TAG, "getSafeJniEnv(): Failed to get jniEnv");
+            Error(TAG, "getSafeJniEnv(): Failed to get jniEnv");
         }
 
         if (status == JNI_EDETACHED)
         {
-            Log::Info(TAG, "getSafeJniEnv(): Thread is detached");
+            Info(TAG, "getSafeJniEnv(): Thread is detached");
 
             int result = javaVm->AttachCurrentThread(&jniEnv, nullptr);
 
             if (result != JNI_OK)
             {
-                Log::Error(TAG, "getSafeJniEnv(): Attach failed");
+                Error(TAG, "getSafeJniEnv(): Attach failed");
 
             } else {
 
                 isThreadAttached = true;
 
-                Log::Info(TAG, "~JNIWrapper(): Thread is attached %p", this);
+                Info(TAG, "~JNIWrapper(): Thread is attached %p", this);
             }
 
         }

@@ -12,7 +12,7 @@
 
 using namespace MYLIB;
 
-const static std::string TAG = "RegistrationHandler";
+const static char* TAG = "RegistrationHandler";
 
 namespace APP
 {
@@ -24,7 +24,7 @@ namespace APP
 
     bool RegisterHandler::handleEvent(const Event<SYSTEM_EVENT>& event)
     {
-        Log::Info(TAG, "handleEvent() : got event");
+        Info(TAG, "handleEvent() : got event");
 
         std::string username = event.getData(USERNAME_KEY);
         std::string password = event.getData(PASSWORD_KEY);
@@ -39,7 +39,7 @@ namespace APP
         {
             if (AuthUtils::isUserAccountExists(username))
             {
-                Log::Info(TAG, "handleEvent() : user is already present");
+                Info(TAG, "handleEvent() : user is already present");
             }
 
             ss.clearData(kFileSystemData);

@@ -22,7 +22,7 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_initNativeConfigs
   (JNIEnv* env, jobject obj)
 {
-    Log::Info("JNI", " %s IN", __FUNCTION__ );
+    Info("JNI", " %s IN", __FUNCTION__ );
 
     jclass clz = env->GetObjectClass(obj);
 
@@ -35,7 +35,7 @@ JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_NotesViewActivity_i
 
     AppAction::getInstance()->setAuthorizeCallback(std::move(callback));
 
-    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+    Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
 #ifdef __cplusplus

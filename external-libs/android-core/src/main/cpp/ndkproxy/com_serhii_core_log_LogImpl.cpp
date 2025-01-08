@@ -30,7 +30,7 @@ bool isDebug(JNIEnv *env) {
 JNIEXPORT void JNICALL Java_com_serhii_core_log_LogImpl__1setTag(JNIEnv* env, jobject, jstring jtag)
 {
     MYLIB::JString strTag(env, jtag);
-    MYLIB::Log::setTag(strTag);
+//    MYLIB::Log::setTag(strTag);
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_log_LogImpl__1setDetailLog(JNIEnv *env, jobject thiz, jboolean enable)

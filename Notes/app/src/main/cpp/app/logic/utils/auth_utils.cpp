@@ -11,7 +11,7 @@
 using namespace MYLIB;
 
 const int MIN_PASSWORD_LENGTH = 6; // Min password length
-const std::string TAG = "AuthUtils";
+static const char* TAG = "AuthUtils";
 
 bool APP::AuthUtils::isUserAccountExists(const std::string& user_name)
 {
@@ -99,10 +99,10 @@ bool APP::AuthUtils::isEmailValid(const std::string& email)
 
     if (std::regex_match(email, base_match, email_regex))
     {
-        Log::Info(TAG, "AuthUtils::isEmailValid() passed");
+        Info(TAG, "AuthUtils::isEmailValid() passed");
         return true;
     }
 
-    Log::Info(TAG, "AuthUtils::isEmailValid() not passed");
+    Info(TAG, "AuthUtils::isEmailValid() not passed");
     return false;
 }

@@ -5,7 +5,7 @@
 
 namespace {
     // For DEBUG
-    const std::string TAG = "SystemStorage";
+    const char* TAG = "SystemStorage";
 }
 
 namespace MYLIB
@@ -53,7 +53,7 @@ namespace MYLIB
     {
         if (!writeData(file_name, data, true))
         {
-            Log::Error(TAG, "addData(): Failed to add data, file is not opened, file name: %s \n", file_name);
+            Error(TAG, "addData(): Failed to add data, file is not opened, file name: %s \n", file_name.c_str());
         }
     }
 
@@ -68,7 +68,7 @@ namespace MYLIB
         {
             data = fs->readFile(file);
         } else {
-            Log::Error(TAG, "readData(): Failed to read data, file was not opened, file name: %s \n", file_name);
+            Error(TAG, "readData(): Failed to read data, file was not opened, file name: %s \n", file_name.c_str());
         }
 
         // UNCOMMENT FOR DEBUGGING
@@ -112,7 +112,7 @@ namespace MYLIB
     {
         if (!doesFileExist(file_name))
         {
-            Log::Error(TAG, "debugPrintAllValues(): File does not exist, file name: %s \n", file_name);
+            Error(TAG, "debugPrintAllValues(): File does not exist, file name: %s \n", file_name.c_str());
             return;
         }
 
@@ -120,7 +120,7 @@ namespace MYLIB
 
         for (auto& v : values)
         {
-            Log::Info(TAG, "debugPrintAllValues(): File data : %s : %s :: file name : %s \n", v.first, v.second, file_name);
+            Info(TAG, "debugPrintAllValues(): File data : %s : %s :: file name : %s \n", v.first.c_str(), v.second.c_str(), file_name.c_str());
         }
 
     }
@@ -139,7 +139,7 @@ namespace MYLIB
 
             if (ofs.is_open())
             {
-                Log::Info(TAG, "clearData(): File is cleared, file name: %s \n", file_name);
+                Info(TAG, "clearData(): File is cleared, file name: %s \n", file_name.c_str());
 
                 ofs.close();
             }
@@ -177,7 +177,7 @@ namespace MYLIB
     {
         if (doesFileExist(file_name))
         {
-            Log::Info(TAG, "createFile(): File does already exist, file name: %s \n", file_name);
+            Info(TAG, "createFile(): File does already exist, file name: %s \n", file_name.c_str());
             return false;
         }
 

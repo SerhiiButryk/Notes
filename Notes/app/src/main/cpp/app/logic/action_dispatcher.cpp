@@ -20,7 +20,7 @@ namespace APP
     {
         if (message == SYSTEM_MESSAGE::AUTHORIZATION_DONE || message == SYSTEM_MESSAGE::UNLOCK_DONE)
         {
-            Log::Info("ActionDispatcher", "sendEvent() - ACTION::AUTHORIZATION_DONE \n");
+            Info("ActionDispatcher", "sendEvent() - ACTION::AUTHORIZATION_DONE \n");
 
             notifyOnAuthorized();
             return;
@@ -28,7 +28,7 @@ namespace APP
 
         if (message == SYSTEM_MESSAGE::REGISTRATION_DONE)
         {
-            Log::Info("ActionDispatcher", "sendEvent() - ACTION::REGISTRATION_DONE \n");
+            Info("ActionDispatcher", "sendEvent() - ACTION::REGISTRATION_DONE \n");
 
             notifyOnRegistered();
             return;
@@ -44,13 +44,13 @@ namespace APP
             message == SYSTEM_MESSAGE ::PASSWORD_IS_WEAK ||
             message == SYSTEM_MESSAGE ::EMAIL_INVALID)
         {
-            Log::Info("ActionDispatcher", "sendEvent() - ACTION notifyOnShowDialog \n");
+            Info("ActionDispatcher", "sendEvent() - ACTION notifyOnShowDialog \n");
 
             notifyOnShowDialog(static_cast<int>(message));
             return;
         }
 
-        Log::Error("ActionDispatcher", "sendEvent() - NO ACTION FOUND\n");
+        Error("ActionDispatcher", "sendEvent() - NO ACTION FOUND\n");
 
     }
 

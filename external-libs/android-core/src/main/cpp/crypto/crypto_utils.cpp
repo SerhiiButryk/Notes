@@ -2,7 +2,7 @@
 
 namespace MYLIB {
 
-    const std::string CryptoUtils::TAG = "CryptoUtils";
+    const char* TAG = "CryptoUtils";
 
     std::vector<std::byte> CryptoUtils::hexToBytes(const std::string& hex)
     {

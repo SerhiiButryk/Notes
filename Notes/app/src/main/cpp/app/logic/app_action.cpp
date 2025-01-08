@@ -4,9 +4,9 @@
 #include "utils/log.h"
 #include "utils/jni_utils.h"
 
-namespace {
-    const std::string TAG = "AppActionSender";
-}
+
+static const char* TAG = "AppActionSender";
+
 
 namespace APP
 {
@@ -31,7 +31,7 @@ namespace APP
         {
             JniUtils::callVoid(f);
 
-            Log::Info(TAG, "notifyOnAuthorized - called observer \n");
+            Info(TAG, "notifyOnAuthorized - called observer \n");
         }
     }
 
@@ -41,9 +41,9 @@ namespace APP
         {
             JniUtils::callVoid(*registerObserver);
 
-            Log::Info(TAG, "notifyOnRegistered - called observer \n");
+            Info(TAG, "notifyOnRegistered - called observer \n");
         } else {
-            Log::Error(TAG, "notifyOnRegistered - no observer \n");
+            Error(TAG, "notifyOnRegistered - no observer \n");
         }
     }
 
@@ -53,9 +53,9 @@ namespace APP
         {
             JniUtils::callVoid(*showDialogObserver, type);
 
-            Log::Info(TAG, "notifyOnShowDialog - called observer \n");
+            Info(TAG, "notifyOnShowDialog - called observer \n");
         } else {
-            Log::Error(TAG, "notifyOnShowDialog - no observer \n");
+            Error(TAG, "notifyOnShowDialog - no observer \n");
         }
     }
 

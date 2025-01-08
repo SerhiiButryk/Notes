@@ -24,7 +24,7 @@ extern "C" {
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save(JNIEnv *env, jobject thiz, jstring value)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     JString str_value(env, value);
 
@@ -32,7 +32,7 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save(JNIEn
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
         if (!ss.createFile(K_CORE_DATA_FILE)) {
-            Log::Error("JNI", "%s failed to create a file", __FUNCTION__);
+            Error("JNI", "%s failed to create a file", __FUNCTION__);
             return;
         }
     }
@@ -45,39 +45,39 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save(JNIEn
         ss.addData(K_CORE_DATA_FILE, data);
 
     } else {
-        Log::Info("JNI", "%s already have this data", __FUNCTION__ );
+        Info("JNI", "%s already have this data", __FUNCTION__ );
     }
 
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1get(JNIEnv *env, jobject thiz)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s file doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s file doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     if (!ss.doesKeyExist(K_CORE_DATA_FILE, K_APP_KEY)) {
-        Log::Error("JNI", "%s value doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s value doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string value = ss.getDataByKey(K_CORE_DATA_FILE, K_APP_KEY);
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(value.c_str());
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save2(JNIEnv *env, jobject thiz, jstring value)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     JString str_value(env, value);
 
@@ -85,7 +85,7 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save2(JNIE
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
         if (!ss.createFile(K_CORE_DATA_FILE)) {
-            Log::Error("JNI", "%s failed to create a file", __FUNCTION__);
+            Error("JNI", "%s failed to create a file", __FUNCTION__);
             return;
         }
     }
@@ -98,61 +98,61 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save2(JNIE
         ss.addData(K_CORE_DATA_FILE, data);
 
     } else {
-        Log::Info("JNI", "%s already have this data", __FUNCTION__ );
+        Info("JNI", "%s already have this data", __FUNCTION__ );
     }
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1get2(JNIEnv *env, jobject thiz)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s file doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s file doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     if (!ss.doesKeyExist(K_CORE_DATA_FILE, K_APP_KEY_2)) {
-        Log::Error("JNI", "%s value doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s value doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string value = ss.getDataByKey(K_CORE_DATA_FILE, K_APP_KEY_2);
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(value.c_str());
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1get3(JNIEnv *env, jobject thiz)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s file doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s file doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     if (!ss.doesKeyExist(K_CORE_DATA_FILE, K_DERIVED_KEY_2)) {
-        Log::Error("JNI", "%s value doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s value doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string value = ss.getDataByKey(K_CORE_DATA_FILE, K_DERIVED_KEY_2);
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(value.c_str());
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save3(JNIEnv *env, jobject thiz, jstring value)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     JString str_value(env, value);
 
@@ -160,7 +160,7 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save3(JNIE
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
         if (!ss.createFile(K_CORE_DATA_FILE)) {
-            Log::Error("JNI", "%s failed to create a file", __FUNCTION__);
+            Error("JNI", "%s failed to create a file", __FUNCTION__);
             return;
         }
     }
@@ -173,38 +173,38 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save3(JNIE
         ss.addData(K_CORE_DATA_FILE, data);
 
     } else {
-        Log::Info("JNI", "%s already have this data", __FUNCTION__ );
+        Info("JNI", "%s already have this data", __FUNCTION__ );
     }
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1get4(JNIEnv *env, jobject thiz)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s file doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s file doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     if (!ss.doesKeyExist(K_CORE_DATA_FILE, K_IV_BIOMETRIC)) {
-        Log::Error("JNI", "%s value doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s value doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string value = ss.getDataByKey(K_CORE_DATA_FILE, K_IV_BIOMETRIC);
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(value.c_str());
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save4(JNIEnv *env, jobject thiz, jstring value)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     JString str_value(env, value);
 
@@ -212,7 +212,7 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save4(JNIE
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
         if (!ss.createFile(K_CORE_DATA_FILE)) {
-            Log::Error("JNI", "%s failed to create a file", __FUNCTION__);
+            Error("JNI", "%s failed to create a file", __FUNCTION__);
             return;
         }
     }
@@ -225,38 +225,38 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save4(JNIE
         ss.addData(K_CORE_DATA_FILE, data);
 
     } else {
-        Log::Info("JNI", "%s already have this data", __FUNCTION__ );
+        Info("JNI", "%s already have this data", __FUNCTION__ );
     }
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1get5(JNIEnv *env, jobject thiz)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s file doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s file doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     if (!ss.doesKeyExist(K_CORE_DATA_FILE, K_APP_KEY_3)) {
-        Log::Error("JNI", "%s value doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s value doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string value = ss.getDataByKey(K_CORE_DATA_FILE, K_APP_KEY_3);
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(value.c_str());
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save5(JNIEnv *env, jobject thiz, jstring value)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     JString str_value(env, value);
 
@@ -264,7 +264,7 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save5(JNIE
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
         if (!ss.createFile(K_CORE_DATA_FILE)) {
-            Log::Error("JNI", "%s failed to create a file", __FUNCTION__);
+            Error("JNI", "%s failed to create a file", __FUNCTION__);
             return;
         }
     }
@@ -277,38 +277,38 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1save5(JNIE
         ss.addData(K_CORE_DATA_FILE, data);
 
     } else {
-        Log::Info("JNI", "%s already have this data", __FUNCTION__ );
+        Info("JNI", "%s already have this data", __FUNCTION__ );
     }
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT jstring JNICALL Java_com_serhii_core_security_impl_KeyMaster__1getUnlockKey(JNIEnv *env, jobject)
 {
-    Log::Info("JNI", "%s IN", __FUNCTION__ );
+    Info("JNI", "%s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s file doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s file doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     if (!ss.doesKeyExist(K_CORE_DATA_FILE, K_UNLOCK_KEY)) {
-        Log::Error("JNI", "%s value doesn't exist", __FUNCTION__ );
+        Error("JNI", "%s value doesn't exist", __FUNCTION__ );
         return env->NewStringUTF("");
     }
 
     std::string value = ss.getDataByKey(K_CORE_DATA_FILE, K_UNLOCK_KEY);
 
-    Log::Info("JNI", "%s OUT", __FUNCTION__ );
+    Info("JNI", "%s OUT", __FUNCTION__ );
 
     return env->NewStringUTF(value.c_str());
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1setUnlockKey(JNIEnv *env, jobject thiz, jstring unlock_key)
 {
-    Log::Info("JNI", " %s IN", __FUNCTION__ );
+    Info("JNI", " %s IN", __FUNCTION__ );
 
     JString str_value(env, unlock_key);
 
@@ -316,7 +316,7 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1setUnlockK
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
         if (!ss.createFile(K_CORE_DATA_FILE)) {
-            Log::Error("JNI", "%s failed to create a file", __FUNCTION__);
+            Error("JNI", "%s failed to create a file", __FUNCTION__);
             return;
         }
     }
@@ -329,26 +329,26 @@ JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1setUnlockK
         ss.addData(K_CORE_DATA_FILE, data);
 
     } else {
-        Log::Info("JNI", "%s already have this data", __FUNCTION__ );
+        Info("JNI", "%s already have this data", __FUNCTION__ );
     }
 
-    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+    Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
 JNIEXPORT void JNICALL Java_com_serhii_core_security_impl_KeyMaster__1clear(JNIEnv *env, jobject thiz)
 {
-    Log::Info("JNI", " %s IN", __FUNCTION__ );
+    Info("JNI", " %s IN", __FUNCTION__ );
 
     SystemStorage ss;
 
     if (!ss.doesFileExist(K_CORE_DATA_FILE)) {
-        Log::Error("JNI", "%s no file", __FUNCTION__);
+        Error("JNI", "%s no file", __FUNCTION__);
         return;
     }
 
     ss.clearData(K_CORE_DATA_FILE);
 
-    Log::Info("JNI", " %s OUT", __FUNCTION__ );
+    Info("JNI", " %s OUT", __FUNCTION__ );
 }
 
 #ifdef __cplusplus

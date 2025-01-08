@@ -9,7 +9,7 @@
 
 using namespace APP;
 
-const static std::string TAG = "JNI";
+const static char* TAG = "JNI";
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +18,7 @@ extern "C" {
   JNIEXPORT void JNICALL Java_com_serhii_apps_notes_activities_AuthorizationActivity_initNative
   (JNIEnv* env, jobject jobj)
   {
-        Log::Info("JNI", " %s IN", __FUNCTION__ );
+        Info("JNI", " %s IN", __FUNCTION__ );
 
         jclass cls = env->GetObjectClass(jobj);
 
@@ -31,7 +31,7 @@ extern "C" {
 
         if (result != JNI_OK)
         {
-            Log::Error(TAG, "initNative(): Failed to get JVM");
+            Error(TAG, "initNative(): Failed to get JVM");
         }
 
         JNIWrapper callback_data(javaVm, jobj, _Login_Activity_onAuthorizedUser);
@@ -42,7 +42,7 @@ extern "C" {
         AppAction::getInstance()->setRegistrationCallback(callback_registred);
         AppAction::getInstance()->setShowDialogCallback(callback_dialog);
 
-      Log::Info("JNI", " %s OUT", __FUNCTION__ );
+      Info("JNI", " %s OUT", __FUNCTION__ );
   }
 
 #ifdef __cplusplus

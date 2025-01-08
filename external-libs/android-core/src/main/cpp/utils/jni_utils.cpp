@@ -1,10 +1,12 @@
 #include "jni_utils.h"
 
+inline static const char* TAG = "JniUtils";
+
 namespace MYLIB
 {
     JNIEXPORT void JniUtils::callVoid(const JNIWrapper &callback)
     {
-        Log::Info(TAG, "callVoid(): Call callback without arguments");
+        Info(TAG, "callVoid(): Call callback without arguments");
 
         std::lock_guard<std::mutex> guard(m);
 
@@ -16,5 +18,4 @@ namespace MYLIB
     }
 
     JNIEXPORT std::mutex JniUtils::m;
-    JNIEXPORT const std::string JniUtils::TAG = "JniUtils";
 }

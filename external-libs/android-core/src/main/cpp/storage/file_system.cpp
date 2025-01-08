@@ -7,7 +7,7 @@
 #include "utils/log.h"
 
 namespace {
-    const std::string TAG = "FileSystem";
+    const char* TAG = "FileSystem";
 
     // TODO: Set from Java
     const std::string FileSeparator = "/";
@@ -24,16 +24,16 @@ namespace MYLIB
     JNIEXPORT void FileSystem::initFilePath(const std::string& path)
     {
         env_path = path;
-        Log::Info("FileSystem", "initFilePath(): INITIALIZED \n");
+        Info("FileSystem", "initFilePath(): INITIALIZED \n");
     }
 
     JNIEXPORT std::string FileSystem::getFilePath() const
     {
-        Log::Info(TAG, "getFilePath() \n");
+        Info(TAG, "getFilePath() \n");
 
         if (env_path.empty())
         {
-            Log::Error(TAG, "getFilePath(): [File system error] File system is not initialized, THROW EXCEPTION \n");
+            Error(TAG, "getFilePath(): [File system error] File system is not initialized, THROW EXCEPTION \n");
             throw std::runtime_error("[File system error] File system is not initialized");
         }
 
@@ -62,7 +62,7 @@ namespace MYLIB
 
     JNIEXPORT std::string FileSystem::getAbsoluteFilePath(const std::string &file_name) const
     {
-        Log::Info(TAG, "getAbsoluteFilePath(): file name: %s \n", file_name);
+        Info(TAG, "getAbsoluteFilePath(): file name: %s \n", file_name.c_str());
 
         return std::string(getFilePath() + file_name);
     }
@@ -86,7 +86,7 @@ namespace MYLIB
                 return _open_f(path, file);
 
             } else {
-                Log::Error(TAG, "openFile(): File was not opened, fle name: %s \n", file_name);
+                Error(TAG, "openFile(): File was not opened, fle name: %s \n", file_name.c_str());
             }
         }
 
@@ -112,7 +112,7 @@ namespace MYLIB
                 return _open_f(path, file, mode);
 
             } else {
-                Log::Error(TAG, "openFile(mode): File was not opened, fle name: %s \n", file_name);
+                Error(TAG, "openFile(mode): File was not opened, fle name: %s \n", file_name.c_str());
             }
         }
 

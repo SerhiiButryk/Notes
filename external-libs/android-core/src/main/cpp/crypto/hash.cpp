@@ -11,10 +11,10 @@ namespace MYLIB
 {
     JNIEXPORT std::string Hash::makeHashMD5(const std::string& message)
     {
-        Log::Info("Hash", "makeHashMD5(), IN");
+        Info("Hash", "makeHashMD5(), IN");
 
         if (message.empty()) {
-            Log::Info("Hash", "makeHashMD5(), empty message");
+            Info("Hash", "makeHashMD5(), empty message");
             return std::string("");
         }
 
@@ -40,7 +40,7 @@ namespace MYLIB
 
         MD5_Final(digest, &ctx);
 
-        Log::Info("Hash", "makeHashMD5(), OUT");
+        Info("Hash", "makeHashMD5(), OUT");
 
         return  convertToHex(digest, MD5_DIGEST_LENGTH);
     }

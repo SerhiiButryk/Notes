@@ -22,7 +22,7 @@ namespace MYLIB
         template<typename T>
         JNIEXPORT static void callVoid(const JNIWrapper& callback, T arg)
         {
-            Log::Info(TAG, "callVoid(): Call callback with argument of type %s ", typeid(arg).name());
+            Info("", "callVoid(): Call callback with argument of type %s ", typeid(arg).name());
 
             std::lock_guard<std::mutex> guard(m);
 
@@ -36,8 +36,6 @@ namespace MYLIB
     private:
 
         JNIEXPORT static std::mutex m; // Access protection
-
-        JNIEXPORT static const std::string TAG;
 
     };
 

@@ -32,14 +32,14 @@ namespace MYLIB
     class CryptoUtils
     {
         // Log tag
-        static const std::string TAG;
+        inline static const char* TAG = "";
 
     public:
 
         template <int key_length, int iv_length>
         JNIEXPORT static void symmetricEncrypt(const std::string &plaintext, std::string &cypherText, const std::string &key, const std::string &iv)
         {
-            Log::Info(TAG, "%s IN", __FUNCTION__ );
+            Info(TAG, "%s IN", __FUNCTION__ );
 
             using namespace cs_crypto::drivers::traits;
             using namespace cs_crypto::drivers;
@@ -58,7 +58,7 @@ namespace MYLIB
             cypherText.assign(cs_crypto::util::hex(ciphertext));
 
 #ifdef UNIT_TESTS
-            Log::Info(TAG,
+            Info(TAG,
                   "%s\n plaintext: %s\n key (hex): %s\n iv (hex): %s\n ciphertext (hex): %s \n",
                   __FUNCTION__,
                   plaintext,
@@ -66,13 +66,13 @@ namespace MYLIB
                   cs_crypto::util::hex(iv),
                   cs_crypto::util::hex(ciphertext));
 #endif
-            Log::Info(TAG, "%s OUT", __FUNCTION__ );
+            Info(TAG, "%s OUT", __FUNCTION__ );
         }
 
         template <int key_length, int iv_length>
         JNIEXPORT static void symmetricDecrypt(const std::string &ciphertext, std::string &plainText, const std::string &key, const std::string &iv)
         {
-            Log::Info(TAG, "%s IN", __FUNCTION__ );
+            Info(TAG, "%s IN", __FUNCTION__ );
 
             using namespace cs_crypto::drivers::traits;
             using namespace cs_crypto::drivers;
@@ -95,7 +95,7 @@ namespace MYLIB
             memcpy(plainText.data(), resultData.data(), resultData.size());
 
 #ifdef UNIT_TESTS
-            Log::Info(TAG,
+            Info(TAG,
                   "%s\n ciphertext: %s\n key (hex): %s\n iv (hex): %s\n result: %s",
                   __FUNCTION__,
                   ciphertext,
@@ -104,7 +104,7 @@ namespace MYLIB
                   plainText);
 #endif
 
-            Log::Info(TAG, "%s OUT", __FUNCTION__ );
+            Info(TAG, "%s OUT", __FUNCTION__ );
         }
 
     private:
@@ -114,17 +114,17 @@ namespace MYLIB
         {
             int rc = RAND_bytes(key, key_size);
             if (rc != 1) {
-                Log::Error(TAG, "generateRandomKey() failed to gen key");
+                Error(TAG, "generateRandomKey() failed to gen key");
                 return rc;
             }
 
             rc = RAND_bytes(iv, block_size);
             if (rc != 1) {
-                Log::Error(TAG, "generateRandomKey() failed to gen iv");
+                Error(TAG, "generateRandomKey() failed to gen iv");
                 return rc;
             }
 
-            Log::Info(TAG, "generateRandomKey() success");
+            Info(TAG, "generateRandomKey() success");
             return rc;
         }
 
