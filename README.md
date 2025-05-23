@@ -1,78 +1,92 @@
-# Notes application for Android
+# Notes application 💜💜💜
 
-# Overview
+<img src="images/icons/Dark/Kotlin Multiplatform Logo.png">
 
-This application is developed for keeping and accessing all your notes securely on a device. 
-The app encryptes your notes before saving it to the storage. So, it couldn't be extracted and read easily. The app protects data with authentication and provides simple and beautiful interface.
+# What is it ? ✨
 
-# Get on Google Play
+Cross-platform, secure, fluent and rich editor for your notes, which is built with KMP.
 
-[<img src="https://www.logo.wine/a/logo/Google_Play/Google_Play-Logo.wine.svg" width="400" />](https://play.google.com/store/apps/details?id=com.serhii.apps.notes)
+# Current state
 
-# Features
+Under active development.
 
-- Password & biometric authentication
-- Basic text editing
-- Application screen lock (the app gets locked after some timeout)
-- Secure data storage
-- Backup/restore support
-- A search across all your notes
+# Design
 
-# Repository structure
+<img src="images/package_structure.png">
 
-- external-libs/ - additinal libraries which the app is using
-- Notes/ - the app project folder
-- tools/ - utility scripts
-- gradle_configs/ - utility project gradle settings
+# Docs/Dev notes
 
-# Used technologies
+**Cloning with submodules**
 
-- Languages: Kotlin, JNI, C++17
+```
+$ git clone /url/to/repo/with/submodules
+$ git submodule init
+$ git submodule update
 
-- Libraries: 
+Add new submodule:
 
-1) OpenSSL (1.1.1v) - https://www.openssl.org/source/
-2) Boost - https://www.boost.org/ 
-3) CSCRYPTO - https://www.copperspice.com/docs/cs_crypto/basic_what.html
+$ git submodule add https://bitbucket.org/jaredw/awesomelibrary
+```
 
-- Build tools: NDK, Gradle
-- Android conponents/libraries: Jatpack Compose, MVVM, SQL database.
+**Declaring IOS targets**
 
-# Supported platforms
+```
+listOf(
+iosX64(),
+iosArm64(),
+iosSimulatorArm64(),
+).forEach { iosTarget ->
+iosTarget.binaries.framework {
+baseName = "Shared"
+isStatic = true
+}
+}
+```
 
-- Android OS: Android 8 - Android 15
-- ABIs: x86, x86_64, armeabi-v7a, arm64-v8a
+** Others
 
-# Localization
+```
+ 1. Ktlint run:
+ ./gradlew ktlintchec
 
-- ua (Ukraine)
-- ru (Russia)
-- uk (English)
-- it (Italian)
-- fr (France)
-- es (Espana)
-- de (Germany)
-- zh-rcn (China)
+ 2. Android lint run:
+ ./gradlew lint
 
-# Build instructions
+ 3. Fix style Ktlint issues:
+ ./gradlew ktlintFormat
 
-Required tools:
+4. Fresh detekt run:
+./gradlew detekt
 
-1) NDK verions: 26
-2) Java version: 17
-2) Kotlin version: 2.0
+This may be required:
+./gradlew detektGenerateConfig
+./gradlew detektBaseline
+```
 
-Use gradlew or Android Studio 'Build' menu to build this project
+**The ongoing TODO list**
 
-# Unit Tests
+1. Investigate Android proguard settings:
 
-Find tests under 'Notes/app/src/androidTest' folder.
+```
+kotlin { androidLibrary { ...
+   optimization {
+   // TODO: Might need to set proguard rules here
+   }
+...
+```
 
-# App designs
+2. Enable kotlin android lint 
 
-<img src="images/Screenshot_1.png" height="420" width="220"> <img src="images/Screenshot_2.png" height="420" width="220">
-<img src="images/Screenshot_3.png" height="420" width="220"> <img src="images/Screenshot_4.png" height="420" width="220">
+**The ongoing improvements/features**
 
-# Questions or help
+1. Add html to pdf export feature
 
-Reach out to me: sergeybutr@gmail.com.
+Need to use WebView or native canvas drawing. No other approaches so far.
+
+2. Add back button on Editor UI screen
+
+3. Adjust colors for Dark mode
+
+4. Investigate memory issues during runtime
+
+5. Support backup

@@ -1,7 +1,0 @@
-// Copyright 2022. Happy coding ! :)
-// Author: Serhii Butryk
-
-// Kotlin version used by project
-ext.kotlin_version = '1.8.0'
-// GP version used by project
-ext.gradle_plugin_version = '8.4.0'
