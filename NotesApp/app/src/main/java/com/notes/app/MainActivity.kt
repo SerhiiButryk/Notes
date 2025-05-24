@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import com.notes.auth_ui.LoginUI
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -14,4 +15,5 @@ class MainActivity : ComponentActivity() {
             LoginUI()
         }
     }
+
 }
