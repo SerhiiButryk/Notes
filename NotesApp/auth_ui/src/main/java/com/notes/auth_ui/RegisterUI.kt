@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,25 +32,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.notes.ui.InputTextField
 import com.notes.ui.theme.AppTheme
 
-private const val TAG = "LoginUI"
+private const val TAG = "RegisterUI"
 
 @Composable
-internal fun LoginUI() {
+internal fun RegisterUI() {
     AppTheme {
-        LoginUIImpl()
+        RegisterImpl()
     }
 }
 
 @Composable
-private fun LoginUIImpl() {
+private fun RegisterImpl() {
 
     val viewModel = viewModel<AuthViewModel>()
-    val state = viewModel.loginState.collectAsStateWithLifecycle()
+    val state = viewModel.registerState.collectAsStateWithLifecycle()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
         var email by rememberSaveable { mutableStateOf("") }
         var password by rememberSaveable { mutableStateOf("") }
+        var confirmPassword by rememberSaveable { mutableStateOf("") }
 
         val emailFieldFocusRequester = remember { FocusRequester() }
 
@@ -71,13 +70,13 @@ private fun LoginUIImpl() {
             SurfaceContainer {
                 Column(
                     modifier = Modifier
-                        .padding(10.dp)
+                        .padding(16.dp)
                         .fillMaxWidth()
                         .wrapContentSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Login",
+                        text = "Register",
                         fontSize = 24.sp,
                         modifier = Modifier.padding(bottom = 24.dp, top = 10.dp)
                     )
@@ -91,8 +90,6 @@ private fun LoginUIImpl() {
                         keyboardType = KeyboardType.Email
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     // Password input field
                     InputTextField(
                         text = password,
@@ -101,15 +98,24 @@ private fun LoginUIImpl() {
                         keyboardType = KeyboardType.Password
                     )
 
+                    // Confirm password input field
+                    InputTextField(
+                        text = confirmPassword,
+                        label = "Confirm password",
+                        onValueChange = { confirmPassword = it },
+                        keyboardType = KeyboardType.Password
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Login button
+                    // Register button
                     Button(
                         onClick = {
-                            viewModel.login(
-                                AuthViewModel.LoginUIState(
+                            viewModel.register(
+                                AuthViewModel.RegisterUIState(
                                     email = email,
-                                    password = password
+                                    password = password,
+                                    confirmPassword = confirmPassword
                                 )
                             )
                         },
@@ -117,7 +123,7 @@ private fun LoginUIImpl() {
                             .fillMaxWidth()
                             .padding(bottom = 10.dp)
                     ) {
-                        Text(text = "Login")
+                        Text(text = "Register")
                     }
                 }
             }
@@ -129,7 +135,7 @@ private fun LoginUIImpl() {
 @Composable
 private fun LoginUIPreviewLight() {
     AppTheme {
-        LoginUIImpl()
+        RegisterImpl()
     }
 }
 
@@ -140,6 +146,6 @@ private fun LoginUIPreviewLight() {
 @Composable
 private fun LoginUIPreviewDark() {
     AppTheme {
-        LoginUIImpl()
+        RegisterImpl()
     }
 }

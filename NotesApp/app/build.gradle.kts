@@ -2,12 +2,22 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 apply(from = "${rootDir}/gradle_configs/versions.gradle")
 
 android {
     namespace = "com.notes.app"
+
+    signingConfigs {
+        create("release") {
+            keyAlias = "key0"
+            storePassword = "password"
+            keyPassword = "password"
+            storeFile = file("test_only.jks")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.notes.app"
@@ -37,11 +47,17 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Compose navigation
+    implementation(libs.navigation)
+    implementation(libs.serialization)
 
     testImplementation(libs.junit)
 
@@ -49,7 +65,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }

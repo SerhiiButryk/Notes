@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
+// Taken from https://composeicons.com/
+
 val EYE_OPEN_ICON: ImageVector
     get() {
         if (_EYE_ICON != null) {
@@ -116,3 +118,155 @@ val EYE_HIDDEN_ICON: ImageVector
     }
 
 private var _EYE_HIDDEN_ICON: ImageVector? = null
+
+val EMAIL_ICON: ImageVector
+    get() {
+        if (_EMAIL_ICON != null) {
+            return _EMAIL_ICON!!
+        }
+        _EMAIL_ICON = ImageVector.Builder(
+            name = "Alternate_email",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 960f,
+            viewportHeight = 960f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1.0f,
+                stroke = null,
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(480f, 880f)
+                quadToRelative(-83f, 0f, -156f, -31.5f)
+                reflectiveQuadTo(197f, 763f)
+                reflectiveQuadToRelative(-85.5f, -127f)
+                reflectiveQuadTo(80f, 480f)
+                reflectiveQuadToRelative(31.5f, -156f)
+                reflectiveQuadTo(197f, 197f)
+                reflectiveQuadToRelative(127f, -85.5f)
+                reflectiveQuadTo(480f, 80f)
+                reflectiveQuadToRelative(156f, 31.5f)
+                reflectiveQuadTo(763f, 197f)
+                reflectiveQuadToRelative(85.5f, 127f)
+                reflectiveQuadTo(880f, 480f)
+                verticalLineToRelative(58f)
+                quadToRelative(0f, 59f, -40.5f, 100.5f)
+                reflectiveQuadTo(740f, 680f)
+                quadToRelative(-35f, 0f, -66f, -15f)
+                reflectiveQuadToRelative(-52f, -43f)
+                quadToRelative(-29f, 29f, -65.5f, 43.5f)
+                reflectiveQuadTo(480f, 680f)
+                quadToRelative(-83f, 0f, -141.5f, -58.5f)
+                reflectiveQuadTo(280f, 480f)
+                reflectiveQuadToRelative(58.5f, -141.5f)
+                reflectiveQuadTo(480f, 280f)
+                reflectiveQuadToRelative(141.5f, 58.5f)
+                reflectiveQuadTo(680f, 480f)
+                verticalLineToRelative(58f)
+                quadToRelative(0f, 26f, 17f, 44f)
+                reflectiveQuadToRelative(43f, 18f)
+                reflectiveQuadToRelative(43f, -18f)
+                reflectiveQuadToRelative(17f, -44f)
+                verticalLineToRelative(-58f)
+                quadToRelative(0f, -134f, -93f, -227f)
+                reflectiveQuadToRelative(-227f, -93f)
+                reflectiveQuadToRelative(-227f, 93f)
+                reflectiveQuadToRelative(-93f, 227f)
+                reflectiveQuadToRelative(93f, 227f)
+                reflectiveQuadToRelative(227f, 93f)
+                horizontalLineToRelative(200f)
+                verticalLineToRelative(80f)
+                close()
+                moveToRelative(0f, -280f)
+                quadToRelative(50f, 0f, 85f, -35f)
+                reflectiveQuadToRelative(35f, -85f)
+                reflectiveQuadToRelative(-35f, -85f)
+                reflectiveQuadToRelative(-85f, -35f)
+                reflectiveQuadToRelative(-85f, 35f)
+                reflectiveQuadToRelative(-35f, 85f)
+                reflectiveQuadToRelative(35f, 85f)
+                reflectiveQuadToRelative(85f, 35f)
+            }
+        }.build()
+        return _EMAIL_ICON!!
+    }
+
+private var _EMAIL_ICON: ImageVector? = null
+
+val KEY_ICON: ImageVector
+    get() {
+        if (_KEY_ICON != null) {
+            return _KEY_ICON!!
+        }
+        _KEY_ICON = ImageVector.Builder(
+            name = "Vpn_key",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 960f,
+            viewportHeight = 960f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1.0f,
+                stroke = null,
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(280f, 720f)
+                quadToRelative(-100f, 0f, -170f, -70f)
+                reflectiveQuadTo(40f, 480f)
+                reflectiveQuadToRelative(70f, -170f)
+                reflectiveQuadToRelative(170f, -70f)
+                quadToRelative(66f, 0f, 121f, 33f)
+                reflectiveQuadToRelative(87f, 87f)
+                horizontalLineToRelative(432f)
+                verticalLineToRelative(240f)
+                horizontalLineToRelative(-80f)
+                verticalLineToRelative(120f)
+                horizontalLineTo(600f)
+                verticalLineToRelative(-120f)
+                horizontalLineTo(488f)
+                quadToRelative(-32f, 54f, -87f, 87f)
+                reflectiveQuadToRelative(-121f, 33f)
+                moveToRelative(0f, -80f)
+                quadToRelative(66f, 0f, 106f, -40.5f)
+                reflectiveQuadToRelative(48f, -79.5f)
+                horizontalLineToRelative(246f)
+                verticalLineToRelative(120f)
+                horizontalLineToRelative(80f)
+                verticalLineToRelative(-120f)
+                horizontalLineToRelative(80f)
+                verticalLineToRelative(-80f)
+                horizontalLineTo(434f)
+                quadToRelative(-8f, -39f, -48f, -79.5f)
+                reflectiveQuadTo(280f, 320f)
+                reflectiveQuadToRelative(-113f, 47f)
+                reflectiveQuadToRelative(-47f, 113f)
+                reflectiveQuadToRelative(47f, 113f)
+                reflectiveQuadToRelative(113f, 47f)
+                moveToRelative(0f, -80f)
+                quadToRelative(33f, 0f, 56.5f, -23.5f)
+                reflectiveQuadTo(360f, 480f)
+                reflectiveQuadToRelative(-23.5f, -56.5f)
+                reflectiveQuadTo(280f, 400f)
+                reflectiveQuadToRelative(-56.5f, 23.5f)
+                reflectiveQuadTo(200f, 480f)
+                reflectiveQuadToRelative(23.5f, 56.5f)
+                reflectiveQuadTo(280f, 560f)
+                moveToRelative(0f, -80f)
+            }
+        }.build()
+        return _KEY_ICON!!
+    }
+
+private var _KEY_ICON: ImageVector? = null
