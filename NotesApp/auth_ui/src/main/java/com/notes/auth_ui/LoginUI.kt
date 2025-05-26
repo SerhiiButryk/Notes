@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,25 +27,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.notes.ui.InputTextField
 import com.notes.ui.theme.AppTheme
 
 private const val TAG = "LoginUI"
 
 @Composable
-internal fun LoginUI() {
+internal fun LoginUI(
+    state: AuthViewModel.LoginUIState,
+    onLogin: (AuthViewModel.LoginUIState) -> Unit
+) {
     AppTheme {
-        LoginUIImpl()
+        LoginUIImpl(state, onLogin)
     }
 }
 
 @Composable
-private fun LoginUIImpl() {
-
-    val viewModel = viewModel<AuthViewModel>()
-    val state = viewModel.loginState.collectAsStateWithLifecycle()
+private fun LoginUIImpl(
+    state: AuthViewModel.LoginUIState,
+    onLogin: (AuthViewModel.LoginUIState) -> Unit
+) {
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
@@ -57,7 +56,7 @@ private fun LoginUIImpl() {
         val emailFieldFocusRequester = remember { FocusRequester() }
 
         LaunchedEffect(false) {
-            if (state.value.emailHasFocus) {
+            if (state.emailHasFocus) {
                 emailFieldFocusRequester.requestFocus()
             }
         }
@@ -106,7 +105,7 @@ private fun LoginUIImpl() {
                     // Login button
                     Button(
                         onClick = {
-                            viewModel.login(
+                            onLogin(
                                 AuthViewModel.LoginUIState(
                                     email = email,
                                     password = password
@@ -117,7 +116,7 @@ private fun LoginUIImpl() {
                             .fillMaxWidth()
                             .padding(bottom = 10.dp)
                     ) {
-                        Text(text = "Login")
+                        Text(text = "Continue")
                     }
                 }
             }
@@ -126,20 +125,13 @@ private fun LoginUIImpl() {
 }
 
 @Preview(showBackground = true)
-@Composable
-private fun LoginUIPreviewLight() {
-    AppTheme {
-        LoginUIImpl()
-    }
-}
-
 @Preview(
     showBackground = true,
     uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES
 )
 @Composable
-private fun LoginUIPreviewDark() {
+private fun LoginUIPreviewLight() {
     AppTheme {
-        LoginUIImpl()
+        LoginUIImpl(AuthViewModel.LoginUIState(), {})
     }
 }

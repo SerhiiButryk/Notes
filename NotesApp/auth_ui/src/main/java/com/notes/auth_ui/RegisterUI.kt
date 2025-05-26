@@ -35,17 +35,20 @@ import com.notes.ui.theme.AppTheme
 private const val TAG = "RegisterUI"
 
 @Composable
-internal fun RegisterUI() {
+internal fun RegisterUI(
+    state: AuthViewModel.RegisterUIState,
+    onRegister: (AuthViewModel.RegisterUIState) -> Unit
+) {
     AppTheme {
-        RegisterImpl()
+        RegisterImpl(state, onRegister)
     }
 }
 
 @Composable
-private fun RegisterImpl() {
-
-    val viewModel = viewModel<AuthViewModel>()
-    val state = viewModel.registerState.collectAsStateWithLifecycle()
+private fun RegisterImpl(
+    state: AuthViewModel.RegisterUIState,
+    onRegister: (AuthViewModel.RegisterUIState) -> Unit
+) {
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
@@ -56,7 +59,7 @@ private fun RegisterImpl() {
         val emailFieldFocusRequester = remember { FocusRequester() }
 
         LaunchedEffect(false) {
-            if (state.value.emailHasFocus) {
+            if (state.emailHasFocus) {
                 emailFieldFocusRequester.requestFocus()
             }
         }
@@ -111,7 +114,7 @@ private fun RegisterImpl() {
                     // Register button
                     Button(
                         onClick = {
-                            viewModel.register(
+                            onRegister(
                                 AuthViewModel.RegisterUIState(
                                     email = email,
                                     password = password,
@@ -123,7 +126,7 @@ private fun RegisterImpl() {
                             .fillMaxWidth()
                             .padding(bottom = 10.dp)
                     ) {
-                        Text(text = "Register")
+                        Text(text = "Continue")
                     }
                 }
             }
@@ -132,20 +135,13 @@ private fun RegisterImpl() {
 }
 
 @Preview(showBackground = true)
-@Composable
-private fun LoginUIPreviewLight() {
-    AppTheme {
-        RegisterImpl()
-    }
-}
-
 @Preview(
     showBackground = true,
     uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES
 )
 @Composable
-private fun LoginUIPreviewDark() {
+private fun RegisterUIPreviewLight() {
     AppTheme {
-        RegisterImpl()
+        RegisterImpl(AuthViewModel.RegisterUIState(), {})
     }
 }
