@@ -1,0 +1,33 @@
+@startuml
+/'
+  Docs:
+  https://plantuml.com/guide
+
+  Online creator:
+  https://www.planttext.com/
+
+  Examples:
+  https://real-world-plantuml.com/ 
+'/
+skinparam titleBorderRoundCorner 10
+skinparam titleBorderThickness 2
+skinparam titleBorderColor lightblue
+skinparam titleBackgroundColor #D3D3D3
+
+title App package structure
+
+rectangle app #white
+rectangle auth #yellow
+rectangle auth_ui #lightblue
+rectangle ui #lightblue
+
+app --> auth_ui
+auth_ui --> ui 
+auth_ui --> auth
+
+note as Description
+  Blue color - UI layer 
+  Yellow color - Domain layer
+end note
+
+@enduml
