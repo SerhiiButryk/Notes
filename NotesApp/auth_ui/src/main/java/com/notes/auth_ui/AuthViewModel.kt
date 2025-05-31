@@ -2,12 +2,15 @@ package com.notes.auth_ui
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
+import com.notes.auth.AuthService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 private const val TAG = "AuthViewModel"
 
-internal class AuthViewModel : ViewModel() {
+internal class AuthViewModel(
+    private val authService: AuthService = AuthService
+) : ViewModel() {
 
     // This annotation could be redundant as
     // the class is already stable, because all properties are stable.
@@ -45,11 +48,15 @@ internal class AuthViewModel : ViewModel() {
     }
 
     fun login(loginUIState: LoginUIState) {
-
+        authService.login(loginUIState.password, loginUIState.email)
     }
 
     fun register(registerUIState: RegisterUIState) {
-
+        authService.register(
+            registerUIState.password,
+            registerUIState.confirmPassword,
+            registerUIState.email
+        )
     }
 
 }

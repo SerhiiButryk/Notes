@@ -1,2 +1,0 @@
-include ':android-core'
-rootProject.name = "android-core"

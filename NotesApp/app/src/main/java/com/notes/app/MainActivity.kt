@@ -14,6 +14,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             EntryScreen()
         }
+
+        initModules()
     }
 
 }

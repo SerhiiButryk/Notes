@@ -24,3 +24,4 @@ rootProject.name = "notes"
 include(":app")
 include(":auth_ui")
 include(":ui")
+include(":auth")

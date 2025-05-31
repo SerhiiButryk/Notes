@@ -40,6 +40,7 @@ android {
 dependencies {
 
     implementation(project(":ui"))
+    implementation(project(":auth"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
