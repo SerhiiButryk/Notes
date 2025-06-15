@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 private const val TAG = "AuthViewModel"
 
 internal class AuthViewModel(
-    private val authService: AuthService = AuthService
+    private val authService: AuthService = AuthService()
 ) : ViewModel() {
 
     // This annotation could be redundant as

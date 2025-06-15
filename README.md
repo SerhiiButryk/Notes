@@ -1,7 +1,7 @@
-# Notes application for Android
+# Note application for Android
 
-New note app is under development.
+This note app is under development.
 
-# App package structure
+# Design
 
 <img src="images/package_diagram.png">

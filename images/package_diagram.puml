@@ -14,20 +14,26 @@ skinparam titleBorderThickness 2
 skinparam titleBorderColor lightblue
 skinparam titleBackgroundColor #D3D3D3
 
-title App package structure
+title App module dependecies
 
 rectangle app #white
+rectangle interfaces #LightGrey
 rectangle auth #yellow
 rectangle auth_ui #lightblue
 rectangle ui #lightblue
 
 app --> auth_ui
+app --> auth
+app --> interfaces
 auth_ui --> ui 
 auth_ui --> auth
+auth --> interfaces
 
 note as Description
+  Modules:
   Blue color - UI layer 
   Yellow color - Domain layer
+  Grey color - Platform interface module
 end note
 
 @enduml
