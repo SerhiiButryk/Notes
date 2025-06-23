@@ -3,13 +3,16 @@ package com.notes.auth_ui
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import com.notes.auth.AuthService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 private const val TAG = "AuthViewModel"
 
-internal class AuthViewModel(
-    private val authService: AuthService = AuthService()
+@HiltViewModel
+internal class AuthViewModel @Inject constructor(
+    private val authService: AuthService
 ) : ViewModel() {
 
     // This annotation could be redundant as

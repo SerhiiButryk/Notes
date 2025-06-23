@@ -26,7 +26,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.notes.ui.InputTextField
 import com.notes.ui.theme.AppTheme
 
@@ -75,11 +74,8 @@ private fun LoginUIImpl(
                         .wrapContentSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Login",
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(bottom = 24.dp, top = 10.dp)
-                    )
+
+                    HeaderTitle(text = "Welcome again !")
 
                     // Email input field
                     InputTextField(

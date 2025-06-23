@@ -78,11 +78,8 @@ private fun RegisterImpl(
                         .wrapContentSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Register",
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(bottom = 24.dp, top = 10.dp)
-                    )
+
+                    HeaderTitle(text = "Register")
 
                     // Email input field
                     InputTextField(

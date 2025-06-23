@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":auth_ui"))
     implementation(project(":auth"))
     implementation(project(":interfaces"))
+    implementation(project(":ui"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

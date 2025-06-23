@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.authDestination(navController: NavController) {
 
-    navigation<Screen.Auth>(startDestination = Screen.Login) {
+    navigation<Screen.Auth>(startDestination = getAuthStartDestination()) {
 
         composable<Screen.Login> { backStackEntry ->
 
@@ -30,8 +30,28 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
     }
 }
 
+fun NavGraphBuilder.onboardingDestination(navController: NavController) {
+    composable<Screen.OnBoardingScreen> { backStackEntry ->
+        OnboardingScreen {
+            navController.navigate(route = Screen.Auth)
+        }
+    }
+}
+
 fun getStartDestination(): Screen {
-    return Screen.Auth
+    val firstLaunch = true
+    return if (firstLaunch)
+        Screen.OnBoardingScreen
+    else
+        Screen.Auth
+}
+
+private fun getAuthStartDestination(): Screen {
+    val registered = false
+    return if (registered)
+        Screen.Login
+    else
+        Screen.Register
 }
 
 // Object: Use an object for routes without arguments.
@@ -47,4 +67,7 @@ sealed class Screen(val route: String) {
 
     @Serializable
     internal object Auth : Screen("auth")
+
+    @Serializable
+    internal object OnBoardingScreen : Screen("onboarding")
 }

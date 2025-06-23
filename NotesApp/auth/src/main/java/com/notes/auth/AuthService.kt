@@ -5,6 +5,7 @@ import com.notes.interfaces.PlatformAPIs
 class AuthService {
 
     private val PASSWORD_SALT_KEY = "password_salt_key"
+    private val serverClient = ServerClient()
 
     fun register(pass: String, confirmPass: String, email: String) {
 
@@ -15,12 +16,10 @@ class AuthService {
             // TODO throw error and handle on upper layer
         }
 
-        val key1 = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
-        val key2 = PlatformAPIs.derivedKey.generatePDKey(confirmPass, salt)
+        val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
+        val confirmPassEncoded = PlatformAPIs.derivedKey.generatePDKey(confirmPass, salt)
 
-        // TODO Execute request
-        // TODO Get response
-        // TODO Update app state
+        serverClient.request(email, passEncoded, confirmPassEncoded)
 
     }
 

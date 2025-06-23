@@ -5,6 +5,7 @@ import com.notes.app.data.StorageProvider
 import com.notes.app.security.Base64Provider
 import com.notes.interfaces.PlatformAPIs
 import com.notes.interfaces.DerivedKeyOperations
+import com.notes.interfaces.Log
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -29,6 +30,12 @@ class Notes : Application() {
 
             override fun generateSalt(): ByteArray {
                 return com.notes.app.security.generateSalt()
+            }
+        }
+
+        PlatformAPIs.log = object : Log {
+            override fun log(message: String) {
+                android.util.Log.i("Notes", message)
             }
         }
     }
