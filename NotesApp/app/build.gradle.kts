@@ -48,17 +48,13 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":interfaces"))
     implementation(project(":ui"))
+    implementation(project(":notes_ui"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.bundles.android.core)
 
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.bundles.composeui)
 
     // Compose navigation
     implementation(libs.navigation)
@@ -67,6 +63,13 @@ dependencies {
     // Hilt dependency injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Android Studio Preview support
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
+
+    // DataStore APIs
+    implementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.junit)
 

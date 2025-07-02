@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.notes.auth_ui.authDestination
 import com.notes.auth_ui.getStartDestination
 import com.notes.auth_ui.onboardingDestination
+import com.notes.notes_ui.mainContentDestination
 
 @Composable
 fun EntryScreen(modifier: Modifier = Modifier) {
@@ -18,6 +19,8 @@ fun EntryScreen(modifier: Modifier = Modifier) {
         onboardingDestination(navController = navController)
 
         authDestination(navController = navController)
+
+        mainContentDestination(navController = navController)
 
     }
 

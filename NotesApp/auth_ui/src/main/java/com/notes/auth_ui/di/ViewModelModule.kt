@@ -1,6 +1,8 @@
 package com.notes.auth_ui.di
 
 import com.notes.auth.AuthService
+import com.notes.interfaces.PlatformAPIs
+import com.notes.net.NetHttpClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +14,7 @@ class ViewModelModule {
 
     @Provides
     fun provideAuthService(): AuthService {
-        return AuthService()
+        return AuthService(netSettings = PlatformAPIs.netSettings, httpClient = NetHttpClient())
     }
 
 }

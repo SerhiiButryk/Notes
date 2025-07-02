@@ -4,7 +4,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Base64
-import android.util.Log
+import com.notes.interfaces.PlatformAPIs.logger
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.*
@@ -29,14 +29,14 @@ class CryptoProvider {
     }
 
     fun selectKey(key: String) {
-        Log.i(TAG, "selectKey(): $key")
+        logger.logi("$TAG: selectKey(): $key")
         // Throw exception in case of error. Cannot proceed.
         require(isSecretKeyExists(key)) { "No key with this alias ($key) is created" }
         selectedKey = key
     }
 
     fun createKey(key: String, timeOutSeconds: Int, authRequired: Boolean) {
-        Log.i(TAG, "createKey()")
+        logger.logi("$TAG: createKey()")
         init(key, timeOutSeconds, authRequired)
     }
 
@@ -53,17 +53,17 @@ class CryptoProvider {
             val iv = String(Base64.encode(_iv, Base64.NO_WRAP))
             return Result(iv + encryptedMessage, iv, CryptoError.OK, true)
         } catch (e: UserNotAuthenticatedException) {
-            Log.e(TAG, "user not authenticated exception: $e")
+            logger.loge("$TAG: user not authenticated exception: $e")
             e.printStackTrace()
             return Result(error = CryptoError.USER_NOT_AUTHORIZED)
         } catch (e: Exception) {
-            Log.e(TAG, "exception during encryption: " + e.message)
+            logger.loge("$TAG: exception during encryption: " + e.message)
             e.printStackTrace()
         }
         return Result(error = CryptoError.UNKNOWN)
     }
 
-    fun decrypt(message: String, inputIV: String): Result {
+    fun decrypt(message: String, inputIV: String = ""): Result {
         // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No key is selected for cryptographic operation" }
         try {
@@ -83,11 +83,11 @@ class CryptoProvider {
             val text = cipher.doFinal(Base64.decode(realMessage.toByteArray(), Base64.NO_WRAP))
             return Result(String(text), error = CryptoError.OK)
         } catch (e: UserNotAuthenticatedException) {
-            Log.e(TAG, "user not authenticated exception: $e")
+            logger.loge("$TAG: user not authenticated exception: $e")
             e.printStackTrace()
             return Result(error = CryptoError.USER_NOT_AUTHORIZED)
         } catch (e: Exception) {
-            Log.e(TAG, "exception during decryption: " + e.message)
+            logger.loge("$TAG: exception during decryption: " + e.message)
             e.printStackTrace()
         }
         return Result(error = CryptoError.UNKNOWN)
@@ -105,13 +105,13 @@ class CryptoProvider {
             keyStore.load(null)
             return true
         } catch (e: CertificateException) {
-            Log.e(TAG, "exception during loading keyStore: " + e.message)
+            logger.loge("$TAG: exception during loading keyStore: " + e.message)
             e.printStackTrace()
         } catch (e: IOException) {
-            Log.e(TAG, "exception during loading keyStore: " + e.message)
+            logger.loge("$TAG: exception during loading keyStore: " + e.message)
             e.printStackTrace()
         } catch (e: NoSuchAlgorithmException) {
-            Log.e(TAG, "exception during loading keyStore: " + e.message)
+            logger.loge("$TAG: exception during loading keyStore: " + e.message)
             e.printStackTrace()
         }
         return false
@@ -122,20 +122,20 @@ class CryptoProvider {
             val entry: KeyStore.Entry? = keyStore?.getEntry(key, null)
             return entry != null
         } catch (e: KeyStoreException) {
-            Log.e(TAG, "exception: " + e.message)
+            logger.loge("$TAG: exception: " + e.message)
             e.printStackTrace()
         } catch (e: NoSuchAlgorithmException) {
-            Log.e(TAG, "exception: " + e.message)
+            logger.loge("$TAG: exception: " + e.message)
             e.printStackTrace()
         } catch (e: UnrecoverableEntryException) {
-            Log.e(TAG, "exception: " + e.message)
+            logger.loge("$TAG: exception: " + e.message)
             e.printStackTrace()
         }
         return false
     }
 
     private fun _createKey(key: String, timeOutSeconds: Int, authRequired: Boolean): Boolean {
-        Log.i(TAG, "_createKey(): $key $timeOutSeconds")
+        logger.logi("$TAG: _createKey(): $key $timeOutSeconds")
         val builder = KeyGenParameterSpec.Builder(
             key,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
@@ -150,7 +150,7 @@ class CryptoProvider {
         if (keyGenerator != null) {
             return genSecretKey(keyGenerator, builder.build())
         }
-        Log.e(TAG, "_createKey(): failed to gen key")
+        logger.loge("$TAG: _createKey(): failed to gen key")
         return false
     }
 
@@ -159,7 +159,7 @@ class CryptoProvider {
         val key = DEFAULT_KEY_FOR_BIOMETRIC
 
         if (isSecretKeyExists(key)) {
-            Log.i(TAG, "createKeyForBiometricAuth(): exists, return")
+            logger.logi("$TAG: createKeyForBiometricAuth(): exists, return")
             return true
         }
 
@@ -184,7 +184,7 @@ class CryptoProvider {
         }
 
         if (!result) {
-            Log.e(TAG, "createKeyForBiometricAuth(): failed to gen key")
+            logger.loge("$TAG: createKeyForBiometricAuth(): failed to gen key")
         }
 
         return result
@@ -194,7 +194,7 @@ class CryptoProvider {
         try {
             return KeyStore.getInstance("AndroidKeyStore")
         } catch (e: KeyStoreException) {
-            Log.e(TAG, "exception: failed to init keyStore object" + e.message)
+            logger.loge("$TAG: exception: failed to init keyStore object" + e.message)
             e.printStackTrace()
             // Cannot proceed
             throw RuntimeException("Failed to init keystore", e)
@@ -205,10 +205,10 @@ class CryptoProvider {
         try {
             return KeyGenerator.getInstance(algorithm, "AndroidKeyStore")
         } catch (e: NoSuchAlgorithmException) {
-            Log.e(TAG, "exception: failed to get Key Generator" + e.message)
+            logger.loge("$TAG: exception: failed to get Key Generator" + e.message)
             e.printStackTrace()
         } catch (e: NoSuchProviderException) {
-            Log.e(TAG, "exception: failed to get Key Generator" + e.message)
+            logger.loge("$TAG: exception: failed to get Key Generator" + e.message)
             e.printStackTrace()
         }
         return null
@@ -222,7 +222,7 @@ class CryptoProvider {
             keyGenerator.init(keyGenParameterSpec)
             keyGenerator.generateKey()
         } catch (e: InvalidAlgorithmParameterException) {
-            Log.e(TAG, "exception: failed to gen Secret Key: " + e.message)
+            logger.loge("$TAG: exception: failed to gen Secret Key: " + e.message)
             e.printStackTrace()
             return false
         }
@@ -259,9 +259,9 @@ class CryptoProvider {
             val success = load(keyStore!!)
             createKey(DEFAULT_KEY, 0, false)
             selectKey(DEFAULT_KEY)
-            Log.i(TAG, "init(): key store loaded '$success'")
+            logger.logi("$TAG: init(): key store loaded '$success'")
         } catch (e: Exception) {
-            Log.e(TAG, "init(): failed to load, error = $e")
+            logger.loge("$TAG: init(): failed to load, error = $e")
         }
     }
 

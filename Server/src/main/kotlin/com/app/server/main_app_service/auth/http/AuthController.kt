@@ -2,6 +2,7 @@ package com.app.server.main_app_service.auth.http
 
 import com.app.server.main_app_service.auth.AuthService
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,8 +29,9 @@ class AuthController(
     @PostMapping(Path.REGISTER)
     fun register(
         @Valid @RequestBody body: AuthRequest
-    ) {
+    ) : ResponseEntity<Any> {
         authService.register(body.email, body.password)
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping(Path.LOGIN)

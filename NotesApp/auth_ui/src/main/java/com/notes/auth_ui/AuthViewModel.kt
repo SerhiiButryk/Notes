@@ -2,11 +2,14 @@ package com.notes.auth_ui
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.notes.auth.AuthService
+import com.notes.auth_ui.data.saveRegisteredUserEmail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
 
@@ -50,16 +53,35 @@ internal class AuthViewModel @Inject constructor(
         _registerState.value = RegisterUIState(emailHasFocus = true)
     }
 
-    fun login(loginUIState: LoginUIState) {
-        authService.login(loginUIState.password, loginUIState.email)
+    fun login(loginUIState: LoginUIState, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            authService.login(loginUIState.password, loginUIState.email) { result ->
+                // TODO handle errors
+                if (result.isSuccess()) {
+                    viewModelScope.launch {
+                        onSuccess()
+                    }
+                }
+            }
+        }
     }
 
-    fun register(registerUIState: RegisterUIState) {
-        authService.register(
-            registerUIState.password,
-            registerUIState.confirmPassword,
-            registerUIState.email
-        )
+    fun register(registerUIState: RegisterUIState, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            authService.register(
+                registerUIState.password,
+                registerUIState.confirmPassword,
+                registerUIState.email
+            ) { result ->
+                // TODO handle errors
+                if (result.isSuccess()) {
+                    viewModelScope.launch {
+                        saveRegisteredUserEmail(result.email)
+                        onSuccess()
+                    }
+                }
+            }
+        }
     }
 
 }

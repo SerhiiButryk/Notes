@@ -1,50 +1,105 @@
 package com.notes.auth
 
+import com.notes.auth.data.getSalt
+import com.notes.auth.data.updateSalt
+import com.notes.interfaces.HttpClient
+import com.notes.interfaces.NetSettings
 import com.notes.interfaces.PlatformAPIs
+import com.notes.interfaces.PlatformAPIs.logger
+import com.notes.net.inputStreamAsString
 
-class AuthService {
+class AuthService(private val netSettings: NetSettings, private val httpClient: HttpClient) {
 
-    private val PASSWORD_SALT_KEY = "password_salt_key"
-    private val serverClient = ServerClient()
+    private val tag = "AuthService"
 
-    fun register(pass: String, confirmPass: String, email: String) {
+    suspend fun register(pass: String, confirmPass: String, email: String, callback: (result: AuthResult) -> Unit) {
+
+        logger.logi("$tag register()")
+
+        if (email.isEmpty() || pass.isEmpty() || !pass.equals(confirmPass)) {
+            callback(AuthResult.passwordEmptyOrNotMatching(email))
+            return
+        }
 
         val salt = PlatformAPIs.derivedKey.generateSalt()
         updateSalt(salt)
 
-        if (!pass.equals(confirmPass)) {
-            // TODO throw error and handle on upper layer
+        val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
+
+        val body = """{"email":"${email}","password":"${passEncoded}"}"""
+        val url = netSettings.registerUrl
+
+        httpClient.post(url, body, "application/json") { statusCode, inputStream ->
+            // Consume body if any
+            inputStreamAsString(inputStream)
+            if (statusCode == 200) {
+                callback(AuthResult.registrationSuccess(email))
+            } else {
+                callback(AuthResult.registrationFailed(email = email, statusCode = statusCode))
+            }
         }
 
-        val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
-        val confirmPassEncoded = PlatformAPIs.derivedKey.generatePDKey(confirmPass, salt)
-
-        serverClient.request(email, passEncoded, confirmPassEncoded)
-
     }
 
-    fun login(pass: String, email: String) {
+    suspend fun login(pass: String, email: String, callback: (result: AuthResult) -> Unit) {
+
+        logger.logi("$tag login()")
+
+        if (pass.isEmpty() || email.isEmpty()) {
+            callback(AuthResult.emailOrPassEmpty(email))
+            return
+        }
 
         val salt = getSalt()
-        val key = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
+        val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
 
-        // TODO Execute request
-        // TODO Get response
-        // TODO Update app state
+        val body = """{"email":"${email}","password":"${passEncoded}"}"""
+        val url = netSettings.loginUrl
+
+        httpClient.post(url, body, "application/json") { statusCode, inputStream ->
+            val response = inputStreamAsString(inputStream)
+            if (statusCode == 200) {
+                val tokens = getTokens(response)
+                callback(AuthResult.loginSuccess(email, tokens.first, tokens.second))
+            } else {
+                callback(AuthResult.loginFailed(email = email, statusCode = statusCode))
+            }
+        }
     }
 
-    fun refreshToken() {
+    suspend fun refreshToken(token: String, callback: (result: AuthResult) -> Unit) {
+
+        logger.logi("$tag refreshToken()")
+
+        val body = """{"refreshToken":"${token}""""
+        val url = netSettings.refreshTokenUrl
+
+        httpClient.post(url, body, "application/json") { statusCode, inputStream ->
+            val response = inputStreamAsString(inputStream)
+            if (statusCode == 200) {
+                val tokens = getTokens(response)
+                callback(AuthResult.refreshTokenSuccess(tokens.first, tokens.second))
+            } else {
+                callback(AuthResult.refreshTokenFailed(statusCode = statusCode))
+            }
+        }
 
     }
 
-    private fun updateSalt(salt: ByteArray) {
-        val result = PlatformAPIs.base64.encode(salt)
-        PlatformAPIs.storage.save(result, PASSWORD_SALT_KEY)
-    }
-
-    private fun getSalt(): ByteArray {
-        val saltString = PlatformAPIs.storage.get(PASSWORD_SALT_KEY)
-        return PlatformAPIs.base64.decode(saltString)
+    fun getTokens(input: String): Pair<String, String> {
+        // Capture the values of refreshToken and accessToken
+        val regex = "\"refreshToken\":\"(.*?)\",\"accessToken\":\"(.*?)\"".toRegex()
+        if (regex.containsMatchIn(input)) {
+            val matches = regex.findAll(input)
+            for (value in matches) {
+                if (value.groupValues.size < 3)
+                    break
+                val refreshToken = value.groupValues[1]
+                val accessToken = value.groupValues[2]
+                return Pair(refreshToken, accessToken)
+            }
+        }
+        return Pair("", "")
     }
 
 }

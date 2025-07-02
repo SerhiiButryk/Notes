@@ -43,17 +43,15 @@ dependencies {
 
     implementation(project(":ui"))
     implementation(project(":auth"))
+    implementation(project(":net"))
+    implementation(project(":interfaces"))
+    implementation(project(":notes_ui"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.bundles.android.core)
 
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.bundles.composeui)
 
     // Compose view model support
     implementation(libs.androidx.lifecycle.viewmodel.compose)

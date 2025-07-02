@@ -16,10 +16,5 @@ kotlin {
 
 dependencies {
     implementation(project(":interfaces"))
-
-    // OkHttp
-    implementation(libs.okhttp)
-
-    // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
+    implementation(project(":net"))
 }

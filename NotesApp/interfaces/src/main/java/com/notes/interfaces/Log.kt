@@ -1,5 +1,6 @@
 package com.notes.interfaces
 
 interface Log {
-    fun log(message: String)
+    fun logi(message: String)
+    fun loge(message: String)
 }
