@@ -55,7 +55,7 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
                 contentScale = ContentScale.Fit
             )
 
-            HeaderTitle("Welcome to Notes")
+            Header("Welcome to Notes")
 
             Spacer(modifier = Modifier.height(12.dp))
 

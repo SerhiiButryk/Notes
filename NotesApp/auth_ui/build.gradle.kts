@@ -69,6 +69,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
 
+    // Adaptive layout
+    implementation(libs.androidx.adaptive)
+
     // UI Tests
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.junit)

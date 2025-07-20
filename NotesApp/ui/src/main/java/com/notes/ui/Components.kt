@@ -57,8 +57,7 @@ fun InputTextField(
             showKeyboardOnFocus = true,
             autoCorrectEnabled = false
         ),
-        modifier = localModifier
-            .fillMaxWidth(),
+        modifier = localModifier,
         maxLines = 1,
         visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email) VisualTransformation.None else PasswordVisualTransformation(),
         supportingText = {
