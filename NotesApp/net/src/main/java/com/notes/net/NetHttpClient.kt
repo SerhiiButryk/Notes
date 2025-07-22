@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
+import java.net.ConnectException
 
 class NetHttpClient : HttpClient {
 
@@ -35,9 +36,10 @@ class NetHttpClient : HttpClient {
                     callback(response.code, response.body?.byteStream())
                 }
 
-            } catch (e: Exception) {
+            } catch (e: ConnectException) {
+                // TODO: Improve error handling
                 logger.loge("${tag}: error: $e")
-                throw e
+                callback(-1, null)
             }
 
         }

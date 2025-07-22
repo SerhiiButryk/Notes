@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -40,7 +40,7 @@ import com.notes.ui.InputTextField
 import com.notes.ui.theme.SurfaceColor
 
 @Composable
-fun AuthUIAdaptive(
+internal fun AuthUIAdaptive(
     title: String,
     subTitle: String,
     emailState: MutableState<String>,
@@ -84,7 +84,7 @@ fun AuthUIAdaptive(
                 SurfaceContainer(
                     modifier = Modifier
                         .widthIn(max = 600.dp)
-                        .heightIn(max = 400.dp)
+                        .wrapContentHeight()
                 ) {
 
                     Column {
@@ -235,7 +235,7 @@ internal fun AuthBody(
 
     var password by passwordState
     var email by emailState
-    var confirmPassword by passwordState
+    val confirmPassword: MutableState<String>? = confirmPasswordState
 
     val scrollState = rememberScrollState()
 
@@ -262,12 +262,12 @@ internal fun AuthBody(
             modifier = Modifier.fillMaxWidth()
         )
 
-        if (confirmPasswordState != null) {
+        if (confirmPassword != null) {
             // Confirm password input field
             InputTextField(
-                text = confirmPassword,
+                text = confirmPassword.value,
                 label = "Confirm password",
-                onValueChange = { confirmPassword = it },
+                onValueChange = { confirmPassword.value = it },
                 keyboardType = KeyboardType.Password,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -278,7 +278,7 @@ internal fun AuthBody(
         // Login button
         Button(
             onClick = {
-                onEnter(password, confirmPassword, email)
+                onEnter(password, confirmPassword?.value ?: "", email)
             },
             modifier = Modifier
                 .fillMaxWidth()

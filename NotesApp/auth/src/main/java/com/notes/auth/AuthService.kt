@@ -16,7 +16,7 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
 
         logger.logi("$tag register()")
 
-        if (email.isEmpty() || pass.isEmpty() || !pass.equals(confirmPass)) {
+        if (email.isEmpty() || pass.isEmpty() || pass != confirmPass) {
             callback(AuthResult.passwordEmptyOrNotMatching(email))
             return
         }
@@ -26,7 +26,7 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
 
         val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
 
-        val body = """{"email":"${email}","password":"${passEncoded}"}"""
+        val body = """{"email":"$email","password":"$passEncoded"}"""
         val url = netSettings.registerUrl
 
         httpClient.post(url, body, "application/json") { statusCode, inputStream ->
@@ -53,7 +53,7 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
         val salt = getSalt()
         val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
 
-        val body = """{"email":"${email}","password":"${passEncoded}"}"""
+        val body = """{"email":"$email","password":"$passEncoded"}"""
         val url = netSettings.loginUrl
 
         httpClient.post(url, body, "application/json") { statusCode, inputStream ->
