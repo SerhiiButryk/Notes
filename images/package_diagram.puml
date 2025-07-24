@@ -21,13 +21,22 @@ rectangle interfaces #LightGrey
 rectangle auth #yellow
 rectangle auth_ui #lightblue
 rectangle ui #lightblue
+rectangle notes_ui #lightblue
+rectangle net #yellow
 
 app --> auth_ui
-app --> auth
+app --> ui
 app --> interfaces
+app --> notes_ui
 auth_ui --> ui 
 auth_ui --> auth
+auth_ui --> net
+auth_ui --> notes_ui
+auth_ui --> interfaces
 auth --> interfaces
+auth --> net
+notes_ui --> ui
+net --> interfaces
 
 note as Description
   Modules:
