@@ -44,13 +44,13 @@ private fun RegisterImpl(
             emailState = email,
             passwordState = password,
             confirmPasswordState = confirmPassword,
-            emailHasFocus = state.emailHasFocus,
+            hasFocus = state.hasFocus,
             innerPadding = innerPadding,
             onEnter = { passwordValue, confirmPasswordValue, emailValue ->
                 onRegister(
                     AuthViewModel.RegisterUIState(
-                        email = passwordValue,
-                        password = emailValue,
+                        email = emailValue,
+                        password = passwordValue,
                         confirmPassword = confirmPasswordValue
                     )
                 )

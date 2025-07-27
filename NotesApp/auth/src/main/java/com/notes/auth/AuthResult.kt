@@ -16,15 +16,15 @@ data class AuthResult(
 
         // Encapsulating errors so call side don't need to depend on them
 
-        private const val passwordEmptyOrNotMatchingError: Int = -1
-        private const val registrationFailed: Int = -2
-        private const val emailOrPassEmptyError: Int = -3
-        private const val refreshTokenFailed: Int = -4
-        private const val loginFailed: Int = -5
+        const val passwordEmptyOrNotMatchingError: Int = -1
+        const val registrationFailed: Int = -2
+        const val emailOrPassEmptyError: Int = -3
+        const val refreshTokenFailed: Int = -4
+        const val loginFailed: Int = -5
 
-        private const val registrationSuccess: Int = 1
-        private const val loginSuccess: Int = 2
-        private const val refreshTokenSuccess: Int = 2
+        const val registrationSuccess: Int = 1
+        const val loginSuccess: Int = 2
+        const val refreshTokenSuccess: Int = 2
 
         fun passwordEmptyOrNotMatching(email: String): AuthResult {
             return AuthResult(email, passwordEmptyOrNotMatchingError)

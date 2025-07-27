@@ -16,6 +16,10 @@ internal suspend fun saveRegisteredUserEmail(email: String) {
     PlatformAPIs.storage.save(email, REGISTERED_USER_EMAIL)
 }
 
+internal suspend fun getRegisteredUserEmail(): String {
+    return PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
+}
+
 suspend fun loadUserData() {
     val userEmail = PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
     userDataState.value = UserDataStore(email = userEmail)

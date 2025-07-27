@@ -35,8 +35,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.window.core.layout.WindowSizeClass
 import com.notes.ui.InputTextField
+import com.notes.ui.isAtLeastTablet
+import com.notes.ui.isPhoneLandScape
 import com.notes.ui.theme.SurfaceColor
 
 @Composable
@@ -48,14 +49,18 @@ internal fun AuthUIAdaptive(
     confirmPasswordState: MutableState<String>? = null,
     onEnter: (String, String, String) -> Unit,
     innerPadding: PaddingValues,
-    emailHasFocus: Boolean
+    hasFocus: Boolean
 ) {
 
     val emailFieldFocusRequester = remember { FocusRequester() }
+    val passFieldFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(false) {
-        if (emailHasFocus) {
-            emailFieldFocusRequester.requestFocus()
+    LaunchedEffect(hasFocus) {
+        if (hasFocus) {
+            if (emailState.value.isEmpty())
+                emailFieldFocusRequester.requestFocus()
+            else
+                passFieldFocusRequester.requestFocus()
         }
     }
 
@@ -71,9 +76,7 @@ internal fun AuthUIAdaptive(
 
     when {
 
-        // Tablet
-        (sc.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
-                && sc.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)) -> {
+        isAtLeastTablet(sc) -> {
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -103,6 +106,7 @@ internal fun AuthUIAdaptive(
                             modifier = modifier,
                             emailState = emailState,
                             emailFieldFocusRequester = emailFieldFocusRequester,
+                            passwordFieldFocusRequester = passFieldFocusRequester,
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
                             onEnter = onEnter
@@ -115,9 +119,7 @@ internal fun AuthUIAdaptive(
 
         }
 
-        // Phone landscape
-        (sc.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
-                && sc.isHeightAtLeastBreakpoint(0)) -> {
+        isPhoneLandScape(sc) -> {
 
             Row(modifier = containerModifier) {
 
@@ -146,6 +148,7 @@ internal fun AuthUIAdaptive(
                             modifier = mainContentModifier,
                             emailState = emailState,
                             emailFieldFocusRequester = emailFieldFocusRequester,
+                            passwordFieldFocusRequester = passFieldFocusRequester,
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
                             onEnter = onEnter
@@ -157,7 +160,7 @@ internal fun AuthUIAdaptive(
 
         }
 
-        // Phone portrait
+        // Other configurations
         else -> {
 
             Box(
@@ -180,6 +183,7 @@ internal fun AuthUIAdaptive(
                             modifier = mainContentModifier,
                             emailState = emailState,
                             emailFieldFocusRequester = emailFieldFocusRequester,
+                            passwordFieldFocusRequester = passFieldFocusRequester,
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
                             onEnter = onEnter
@@ -228,6 +232,7 @@ internal fun AuthBody(
     modifier: Modifier,
     emailState: MutableState<String>,
     emailFieldFocusRequester: FocusRequester,
+    passwordFieldFocusRequester: FocusRequester,
     passwordState: MutableState<String>,
     confirmPasswordState: MutableState<String>? = null,
     onEnter: (String, String, String) -> Unit,
@@ -257,6 +262,7 @@ internal fun AuthBody(
         InputTextField(
             text = password,
             label = "Enter password",
+            focusRequester = passwordFieldFocusRequester,
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
             modifier = Modifier.fillMaxWidth()

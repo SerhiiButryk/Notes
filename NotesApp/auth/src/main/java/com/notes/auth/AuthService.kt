@@ -32,11 +32,13 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
         httpClient.post(url, body, "application/json") { statusCode, inputStream ->
             // Consume body if any
             inputStreamAsString(inputStream)
+            val result: AuthResult
             if (statusCode == 200) {
-                callback(AuthResult.registrationSuccess(email))
+                result = AuthResult.registrationSuccess(email)
             } else {
-                callback(AuthResult.registrationFailed(email = email, statusCode = statusCode))
+                result = AuthResult.registrationFailed(email = email, statusCode = statusCode)
             }
+            callback(result)
         }
 
     }
@@ -58,12 +60,14 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
 
         httpClient.post(url, body, "application/json") { statusCode, inputStream ->
             val response = inputStreamAsString(inputStream)
+            val result: AuthResult
             if (statusCode == 200) {
                 val tokens = getTokens(response)
-                callback(AuthResult.loginSuccess(email, tokens.first, tokens.second))
+                result = AuthResult.loginSuccess(email, tokens.first, tokens.second)
             } else {
-                callback(AuthResult.loginFailed(email = email, statusCode = statusCode))
+                result = AuthResult.loginFailed(email = email, statusCode = statusCode)
             }
+            callback(result)
         }
     }
 

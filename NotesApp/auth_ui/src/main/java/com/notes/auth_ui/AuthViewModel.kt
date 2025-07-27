@@ -3,7 +3,9 @@ package com.notes.auth_ui
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notes.auth.AuthResult
 import com.notes.auth.AuthService
+import com.notes.auth_ui.data.getRegisteredUserEmail
 import com.notes.auth_ui.data.saveRegisteredUserEmail
 import com.notes.interfaces.PlatformAPIs.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +28,7 @@ internal class AuthViewModel @Inject constructor(
     data class LoginUIState(
         val email: String = "",
         val password: String = "",
-        val emailHasFocus: Boolean = false
+        val hasFocus: Boolean = false
     )
 
     // This annotation could be redundant as
@@ -37,7 +39,7 @@ internal class AuthViewModel @Inject constructor(
         val email: String = "",
         val password: String = "",
         val confirmPassword: String = "",
-        val emailHasFocus: Boolean = false
+        val hasFocus: Boolean = false
     )
 
     // This annotation could be redundant as
@@ -59,11 +61,14 @@ internal class AuthViewModel @Inject constructor(
     val dialogState = _dialogState.asStateFlow()
 
     init {
-        // Initially we are going to show a keyboard if ui is open
-        _loginState.value = LoginUIState(emailHasFocus = true)
+
+        viewModelScope.launch {
+            // Initially we are going to show a keyboard if ui is open
+            _loginState.value = LoginUIState(hasFocus = true, email = getRegisteredUserEmail())
+        }
 
         // Initially we are going to show a keyboard if ui is open
-        _registerState.value = RegisterUIState(emailHasFocus = true)
+        _registerState.value = RegisterUIState(hasFocus = true)
     }
 
     fun login(loginUIState: LoginUIState, onSuccess: () -> Unit) {
@@ -74,7 +79,7 @@ internal class AuthViewModel @Inject constructor(
                     if (result.isSuccess()) {
                         onSuccess()
                     } else {
-                        requestDialog<LoginUIState>()
+                        handleError(result)
                     }
                 }
             }
@@ -92,9 +97,10 @@ internal class AuthViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (result.isSuccess()) {
                         saveRegisteredUserEmail(result.email)
+                        refreshUserEmail()
                         onSuccess()
                     } else {
-                        requestDialog<RegisterUIState>()
+                        handleError(result)
                     }
                 }
             }
@@ -106,24 +112,19 @@ internal class AuthViewModel @Inject constructor(
         _dialogState.value = null
     }
 
-    private inline fun <reified T> requestDialog() {
+    private fun handleError(result: AuthResult) {
 
-        logger.logi("requestDialog()")
+        logger.logi("handleError() showing a dialog")
 
-        var title = ""
-        var subtitle = ""
-
-        if (T::class.java == LoginUIState::class.java) {
-            title = "Sorry, login is failed"
-            subtitle = "Please, try again."
-        }
-
-        if (T::class.java == RegisterUIState::class.java) {
-            title = "Sorry, register is failed"
-            subtitle = "Please, try again."
-        }
+        val strings = getErrorTitleAndMessage(result)
+        val title = strings.first
+        val subtitle = strings.second
 
         _dialogState.value = DialogState(title = title, subtitle = subtitle)
+    }
+
+    private suspend fun refreshUserEmail() {
+        _loginState.value = _loginState.value.copy(email = getRegisteredUserEmail())
     }
 
 }

@@ -36,18 +36,21 @@ private fun LoginUIImpl(
         val email = rememberSaveable { mutableStateOf("") }
         val password = rememberSaveable { mutableStateOf("") }
 
+        if (email.value != state.email)
+            email.value = state.email
+
         AuthUIAdaptive(
             title = "Welcome again !",
             subTitle = "Login using your email and password",
             emailState = email,
             passwordState = password,
-            emailHasFocus = state.emailHasFocus,
+            hasFocus = state.hasFocus,
             innerPadding = innerPadding,
             onEnter = { passwordValue, _, emailValue ->
                 onLogin(
                     AuthViewModel.LoginUIState(
-                        email = passwordValue,
-                        password = emailValue
+                        email = emailValue,
+                        password = passwordValue
                     )
                 )
             }
