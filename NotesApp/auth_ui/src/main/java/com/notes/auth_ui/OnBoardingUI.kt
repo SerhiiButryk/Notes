@@ -25,7 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.notes.ui.isAtLeastTablet
+import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
 
 @Composable
@@ -43,7 +43,7 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
 
         val sc = currentWindowAdaptiveInfo().windowSizeClass
 
-        val sizeModifier: Modifier = if (isAtLeastTablet(sc)) {
+        val sizeModifier: Modifier = if (isTabletOrFoldableExpanded(sc)) {
             // Add max width bound
             Modifier.widthIn(max = 800.dp)
         } else {

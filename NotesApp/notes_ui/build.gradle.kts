@@ -55,10 +55,12 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Adaptive layout
+    // For currentWindowAdaptiveInfo()
     implementation(libs.androidx.adaptive)
-    implementation(libs.androidx.adaptive.layout)
-    implementation(libs.androidx.adaptive.navigation)
+
+    // Rich text editor lib
+    // https://github.com/MohamedRejeb/compose-rich-editor
+    implementation(libs.richeditor.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

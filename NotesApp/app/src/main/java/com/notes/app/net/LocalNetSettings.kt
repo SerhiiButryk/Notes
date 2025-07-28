@@ -3,10 +3,12 @@ package com.notes.app.net
 import android.content.Context
 import com.notes.app.R
 import com.notes.interfaces.NetSettings
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class LocalNetSettings(context: Context) : NetSettings {
+class LocalNetSettings @Inject constructor(@ApplicationContext context: Context) : NetSettings {
 
-    val domain = context.getString(R.string.server_domain)
+    private val domain = context.getString(R.string.server_domain)
 
     override val loginUrl: String = "http://$domain/auth/login"
     override val registerUrl: String = "http://$domain/auth/register"

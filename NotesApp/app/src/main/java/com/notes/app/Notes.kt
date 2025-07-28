@@ -1,54 +1,48 @@
 package com.notes.app
 
 import android.app.Application
-import com.notes.app.data.StorageProvider
-import com.notes.app.net.LocalNetSettings
-import com.notes.app.security.Base64Provider
-import com.notes.interfaces.PlatformAPIs
+import com.notes.interfaces.Base64Operations
 import com.notes.interfaces.DerivedKeyOperations
 import com.notes.interfaces.Log
+import com.notes.interfaces.NetSettings
+import com.notes.interfaces.PlatformAPIs
+import com.notes.interfaces.StorageOperations
 import dagger.hilt.android.HiltAndroidApp
-import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 @HiltAndroidApp
 class Notes : Application() {
+
+    @Inject
+    lateinit var logger: Log
+
+    @Inject
+    lateinit var base64: Base64Operations
+
+    @Inject
+    lateinit var storage: StorageOperations
+
+    @Inject
+    lateinit var derivedKey: DerivedKeyOperations
+
+    @Inject
+    lateinit var netSettings: NetSettings
 
     override fun onCreate() {
         super.onCreate()
         initComponents()
     }
 
-    fun initComponents() {
+    private fun initComponents() {
 
-        // Set platform component implementation for modules
+        // Setup module dependencies
 
         // Logger is initialized first as some of the below classes
         // could call it during instance creation
-        PlatformAPIs.logger = object : Log {
-
-            override fun logi(message: String) {
-                android.util.Log.i("Notes", message)
-            }
-
-            override fun loge(message: String) {
-                android.util.Log.e("Notes", message)
-            }
-        }
-
-        PlatformAPIs.base64 = Base64Provider()
-        // Keep context as weak ref for safety
-        PlatformAPIs.storage = StorageProvider(contextRef = WeakReference(this))
-        PlatformAPIs.derivedKey = object : DerivedKeyOperations {
-
-            override fun generatePDKey(input: String, salt: ByteArray): String {
-                return com.notes.app.security.generatePDKey(input, salt)
-            }
-
-            override fun generateSalt(): ByteArray {
-                return com.notes.app.security.generateSalt()
-            }
-        }
-
-        PlatformAPIs.netSettings = LocalNetSettings(this)
+        PlatformAPIs.logger = logger
+        PlatformAPIs.base64 = base64
+        PlatformAPIs.storage = storage
+        PlatformAPIs.derivedKey = derivedKey
+        PlatformAPIs.netSettings = netSettings
     }
 }

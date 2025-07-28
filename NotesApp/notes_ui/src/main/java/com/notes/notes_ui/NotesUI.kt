@@ -2,162 +2,113 @@ package com.notes.notes_ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.notes.notes_ui.richeditor.NotesEditorUI
+import com.notes.ui.SearchBarField
+import com.notes.ui.isMiddleWidth
+import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
 
 @Composable
-fun NotesUI(modifier: Modifier = Modifier) {
+fun NotesUI(
+    modifier: Modifier = Modifier,
+    addButtonAction: () -> Unit = {},
+    onSettingsAction: () -> Unit = {}
+) {
     AppTheme {
-        NotesUIImpl()
+        NotesUIImpl(addButtonAction = addButtonAction, onSettingsAction = onSettingsAction)
     }
 }
 
 @Composable
-private fun NotesUIImpl() {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            SearchBarAdaptive()
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { },
-            ) {
-                Icon(Icons.Filled.Add, "Floating action button.")
+private fun NotesUIImpl(addButtonAction: () -> Unit = {}, onSettingsAction: () -> Unit = {}) {
+    Row {
+        // TODO: Might need to pass this from outside. Recalculation every time might be slow.
+        val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
+        // Show list + editor on large screens
+        if (isTabletOrFoldableExpanded(sizeClass)) {
+
+            val showSettingsIcon = false // Not showing for large screens
+
+            NotesNavRail()
+
+            // Show list + editor if we have large width
+            if (isMiddleWidth(sizeClass)) {
+
+                val modifierList = Modifier.weight(0.4f)
+                val modifierEditor = Modifier.weight(1.0f)
+
+                NotesListLayout(
+                    showList = true,
+                    showSettingsIcon = showSettingsIcon,
+                    modifier = modifierList,
+                    addButtonAction = addButtonAction,
+                    onSettingsAction = onSettingsAction
+                )
+
+                NotesEditorUI(modifier = modifierEditor)
+
+                // Show only list if width is not large enough
+            } else {
+                NotesListLayout(
+                    showSettingsIcon = showSettingsIcon,
+                    addButtonAction = addButtonAction,
+                    onSettingsAction = onSettingsAction
+                )
             }
-        }
-    ) { innerPadding ->
 
-        val modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
-
-        NotesList(modifier = modifier)
-    }
-}
-
-@Composable
-private fun NotesList(modifier: Modifier = Modifier) {
-    LazyVerticalStaggeredGrid(
-        modifier = modifier,
-        columns = StaggeredGridCells.Adaptive(160.dp),
-        contentPadding = PaddingValues(horizontal = 4.dp)
-    ) {
-        item {
-            CardNote()
-        }
-
-        item {
-            CardNote()
-        }
-
-        item {
-            CardNote()
-        }
-
-        item {
-            CardNote()
-        }
-
-        item {
-            CardNote()
-        }
-
-        item {
-            CardNote()
-        }
-
-        item {
-            CardNote()
+            // Show only list on small screens like phones
+        } else {
+            NotesListLayout(addButtonAction = addButtonAction, onSettingsAction = onSettingsAction)
         }
     }
 }
 
 @Composable
-private fun CardNote() {
-    Box(
-        modifier = Modifier
-            .heightIn(min = 40.dp)
-            .combinedClickable(
-                onLongClick = { },
-                onClick = { }
-            )
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(4.dp)
+private fun NotesListLayout(
+    modifier: Modifier = Modifier,
+    showList: Boolean = false,
+    showSettingsIcon: Boolean = true,
+    addButtonAction: () -> Unit,
+    onSettingsAction: () -> Unit = {}
+) {
+    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
+        SearchBarField(
+            trailingIcon = {
+                if (showSettingsIcon) {
+                    IconButton(
+                        onClick = { onSettingsAction() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+            })
+    }, floatingActionButton = {
+        FloatingActionButton(
+            onClick = { addButtonAction() },
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = "Hello"
-            )
+            Icon(Icons.Filled.Add, null)
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SearchBarAdaptive(modifier: Modifier = Modifier) {
-    SearchBar(
-        inputField = {
-            SearchBarDefaults.InputField(
-                expanded = false,
-                query = "",
-                onQueryChange = {  },
-                onSearch = {  }, // Collapse on search submission
-                onExpandedChange = {  },
-                placeholder = { Text("Search your notes...") },
-                leadingIcon = {
-                    if (true) {
-                        IconButton(onClick = {
-//                            active = false
-//                            query = "" // Clear query when collapsing with back button
-                        }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    } else {
-                        Icon(Icons.Default.Search, contentDescription = "Search icon")
-                    }
-                },
-                trailingIcon = {
-                    if (/*active && query.isNotEmpty()*/false) {
-                        IconButton(onClick = { /*query = ""*/ }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear search")
-                        }
-                    }
-                },
-            )
-        },
-        expanded = false,
-        onExpandedChange = {},
-        modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 6.dp),
-    ) {
-
+    }) { innerPadding ->
+        NotesList(modifier = Modifier.padding(innerPadding), showList = showList)
     }
 }
 

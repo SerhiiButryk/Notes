@@ -2,8 +2,9 @@ package com.notes.app.security
 
 import android.util.Base64
 import com.notes.interfaces.Base64Operations
+import javax.inject.Inject
 
-class Base64Provider : Base64Operations {
+class Base64Provider @Inject constructor() : Base64Operations {
 
     override fun encode(byteArray: ByteArray): String {
         return Base64.encodeToString(byteArray, Base64.NO_WRAP)

@@ -2,14 +2,20 @@ package com.notes.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,10 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun InputTextField(
@@ -34,7 +40,9 @@ fun InputTextField(
     focusRequester: FocusRequester? = null,
     onValueChange: (String) -> Unit = {},
     label: String = "",
-    keyboardType: KeyboardType
+    keyboardType: KeyboardType,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     val localModifier =
         if (focusRequester == null) modifier else modifier.focusRequester(focusRequester)
@@ -60,8 +68,10 @@ fun InputTextField(
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             showKeyboardOnFocus = true,
-            autoCorrectEnabled = false
+            autoCorrectEnabled = false,
+            imeAction = keyboardOptions.imeAction
         ),
+        keyboardActions = keyboardActions,
         modifier = localModifier,
         maxLines = 1,
         visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email) VisualTransformation.None else PasswordVisualTransformation(),
@@ -138,4 +148,52 @@ fun AlertDialogUI(
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBarField(
+    modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    SearchBar(
+        inputField = {
+            SearchBarDefaults.InputField(
+                expanded = false,
+                query = "",
+                onQueryChange = { },
+                onSearch = { }, // Collapse on search submission
+                onExpandedChange = { },
+                placeholder = { Text("Search your notes...") },
+                leadingIcon = {
+//                    if (true) {
+                    IconButton(onClick = {
+//                            active = false
+//                            query = "" // Clear query when collapsing with back button
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+//                    } else {
+//                        Icon(Icons.Default.Search, contentDescription = "Search icon")
+//                    }
+                },
+                trailingIcon = {
+//                    if (/*active && query.isNotEmpty()*/false) {
+//                        IconButton(onClick = { /*query = ""*/ }) {
+//                            Icon(Icons.Default.Close, contentDescription = "Clear search")
+//                        }
+//                    }
+
+                    trailingIcon?.invoke()
+                },
+            )
+        },
+        expanded = false,
+        onExpandedChange = {},
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
+    ) {
+
+    }
 }

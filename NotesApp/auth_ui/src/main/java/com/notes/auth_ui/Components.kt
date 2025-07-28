@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -30,13 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notes.ui.InputTextField
-import com.notes.ui.isAtLeastTablet
+import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.isPhoneLandScape
 import com.notes.ui.theme.SurfaceColor
 
@@ -76,7 +79,7 @@ internal fun AuthUIAdaptive(
 
     when {
 
-        isAtLeastTablet(sc) -> {
+        isTabletOrFoldableExpanded(sc) -> {
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -246,6 +249,7 @@ internal fun AuthBody(
 
     Column(
         modifier = modifier.verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         // Email input field
@@ -265,7 +269,12 @@ internal fun AuthBody(
             focusRequester = passwordFieldFocusRequester,
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = if (confirmPassword == null) KeyboardOptions(imeAction = ImeAction.Done)
+                else KeyboardOptions.Default,
+            keyboardActions = if (confirmPassword == null) KeyboardActions(
+                onDone = { onEnter(password, confirmPassword?.value ?: "", email) },
+            ) else KeyboardActions.Default,
         )
 
         if (confirmPassword != null) {
@@ -275,7 +284,11 @@ internal fun AuthBody(
                 label = "Confirm password",
                 onValueChange = { confirmPassword.value = it },
                 keyboardType = KeyboardType.Password,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { onEnter(password, confirmPassword.value, email) },
+                ),
             )
         }
 
@@ -287,6 +300,7 @@ internal fun AuthBody(
                 onEnter(password, confirmPassword?.value ?: "", email)
             },
             modifier = Modifier
+                .widthIn(max = 320.dp)
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
         ) {
