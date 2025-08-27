@@ -1,5 +1,5 @@
 [versions]
-adaptiveLayout = "1.2.0-alpha09"
+adaptiveLayout = "1.2.0-alpha11"
 agp = "8.9.2"
 datastorePreferences = "1.1.7"
 kotlin = "2.1.21"

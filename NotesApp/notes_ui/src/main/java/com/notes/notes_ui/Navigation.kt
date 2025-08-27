@@ -1,10 +1,12 @@
 package com.notes.notes_ui
 
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.notes.notes_ui.richeditor.NotesEditorUI
+import com.notes.ui.getViewModel
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
@@ -12,17 +14,12 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
     // Main app content graph
     navigation<Screen.MainContent>(startDestination = Screen.NotesPreview) {
 
-        composable<Screen.NotesPreview> {
+        composable<Screen.NotesPreview> { backStackEntry ->
 
-            val addButtonAction: () -> Unit = {
-                navController.navigate(Screen.NotesEditor)
-            }
+            val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController)
+            val noteList by viewModel.notesState.collectAsStateWithLifecycle()
 
-            NotesUI(addButtonAction = addButtonAction)
-        }
-
-        composable<Screen.NotesEditor> {
-            NotesEditorUI()
+            NotesUI(notes = noteList)
         }
 
     }
@@ -41,11 +38,5 @@ sealed class Screen(val route: String) {
 
     @Serializable
     internal object MainContent : Screen("main_content")
-
-    @Serializable
-    internal object NotesEditor : Screen("editor")
-
-    @Serializable
-    internal object Settings : Screen("settings")
 
 }

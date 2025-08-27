@@ -1,123 +1,119 @@
 package com.notes.notes_ui
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
+import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.notes.notes_ui.richeditor.NotesEditorUI
-import com.notes.ui.SearchBarField
-import com.notes.ui.isMiddleWidth
+import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.notes.notes_ui.NotesViewModel.Notes.Companion.EmptyNote
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun NotesUI(
     modifier: Modifier = Modifier,
-    addButtonAction: () -> Unit = {},
-    onSettingsAction: () -> Unit = {}
+    notes: List<NotesViewModel.Notes>
 ) {
     AppTheme {
-        NotesUIImpl(addButtonAction = addButtonAction, onSettingsAction = onSettingsAction)
+        NotesUIImpl(notes = notes)
     }
 }
 
 @Composable
-private fun NotesUIImpl(addButtonAction: () -> Unit = {}, onSettingsAction: () -> Unit = {}) {
+private fun NotesUIImpl(notes: List<NotesViewModel.Notes>) {
+
     Row {
         // TODO: Might need to pass this from outside. Recalculation every time might be slow.
         val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-        // Show list + editor on large screens
+        // Show nav rail for large screens
         if (isTabletOrFoldableExpanded(sizeClass)) {
-
-            val showSettingsIcon = false // Not showing for large screens
-
             NotesNavRail()
+        }
 
-            // Show list + editor if we have large width
-            if (isMiddleWidth(sizeClass)) {
+        ListDetailUI(notes = notes, sizeClass = sizeClass)
+    }
 
-                val modifierList = Modifier.weight(0.4f)
-                val modifierEditor = Modifier.weight(1.0f)
+}
 
-                NotesListLayout(
-                    showList = true,
-                    showSettingsIcon = showSettingsIcon,
-                    modifier = modifierList,
-                    addButtonAction = addButtonAction,
-                    onSettingsAction = onSettingsAction
-                )
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun ListDetailUI(
+    notes: List<NotesViewModel.Notes>,
+    sizeClass: WindowSizeClass
+) {
 
-                NotesEditorUI(modifier = modifierEditor)
+    val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
-                // Show only list if width is not large enough
-            } else {
-                NotesListLayout(
-                    showSettingsIcon = showSettingsIcon,
-                    addButtonAction = addButtonAction,
-                    onSettingsAction = onSettingsAction
+    // TODO: Dig deeper into this APIs
+    val customDirective = remember() {
+        PaneScaffoldDirective(
+            // Applied workaround to remove a horizontal space between 2 panes
+            // which more likely is added to handle hinges
+            horizontalPartitionSpacerSize = 0.dp,
+            maxHorizontalPartitions = defaultDirective.maxHorizontalPartitions,
+            maxVerticalPartitions = defaultDirective.maxVerticalPartitions,
+            verticalPartitionSpacerSize = defaultDirective.verticalPartitionSpacerSize,
+            defaultPanePreferredWidth = defaultDirective.defaultPanePreferredWidth,
+            excludedBounds = defaultDirective.excludedBounds
+        )
+    }
+
+    val navigator = rememberListDetailPaneScaffoldNavigator<NotesViewModel.Notes>(
+        scaffoldDirective = customDirective
+    )
+
+    val coroutineScope = rememberCoroutineScope()
+
+    NavigableListDetailPaneScaffold(
+        navigator = navigator,
+        listPane = {
+            AnimatedPane {
+                // Note List screen
+                NotesListUI(
+                    notes = notes,
+                    onSelected = { note ->
+                        // Open to Note Editor Screen
+                        coroutineScope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, note)
+                        }
+                    },
+                    sizeClass = sizeClass,
+                    addAction = {
+                        // Open to Note Editor Screen
+                        coroutineScope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, EmptyNote())
+                        }
+                    }
                 )
             }
+        },
+        detailPane = {
+            AnimatedPane {
+                val note: NotesViewModel.Notes? = navigator.currentDestination?.contentKey
 
-            // Show only list on small screens like phones
-        } else {
-            NotesListLayout(addButtonAction = addButtonAction, onSettingsAction = onSettingsAction)
-        }
-    }
-}
+                val state = rememberRichTextState()
 
-@Composable
-private fun NotesListLayout(
-    modifier: Modifier = Modifier,
-    showList: Boolean = false,
-    showSettingsIcon: Boolean = true,
-    addButtonAction: () -> Unit,
-    onSettingsAction: () -> Unit = {}
-) {
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
-        SearchBarField(
-            trailingIcon = {
-                if (showSettingsIcon) {
-                    IconButton(
-                        onClick = { onSettingsAction() }) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    }
+                // Set initial content
+                LaunchedEffect(note) {
+                    state.setText(note?.content ?: "")
                 }
-            })
-    }, floatingActionButton = {
-        FloatingActionButton(
-            onClick = { addButtonAction() },
-        ) {
-            Icon(Icons.Filled.Add, null)
-        }
-    }) { innerPadding ->
-        NotesList(modifier = Modifier.padding(innerPadding), showList = showList)
-    }
-}
 
-@Preview
-@Preview(
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
-    device = "spec:parent=pixel_5,orientation=landscape"
-)
-@Composable
-private fun NotesUIPrev() {
-    NotesUIImpl()
+                // Note editor screen
+                NotesEditorUI(notes = note, state = state)
+            }
+        }
+    )
 }

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("kotlin-parcelize")
 }
 
 apply(from = "${rootDir}/gradle_configs/versions.gradle")
@@ -55,8 +56,10 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // For currentWindowAdaptiveInfo()
+    // For currentWindowAdaptiveInfo() & List Detail composable
     implementation(libs.androidx.adaptive)
+    implementation(libs.androidx.adaptive.navigation)
+    implementation(libs.androidx.adaptive.layout)
 
     // Rich text editor lib
     // https://github.com/MohamedRejeb/compose-rich-editor
