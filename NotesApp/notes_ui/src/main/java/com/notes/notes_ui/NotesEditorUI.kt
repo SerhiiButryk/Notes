@@ -2,6 +2,7 @@ package com.notes.notes_ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,30 +20,58 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.notes.ui.theme.AppTheme
 
 @Composable
-fun NotesEditorUI(modifier: Modifier = Modifier, notes: NotesViewModel.Notes?, state: RichTextState) {
+fun NotesEditorUI(
+    modifier: Modifier = Modifier,
+    notes: NotesViewModel.Notes?,
+    state: RichTextState
+) {
     AppTheme {
         EditorUI(modifier, notes, state)
     }
 }
 
 @Composable
-private fun EditorUI(modifier: Modifier = Modifier, notes: NotesViewModel.Notes?, state: RichTextState) {
+private fun EditorUI(
+    modifier: Modifier = Modifier,
+    note: NotesViewModel.Notes?,
+    state: RichTextState
+) {
     Scaffold(
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
-
-        if (notes == null) {
-            InfoLabel()
-        } else {
-            RichTextEditor(
-                state = state,
-                modifier = Modifier
-                    .focusable()
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            )
+        // Adds cross fade animation when selecting a note from the list
+        Crossfade(
+            targetState = note,
+            label = "Editor cross fade animation",
+            modifier = Modifier.padding(innerPadding)
+        ) { note ->
+            if (note == null) {
+                InfoLabel()
+            } else {
+                EditorLayout(state = state)
+            }
         }
+    }
+}
 
+@Composable
+private fun EditorLayout(modifier: Modifier = Modifier, state: RichTextState) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        RichTextEditor(
+            state = state,
+            modifier = Modifier
+                .focusable()
+                .fillMaxSize()
+                // add weight modifier to the composable to ensure
+                // that the composable is measured after the other
+                // composable is measured specifically after the tools pane.
+                .weight(1f)
+        )
+
+        ToolsPane()
     }
 }
 

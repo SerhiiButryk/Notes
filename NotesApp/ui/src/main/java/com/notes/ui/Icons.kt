@@ -270,3 +270,119 @@ val KEY_ICON: ImageVector
     }
 
 private var _KEY_ICON: ImageVector? = null
+
+val SAVE_ICON: ImageVector
+    get() {
+        if (_Save != null) return _Save!!
+
+        _Save = ImageVector.Builder(
+            name = "Save",
+            defaultWidth = 16.dp,
+            defaultHeight = 16.dp,
+            viewportWidth = 16f,
+            viewportHeight = 16f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black)
+            ) {
+                moveTo(2f, 1f)
+                arcToRelative(1f, 1f, 0f, false, false, -1f, 1f)
+                verticalLineToRelative(12f)
+                arcToRelative(1f, 1f, 0f, false, false, 1f, 1f)
+                horizontalLineToRelative(12f)
+                arcToRelative(1f, 1f, 0f, false, false, 1f, -1f)
+                verticalLineTo(2f)
+                arcToRelative(1f, 1f, 0f, false, false, -1f, -1f)
+                horizontalLineTo(9.5f)
+                arcToRelative(1f, 1f, 0f, false, false, -1f, 1f)
+                verticalLineToRelative(7.293f)
+                lineToRelative(2.646f, -2.647f)
+                arcToRelative(0.5f, 0.5f, 0f, false, true, 0.708f, 0.708f)
+                lineToRelative(-3.5f, 3.5f)
+                arcToRelative(0.5f, 0.5f, 0f, false, true, -0.708f, 0f)
+                lineToRelative(-3.5f, -3.5f)
+                arcToRelative(0.5f, 0.5f, 0f, true, true, 0.708f, -0.708f)
+                lineTo(7.5f, 9.293f)
+                verticalLineTo(2f)
+                arcToRelative(2f, 2f, 0f, false, true, 2f, -2f)
+                horizontalLineTo(14f)
+                arcToRelative(2f, 2f, 0f, false, true, 2f, 2f)
+                verticalLineToRelative(12f)
+                arcToRelative(2f, 2f, 0f, false, true, -2f, 2f)
+                horizontalLineTo(2f)
+                arcToRelative(2f, 2f, 0f, false, true, -2f, -2f)
+                verticalLineTo(2f)
+                arcToRelative(2f, 2f, 0f, false, true, 2f, -2f)
+                horizontalLineToRelative(2.5f)
+                arcToRelative(0.5f, 0.5f, 0f, false, true, 0f, 1f)
+                close()
+            }
+        }.build()
+
+        return _Save!!
+    }
+
+private var _Save: ImageVector? = null
+
+val CLEAR_ALL: ImageVector
+    get() {
+        if (_ClearAll != null) return _ClearAll!!
+
+        _ClearAll = ImageVector.Builder(
+            name = "ClearAll",
+            defaultWidth = 16.dp,
+            defaultHeight = 16.dp,
+            viewportWidth = 16f,
+            viewportHeight = 16f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black)
+            ) {
+                moveTo(10f, 12.6f)
+                lineToRelative(0.7f, 0.7f)
+                lineToRelative(1.6f, -1.6f)
+                lineToRelative(1.6f, 1.6f)
+                lineToRelative(0.8f, -0.7f)
+                lineTo(13f, 11f)
+                lineToRelative(1.7f, -1.6f)
+                lineToRelative(-0.8f, -0.8f)
+                lineToRelative(-1.6f, 1.7f)
+                lineToRelative(-1.6f, -1.7f)
+                lineToRelative(-0.7f, 0.8f)
+                lineToRelative(1.6f, 1.6f)
+                lineToRelative(-1.6f, 1.6f)
+                close()
+                moveTo(1f, 4f)
+                horizontalLineToRelative(14f)
+                verticalLineTo(3f)
+                horizontalLineTo(1f)
+                verticalLineToRelative(1f)
+                close()
+                moveToRelative(0f, 3f)
+                horizontalLineToRelative(14f)
+                verticalLineTo(6f)
+                horizontalLineTo(1f)
+                verticalLineToRelative(1f)
+                close()
+                moveToRelative(8f, 2.5f)
+                verticalLineTo(9f)
+                horizontalLineTo(1f)
+                verticalLineToRelative(1f)
+                horizontalLineToRelative(8f)
+                verticalLineToRelative(-0.5f)
+                close()
+                moveTo(9f, 13f)
+                verticalLineToRelative(-1f)
+                horizontalLineTo(1f)
+                verticalLineToRelative(1f)
+                horizontalLineToRelative(8f)
+                close()
+            }
+        }.build()
+
+        return _ClearAll!!
+    }
+
+private var _ClearAll: ImageVector? = null
+
+

@@ -38,6 +38,8 @@ dependencies {
     implementation(project(":ui"))
 
     implementation(libs.bundles.android.core)
+    // For style attributes like attr/colorControlNormal
+    implementation(libs.androidx.appcompat)
 
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
@@ -64,6 +66,8 @@ dependencies {
     // Rich text editor lib
     // https://github.com/MohamedRejeb/compose-rich-editor
     implementation(libs.richeditor.compose)
+
+    implementation(libs.material.icons.extended)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
