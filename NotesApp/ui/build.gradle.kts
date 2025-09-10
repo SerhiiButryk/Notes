@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 apply(from = "${rootDir}/gradle_configs/versions.gradle")
@@ -41,6 +42,7 @@ dependencies {
 
     // Compose navigation
     implementation(libs.navigation)
+    implementation(libs.serialization)
 
     // Hilt dependency injection
     implementation(libs.hilt.android)

@@ -1,4 +1,4 @@
-package com.notes.notes_ui
+package com.notes.notes_ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
@@ -17,16 +17,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.notes.notes_ui.NotesViewModel
+import com.notes.notes_ui.NotesViewModel.ToolsPane
+import com.notes.notes_ui.ToolsPane
 import com.notes.ui.theme.AppTheme
 
 @Composable
 fun NotesEditorUI(
     modifier: Modifier = Modifier,
     notes: NotesViewModel.Notes?,
-    state: RichTextState
+    state: RichTextState,
+    toolsPaneItems: List<ToolsPane> = emptyList<ToolsPane>()
 ) {
     AppTheme {
-        EditorUI(modifier, notes, state)
+        EditorUI(modifier, notes, state, toolsPaneItems)
     }
 }
 
@@ -34,7 +38,8 @@ fun NotesEditorUI(
 private fun EditorUI(
     modifier: Modifier = Modifier,
     note: NotesViewModel.Notes?,
-    state: RichTextState
+    state: RichTextState,
+    toolsPaneItems: List<ToolsPane>
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize()
@@ -48,14 +53,18 @@ private fun EditorUI(
             if (note == null) {
                 InfoLabel()
             } else {
-                EditorLayout(state = state)
+                EditorLayout(state = state, toolsPaneItems = toolsPaneItems)
             }
         }
     }
 }
 
 @Composable
-private fun EditorLayout(modifier: Modifier = Modifier, state: RichTextState) {
+private fun EditorLayout(
+    modifier: Modifier = Modifier,
+    state: RichTextState,
+    toolsPaneItems: List<ToolsPane>
+) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -71,7 +80,7 @@ private fun EditorLayout(modifier: Modifier = Modifier, state: RichTextState) {
                 .weight(1f)
         )
 
-        ToolsPane()
+        ToolsPane(state = state, toolsPaneItems = toolsPaneItems)
     }
 }
 

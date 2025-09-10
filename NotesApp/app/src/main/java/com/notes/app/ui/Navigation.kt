@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.notes.auth_ui.authDestination
-import com.notes.auth_ui.getStartDestination
+import com.notes.auth_ui.getDestination
 import com.notes.auth_ui.onboardingDestination
 import com.notes.notes_ui.mainContentDestination
 
@@ -14,7 +14,7 @@ fun EntryScreen(modifier: Modifier = Modifier) {
 
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = getStartDestination()) {
+    NavHost(navController = navController, startDestination = getDestination()) {
 
         onboardingDestination(navController = navController)
 

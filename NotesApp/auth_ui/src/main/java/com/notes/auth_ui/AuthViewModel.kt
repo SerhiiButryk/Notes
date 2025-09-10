@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
@@ -21,6 +22,8 @@ internal class AuthViewModel @Inject constructor(
     private val authService: AuthService
 ) : ViewModel() {
 
+    open class UIState()
+
     // This annotation could be redundant as
     // the class is already stable, because all properties are stable.
     // However, keep it for clarity.
@@ -29,7 +32,7 @@ internal class AuthViewModel @Inject constructor(
         val email: String = "",
         val password: String = "",
         val hasFocus: Boolean = false
-    )
+    ) : UIState()
 
     // This annotation could be redundant as
     // the class is already stable, because all properties are stable.
@@ -40,7 +43,7 @@ internal class AuthViewModel @Inject constructor(
         val password: String = "",
         val confirmPassword: String = "",
         val hasFocus: Boolean = false
-    )
+    ) : UIState()
 
     // This annotation could be redundant as
     // the class is already stable, because all properties are stable.
@@ -51,24 +54,24 @@ internal class AuthViewModel @Inject constructor(
         val subtitle: String,
     )
 
-    private val _loginState = MutableStateFlow(LoginUIState())
-    val loginState = _loginState.asStateFlow()
-
-    private val _registerState = MutableStateFlow(RegisterUIState())
-    val registerState = _registerState.asStateFlow()
+    private val _uiState = MutableStateFlow(UIState())
+    val uiState = _uiState.asStateFlow()
 
     private val _dialogState = MutableStateFlow<DialogState?>(null)
     val dialogState = _dialogState.asStateFlow()
 
-    init {
-
+    fun onShowLoginUI() {
         viewModelScope.launch {
             // Initially we are going to show a keyboard if ui is open
-            _loginState.value = LoginUIState(hasFocus = true, email = getRegisteredUserEmail())
+            _uiState.update { LoginUIState(hasFocus = true, email = getRegisteredUserEmail()) }
         }
+    }
 
-        // Initially we are going to show a keyboard if ui is open
-        _registerState.value = RegisterUIState(hasFocus = true)
+    fun onShowRegisterUI() {
+        viewModelScope.launch {
+            // Initially we are going to show a keyboard if ui is open
+            _uiState.update { RegisterUIState(hasFocus = true) }
+        }
     }
 
     fun login(loginUIState: LoginUIState, onSuccess: () -> Unit) {
@@ -124,7 +127,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     private suspend fun refreshUserEmail() {
-        _loginState.value = _loginState.value.copy(email = getRegisteredUserEmail())
+        _uiState.update { (_uiState.value as LoginUIState).copy(email = getRegisteredUserEmail()) }
     }
 
 }

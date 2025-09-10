@@ -1,21 +1,28 @@
 package com.notes.auth_ui
 
+import com.notes.auth_ui.data.isFirstLaunch
+import com.notes.auth_ui.data.isUserRegistered
+import com.notes.ui.Screen
 import kotlinx.serialization.Serializable
 
 // Object: Use an object for routes without arguments.
 // Class: Use a class or data class for routes with arguments.
+
 @Serializable
-sealed class Screen(val route: String) {
+internal object Auth : Screen("auth")
 
-    @Serializable
-    internal object Login : Screen("login")
+@Serializable
+internal object Access : Screen("access")
 
-    @Serializable
-    internal object Register : Screen("register")
+@Serializable
+internal object OnBoardingScreen : Screen("onboarding")
 
-    @Serializable
-    internal object Auth : Screen("auth")
+internal fun getStartRoute(): Screen {
+    if (isFirstLaunch())
+        return OnBoardingScreen
+    return getAuthStartDestination()
+}
 
-    @Serializable
-    internal object OnBoardingScreen : Screen("onboarding")
+internal fun getAuthStartDestination(): Screen {
+    return Access
 }

@@ -1,4 +1,4 @@
-package com.notes.notes_ui
+package com.notes.notes_ui.screens
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -16,7 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.notes.notes_ui.NotesListUI
+import com.notes.notes_ui.NotesNavRail
+import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.NotesViewModel.Notes.Companion.EmptyNote
+import com.notes.notes_ui.NotesViewModel.ToolsPane
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -24,15 +28,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotesUI(
     modifier: Modifier = Modifier,
-    notes: List<NotesViewModel.Notes>
+    notes: List<NotesViewModel.Notes>,
+    toolsPaneItems: List<ToolsPane>,
 ) {
     AppTheme {
-        NotesUIImpl(notes = notes)
+        NotesUIImpl(notes = notes, toolsPaneItems = toolsPaneItems)
     }
 }
 
 @Composable
-private fun NotesUIImpl(notes: List<NotesViewModel.Notes>) {
+private fun NotesUIImpl(notes: List<NotesViewModel.Notes>, toolsPaneItems: List<ToolsPane>) {
 
     Row {
         // TODO: Might need to pass this from outside. Recalculation every time might be slow.
@@ -43,7 +48,7 @@ private fun NotesUIImpl(notes: List<NotesViewModel.Notes>) {
             NotesNavRail()
         }
 
-        ListDetailUI(notes = notes, sizeClass = sizeClass)
+        ListDetailUI(notes = notes, sizeClass = sizeClass, toolsPaneItems = toolsPaneItems)
     }
 
 }
@@ -52,7 +57,8 @@ private fun NotesUIImpl(notes: List<NotesViewModel.Notes>) {
 @Composable
 private fun ListDetailUI(
     notes: List<NotesViewModel.Notes>,
-    sizeClass: WindowSizeClass
+    sizeClass: WindowSizeClass,
+    toolsPaneItems: List<ToolsPane>
 ) {
 
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
@@ -112,7 +118,7 @@ private fun ListDetailUI(
                 }
 
                 // Note editor screen
-                NotesEditorUI(notes = note, state = state)
+                NotesEditorUI(notes = note, state = state, toolsPaneItems = toolsPaneItems)
             }
         }
     )

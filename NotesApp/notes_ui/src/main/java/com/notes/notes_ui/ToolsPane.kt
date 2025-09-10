@@ -1,104 +1,49 @@
 package com.notes.notes_ui
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FormatBold
-import androidx.compose.material.icons.outlined.FormatItalic
-import androidx.compose.material.icons.outlined.FormatUnderlined
-import androidx.compose.material.icons.outlined.StrikethroughS
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import com.notes.ui.CLEAR_ALL
-import com.notes.ui.SAVE_ICON
+import com.mohamedrejeb.richeditor.model.RichTextState
+import com.notes.notes_ui.NotesViewModel.ToolsPane
 
 @Composable
-fun ToolsPane(modifier: Modifier = Modifier) {
+fun ToolsPane(modifier: Modifier = Modifier, state: RichTextState, toolsPaneItems: List<ToolsPane>) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-
-        item {
-            ToolButton(
-                imageVector = SAVE_ICON
-            ) { /* on click */ }
+        for (item in toolsPaneItems) {
+            item(key = item.key) {
+                ToolButton(
+                    imageVector = item.imageVector,
+                    id = item.id
+                ) { item.onClick(state) }
+            }
         }
-
-        item {
-            ToolButton(
-                imageVector = CLEAR_ALL
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                id = R.drawable.format_h1
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                id = R.drawable.format_h2
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                id = R.drawable.format_h3
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                id = R.drawable.format_h4
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                id = R.drawable.format_h5
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                id = R.drawable.format_h6
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                imageVector = Icons.Outlined.FormatBold
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                imageVector = Icons.Outlined.FormatItalic
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                imageVector = Icons.Outlined.FormatUnderlined
-            ) { /* on click */ }
-        }
-
-        item {
-            ToolButton(
-                imageVector = Icons.Outlined.StrikethroughS
-            ) { /* on click */ }
-        }
-
     }
 }
 
@@ -108,17 +53,50 @@ private fun ToolButton(
     @DrawableRes id: Int = 0,
     onClick: () -> Unit
 ) {
-    IconButton(onClick = onClick) {
-        if (imageVector != null) {
-            Icon(
-                imageVector = imageVector,
-                contentDescription = ""
-            )
-        } else {
-            Icon(
-                painter = painterResource(id = id),
-                contentDescription = ""
-            )
+
+    Surface(shape = CircleShape) {
+
+        var clicked by rememberSaveable { mutableStateOf(false) }
+
+        val onClickListener = {
+            onClick()
+            clicked = !clicked
         }
+
+        val color1 = MaterialTheme.colorScheme.surfaceBright
+        val color2 = MaterialTheme.colorScheme.primaryContainer
+
+        val infiniteTransition = rememberInfiniteTransition()
+        val offset by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 70f,
+            animationSpec = infiniteRepeatable(tween(durationMillis = 1500, easing = LinearEasing))
+        )
+
+        IconButton(onClick = onClickListener,
+            // Animate button background
+            modifier = Modifier.drawBehind {
+                if (clicked) {
+                    drawRect(brush = Brush.linearGradient(
+                        colors = listOf(color1, color2),
+                        start = Offset(0f, 0f),
+                        end = Offset(offset, offset),
+                    ))
+                }
+            }) {
+            if (imageVector != null) {
+                Icon(
+                    imageVector = imageVector,
+                    contentDescription = ""
+                )
+            } else {
+                Icon(
+                    painter = painterResource(id = id),
+                    contentDescription = ""
+                )
+            }
+        }
+
     }
+
 }

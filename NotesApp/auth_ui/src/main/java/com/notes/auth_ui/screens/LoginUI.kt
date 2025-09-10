@@ -1,4 +1,4 @@
-package com.notes.auth_ui
+package com.notes.auth_ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.notes.auth_ui.AuthUIAdaptive
+import com.notes.auth_ui.AuthViewModel
 import com.notes.ui.theme.AppTheme
 
 private const val TAG = "LoginUI"

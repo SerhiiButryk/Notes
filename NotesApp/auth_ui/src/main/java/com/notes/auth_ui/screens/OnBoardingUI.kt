@@ -1,4 +1,4 @@
-package com.notes.auth_ui
+package com.notes.auth_ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
@@ -25,6 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.notes.auth_ui.Header
+import com.notes.auth_ui.R
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
 
