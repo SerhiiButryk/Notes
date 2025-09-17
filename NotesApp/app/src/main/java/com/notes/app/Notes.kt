@@ -1,12 +1,12 @@
 package com.notes.app
 
 import android.app.Application
-import com.notes.interfaces.Base64Operations
-import com.notes.interfaces.DerivedKeyOperations
-import com.notes.interfaces.Log
-import com.notes.interfaces.NetSettings
-import com.notes.interfaces.PlatformAPIs
-import com.notes.interfaces.StorageOperations
+import com.notes.api.Base64Operations
+import com.notes.api.DerivedKeyOperations
+import com.notes.api.Log
+import com.notes.api.NetSettings
+import com.notes.api.PlatformAPIs
+import com.notes.api.StorageOperations
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

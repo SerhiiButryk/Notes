@@ -4,11 +4,11 @@ import com.notes.app.data.StorageProvider
 import com.notes.app.log.AppLogger
 import com.notes.app.net.LocalNetSettings
 import com.notes.app.security.Base64Provider
-import com.notes.interfaces.Base64Operations
-import com.notes.interfaces.DerivedKeyOperations
-import com.notes.interfaces.Log
-import com.notes.interfaces.NetSettings
-import com.notes.interfaces.StorageOperations
+import com.notes.api.Base64Operations
+import com.notes.api.DerivedKeyOperations
+import com.notes.api.Log
+import com.notes.api.NetSettings
+import com.notes.api.StorageOperations
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

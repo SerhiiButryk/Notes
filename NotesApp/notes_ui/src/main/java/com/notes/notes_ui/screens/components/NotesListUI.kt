@@ -1,4 +1,4 @@
-package com.notes.notes_ui
+package com.notes.notes_ui.screens.components
 
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
+import com.notes.notes_ui.NotesViewModel
 import com.notes.ui.SearchBarField
 import com.notes.ui.isTabletOrFoldableExpanded
 

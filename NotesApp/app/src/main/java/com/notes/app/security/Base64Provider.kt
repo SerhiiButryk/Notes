@@ -1,7 +1,7 @@
 package com.notes.app.security
 
 import android.util.Base64
-import com.notes.interfaces.Base64Operations
+import com.notes.api.Base64Operations
 import javax.inject.Inject
 
 class Base64Provider @Inject constructor() : Base64Operations {

@@ -1,6 +1,6 @@
 package com.notes.app.log
 
-import com.notes.interfaces.Log
+import com.notes.api.Log
 import javax.inject.Inject
 
 class AppLogger @Inject constructor() : Log {

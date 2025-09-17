@@ -1,6 +1,6 @@
 package com.notes.auth.data
 
-import com.notes.interfaces.PlatformAPIs
+import com.notes.api.PlatformAPIs
 
 private const val PASSWORD_SALT_KEY = "password_salt_key"
 

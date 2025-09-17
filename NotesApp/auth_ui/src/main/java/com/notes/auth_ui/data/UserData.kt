@@ -1,7 +1,7 @@
 package com.notes.auth_ui.data
 
-import com.notes.interfaces.PlatformAPIs
-import com.notes.interfaces.PlatformAPIs.logger
+import com.notes.api.PlatformAPIs
+import com.notes.api.PlatformAPIs.logger
 import kotlinx.coroutines.flow.MutableStateFlow
 
 private const val REGISTERED_USER_EMAIL = "REGISTERED_USER_EMAIL"

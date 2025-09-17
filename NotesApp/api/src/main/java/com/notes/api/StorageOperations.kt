@@ -1,4 +1,4 @@
-package com.notes.interfaces
+package com.notes.api
 
 interface StorageOperations {
     suspend fun save(value: String, key: String): Boolean

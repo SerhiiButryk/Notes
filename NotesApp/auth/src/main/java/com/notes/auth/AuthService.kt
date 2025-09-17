@@ -2,10 +2,10 @@ package com.notes.auth
 
 import com.notes.auth.data.getSalt
 import com.notes.auth.data.updateSalt
-import com.notes.interfaces.HttpClient
-import com.notes.interfaces.NetSettings
-import com.notes.interfaces.PlatformAPIs
-import com.notes.interfaces.PlatformAPIs.logger
+import com.notes.api.HttpClient
+import com.notes.api.NetSettings
+import com.notes.api.PlatformAPIs
+import com.notes.api.PlatformAPIs.logger
 import com.notes.net.inputStreamAsString
 
 class AuthService(private val netSettings: NetSettings, private val httpClient: HttpClient) {

@@ -1,4 +1,4 @@
-package com.notes.interfaces
+package com.notes.api
 
 interface DerivedKeyOperations {
     fun generatePDKey(input: String, salt: ByteArray): String

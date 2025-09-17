@@ -7,8 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.notes.app.security.CryptoProvider
-import com.notes.interfaces.PlatformAPIs.logger
-import com.notes.interfaces.StorageOperations
+import com.notes.api.PlatformAPIs.logger
+import com.notes.api.StorageOperations
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

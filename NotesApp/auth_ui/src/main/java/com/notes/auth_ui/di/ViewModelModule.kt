@@ -1,7 +1,7 @@
 package com.notes.auth_ui.di
 
 import com.notes.auth.AuthService
-import com.notes.interfaces.PlatformAPIs
+import com.notes.api.PlatformAPIs
 import com.notes.net.NetHttpClient
 import dagger.Module
 import dagger.Provides

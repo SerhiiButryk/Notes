@@ -7,7 +7,7 @@ import com.notes.auth.AuthResult
 import com.notes.auth.AuthService
 import com.notes.auth_ui.data.getRegisteredUserEmail
 import com.notes.auth_ui.data.saveRegisteredUserEmail
-import com.notes.interfaces.PlatformAPIs.logger
+import com.notes.api.PlatformAPIs.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,7 +1,7 @@
 package com.notes.net
 
-import com.notes.interfaces.HttpClient
-import com.notes.interfaces.PlatformAPIs.logger
+import com.notes.api.HttpClient
+import com.notes.api.PlatformAPIs.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType

@@ -4,7 +4,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Base64
-import com.notes.interfaces.PlatformAPIs.logger
+import com.notes.api.PlatformAPIs.logger
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.*

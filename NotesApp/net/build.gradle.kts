@@ -15,7 +15,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":interfaces"))
+    implementation(project(":api"))
     // OkHttp
     implementation(libs.okhttp)
     // Coroutines

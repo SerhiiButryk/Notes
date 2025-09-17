@@ -1,4 +1,4 @@
-package com.notes.interfaces
+package com.notes.api
 
 import java.io.InputStream
 

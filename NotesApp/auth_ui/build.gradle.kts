@@ -44,7 +44,7 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":auth"))
     implementation(project(":net"))
-    implementation(project(":interfaces"))
+    implementation(project(":api"))
     implementation(project(":notes_ui"))
 
     implementation(libs.bundles.android.core)

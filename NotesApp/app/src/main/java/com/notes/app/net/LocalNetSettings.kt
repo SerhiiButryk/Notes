@@ -2,7 +2,7 @@ package com.notes.app.net
 
 import android.content.Context
 import com.notes.app.R
-import com.notes.interfaces.NetSettings
+import com.notes.api.NetSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

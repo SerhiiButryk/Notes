@@ -16,11 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.notes.notes_ui.NotesListUI
-import com.notes.notes_ui.NotesNavRail
+import com.notes.notes_ui.screens.components.NotesListUI
+import com.notes.notes_ui.screens.components.NotesNavRail
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.NotesViewModel.Notes.Companion.EmptyNote
-import com.notes.notes_ui.NotesViewModel.ToolsPane
+import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -114,6 +114,8 @@ private fun ListDetailUI(
 
                 // Set initial content
                 LaunchedEffect(note) {
+                    // Clear previous styles and text
+                    state.clear()
                     state.setText(note?.content ?: "")
                 }
 

@@ -1,4 +1,4 @@
-package com.notes.interfaces
+package com.notes.api
 
 interface NetSettings {
     val loginUrl: String

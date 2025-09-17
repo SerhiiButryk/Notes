@@ -1,6 +1,6 @@
 package com.notes.app.security
 
-import com.notes.interfaces.PlatformAPIs
+import com.notes.api.PlatformAPIs
 import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec

@@ -18,8 +18,8 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.notes.notes_ui.NotesViewModel
-import com.notes.notes_ui.NotesViewModel.ToolsPane
-import com.notes.notes_ui.ToolsPane
+import com.notes.notes_ui.screens.components.ToolsPane
+import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.theme.AppTheme
 
 @Composable
@@ -103,5 +103,5 @@ private fun InfoLabel(modifier: Modifier = Modifier) {
 @Composable
 fun NotesEditorUIPrev(modifier: Modifier = Modifier) {
     val state = rememberRichTextState()
-    NotesEditorUI(notes = NotesViewModel.Notes(), state = state)
+    NotesEditorUI(notes = NotesViewModel.Notes(), state = state, toolsPaneItems = emptyList())
 }

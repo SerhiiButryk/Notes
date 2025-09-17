@@ -15,6 +15,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":interfaces"))
+    implementation(project(":api"))
     implementation(project(":net"))
 }

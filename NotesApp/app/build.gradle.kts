@@ -46,7 +46,7 @@ android {
 dependencies {
 
     implementation(project(":auth_ui"))
-    implementation(project(":interfaces"))
+    implementation(project(":api"))
     implementation(project(":ui"))
     implementation(project(":notes_ui"))
 

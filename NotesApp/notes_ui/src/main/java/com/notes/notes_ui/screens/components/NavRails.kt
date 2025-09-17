@@ -1,4 +1,4 @@
-package com.notes.notes_ui
+package com.notes.notes_ui.screens.components
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
