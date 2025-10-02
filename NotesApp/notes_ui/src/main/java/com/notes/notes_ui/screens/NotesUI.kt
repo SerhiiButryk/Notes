@@ -14,30 +14,47 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.notes.notes_ui.NotesViewModel
+import com.notes.notes_ui.NotesViewModel.Notes
 import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail
-import com.notes.notes_ui.NotesViewModel
-import com.notes.notes_ui.NotesViewModel.Notes.Companion.EmptyNote
 import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Composable
 fun NotesUI(
     modifier: Modifier = Modifier,
-    notes: List<NotesViewModel.Notes>,
+    notes: List<Notes>,
     toolsPaneItems: List<ToolsPane>,
+    getNote: () -> StateFlow<Notes>,
+    onAddAction: suspend () -> Unit,
+    onSelectAction: suspend (Notes) -> Unit
 ) {
     AppTheme {
-        NotesUIImpl(notes = notes, toolsPaneItems = toolsPaneItems)
+        NotesUIImpl(
+            notes = notes,
+            toolsPaneItems = toolsPaneItems,
+            onAddAction = onAddAction,
+            getNote = getNote,
+            onSelectAction = onSelectAction
+        )
     }
 }
 
 @Composable
-private fun NotesUIImpl(notes: List<NotesViewModel.Notes>, toolsPaneItems: List<ToolsPane>) {
+private fun NotesUIImpl(
+    notes: List<Notes>,
+    toolsPaneItems: List<ToolsPane>,
+    getNote: () -> StateFlow<Notes>,
+    onAddAction: suspend () -> Unit,
+    onSelectAction: suspend (Notes) -> Unit
+) {
 
     Row {
         // TODO: Might need to pass this from outside. Recalculation every time might be slow.
@@ -48,7 +65,14 @@ private fun NotesUIImpl(notes: List<NotesViewModel.Notes>, toolsPaneItems: List<
             NotesNavRail()
         }
 
-        ListDetailUI(notes = notes, sizeClass = sizeClass, toolsPaneItems = toolsPaneItems)
+        ListDetailUI(
+            notes = notes,
+            sizeClass = sizeClass,
+            toolsPaneItems = toolsPaneItems,
+            onAddAction = onAddAction,
+            getNote = getNote,
+            onSelectAction = onSelectAction
+        )
     }
 
 }
@@ -56,15 +80,18 @@ private fun NotesUIImpl(notes: List<NotesViewModel.Notes>, toolsPaneItems: List<
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun ListDetailUI(
-    notes: List<NotesViewModel.Notes>,
+    notes: List<Notes>,
     sizeClass: WindowSizeClass,
-    toolsPaneItems: List<ToolsPane>
+    toolsPaneItems: List<ToolsPane>,
+    getNote: () -> StateFlow<Notes>,
+    onAddAction: suspend () -> Unit,
+    onSelectAction: suspend (Notes) -> Unit
 ) {
 
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
     // TODO: Dig deeper into this APIs
-    val customDirective = remember() {
+    val customDirective = remember {
         PaneScaffoldDirective(
             // Applied workaround to remove a horizontal space between 2 panes
             // which more likely is added to handle hinges
@@ -91,16 +118,18 @@ private fun ListDetailUI(
                 NotesListUI(
                     notes = notes,
                     onSelected = { note ->
-                        // Open to Note Editor Screen
+                        // Open Note Editor Screen
                         coroutineScope.launch {
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, note)
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
+                            onSelectAction(note)
                         }
                     },
                     sizeClass = sizeClass,
                     addAction = {
-                        // Open to Note Editor Screen
+                        // Open Note Editor Screen
                         coroutineScope.launch {
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, EmptyNote())
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
+                            onAddAction()
                         }
                     }
                 )
@@ -108,19 +137,17 @@ private fun ListDetailUI(
         },
         detailPane = {
             AnimatedPane {
-                val note: NotesViewModel.Notes? = navigator.currentDestination?.contentKey
 
                 val state = rememberRichTextState()
+                val noteState = getNote().collectAsStateWithLifecycle()
 
-                // Set initial content
-                LaunchedEffect(note) {
-                    // Clear previous styles and text
+                LaunchedEffect(noteState) {
+                    // Clear previous styles and states
                     state.clear()
-                    state.setText(note?.content ?: "")
+                    state.setHtml(noteState.value.content)
                 }
 
-                // Note editor screen
-                NotesEditorUI(notes = note, state = state, toolsPaneItems = toolsPaneItems)
+                NotesEditorUI(notes = noteState.value, state = state, toolsPaneItems = toolsPaneItems)
             }
         }
     )

@@ -1,7 +1,9 @@
 package com.notes.notes_ui.screens.components
 
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
@@ -73,28 +76,39 @@ fun NotesList(
     onSelected: (NotesViewModel.Notes) -> Unit,
     sizeClass: WindowSizeClass
 ) {
-    if (!isTabletOrFoldableExpanded(sizeClass)) {
-        LazyColumn(
-            modifier = modifier.fillMaxSize()
+    if (notes.isEmpty()) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            for (note in notes) {
-                item(key = note.id) {
-                    CardNote(note = note, onSelected = onSelected)
-                }
-            }
+            Text("Create your first note by tapping '+' button")
         }
     } else {
-        LazyVerticalStaggeredGrid(
-            modifier = modifier,
-            columns = StaggeredGridCells.Adaptive(160.dp)
-        ) {
-            for (note in notes) {
-                item(key = note.id) {
-                    CardNote(note = note, onSelected = onSelected)
+        if (!isTabletOrFoldableExpanded(sizeClass)) {
+            LazyColumn(
+                modifier = modifier.fillMaxSize()
+            ) {
+                for (note in notes) {
+                    item(key = note.id) {
+                        CardNote(note = note, onSelected = onSelected)
+                    }
+                }
+            }
+        } else {
+            LazyVerticalStaggeredGrid(
+                modifier = modifier,
+                columns = StaggeredGridCells.Adaptive(160.dp)
+            ) {
+                for (note in notes) {
+                    item(key = note.id) {
+                        CardNote(note = note, onSelected = onSelected)
+                    }
                 }
             }
         }
     }
+
 }
 
 @Composable

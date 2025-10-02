@@ -34,9 +34,6 @@ class Notes : Application() {
     }
 
     private fun initComponents() {
-
-        // Setup module dependencies
-
         // Logger is initialized first as some of the below classes
         // could call it during instance creation
         PlatformAPIs.logger = logger

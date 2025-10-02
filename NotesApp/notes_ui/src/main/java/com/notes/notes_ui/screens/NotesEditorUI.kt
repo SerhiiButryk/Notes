@@ -25,7 +25,7 @@ import com.notes.ui.theme.AppTheme
 @Composable
 fun NotesEditorUI(
     modifier: Modifier = Modifier,
-    notes: NotesViewModel.Notes?,
+    notes: NotesViewModel.Notes,
     state: RichTextState,
     toolsPaneItems: List<ToolsPane> = emptyList<ToolsPane>()
 ) {
@@ -37,7 +37,7 @@ fun NotesEditorUI(
 @Composable
 private fun EditorUI(
     modifier: Modifier = Modifier,
-    note: NotesViewModel.Notes?,
+    notes: NotesViewModel.Notes,
     state: RichTextState,
     toolsPaneItems: List<ToolsPane>
 ) {
@@ -46,14 +46,14 @@ private fun EditorUI(
     ) { innerPadding ->
         // Adds cross fade animation when selecting a note from the list
         Crossfade(
-            targetState = note,
+            targetState = notes,
             label = "Editor cross fade animation",
             modifier = Modifier.padding(innerPadding)
         ) { note ->
-            if (note == null) {
+            if (note == NotesViewModel.Notes.AbsentNote()) {
                 InfoLabel()
             } else {
-                EditorLayout(state = state, toolsPaneItems = toolsPaneItems)
+                EditorLayout(state = state, toolsPaneItems = toolsPaneItems, notes = note)
             }
         }
     }
@@ -63,7 +63,8 @@ private fun EditorUI(
 private fun EditorLayout(
     modifier: Modifier = Modifier,
     state: RichTextState,
-    toolsPaneItems: List<ToolsPane>
+    toolsPaneItems: List<ToolsPane>,
+    notes: NotesViewModel.Notes,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -80,7 +81,7 @@ private fun EditorLayout(
                 .weight(1f)
         )
 
-        ToolsPane(state = state, toolsPaneItems = toolsPaneItems)
+        ToolsPane(state = state, toolsPaneItems = toolsPaneItems, notes = notes)
     }
 }
 
@@ -103,5 +104,5 @@ private fun InfoLabel(modifier: Modifier = Modifier) {
 @Composable
 fun NotesEditorUIPrev(modifier: Modifier = Modifier) {
     val state = rememberRichTextState()
-    NotesEditorUI(notes = NotesViewModel.Notes(), state = state, toolsPaneItems = emptyList())
+    NotesEditorUI(notes = NotesViewModel.Notes.NewNote(), state = state, toolsPaneItems = emptyList())
 }

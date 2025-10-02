@@ -3,6 +3,7 @@ package com.notes.notes_ui.screens.editor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.FormatAlignLeft
 import androidx.compose.material.icons.automirrored.outlined.FormatAlignRight
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.FormatAlignCenter
 import androidx.compose.material.icons.outlined.FormatBold
 import androidx.compose.material.icons.outlined.FormatItalic
@@ -18,7 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.notes.notes_ui.NotesInteraction
+import com.notes.notes_ui.EditorState
+import com.notes.notes_ui.Interaction
+import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.R
 import com.notes.ui.CLEAR_ALL
 import com.notes.ui.SAVE_ICON
@@ -30,7 +33,7 @@ data class Tool(
     val imageVector: ImageVector? = null,
     val id: Int = 0,
     val enabled: Boolean = false,
-    val onClick: (richTextState: RichTextState) -> Unit = {},
+    val onClick: (richTextState: RichTextState, NotesViewModel.Notes) -> Unit,
     val key: Long = uuid++,
     val highlight: Boolean = true
 )
@@ -40,7 +43,7 @@ data class ToolsPane(
     val list: List<Tool>
 )
 
-fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
+fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
     //////////////////////////////////
     // Construct editor tool pane
     //////////////////////////////////
@@ -49,8 +52,21 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
             listOf(
                 Tool(
                     imageVector = SAVE_ICON,
-                    onClick = { state ->
-                        notesInteraction.saveContent(state)
+                    onClick = { state, note ->
+                        val wrappedState = object : EditorState {
+                            override fun getHtml() = state.toHtml()
+                        }
+                        notesInteraction.saveContent(wrappedState, note)
+                    },
+                    highlight = false
+                )
+            )
+        ),
+        ToolsPane(listOf(
+                Tool(
+                    imageVector = Icons.Outlined.DeleteForever,
+                    onClick = { state, note ->
+                        notesInteraction.deleteNote(note)
                     },
                     highlight = false
                 )
@@ -60,7 +76,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
             listOf(
                 Tool(
                     imageVector = CLEAR_ALL,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(ClearCommand(state))
                     },
                     highlight = false
@@ -71,7 +87,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
             listOf(
                 Tool(
                     id = R.drawable.format_h1,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontSize = 50.sp),
@@ -81,7 +97,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                     }),
                 Tool(
                     id = R.drawable.format_h2,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontSize = 40.sp),
@@ -92,7 +108,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                 ),
                 Tool(
                     id = R.drawable.format_h3,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontSize = 30.sp),
@@ -102,7 +118,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                     }),
                 Tool(
                     id = R.drawable.format_h4,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontSize = 20.sp),
@@ -112,7 +128,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                     }),
                 Tool(
                     id = R.drawable.format_h5,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontSize = 15.sp),
@@ -122,7 +138,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                     }),
                 Tool(
                     id = R.drawable.format_h6,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontSize = 10.sp),
@@ -136,7 +152,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
             listOf(
                 Tool(
                     imageVector = Icons.Outlined.FormatBold,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontWeight = FontWeight.Bold),
@@ -146,7 +162,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                     }),
                 Tool(
                     imageVector = Icons.Outlined.FormatItalic,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(fontStyle = FontStyle.Italic),
@@ -156,7 +172,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                     }),
                 Tool(
                     imageVector = Icons.Outlined.FormatUnderlined,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(textDecoration = TextDecoration.Underline),
@@ -167,7 +183,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                 ),
                 Tool(
                     imageVector = Icons.Outlined.StrikethroughS,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             EditCommand(
                                 spanStyle = SpanStyle(textDecoration = TextDecoration.LineThrough),
@@ -182,7 +198,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
             listOf(
                 Tool(
                     imageVector = Icons.Outlined.FormatAlignCenter,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             AlignCommand(
                                 paragraphStyle = ParagraphStyle(textAlign = TextAlign.Center),
@@ -193,7 +209,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                 ),
                 Tool(
                     imageVector = Icons.AutoMirrored.Outlined.FormatAlignLeft,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             AlignCommand(
                                 paragraphStyle = ParagraphStyle(textAlign = TextAlign.Left),
@@ -204,7 +220,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                 ),
                 Tool(
                     imageVector = Icons.AutoMirrored.Outlined.FormatAlignRight,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             AlignCommand(
                                 paragraphStyle = ParagraphStyle(textAlign = TextAlign.Right),
@@ -219,7 +235,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
             listOf(
                 Tool(
                     imageVector = com.notes.ui.List,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             UnorderedListCommand(state)
                         )
@@ -227,7 +243,7 @@ fun getToolsList(notesInteraction: NotesInteraction): List<ToolsPane> {
                 ),
                 Tool(
                     imageVector = com.notes.ui.Format_list_numbered,
-                    onClick = { state ->
+                    onClick = { state, note ->
                         notesInteraction.sendEditorCommand(
                             OrderedListCommand(state)
                         )

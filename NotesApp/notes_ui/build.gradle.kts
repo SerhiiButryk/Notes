@@ -36,6 +36,8 @@ android {
 dependencies {
 
     implementation(project(":ui"))
+    implementation(project(":data"))
+    implementation(project(":api"))
 
     implementation(libs.bundles.android.core)
     // For style attributes like attr/colorControlNormal

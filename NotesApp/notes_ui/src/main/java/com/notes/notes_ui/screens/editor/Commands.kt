@@ -3,10 +3,7 @@ package com.notes.notes_ui.screens.editor
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import com.mohamedrejeb.richeditor.model.RichTextState
-
-interface EditorCommand {
-    fun execCommand()
-}
+import com.notes.notes_ui.EditorCommand
 
 class EditCommand(val spanStyle: SpanStyle, val richTextState: RichTextState) : EditorCommand {
     override fun execCommand() {

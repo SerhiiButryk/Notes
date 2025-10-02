@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.RichTextState
+import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.screens.editor.Tool
 import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.Arrow_up
@@ -43,7 +44,8 @@ import com.notes.ui.Arrow_up
 fun ToolsPane(
     modifier: Modifier = Modifier,
     state: RichTextState,
-    toolsPaneItems: List<ToolsPane>
+    toolsPaneItems: List<ToolsPane>,
+    notes: NotesViewModel.Notes,
 ) {
     Surface(
         shape = CircleShape,
@@ -66,14 +68,14 @@ fun ToolsPane(
                         ToolButton(
                             imageVector = option.imageVector,
                             id = option.id,
-                            onClick = { option.onClick(state) },
+                            onClick = { option.onClick(state, notes) },
                             animated = option.highlight
                         )
                     }
                     // Add a list of options
                 } else {
                     item {
-                        ToolsMenu(tools, state)
+                        ToolsMenu(tools, state, notes)
                     }
                 }
             }
@@ -141,7 +143,7 @@ private fun ToolButton(
 }
 
 @Composable
-private fun ToolsMenu(tools: ToolsPane, state: RichTextState) {
+private fun ToolsMenu(tools: ToolsPane, state: RichTextState, notes: NotesViewModel.Notes) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -168,7 +170,7 @@ private fun ToolsMenu(tools: ToolsPane, state: RichTextState) {
             for (tool in tools.list) {
                 MenuItem(
                     tool = tool,
-                    state = state
+                    onAction = { tool.onClick(state, notes) }
                 )
             }
         }
@@ -178,7 +180,7 @@ private fun ToolsMenu(tools: ToolsPane, state: RichTextState) {
 @Composable
 private fun MenuItem(
     tool: Tool,
-    state: RichTextState
+    onAction: () -> Unit
 ) {
     DropdownMenuItem(
         leadingIcon = {
@@ -195,8 +197,6 @@ private fun MenuItem(
             }
         },
         text = { },
-        onClick = {
-            tool.onClick(state)
-        }
+        onClick = onAction
     )
 }
