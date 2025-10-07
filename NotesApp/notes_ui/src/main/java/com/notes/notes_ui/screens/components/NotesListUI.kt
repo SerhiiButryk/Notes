@@ -1,19 +1,21 @@
 package com.notes.notes_ui.screens.components
 
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,10 +23,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
+import com.mohamedrejeb.richeditor.model.RichTextState
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import com.notes.notes_ui.NotesViewModel
 import com.notes.ui.SearchBarField
 import com.notes.ui.isTabletOrFoldableExpanded
@@ -91,7 +99,7 @@ fun NotesList(
             ) {
                 for (note in notes) {
                     item(key = note.id) {
-                        CardNote(note = note, onSelected = onSelected)
+                        EditorPreviewStateful(content = note.content) { onSelected(note) }
                     }
                 }
             }
@@ -102,7 +110,7 @@ fun NotesList(
             ) {
                 for (note in notes) {
                     item(key = note.id) {
-                        CardNote(note = note, onSelected = onSelected)
+                        EditorPreviewStateful(content = note.content) { onSelected(note) }
                     }
                 }
             }
@@ -112,20 +120,50 @@ fun NotesList(
 }
 
 @Composable
-private fun CardNote(note: NotesViewModel.Notes, onSelected: (NotesViewModel.Notes) -> Unit) {
+private fun EditorPreviewStateful(content: String, onClicked: () -> Unit) {
+
+    val state = rememberRichTextState()
+
+    LaunchedEffect(content) {
+        state.clear()
+        state.setHtml(content)
+    }
+
+    EditorPreview(state = state) {
+        onClicked()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditorPreview(state: RichTextState, onClicked: () -> Unit) {
     Box(
-        modifier = Modifier
-            .heightIn(min = 40.dp)
-            .combinedClickable(onLongClick = { }, onClick = { onSelected(note) })
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Card(
+
+        // Readonly field doesn't react on click events
+        RichTextEditor(
+            state = state,
+            shape = RoundedCornerShape(10),
+            readOnly = true,
+            colors = richTextEditorColors(
+                // Remove bottom thin line
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(4.dp)
-        ) {
-            Text(
-                modifier = Modifier.padding(8.dp), text = note.content
-            )
-        }
+        )
+
+        // Composable to be able to intercept click events
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable {
+                    onClicked()
+                }
+        )
+
     }
 }

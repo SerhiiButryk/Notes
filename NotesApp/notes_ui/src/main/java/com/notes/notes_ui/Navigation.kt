@@ -8,10 +8,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.notes.notes_ui.NotesViewModel.Actions
 import com.notes.notes_ui.NotesViewModel.Notes
 import com.notes.notes_ui.screens.NotesUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
@@ -33,6 +35,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val getNote: () -> StateFlow<Notes> = { viewModel.noteState }
 
+            val getActions: () -> SharedFlow<Actions> = { viewModel.getActions() }
+
             val toolsPaneItems = viewModel.richTools
 
             val context = LocalContext.current
@@ -45,7 +49,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 toolsPaneItems = toolsPaneItems,
                 onAddAction = onAddAction,
                 getNote = getNote,
-                onSelectAction = onSelectAction
+                onSelectAction = onSelectAction,
+                getActions = getActions
             )
         }
 

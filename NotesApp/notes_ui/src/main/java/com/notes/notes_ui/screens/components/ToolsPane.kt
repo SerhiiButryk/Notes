@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -107,7 +108,7 @@ private fun ToolButton(
         val infiniteTransition = rememberInfiniteTransition()
         val offset by infiniteTransition.animateFloat(
             initialValue = 0f,
-            targetValue = 70f,
+            targetValue = 120f,
             animationSpec = infiniteRepeatable(tween(durationMillis = 1500, easing = LinearEasing))
         )
 
@@ -196,7 +197,7 @@ private fun MenuItem(
                 )
             }
         },
-        text = { },
+        text = { Text(text = tool.text) },
         onClick = onAction
     )
 }

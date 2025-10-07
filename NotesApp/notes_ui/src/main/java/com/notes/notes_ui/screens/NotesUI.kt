@@ -18,12 +18,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.notes.notes_ui.NotesViewModel
+import com.notes.notes_ui.NotesViewModel.Actions
 import com.notes.notes_ui.NotesViewModel.Notes
 import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail
 import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -34,7 +36,8 @@ fun NotesUI(
     toolsPaneItems: List<ToolsPane>,
     getNote: () -> StateFlow<Notes>,
     onAddAction: suspend () -> Unit,
-    onSelectAction: suspend (Notes) -> Unit
+    onSelectAction: suspend (Notes) -> Unit,
+    getActions: () -> SharedFlow<Actions>
 ) {
     AppTheme {
         NotesUIImpl(
@@ -42,7 +45,8 @@ fun NotesUI(
             toolsPaneItems = toolsPaneItems,
             onAddAction = onAddAction,
             getNote = getNote,
-            onSelectAction = onSelectAction
+            onSelectAction = onSelectAction,
+            getActions = getActions
         )
     }
 }
@@ -53,7 +57,8 @@ private fun NotesUIImpl(
     toolsPaneItems: List<ToolsPane>,
     getNote: () -> StateFlow<Notes>,
     onAddAction: suspend () -> Unit,
-    onSelectAction: suspend (Notes) -> Unit
+    onSelectAction: suspend (Notes) -> Unit,
+    getActions: () -> SharedFlow<Actions>
 ) {
 
     Row {
@@ -71,7 +76,8 @@ private fun NotesUIImpl(
             toolsPaneItems = toolsPaneItems,
             onAddAction = onAddAction,
             getNote = getNote,
-            onSelectAction = onSelectAction
+            onSelectAction = onSelectAction,
+            getActions = getActions
         )
     }
 
@@ -85,7 +91,8 @@ private fun ListDetailUI(
     toolsPaneItems: List<ToolsPane>,
     getNote: () -> StateFlow<Notes>,
     onAddAction: suspend () -> Unit,
-    onSelectAction: suspend (Notes) -> Unit
+    onSelectAction: suspend (Notes) -> Unit,
+    getActions: () -> SharedFlow<Actions>
 ) {
 
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
@@ -141,10 +148,16 @@ private fun ListDetailUI(
                 val state = rememberRichTextState()
                 val noteState = getNote().collectAsStateWithLifecycle()
 
-                LaunchedEffect(noteState) {
+                LaunchedEffect(noteState.value) {
                     // Clear previous styles and states
                     state.clear()
                     state.setHtml(noteState.value.content)
+
+                    getActions().collect {
+                        if (it is Actions.NavBackAction) {
+                            navigator.navigateBack()
+                        }
+                    }
                 }
 
                 NotesEditorUI(notes = noteState.value, state = state, toolsPaneItems = toolsPaneItems)

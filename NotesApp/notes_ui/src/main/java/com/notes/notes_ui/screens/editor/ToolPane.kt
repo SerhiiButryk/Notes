@@ -35,7 +35,8 @@ data class Tool(
     val enabled: Boolean = false,
     val onClick: (richTextState: RichTextState, NotesViewModel.Notes) -> Unit,
     val key: Long = uuid++,
-    val highlight: Boolean = true
+    val highlight: Boolean = true,
+    val text: String = ""
 )
 
 @Stable
@@ -94,7 +95,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }),
+                    },
+                    text = "size"),
                 Tool(
                     id = R.drawable.format_h2,
                     onClick = { state, note ->
@@ -104,7 +106,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }
+                    },
+                    text = "size"
                 ),
                 Tool(
                     id = R.drawable.format_h3,
@@ -115,7 +118,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }),
+                    },
+                    text = "size"),
                 Tool(
                     id = R.drawable.format_h4,
                     onClick = { state, note ->
@@ -125,7 +129,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }),
+                    },
+                    text = "size"),
                 Tool(
                     id = R.drawable.format_h5,
                     onClick = { state, note ->
@@ -135,7 +140,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }),
+                    },
+                    text = "size"),
                 Tool(
                     id = R.drawable.format_h6,
                     onClick = { state, note ->
@@ -145,7 +151,9 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    })
+                    },
+                    text = "size"
+                )
             )
         ),
         ToolsPane(
@@ -159,7 +167,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }),
+                    },
+                    text = "Bold"),
                 Tool(
                     imageVector = Icons.Outlined.FormatItalic,
                     onClick = { state, note ->
@@ -169,7 +178,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }),
+                    },
+                    text = "Italic"),
                 Tool(
                     imageVector = Icons.Outlined.FormatUnderlined,
                     onClick = { state, note ->
@@ -179,7 +189,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }
+                    },
+                    text = "Underlined"
                 ),
                 Tool(
                     imageVector = Icons.Outlined.StrikethroughS,
@@ -190,7 +201,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }
+                    },
+                    text = "Strike through"
                 )
             )
         ),
@@ -205,7 +217,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }
+                    },
+                    text = "Align center"
                 ),
                 Tool(
                     imageVector = Icons.AutoMirrored.Outlined.FormatAlignLeft,
@@ -216,7 +229,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }
+                    },
+                    text = "Align left"
                 ),
                 Tool(
                     imageVector = Icons.AutoMirrored.Outlined.FormatAlignRight,
@@ -227,7 +241,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                                 richTextState = state
                             )
                         )
-                    }
+                    },
+                    text = "Align right"
                 )
             )
         ),
@@ -239,7 +254,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                         notesInteraction.sendEditorCommand(
                             UnorderedListCommand(state)
                         )
-                    }
+                    },
+                    text = "Simple list"
                 ),
                 Tool(
                     imageVector = com.notes.ui.Format_list_numbered,
@@ -247,7 +263,8 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                         notesInteraction.sendEditorCommand(
                             OrderedListCommand(state)
                         )
-                    }
+                    },
+                    text = "Numbered list"
                 )
             )
         )

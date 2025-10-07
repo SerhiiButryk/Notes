@@ -75,17 +75,19 @@ class OfflineRepository : Repository {
         }
     }
 
-    override fun deleteNote(note: Notes) = deleteNote(scope = scope, note = note)
+    override fun deleteNote(note: Notes, callback: (Long) -> Unit)
+        = deleteNote(scope = scope, note = note, callback = callback)
 
     // TODO: Double-check delete behavior
     // What happens with the table ? Is private ket get reused ?
-    fun deleteNote(scope: CoroutineScope, note: Notes) {
+    fun deleteNote(scope: CoroutineScope, note: Notes, callback: (Long) -> Unit) {
         scope.launch {
             logger.logi("OfflineRepository::deleteNote(${note.id})")
             // Deliberately set default value, only uid is important
             // as it is used as primary key to match the note
             val noteEntity = NoteEntity(uid = note.id, "", "", "")
             LocalNoteDatabase.access().deleteNote(noteEntity)
+            callback(note.id)
         }
     }
 

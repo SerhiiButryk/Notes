@@ -13,14 +13,15 @@ interface EditorCommand {
 }
 
 interface Callback {
-    fun onNewAdded(id: Long)
+    fun onAdded(id: Long)
+    fun onDeleted(id: Long)
 }
 
 interface Repository {
     fun getNotes(): Flow<List<Notes>>
     fun getNotes(id: Long): Flow<Notes?>
     fun saveNote(note: Notes, onNewAdded: suspend (Long) -> Unit)
-    fun deleteNote(note: Notes)
+    fun deleteNote(note: Notes, callback: (Long) -> Unit)
     fun init(context: Context)
     fun clear()
 }
@@ -34,12 +35,14 @@ class Interaction(private val repository: Repository, private val callback: Call
     fun saveContent(state: EditorState, note: Notes) {
         val html = state.getHtml()
         repository.saveNote(note.copy(content = html)) {
-            callback.onNewAdded(it)
+            callback.onAdded(it)
         }
     }
 
     fun deleteNote(note: Notes) {
-        repository.deleteNote(note)
+        repository.deleteNote(note) {
+            callback.onDeleted(it)
+        }
     }
 
     fun getNotes(): Flow<List<Notes>> {

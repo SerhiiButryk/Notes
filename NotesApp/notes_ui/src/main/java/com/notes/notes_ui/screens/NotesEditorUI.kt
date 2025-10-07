@@ -8,15 +8,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.screens.components.ToolsPane
 import com.notes.notes_ui.screens.editor.ToolsPane
@@ -59,6 +63,7 @@ private fun EditorUI(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorLayout(
     modifier: Modifier = Modifier,
@@ -78,7 +83,13 @@ private fun EditorLayout(
                 // add weight modifier to the composable to ensure
                 // that the composable is measured after the other
                 // composable is measured specifically after the tools pane.
-                .weight(1f)
+                .weight(1f),
+            colors = richTextEditorColors(
+                // Remove bottom thin line
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
+            shape = RoundedCornerShape(4)
         )
 
         ToolsPane(state = state, toolsPaneItems = toolsPaneItems, notes = notes)

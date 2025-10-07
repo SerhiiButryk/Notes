@@ -184,7 +184,7 @@ class ViewModelNotesTest {
             }
         }
 
-        viewModel?.onNewAdded(id = note3.id)
+        viewModel?.onAdded(id = note3.id)
 
         assertThat(notes.receive()).isEqualTo(note3)
 
