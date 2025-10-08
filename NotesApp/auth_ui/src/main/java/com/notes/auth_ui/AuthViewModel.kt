@@ -3,11 +3,9 @@ package com.notes.auth_ui
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notes.api.PlatformAPIs.logger
 import com.notes.auth.AuthResult
 import com.notes.auth.AuthService
-import com.notes.auth_ui.data.getRegisteredUserEmail
-import com.notes.auth_ui.data.saveRegisteredUserEmail
-import com.notes.api.PlatformAPIs.logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +17,7 @@ private const val TAG = "AuthViewModel"
 
 @HiltViewModel
 internal class AuthViewModel @Inject constructor(
-    private val authService: AuthService
+    authService: AuthService
 ) : ViewModel() {
 
     open class UIState()
@@ -60,10 +58,12 @@ internal class AuthViewModel @Inject constructor(
     private val _dialogState = MutableStateFlow<DialogState?>(null)
     val dialogState = _dialogState.asStateFlow()
 
+    private val interaction = Interaction(authService)
+
     fun onShowLoginUI() {
         viewModelScope.launch {
             // Initially we are going to show a keyboard if ui is open
-            _uiState.update { LoginUIState(hasFocus = true, email = getRegisteredUserEmail()) }
+            _uiState.update { LoginUIState(hasFocus = true, email = interaction.getUserEmail()) }
         }
     }
 
@@ -74,50 +74,30 @@ internal class AuthViewModel @Inject constructor(
         }
     }
 
-    fun login(loginUIState: LoginUIState, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            authService.login(loginUIState.password, loginUIState.email) { result ->
-                // Handle the result
-                viewModelScope.launch {
-                    if (result.isSuccess()) {
-                        onSuccess()
-                    } else {
-                        handleError(result)
-                    }
-                }
-            }
-        }
+    fun login(state: LoginUIState, onSuccess: () -> Unit) {
+        interaction.login(state, onSuccess, onError = { handleError(it) })
     }
 
-    fun register(registerUIState: RegisterUIState, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            authService.register(
-                registerUIState.password,
-                registerUIState.confirmPassword,
-                registerUIState.email
-            ) { result ->
-                // Handle the result
-                viewModelScope.launch {
-                    if (result.isSuccess()) {
-                        saveRegisteredUserEmail(result.email)
-                        refreshUserEmail()
-                        onSuccess()
-                    } else {
-                        handleError(result)
-                    }
-                }
-            }
-        }
+    fun register(state: RegisterUIState, onSuccess: suspend () -> Unit) {
+        interaction.register(state, onSuccess = {
+            refreshUserEmail()
+            onSuccess()
+        }, onError = { handleError(it) })
     }
 
     fun dismissDialog() {
-        logger.logi("dismissDialog()")
+        logger.logi("$TAG::dismissDialog()")
         _dialogState.value = null
+    }
+
+    override fun onCleared() {
+        logger.logi("$TAG::onCleared()")
+        interaction.onClear()
     }
 
     private fun handleError(result: AuthResult) {
 
-        logger.logi("handleError() showing a dialog")
+        logger.logi("$TAG::handleError() showing a dialog")
 
         val strings = getErrorTitleAndMessage(result)
         val title = strings.first
@@ -127,7 +107,8 @@ internal class AuthViewModel @Inject constructor(
     }
 
     private suspend fun refreshUserEmail() {
-        _uiState.update { (_uiState.value as LoginUIState).copy(email = getRegisteredUserEmail()) }
+        val email = interaction.getUserEmail()
+        _uiState.update { (_uiState.value as LoginUIState).copy(email = email) }
     }
 
 }

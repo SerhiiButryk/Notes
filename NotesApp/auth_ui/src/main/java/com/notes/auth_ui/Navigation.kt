@@ -40,7 +40,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
                 LoginUI(
                     state = state.value as AuthViewModel.LoginUIState,
-                    onLogin = { viewModel.login(loginUIState = it, onSuccess = onSuccess) })
+                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess) })
             }
 
             if (state.value is AuthViewModel.RegisterUIState) {
@@ -51,7 +51,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                     state = state.value as AuthViewModel.RegisterUIState,
                     onRegister = {
                         viewModel.register(
-                            registerUIState = it,
+                            state = it,
                             onSuccess = onSuccess
                         )
                     })
