@@ -1,34 +1,8 @@
 TODO list:
 
-1. No autofocus for com.notes.notes_ui.screens.EditorLayout() function
+1. No ontextchanged listener for com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 
-- Need to modify com.mohamedrejeb.richeditor.ui.material3.RichTextEditor sources
-and to add autofocus
-
-https://github.com/MohamedRejeb/compose-rich-editor
-
-The next code is working on Android:
-
-val focusRequester = remember { FocusRequester() }
-
-// State for the text field value
-var textState by remember { mutableStateOf(TextFieldValue("")) }
-
-BasicTextField(
-    value = textState,
-    onValueChange = { textState = it },
-    modifier = Modifier
-        // 2. Associate the FocusRequester with the BasicTextField
-        .focusRequester(focusRequester)
-        .fillMaxWidth()
-)
-
-LaunchedEffect(Unit) {
-    // Requesting focus here will automatically show the keyboard on Android.
-    focusRequester.requestFocus()
-}
-
-So, autofocus should work.
+Need to modify sources
 
 2. Add html to pdf export feature
 

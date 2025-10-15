@@ -2,16 +2,12 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    id("kotlin-parcelize")
 }
 
 apply(from = "${rootDir}/gradle_configs/versions.gradle")
 
 android {
-    namespace = "com.notes.notes_ui"
+    namespace = "com.mohamedrejeb.richeditor"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -35,15 +31,6 @@ android {
 
 dependencies {
 
-    implementation(project(":ui"))
-    implementation(project(":data"))
-    implementation(project(":api"))
-    implementation(project(":ext:richeditor-compose"))
-
-    implementation(libs.bundles.android.core)
-    // For style attributes like attr/colorControlNormal
-    implementation(libs.androidx.appcompat)
-
     // Compose UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.composeui)
@@ -52,19 +39,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
 
-    // Compose navigation
-    implementation(libs.navigation)
-    implementation(libs.serialization)
-
-    // Hilt dependency injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
-
-    // For currentWindowAdaptiveInfo() & List Detail composable
-    implementation(libs.androidx.adaptive)
-    implementation(libs.androidx.adaptive.navigation)
-    implementation(libs.androidx.adaptive.layout)
+    implementation(libs.ksoup.html)
+    implementation(libs.ksoup.entities)
+    implementation(libs.markdown)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

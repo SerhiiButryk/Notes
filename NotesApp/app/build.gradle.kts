@@ -12,15 +12,6 @@ apply(from = "${rootDir}/gradle_configs/versions.gradle")
 android {
     namespace = "com.notes.app"
 
-    signingConfigs {
-        create("release") {
-            keyAlias = "key0"
-            storePassword = "password"
-            keyPassword = "password"
-            storeFile = file("test_only.jks")
-        }
-    }
-
     defaultConfig {
         applicationId = "com.notes.app"
 
