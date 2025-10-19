@@ -25,6 +25,7 @@ ksp = "2.1.21-2.0.2"
 hilt = "2.56.2"
 hiltcompose = "1.2.0"
 truth = "1.4.4"
+media3 = "1.8.0"
 
 [libraries]
 ksoup-entities = { module = "com.mohamedrejeb.ksoup:ksoup-entities", version.ref = "ksoupHtml" }
@@ -63,6 +64,8 @@ serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization
 navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+androidx-media3-ui-compose = { group = "androidx.media3", name = "media3-ui-compose", version.ref = "media3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

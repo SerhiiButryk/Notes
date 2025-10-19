@@ -27,6 +27,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.*
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
@@ -114,7 +115,8 @@ public fun RichTextEditor(
             RichTextEditorDefaults.richTextEditorWithoutLabelPadding()
         } else {
             RichTextEditorDefaults.richTextEditorWithLabelPadding()
-        }
+        },
+    onTextChanged: (TextFieldValue) -> Unit = {},
 ) {
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {
@@ -163,6 +165,7 @@ public fun RichTextEditor(
                 )
             },
             contentPadding = contentPadding,
+            onTextChanged = onTextChanged
         )
     }
 }

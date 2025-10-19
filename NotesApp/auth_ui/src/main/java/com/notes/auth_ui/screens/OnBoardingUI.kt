@@ -2,7 +2,6 @@ package com.notes.auth_ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,13 +19,12 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.notes.auth_ui.Header
-import com.notes.auth_ui.R
+import com.notes.ui.VideoPlayer
+import com.notes.ui.isPhoneLandScape
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.AppTheme
 
@@ -50,7 +48,8 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
             Modifier.widthIn(max = 800.dp)
         } else {
             // Full size
-            Modifier.fillMaxSize()
+            Modifier
+                .fillMaxSize()
                 .padding(24.dp)
         }
 
@@ -65,15 +64,25 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // From https://undraw.co/search/notes
-                Image(
-                    painter = painterResource(id = R.drawable.onboarding_notes_icon),
-                    contentDescription = "Note Icon",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(bottom = 32.dp),
-                    contentScale = ContentScale.Fit
-                )
+                // Generated using https://www.vidnoz.com/image-to-video-ai.html
+                // From image https://undraw.co/search/notes
+                val url = "asset:///preview_video.mp4"
+
+                if (isPhoneLandScape(sc) && !isTabletOrFoldableExpanded(sc)) {
+                    VideoPlayer(
+                        videoLink = url,
+                        modifier = Modifier
+                            .size(200.dp)
+                            .padding(bottom = 32.dp)
+                    )
+                } else {
+                    VideoPlayer(
+                        videoLink = url,
+                        modifier = Modifier
+                            .size(400.dp)
+                            .padding(bottom = 32.dp)
+                    )
+                }
 
                 Header("Welcome to Notes")
 

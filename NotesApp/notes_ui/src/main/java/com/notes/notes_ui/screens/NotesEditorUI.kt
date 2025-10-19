@@ -89,7 +89,9 @@ private fun EditorLayout(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            shape = RoundedCornerShape(4)
+            shape = RoundedCornerShape(4),
+            onTextChanged = {
+            }
         )
 
         ToolsPane(state = state, toolsPaneItems = toolsPaneItems, notes = notes)

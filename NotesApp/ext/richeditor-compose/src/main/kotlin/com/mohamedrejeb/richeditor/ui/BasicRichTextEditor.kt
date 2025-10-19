@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.mohamedrejeb.richeditor.model.RichTextState
@@ -99,6 +100,7 @@ public fun BasicRichTextEditor(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(Color.Black),
+    onTextChanged: (TextFieldValue) -> Unit = {},
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
@@ -118,7 +120,8 @@ public fun BasicRichTextEditor(
         interactionSource = interactionSource,
         cursorBrush = cursorBrush,
         decorationBox = decorationBox,
-        contentPadding = PaddingValues()
+        contentPadding = PaddingValues(),
+        onTextChanged = onTextChanged
     )
 }
 
@@ -194,7 +197,8 @@ public fun BasicRichTextEditor(
     cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() },
-    contentPadding: PaddingValues
+    contentPadding: PaddingValues,
+    onTextChanged: (TextFieldValue) -> Unit = {}
 ) {
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
@@ -247,6 +251,9 @@ public fun BasicRichTextEditor(
             onValueChange = {
                 if (readOnly) return@BasicTextField
                 if (it.text.length > maxLength) return@BasicTextField
+
+                // TODO: Change xx03
+                onTextChanged(it)
 
                 state.onTextFieldValueChange(it)
             },
