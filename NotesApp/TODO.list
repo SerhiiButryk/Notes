@@ -7,3 +7,8 @@ Need to modify sources
 2. Add html to pdf export feature
 
 - Need to use WebView or native canvas drawing. No other approaches so far.
+
+3. Revisit Proguard configs and update project to use Dagger for multi-module.
+Looks like we need additional configs.
+
+https://developer.android.com/training/dependency-injection/dagger-multi-module#dagger-dfm

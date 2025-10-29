@@ -20,9 +20,7 @@ internal fun LoginUI(
     state: AuthViewModel.LoginUIState,
     onLogin: (AuthViewModel.LoginUIState) -> Unit
 ) {
-    AppTheme {
-        LoginUIImpl(state, onLogin)
-    }
+    LoginUIImpl(state, onLogin)
 }
 
 @Composable

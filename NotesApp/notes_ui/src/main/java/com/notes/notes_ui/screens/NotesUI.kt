@@ -24,7 +24,6 @@ import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail
 import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.isTabletOrFoldableExpanded
-import com.notes.ui.theme.AppTheme
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,16 +38,14 @@ fun NotesUI(
     onSelectAction: suspend (Notes) -> Unit,
     getActions: () -> SharedFlow<Actions>
 ) {
-    AppTheme {
-        NotesUIImpl(
-            notes = notes,
-            toolsPaneItems = toolsPaneItems,
-            onAddAction = onAddAction,
-            getNote = getNote,
-            onSelectAction = onSelectAction,
-            getActions = getActions
-        )
-    }
+    NotesUIImpl(
+        notes = notes,
+        toolsPaneItems = toolsPaneItems,
+        onAddAction = onAddAction,
+        getNote = getNote,
+        onSelectAction = onSelectAction,
+        getActions = getActions
+    )
 }
 
 @Composable

@@ -12,11 +12,11 @@ private data class UserDataStore(
 
 private val userDataState = MutableStateFlow(UserDataStore())
 
-internal suspend fun saveRegisteredUserEmail(email: String) {
+internal suspend fun saveUserEmail(email: String) {
     PlatformAPIs.storage.save(email, REGISTERED_USER_EMAIL)
 }
 
-internal suspend fun getRegisteredUserEmail(): String {
+internal suspend fun getUserEmail(): String {
     return PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
 }
 

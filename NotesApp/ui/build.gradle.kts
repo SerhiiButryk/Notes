@@ -19,7 +19,6 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,6 +44,11 @@ dependencies {
     implementation(libs.serialization)
 
     // Hilt dependency injection
+    // Dependencies notes:
+    // 'libs.hilt.android' has Hilt source dependencies like hilt annotations
+    // 'libs.hilt.compiler' is needed to presses Hilt source annotations and generate code
+    // 'libs.androidx.hilt.navigation.compose' is needed to properly create a view model
+    // when compose navigation is used
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)

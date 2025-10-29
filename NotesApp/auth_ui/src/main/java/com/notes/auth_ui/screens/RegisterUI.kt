@@ -20,9 +20,7 @@ internal fun RegisterUI(
     state: AuthViewModel.RegisterUIState,
     onRegister: (AuthViewModel.RegisterUIState) -> Unit
 ) {
-    AppTheme {
-        RegisterImpl(state, onRegister)
-    }
+    RegisterImpl(state, onRegister)
 }
 
 @Composable

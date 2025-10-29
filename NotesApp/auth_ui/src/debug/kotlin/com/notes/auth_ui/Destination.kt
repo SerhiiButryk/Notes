@@ -2,7 +2,7 @@ package com.notes.auth_ui
 
 import com.notes.ui.Screen
 
-private var simulationMode = true
+private var simulationMode = false
 
 /**
  * Defining destinations for debug app.

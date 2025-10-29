@@ -24,7 +24,6 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextE
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.screens.components.ToolsPane
 import com.notes.notes_ui.screens.editor.ToolsPane
-import com.notes.ui.theme.AppTheme
 
 @Composable
 fun NotesEditorUI(
@@ -33,9 +32,7 @@ fun NotesEditorUI(
     state: RichTextState,
     toolsPaneItems: List<ToolsPane> = emptyList<ToolsPane>()
 ) {
-    AppTheme {
-        EditorUI(modifier, notes, state, toolsPaneItems)
-    }
+    EditorUI(modifier, notes, state, toolsPaneItems)
 }
 
 @Composable

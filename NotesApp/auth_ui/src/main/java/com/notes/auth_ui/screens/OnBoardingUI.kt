@@ -26,13 +26,10 @@ import com.notes.auth_ui.Header
 import com.notes.ui.VideoPlayer
 import com.notes.ui.isPhoneLandScape
 import com.notes.ui.isTabletOrFoldableExpanded
-import com.notes.ui.theme.AppTheme
 
 @Composable
-fun OnboardingScreen(onContinue: () -> Unit = {}) {
-    AppTheme {
-        OnboardingScreenImpl(onContinue = onContinue)
-    }
+internal fun OnboardingScreen(onContinue: () -> Unit = {}) {
+    OnboardingScreenImpl(onContinue = onContinue)
 }
 
 @Composable

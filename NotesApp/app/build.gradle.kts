@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 apply(from = "${rootDir}/gradle_configs/versions.gradle")
@@ -20,7 +21,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Attention !!!
+            // Obfuscation, shrinking and minification should be enabled only in the top app module.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -40,6 +44,7 @@ dependencies {
     implementation(project(":api"))
     implementation(project(":ui"))
     implementation(project(":notes_ui"))
+    implementation(project(":ext:services"))
 
     implementation(libs.bundles.android.core)
 
@@ -52,8 +57,14 @@ dependencies {
     implementation(libs.serialization)
 
     // Hilt dependency injection
+    // Dependencies notes:
+    // 'libs.hilt.android' has Hilt source dependencies like hilt annotations
+    // 'libs.hilt.compiler' is needed to presses Hilt source annotations and generate code
+    // 'libs.androidx.hilt.navigation.compose' is needed to properly create a view model
+    // when compose navigation is used
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Android Studio Preview support
     debugImplementation(libs.androidx.ui.tooling)

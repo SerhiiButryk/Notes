@@ -21,6 +21,22 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.App">
+
+            <!--
+                To support redirection to app during email verification flow
+                TODO: Auto verify doesn't work because assetlinks.json is not created
+                https://fancynotesdevtest.firebaseapp.com/.well-known/assetlinks.json
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="@string/verification_server_domain"
+                    android:pathPrefix="@string/verification_path" />
+            </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

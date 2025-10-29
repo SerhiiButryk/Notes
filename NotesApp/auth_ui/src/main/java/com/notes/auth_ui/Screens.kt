@@ -1,7 +1,6 @@
 package com.notes.auth_ui
 
 import com.notes.auth_ui.data.isFirstLaunch
-import com.notes.auth_ui.data.isUserRegistered
 import com.notes.ui.Screen
 import kotlinx.serialization.Serializable
 
@@ -17,12 +16,11 @@ internal object Access : Screen("access")
 @Serializable
 internal object OnBoardingScreen : Screen("onboarding")
 
+@Serializable
+internal object EmailVerification : Screen("email_verification")
+
 internal fun getStartRoute(): Screen {
     if (isFirstLaunch())
         return OnBoardingScreen
-    return getAuthStartDestination()
-}
-
-internal fun getAuthStartDestination(): Screen {
-    return Access
+    return Auth
 }

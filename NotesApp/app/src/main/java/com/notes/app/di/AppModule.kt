@@ -1,5 +1,6 @@
 package com.notes.app.di
 
+import com.notes.api.AuthService
 import com.notes.app.data.StorageProvider
 import com.notes.app.log.AppLogger
 import com.notes.app.net.LocalNetSettings
@@ -9,6 +10,9 @@ import com.notes.api.DerivedKeyOperations
 import com.notes.api.Log
 import com.notes.api.NetSettings
 import com.notes.api.StorageOperations
+import com.notes.notes_ui.Repository
+import com.notes.notes_ui.data.OfflineRepository
+import com.notes.services.auth.FirebaseAuthService
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -45,6 +49,16 @@ interface AppModule {
                     return com.notes.app.security.generateSalt()
                 }
             }
+        }
+
+        @Provides
+        fun provideAuthService(): AuthService {
+            return FirebaseAuthService()
+        }
+
+        @Provides
+        fun provideRepo(): Repository {
+            return OfflineRepository()
         }
 
     }

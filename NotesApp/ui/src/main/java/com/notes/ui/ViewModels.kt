@@ -3,9 +3,8 @@ package com.notes.ui
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 
@@ -23,7 +22,7 @@ inline fun <reified T : ViewModel> NavBackStackEntry.getViewModel(navController:
     val route = parentNavGraph.route
     if (route == null) {
         Log.i(TAG, "getViewModel: no route, use default arguments")
-        return viewModel()
+        return hiltViewModel<T>()
     }
 
     val parentEntry = remember(this) { navController.getBackStackEntry(route) }

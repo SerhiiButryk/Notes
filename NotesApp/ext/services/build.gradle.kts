@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
 }
 
 apply(from = "${rootDir}/gradle_configs/versions.gradle")
 
 android {
-    namespace = "com.notes.data"
+    namespace = "com.notes.services"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -22,14 +21,15 @@ android {
             )
         }
     }
-
 }
 
 dependencies {
 
     implementation(project(":api"))
 
-    // Room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
+    implementation(platform(libs.firebase.bom))
+    // Firebase AI Logic
+    implementation(libs.firebase.ai)
+    // Firebase auth
+    implementation(libs.firebase.auth)
 }

@@ -1,5 +1,7 @@
 package com.notes.auth
 
+import com.notes.api.AuthResult
+import com.notes.api.AuthService
 import com.notes.auth.data.getSalt
 import com.notes.auth.data.updateSalt
 import com.notes.api.HttpClient
@@ -8,18 +10,17 @@ import com.notes.api.PlatformAPIs
 import com.notes.api.PlatformAPIs.logger
 import com.notes.net.inputStreamAsString
 
-class AuthService(private val netSettings: NetSettings, private val httpClient: HttpClient) {
+/**
+ * Service which implements custom authentication with custom backend server.
+ * TODO: Unsupported
+ */
+class RemoteAuth(private val netSettings: NetSettings, private val httpClient: HttpClient) : AuthService {
 
-    private val tag = "AuthService"
+    private val tag = "RemoteAuth"
 
-    suspend fun register(pass: String, confirmPass: String, email: String, callback: (result: AuthResult) -> Unit) {
+    override suspend fun createUser(pass: String, email: String, callback: (result: AuthResult) -> Unit) {
 
-        logger.logi("$tag register()")
-
-        if (email.isEmpty() || pass.isEmpty() || pass != confirmPass) {
-            callback(AuthResult.passwordEmptyOrNotMatching(email))
-            return
-        }
+        logger.logi("$tag createUser()")
 
         val salt = PlatformAPIs.derivedKey.generateSalt()
         updateSalt(salt)
@@ -43,14 +44,9 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
 
     }
 
-    suspend fun login(pass: String, email: String, callback: (result: AuthResult) -> Unit) {
+    override suspend fun login(pass: String, email: String, callback: (result: AuthResult) -> Unit) {
 
         logger.logi("$tag login()")
-
-        if (pass.isEmpty() || email.isEmpty()) {
-            callback(AuthResult.emailOrPassEmpty(email))
-            return
-        }
 
         val salt = getSalt()
         val passEncoded = PlatformAPIs.derivedKey.generatePDKey(pass, salt)
@@ -90,7 +86,11 @@ class AuthService(private val netSettings: NetSettings, private val httpClient: 
 
     }
 
-    fun getTokens(input: String): Pair<String, String> {
+    override suspend fun sendEmailVerify(callback: (AuthResult) -> Unit) {
+
+    }
+
+    private fun getTokens(input: String): Pair<String, String> {
         // Capture the values of refreshToken and accessToken
         val regex = "\"refreshToken\":\"(.*?)\",\"accessToken\":\"(.*?)\"".toRegex()
         if (regex.containsMatchIn(input)) {

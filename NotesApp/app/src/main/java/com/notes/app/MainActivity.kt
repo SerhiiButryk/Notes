@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import com.notes.app.ui.EntryScreen
 import com.notes.auth_ui.data.loadUserData
+import com.notes.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -22,7 +23,9 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             loadUserData()
             setContent {
-                EntryScreen()
+                AppTheme {
+                    EntryScreen()
+                }
             }
         }
     }
