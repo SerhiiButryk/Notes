@@ -26,7 +26,7 @@ import com.notes.notes_ui.R
 import com.notes.ui.CLEAR_ALL
 import com.notes.ui.SAVE_ICON
 
-private var uuid: Long = 0
+private var uuid: Long = 1
 
 @Stable
 data class Tool(
@@ -36,7 +36,10 @@ data class Tool(
     val onClick: (richTextState: RichTextState, NotesViewModel.Notes) -> Unit,
     val key: Long = uuid++,
     val highlight: Boolean = true,
-    val text: String = ""
+    val text: String = "",
+    val showConfirmDialog: Boolean = false,
+    val title: String = "",
+    val message: String = ""
 )
 
 @Stable
@@ -59,7 +62,10 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                         }
                         notesInteraction.saveContent(wrappedState, note)
                     },
-                    highlight = false
+                    highlight = false,
+                    showConfirmDialog = true,
+                    title = "Confirm save action",
+                    message = "Do you want to save this note ?"
                 )
             )
         ),
@@ -69,7 +75,10 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                     onClick = { state, note ->
                         notesInteraction.deleteNote(note)
                     },
-                    highlight = false
+                    highlight = false,
+                    showConfirmDialog = true,
+                    title = "Confirm delete action",
+                    message = "Do you want to delete this note ?"
                 )
             )
         ),

@@ -7,12 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notes.notes_ui.screens.editor.getToolsList
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -41,13 +39,8 @@ class NotesViewModel @Inject constructor(
         companion object {
             fun NewNote() = Notes(id = -1)
             fun AbsentNote() = Notes(id = -2)
+            fun DeletedNote() = Notes(id = -3)
         }
-    }
-
-    // Class to model different action for note UI
-    @Stable
-    sealed class Actions {
-        class NavBackAction : Actions()
     }
 
     private val interaction: Interaction = Interaction(repository, this)
@@ -67,14 +60,6 @@ class NotesViewModel @Inject constructor(
     val noteState = _noteState.asStateFlow()
 
     val richTools = getToolsList(interaction)
-
-    private val actionsUI = MutableSharedFlow<Actions>()
-
-    fun getActions() = actionsUI
-        .shareIn(
-            scope = viewModelScope,
-            started = WhileSubscribed()
-        )
 
     fun init(context: Context) {
         interaction.init(context)
@@ -102,11 +87,12 @@ class NotesViewModel @Inject constructor(
     override fun onAdded(id: Long) = onSelectAction(Notes(id = id))
 
     override fun onDeleted(id: Long) {
-        _noteState.update { Notes.AbsentNote() }
-        // Close Editor UI screen if it's open
-        viewModelScope.launch {
-            actionsUI.emit(Actions.NavBackAction())
-        }
+        _noteState.update { Notes.DeletedNote() }
     }
+
+    fun onNavigatedBack() {
+        _noteState.update { Notes.AbsentNote() }
+    }
+
 
 }

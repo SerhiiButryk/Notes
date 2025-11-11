@@ -37,7 +37,10 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
             if (state.value is AuthViewModel.LoginUIState) {
 
-                val onSuccess = { navController.navigate(com.notes.notes_ui.getStartDestination()) }
+                val onSuccess = {
+                    navController.popBackStack()
+                    navController.navigate(com.notes.notes_ui.getStartDestination())
+                }
 
                 LoginUI(
                     state = state.value as AuthViewModel.LoginUIState,

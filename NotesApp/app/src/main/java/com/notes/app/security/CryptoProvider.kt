@@ -250,7 +250,7 @@ class CryptoProvider {
         private const val DEFAULT_KEY = "Default-key-160375068"
         private const val DEFAULT_KEY_FOR_BIOMETRIC = "Default-key-43294023"
 
-        val IV_SIZE = 16
+        const val IV_SIZE = 16
     }
 
     init {

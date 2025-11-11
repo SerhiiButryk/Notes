@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,6 +40,7 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.screens.editor.Tool
 import com.notes.notes_ui.screens.editor.ToolsPane
+import com.notes.ui.AlertDialogUI
 import com.notes.ui.Arrow_up
 
 @Composable
@@ -55,6 +57,9 @@ fun ToolsPane(
             .padding(4.dp)
             .fillMaxWidth()
     ) {
+
+        var savedOption by rememberSaveable { mutableLongStateOf(0) }
+
         LazyRow(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceBright),
@@ -69,7 +74,13 @@ fun ToolsPane(
                         ToolButton(
                             imageVector = option.imageVector,
                             id = option.id,
-                            onClick = { option.onClick(state, notes) },
+                            onClick = {
+                                if (option.showConfirmDialog) {
+                                    savedOption = option.key
+                                } else {
+                                    option.onClick(state, notes)
+                                }
+                            },
                             animated = option.highlight
                         )
                     }
@@ -81,6 +92,28 @@ fun ToolsPane(
                 }
             }
         }
+
+        if (savedOption != 0L) {
+
+            for (tools in toolsPaneItems) {
+
+                val option = tools.list.first()
+                if (tools.list.size == 1 && option.key == savedOption) {
+                    AlertDialogUI(
+                        onDismissRequest = { savedOption = 0 },
+                        onConfirmation = {
+                            option.onClick(state, notes)
+                            savedOption = 0
+                        },
+                        dialogTitle = option.title,
+                        dialogText = option.message
+                    )
+                }
+
+            }
+
+        }
+
     }
 }
 

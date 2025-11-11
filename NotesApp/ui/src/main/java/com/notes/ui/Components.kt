@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -41,7 +42,7 @@ fun InputTextField(
     onValueChange: (String) -> Unit = {},
     label: String = "",
     keyboardType: KeyboardType,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     val localModifier =
@@ -52,10 +53,12 @@ fun InputTextField(
     OutlinedTextField(
         leadingIcon = {
             // Show an icon base on keyboard type
-            if (keyboardType == KeyboardType.Password)
-                Icon(imageVector = KEY_ICON, contentDescription = "")
-            else if (keyboardType == KeyboardType.Email)
-                Icon(imageVector = EMAIL_ICON, contentDescription = "")
+            if (keyboardType == KeyboardType.Password) Icon(
+                imageVector = KEY_ICON, contentDescription = ""
+            )
+            else if (keyboardType == KeyboardType.Email) Icon(
+                imageVector = EMAIL_ICON, contentDescription = ""
+            )
         },
         trailingIcon = {
             if (keyboardType == KeyboardType.Password) PasswordEye(
@@ -69,23 +72,22 @@ fun InputTextField(
             keyboardType = keyboardType,
             showKeyboardOnFocus = true,
             autoCorrectEnabled = false,
-            imeAction = keyboardOptions.imeAction
+            imeAction = imeAction
         ),
         keyboardActions = keyboardActions,
         modifier = localModifier,
         maxLines = 1,
-        visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email)
+            VisualTransformation.None else PasswordVisualTransformation(),
         supportingText = {
 // TODO Enable error message for input validation errors
             //            ErrorMessage()
-        }
-    )
+        })
 }
 
 @Composable
 internal fun PasswordEye(
-    passwordShown: Boolean,
-    onTogglePasswordVisibility: () -> Unit
+    passwordShown: Boolean, onTogglePasswordVisibility: () -> Unit
 ) {
     val image = if (passwordShown) EYE_HIDDEN_ICON else EYE_OPEN_ICON
 
@@ -97,8 +99,7 @@ internal fun PasswordEye(
 @Composable
 internal fun ErrorMessage(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Error !!!",

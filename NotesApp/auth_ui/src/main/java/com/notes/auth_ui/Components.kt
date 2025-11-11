@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -259,7 +260,19 @@ internal fun AuthBody(
             focusRequester = emailFieldFocusRequester,
             onValueChange = { email = it },
             keyboardType = KeyboardType.Email,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            imeAction = ImeAction.Next
+        )
+
+        val focusManager = LocalFocusManager.current
+
+        val doneAction = {
+            onEnter(password, confirmPassword?.value ?: "", email)
+            focusManager.clearFocus()
+        }
+
+        val keyboardActions = KeyboardActions(
+            onDone = { doneAction() },
         )
 
         // Password input field
@@ -270,11 +283,8 @@ internal fun AuthBody(
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = if (confirmPassword == null) KeyboardOptions(imeAction = ImeAction.Done)
-                else KeyboardOptions.Default,
-            keyboardActions = if (confirmPassword == null) KeyboardActions(
-                onDone = { onEnter(password, confirmPassword?.value ?: "", email) },
-            ) else KeyboardActions.Default,
+            imeAction = if (confirmPassword == null) ImeAction.Done else ImeAction.Next,
+            keyboardActions = if (confirmPassword == null) keyboardActions else KeyboardActions.Default,
         )
 
         if (confirmPassword != null) {
@@ -285,9 +295,9 @@ internal fun AuthBody(
                 onValueChange = { confirmPassword.value = it },
                 keyboardType = KeyboardType.Password,
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(
-                    onDone = { onEnter(password, confirmPassword.value, email) },
+                    onDone = { doneAction() }
                 ),
             )
         }

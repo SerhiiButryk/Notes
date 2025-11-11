@@ -8,13 +8,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.notes.notes_ui.NotesViewModel.Actions
 import com.notes.notes_ui.NotesViewModel.Notes
 import com.notes.notes_ui.screens.NotesUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
@@ -25,7 +22,9 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
         composable<NotesPreview> { backStackEntry ->
 
             val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController)
+
             val noteList by viewModel.notesState.collectAsStateWithLifecycle()
+            val note by viewModel.noteState.collectAsStateWithLifecycle()
 
             val onSelectAction: suspend (Notes) -> Unit =
                 { note -> viewModel.onSelectAction(note) }
@@ -33,9 +32,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val onAddAction: suspend () -> Unit =
                 { viewModel.onAddAction() }
 
-            val getNote: () -> StateFlow<Notes> = { viewModel.noteState }
-
-            val getActions: () -> SharedFlow<Actions> = { viewModel.getActions() }
+            val onNavigatedBack: () -> Unit = { viewModel.onNavigatedBack() }
 
             val toolsPaneItems = viewModel.richTools
 
@@ -48,9 +45,9 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 notes = noteList,
                 toolsPaneItems = toolsPaneItems,
                 onAddAction = onAddAction,
-                getNote = getNote,
+                note = note,
                 onSelectAction = onSelectAction,
-                getActions = getActions
+                onNavigatedBack = onNavigatedBack
             )
         }
 
