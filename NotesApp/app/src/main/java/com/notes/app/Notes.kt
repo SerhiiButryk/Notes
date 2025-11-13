@@ -2,6 +2,7 @@ package com.notes.app
 
 import android.app.Application
 import com.notes.api.Base64Operations
+import com.notes.api.CryptoOperations
 import com.notes.api.DerivedKeyOperations
 import com.notes.api.Log
 import com.notes.api.NetSettings
@@ -28,6 +29,9 @@ class Notes : Application() {
     @Inject
     lateinit var netSettings: NetSettings
 
+    @Inject
+    lateinit var crypto: CryptoOperations
+
     override fun onCreate() {
         super.onCreate()
         initComponents()
@@ -41,5 +45,6 @@ class Notes : Application() {
         PlatformAPIs.storage = storage
         PlatformAPIs.derivedKey = derivedKey
         PlatformAPIs.netSettings = netSettings
+        PlatformAPIs.crypto = crypto
     }
 }

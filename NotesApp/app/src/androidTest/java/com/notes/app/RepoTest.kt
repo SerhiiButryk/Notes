@@ -74,7 +74,7 @@ class RepoTest {
 
         // Will not return unless the task is completed
         coroutineScope {
-            repo?.deleteNote(scope = this, NotesViewModel.Notes(id = id))
+            repo?.deleteNote(scope = this, NotesViewModel.Notes(id = id), {})
         }
 
         // Check that no data
@@ -143,7 +143,7 @@ class RepoTest {
 
         // Will not return unless the task is completed
         coroutineScope {
-            repo?.deleteNote(scope = this, NotesViewModel.Notes(id = id))
+            repo?.deleteNote(scope = this, NotesViewModel.Notes(id = id), {})
         }
 
         // Check that no notes left

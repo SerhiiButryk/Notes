@@ -85,13 +85,17 @@ object LocalNoteDatabase {
         }
     }
 
-    suspend fun access(): NoteDao {
+    suspend fun accessInternal(): NoteDao {
         while (noteDb == null) {
-            logger.logi("LocalDatabase: access() not initialized, waiting...")
+            logger.logi("LocalDatabase: accessInternal() not initialized, waiting...")
             delay(100)
         }
-        logger.logi("LocalDatabase: access() done")
+        logger.logi("LocalDatabase: accessInternal() done")
         return noteDb!!.noteDao()
+    }
+
+    suspend fun access(): NoteDao {
+        return EncryptedNoteEntity(accessInternal())
     }
 
     fun close() {

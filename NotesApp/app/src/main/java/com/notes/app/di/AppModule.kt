@@ -6,10 +6,13 @@ import com.notes.app.log.AppLogger
 import com.notes.app.net.LocalNetSettings
 import com.notes.app.security.Base64Provider
 import com.notes.api.Base64Operations
+import com.notes.api.CryptoOperations
 import com.notes.api.DerivedKeyOperations
 import com.notes.api.Log
 import com.notes.api.NetSettings
+import com.notes.api.PlatformAPIs
 import com.notes.api.StorageOperations
+import com.notes.app.security.CryptoProvider
 import com.notes.notes_ui.Repository
 import com.notes.notes_ui.data.OfflineRepository
 import com.notes.services.auth.FirebaseAuthService
@@ -18,6 +21,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -59,6 +63,25 @@ interface AppModule {
         @Provides
         fun provideRepo(): Repository {
             return OfflineRepository()
+        }
+
+        @Singleton
+        @Provides
+        fun provideCryptoOperations(log: Log): CryptoOperations {
+            // Init as we use it early
+            PlatformAPIs.logger = log
+            // Single instance should be created
+            val provider = CryptoProvider()
+            return object : CryptoOperations {
+                @Synchronized // Underlined KeyStore is not thread-safe
+                override fun encrypt(message: String): String {
+                    return provider.encrypt(message).message
+                }
+                @Synchronized // Underlined KeyStore is not thread-safe
+                override fun decrypt(message: String): String {
+                    return provider.decrypt(message).message
+                }
+            }
         }
 
     }

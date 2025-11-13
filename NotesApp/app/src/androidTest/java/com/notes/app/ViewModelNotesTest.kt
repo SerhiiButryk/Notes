@@ -65,8 +65,7 @@ class ViewModelNotesTest {
             ) {
             }
 
-            override fun deleteNote(note: NotesViewModel.Notes) {
-            }
+            override fun deleteNote(note: NotesViewModel.Notes, callback: (Long) -> Unit) {}
 
             override fun init(context: Context) {
             }

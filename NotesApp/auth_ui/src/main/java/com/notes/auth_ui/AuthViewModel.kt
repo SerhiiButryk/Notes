@@ -82,6 +82,7 @@ internal class AuthViewModel @Inject constructor(
     private val interaction = Interaction(authService)
 
     fun login(state: LoginUIState, onSuccess: () -> Unit) {
+        logger.logi("$TAG::login()")
         viewModelScope.launch {
             val result = interaction.login(state)
             if (result.isSuccess()) {
@@ -93,6 +94,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun register(state: RegisterUIState, onSuccess: suspend () -> Unit) {
+        logger.logi("$TAG::register()")
         viewModelScope.launch {
             val result = interaction.register(state)
             if (result.isSuccess()) {

@@ -116,6 +116,15 @@ class DatabaseTest {
 
         assertThat(actualNote).isEqualTo(note)
 
+        // Check that actual data is encrypted
+        val originalDb = LocalNoteDatabase.accessInternal()
+        val noteEncrypted = originalDb.getNote(note.uid)
+            .first()
+
+        Log.i("DatabaseTest", "test01_add_delete: encrypted content = " +
+                noteEncrypted!!.content)
+        assertThat(noteEncrypted.content).isNotEqualTo(note.content)
+
         // Make sure that id is enough to delete data
         val noteDelete = NoteEntity(1, "", "", "")
         db.deleteNote(noteDelete)
