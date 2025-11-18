@@ -23,7 +23,7 @@
             android:theme="@style/Theme.App">
 
             <!--
-                To support redirection to app during email verification flow
+                To support automatic redirection to the app during email verification flow
                 TODO: Auto verify doesn't work because assetlinks.json is not created
                 https://fancynotesdevtest.firebaseapp.com/.well-known/assetlinks.json
             -->

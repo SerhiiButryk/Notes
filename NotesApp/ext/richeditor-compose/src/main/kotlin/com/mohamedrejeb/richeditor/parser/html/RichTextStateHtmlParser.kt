@@ -1,5 +1,6 @@
 package com.mohamedrejeb.richeditor.parser.html
 
+import android.util.Log
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.sp
@@ -25,6 +26,7 @@ internal object RichTextStateHtmlParser : RichTextStateParser<String> {
 
     @OptIn(ExperimentalRichTextApi::class)
     override fun encode(input: String): RichTextState {
+        Log.i("", "RichTextStateHtmlParser.encode:")
         val openedTags = mutableListOf<Pair<String, Map<String, String>>>()
         val stringBuilder = StringBuilder()
         val richParagraphList = mutableListOf(RichParagraph())
@@ -33,55 +35,83 @@ internal object RichTextStateHtmlParser : RichTextStateParser<String> {
         var currentRichSpan: RichSpan? = null
         var currentListLevel = 0
 
-        val handler = KsoupHtmlHandler
-            .Builder()
-            .onText {
-                // In html text inside ul/ol tags is skipped
-                val lastOpenedTag = openedTags.lastOrNull()?.first
-                if (lastOpenedTag == "ul" || lastOpenedTag == "ol") return@onText
-
-                if (lastOpenedTag in skippedHtmlElements) return@onText
-
-                val addedText = KsoupEntities.decodeHtml(
-                    removeHtmlTextExtraSpaces(
-                        input = it,
-                        trimStart = stringBuilder.lastOrNull() == null || stringBuilder.lastOrNull()?.isWhitespace() == true || stringBuilder.lastOrNull() == '\n',
-                    )
-                )
-
-                if (addedText.isEmpty()) return@onText
-
-                stringBuilder.append(addedText)
-
-                val currentRichParagraph = richParagraphList.last()
-                val safeCurrentRichSpan = currentRichSpan ?: RichSpan(paragraph = currentRichParagraph)
-
-                if (safeCurrentRichSpan.children.isEmpty()) {
-                    safeCurrentRichSpan.text += addedText
-                } else {
-                    val newRichSpan = RichSpan(paragraph = currentRichParagraph)
-                    newRichSpan.text = addedText
-                    safeCurrentRichSpan.children.add(newRichSpan)
-                }
-
-                if (currentRichSpan == null) {
-                    currentRichSpan = safeCurrentRichSpan
-                    currentRichParagraph.children.add(safeCurrentRichSpan)
-                }
+        val handler = object : KsoupHtmlHandler {
+            override fun onAttribute(
+                name: String,
+                value: String,
+                quote: String?
+            ) {
             }
-            .onOpenTag { name, attributes, _ ->
+
+            override fun onCDataEnd() {
+            }
+
+            override fun onCDataStart() {
+            }
+
+            override fun onCloseTag(name: String, isImplied: Boolean) {
+                openedTags.removeLastOrNull()
+
+                val isCurrentRichParagraphBlank = richParagraphList.lastOrNull()?.isBlank() == true
+                val isCurrentTagBlockElement = name in htmlBlockElements && name != "li"
+
+                if (isCurrentTagBlockElement && !isCurrentRichParagraphBlank) {
+                    stringBuilder.append(' ')
+
+                    val newParagraph =
+                        if (richParagraphList.isEmpty())
+                            RichParagraph()
+                        else
+                            RichParagraph(paragraphStyle = richParagraphList.last().paragraphStyle)
+
+                    richParagraphList.add(newParagraph)
+
+                    toKeepEmptyParagraphIndexSet.add(richParagraphList.lastIndex)
+
+                    currentRichSpan = null
+                }
+
+                if (name == "ul" || name == "ol") {
+                    currentListLevel = (currentListLevel - 1).coerceAtLeast(0)
+                    return
+                }
+
+                if (name in skippedHtmlElements)
+                    return
+
+                if (name != BrElement)
+                    currentRichSpan = currentRichSpan?.parent
+            }
+
+            override fun onComment(comment: String) {
+            }
+
+            override fun onCommentEnd() {
+            }
+
+            override fun onEnd() {
+            }
+
+            override fun onError(error: Exception) {
+            }
+
+            override fun onOpenTag(
+                name: String,
+                attributes: Map<String, String>,
+                isImplied: Boolean
+            ) {
                 val lastOpenedTag = openedTags.lastOrNull()?.first
 
                 openedTags.add(name to attributes)
 
                 if (name in skippedHtmlElements) {
-                    return@onOpenTag
+                    return
                 }
 
                 if (name == "ul" || name == "ol") {
                     // Todo: Apply ul/ol styling if exists
                     currentListLevel = currentListLevel + 1
-                    return@onOpenTag
+                    return
                 }
 
                 if (name == "body") {
@@ -199,40 +229,54 @@ internal object RichTextStateHtmlParser : RichTextStateParser<String> {
                         currentRichSpan = null
                 }
             }
-            .onCloseTag { name, _ ->
-                openedTags.removeLastOrNull()
 
-                val isCurrentRichParagraphBlank = richParagraphList.lastOrNull()?.isBlank() == true
-                val isCurrentTagBlockElement = name in htmlBlockElements && name != "li"
-
-                if (isCurrentTagBlockElement && !isCurrentRichParagraphBlank) {
-                    stringBuilder.append(' ')
-
-                    val newParagraph =
-                        if (richParagraphList.isEmpty())
-                            RichParagraph()
-                        else
-                            RichParagraph(paragraphStyle = richParagraphList.last().paragraphStyle)
-
-                    richParagraphList.add(newParagraph)
-
-                    toKeepEmptyParagraphIndexSet.add(richParagraphList.lastIndex)
-
-                    currentRichSpan = null
-                }
-
-                if (name == "ul" || name == "ol") {
-                    currentListLevel = (currentListLevel - 1).coerceAtLeast(0)
-                    return@onCloseTag
-                }
-
-                if (name in skippedHtmlElements)
-                    return@onCloseTag
-
-                if (name != BrElement)
-                    currentRichSpan = currentRichSpan?.parent
+            override fun onOpenTagName(name: String) {
             }
-            .build()
+
+            override fun onParserInit(ksoupHtmlParser: KsoupHtmlParser) {
+            }
+
+            override fun onProcessingInstruction(name: String, data: String) {
+            }
+
+            override fun onReset() {
+            }
+
+            override fun onText(text: String) {
+                // In html text inside ul/ol tags is skipped
+                val lastOpenedTag = openedTags.lastOrNull()?.first
+                if (lastOpenedTag == "ul" || lastOpenedTag == "ol") return
+
+                if (lastOpenedTag in skippedHtmlElements) return
+
+                val addedText = KsoupEntities.decodeHtml(
+                    removeHtmlTextExtraSpaces(
+                        input = text,
+                        trimStart = stringBuilder.lastOrNull() == null || stringBuilder.lastOrNull()?.isWhitespace() == true || stringBuilder.lastOrNull() == '\n',
+                    )
+                )
+
+                if (addedText.isEmpty()) return
+
+                stringBuilder.append(addedText)
+
+                val currentRichParagraph = richParagraphList.last()
+                val safeCurrentRichSpan = currentRichSpan ?: RichSpan(paragraph = currentRichParagraph)
+
+                if (safeCurrentRichSpan.children.isEmpty()) {
+                    safeCurrentRichSpan.text += addedText
+                } else {
+                    val newRichSpan = RichSpan(paragraph = currentRichParagraph)
+                    newRichSpan.text = addedText
+                    safeCurrentRichSpan.children.add(newRichSpan)
+                }
+
+                if (currentRichSpan == null) {
+                    currentRichSpan = safeCurrentRichSpan
+                    currentRichParagraph.children.add(safeCurrentRichSpan)
+                }
+            }
+        }
 
         val parser = KsoupHtmlParser(
             handler = handler

@@ -44,8 +44,7 @@ import com.notes.ui.AlertDialogUI
 import com.notes.ui.Arrow_up
 
 @Composable
-fun ToolsPane(
-    modifier: Modifier = Modifier,
+fun ToolsBar(
     state: RichTextState,
     toolsPaneItems: List<ToolsPane>,
     notes: NotesViewModel.Notes,

@@ -8,4 +8,6 @@ Need to modify sources
 
 - Need to use WebView or native canvas drawing. No other approaches so far.
 
-3. Encrypt data in local database
+3. Add back button on Editor UI screen
+
+4. Adjust colors issues in Dark mode

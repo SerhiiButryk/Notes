@@ -6,15 +6,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -40,8 +41,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notes.ui.InputTextField
-import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.isPhoneLandScape
+import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.theme.SurfaceColor
 
 @Composable
@@ -78,6 +79,12 @@ internal fun AuthUIAdaptive(
         .padding(20.dp)
         .fillMaxWidth()
 
+    // Add padding specifically for UI in portrait phone and tablet mode
+    // to make UI a bit better
+    val keyboardPadding = Modifier
+        .consumeWindowInsets(innerPadding)
+        .imePadding()
+
     when {
 
         isTabletOrFoldableExpanded(sc) -> {
@@ -85,7 +92,7 @@ internal fun AuthUIAdaptive(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = containerModifier
+                modifier = containerModifier.then(keyboardPadding)
             ) {
 
                 SurfaceContainer(
@@ -168,7 +175,7 @@ internal fun AuthUIAdaptive(
         else -> {
 
             Box(
-                modifier = containerModifier,
+                modifier = containerModifier.then(keyboardPadding),
                 contentAlignment = Alignment.Center
             ) {
 

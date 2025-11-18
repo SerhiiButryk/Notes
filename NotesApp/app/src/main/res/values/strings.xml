@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">app</string>
+    <string name="app_name">Notes</string>
 
     <string name="server_domain">10.0.2.2:8085</string>
     <string name="verification_server_domain">fancynotesdevtest.firebaseapp.com</string>

@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -46,28 +46,33 @@ fun NotesListUI(
     notes: List<NotesViewModel.Notes>,
     sizeClass: WindowSizeClass,
 ) {
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
-        SearchBarField(
-            trailingIcon = {
-                // Show settings conditionally for phone devices
-                if (!isTabletOrFoldableExpanded(sizeClass)) {
-                    IconButton(
-                        onClick = { onSettingsAction() }) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            SearchBarField(
+                trailingIcon = {
+                    // Show settings conditionally for phone devices
+                    if (!isTabletOrFoldableExpanded(sizeClass)) {
+                        IconButton(
+                            onClick = { onSettingsAction() }) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
                     }
-                }
-            })
-    }, floatingActionButton = {
-        FloatingActionButton(
-            onClick = { addAction() },
-        ) {
-            Icon(Icons.Filled.Add, null)
+                })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier.imePadding(),
+                onClick = { addAction() },
+            ) {
+                Icon(Icons.Filled.Add, null)
+            }
         }
-    }) { innerPadding ->
+    ) { innerPadding ->
         NotesList(
             modifier = Modifier.padding(innerPadding),
             sizeClass = sizeClass,
