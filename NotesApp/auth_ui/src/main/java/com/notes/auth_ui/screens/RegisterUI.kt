@@ -46,6 +46,7 @@ private fun RegisterImpl(
             confirmPasswordState = confirmPassword,
             hasFocus = state.hasFocus,
             innerPadding = innerPadding,
+            progress = false,
             onEnter = { passwordValue, confirmPasswordValue, emailValue ->
                 onRegister(
                     AuthViewModel.RegisterUIState(

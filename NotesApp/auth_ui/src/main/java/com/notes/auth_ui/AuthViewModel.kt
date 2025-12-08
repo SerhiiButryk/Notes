@@ -30,7 +30,8 @@ internal class AuthViewModel @Inject constructor(
     data class LoginUIState(
         val email: String = "",
         val password: String = "",
-        val hasFocus: Boolean = false
+        val hasFocus: Boolean = false,
+        val showProgress: Boolean = false
     ) : UIState()
 
     // This annotation could be redundant as
@@ -83,12 +84,20 @@ internal class AuthViewModel @Inject constructor(
 
     fun login(state: LoginUIState, onSuccess: () -> Unit) {
         logger.logi("$TAG::login()")
+        // Show progress
+        val updated = (_uiState.value as LoginUIState).copy(showProgress = true)
+        _uiState.update { updated }
         viewModelScope.launch {
             val result = interaction.login(state)
             if (result.isSuccess()) {
                 onSuccess()
             } else {
                 handleResult(result)
+            }
+            // Hide progress
+            val updated = (_uiState.value as? LoginUIState)?.copy(showProgress = false)
+            if (updated != null) {
+                _uiState.update { updated }
             }
         }
     }

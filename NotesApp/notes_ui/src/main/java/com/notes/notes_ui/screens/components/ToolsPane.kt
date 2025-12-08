@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -59,9 +60,13 @@ fun ToolsBar(
 
         var savedOption by rememberSaveable { mutableLongStateOf(0) }
 
+        val backgroundColor =
+            if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background
+            else MaterialTheme.colorScheme.surface
+
         LazyRow(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceBright),
+                .background(backgroundColor),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -125,7 +130,11 @@ private fun ToolButton(
     animated: Boolean = true
 ) {
 
-    Surface(shape = CircleShape) {
+    val backgroundColor =
+        if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surfaceVariant
+        else MaterialTheme.colorScheme.surface
+
+    Surface(shape = CircleShape, color = backgroundColor) {
 
         var clicked by rememberSaveable { mutableStateOf(false) }
 
@@ -182,7 +191,7 @@ private fun ToolsMenu(tools: ToolsPane, state: RichTextState, notes: NotesViewMo
 
     Box {
 
-        var startAnimation = remember { mutableStateOf(false) }
+        val startAnimation = remember { mutableStateOf(false) }
 
         ToolButton(
             onClick = {

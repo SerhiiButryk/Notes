@@ -1,13 +1,11 @@
 TODO list:
 
-1. No ontextchanged listener for com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-
-Need to modify sources
-
-2. Add html to pdf export feature
+1. Add html to pdf export feature
 
 - Need to use WebView or native canvas drawing. No other approaches so far.
 
-3. Add back button on Editor UI screen
+2. Add back button on Editor UI screen
 
-4. Adjust colors issues in Dark mode
+3. Adjust colors issues in Dark mode
+
+4. Investigate memory state during runtime

@@ -24,7 +24,9 @@ import com.notes.notes_ui.Interaction
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.R
 import com.notes.ui.CLEAR_ALL
+import com.notes.ui.Redo
 import com.notes.ui.SAVE_ICON
+import com.notes.ui.Undo
 
 private var uuid: Long = 1
 
@@ -52,6 +54,28 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
     // Construct editor tool pane
     //////////////////////////////////
     val list = listOf(
+        ToolsPane(
+            listOf(
+                Tool(
+                    imageVector = Undo,
+                    onClick = { state, note ->
+                        notesInteraction.redoUndoAction.undoAction()
+                    },
+                    highlight = false
+                )
+            )
+        ),
+        ToolsPane(
+            listOf(
+                Tool(
+                    imageVector = Redo,
+                    onClick = { state, note ->
+                        notesInteraction.redoUndoAction.reapplyAction()
+                    },
+                    highlight = false
+                )
+            )
+        ),
         ToolsPane(
             listOf(
                 Tool(

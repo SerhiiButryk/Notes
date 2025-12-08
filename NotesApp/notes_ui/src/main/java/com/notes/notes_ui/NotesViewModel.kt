@@ -78,10 +78,12 @@ class NotesViewModel @Inject constructor(
         } else {
             _noteState.update { found }
         }
+        interaction.onNoteOpened()
     }
 
     fun onAddAction() {
         _noteState.update { Notes.NewNote() }
+        interaction.onNoteOpened()
     }
 
     override fun onAdded(id: Long) = onSelectAction(Notes(id = id))
@@ -92,6 +94,10 @@ class NotesViewModel @Inject constructor(
 
     fun onNavigatedBack() {
         _noteState.update { Notes.AbsentNote() }
+    }
+
+    fun sendEditorCommand(command: EditorCommand) {
+        interaction.sendEditorCommand(command)
     }
 
 

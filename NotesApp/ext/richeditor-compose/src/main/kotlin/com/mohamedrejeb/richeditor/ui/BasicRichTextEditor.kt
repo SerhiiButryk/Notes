@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -25,7 +29,6 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.mohamedrejeb.richeditor.model.RichTextState
@@ -100,7 +103,7 @@ public fun BasicRichTextEditor(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(Color.Black),
-    onTextChanged: (TextFieldValue) -> Unit = {},
+    onTextChanged: (String) -> Unit = { },
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
@@ -198,7 +201,7 @@ public fun BasicRichTextEditor(
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() },
     contentPadding: PaddingValues,
-    onTextChanged: (TextFieldValue) -> Unit = {}
+    onTextChanged: (String) -> Unit = { },
 ) {
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
@@ -253,7 +256,8 @@ public fun BasicRichTextEditor(
                 if (it.text.length > maxLength) return@BasicTextField
 
                 // TODO: Change xx03
-                onTextChanged(it)
+                val old = state.toHtml()
+                onTextChanged(old)
 
                 state.onTextFieldValueChange(it)
             },
@@ -269,7 +273,11 @@ public fun BasicRichTextEditor(
                 .drawRichSpanStyle(
                     richTextState = state,
                     topPadding = with(density) { contentPadding.calculateTopPadding().toPx() },
-                    startPadding = with(density) { contentPadding.calculateStartPadding(layoutDirection).toPx() },
+                    startPadding = with(density) {
+                        contentPadding.calculateStartPadding(
+                            layoutDirection
+                        ).toPx()
+                    },
                 )
                 .then(
                     if (!readOnly)

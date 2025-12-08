@@ -2,6 +2,8 @@ package com.notes.notes_ui
 
 import android.content.Context
 import com.notes.notes_ui.NotesViewModel.Notes
+import com.notes.notes_ui.feature.RedoUndoAction
+import com.notes.notes_ui.screens.editor.TextInputCommand
 import kotlinx.coroutines.flow.Flow
 
 interface EditorState {
@@ -10,6 +12,7 @@ interface EditorState {
 
 interface EditorCommand {
     fun execCommand()
+    fun undo()
 }
 
 interface Callback {
@@ -28,7 +31,19 @@ interface Repository {
 
 class Interaction(private val repository: Repository, private val callback: Callback) {
 
+    // Redo, undo edit command support. Called from the menu.
+    val redoUndoAction = RedoUndoAction()
+
+    fun onNoteOpened() {
+        redoUndoAction.clearStates()
+    }
+
+    // User changes text
     fun sendEditorCommand(command: EditorCommand) {
+        redoUndoAction.onEditAction(command)
+        // It has already been applied
+        if (command is TextInputCommand)
+            return
         command.execCommand()
     }
 

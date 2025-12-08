@@ -18,14 +18,16 @@ private const val TAG = "LoginUI"
 @Composable
 internal fun LoginUI(
     state: AuthViewModel.LoginUIState,
+    progress: Boolean,
     onLogin: (AuthViewModel.LoginUIState) -> Unit
 ) {
-    LoginUIImpl(state, onLogin)
+    LoginUIImpl(state = state, onLogin = onLogin, progress = progress)
 }
 
 @Composable
 private fun LoginUIImpl(
     state: AuthViewModel.LoginUIState,
+    progress: Boolean,
     onLogin: (AuthViewModel.LoginUIState) -> Unit
 ) {
 
@@ -46,6 +48,7 @@ private fun LoginUIImpl(
             passwordState = password,
             hasFocus = state.hasFocus,
             innerPadding = innerPadding,
+            progress = progress,
             onEnter = { passwordValue, _, emailValue ->
                 onLogin(
                     AuthViewModel.LoginUIState(
@@ -67,6 +70,6 @@ private fun LoginUIImpl(
 @Composable
 private fun LoginUIPreviewLight() {
     AppTheme {
-        LoginUIImpl(AuthViewModel.LoginUIState(), {})
+        LoginUIImpl(AuthViewModel.LoginUIState(), false, {})
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -142,8 +143,13 @@ private fun EditorPreviewStateful(content: String, onClicked: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorPreview(state: RichTextState, onClicked: () -> Unit) {
+
+    val contentModifier = Modifier
+        .fillMaxWidth()
+        .heightIn(max = 250.dp)
+
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = contentModifier
     ) {
 
         // Readonly field doesn't react on click events
@@ -156,8 +162,7 @@ private fun EditorPreview(state: RichTextState, onClicked: () -> Unit) {
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = contentModifier
                 .padding(4.dp)
         )
 

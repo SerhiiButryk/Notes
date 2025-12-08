@@ -1596,7 +1596,7 @@ public class RichTextState internal constructor(
      * @see [textFieldValue]
      * @see [annotatedString]
      */
-    internal fun updateAnnotatedString(newTextFieldValue: TextFieldValue = textFieldValue) {
+    fun updateAnnotatedString(newTextFieldValue: TextFieldValue = textFieldValue) {
         val newText =
             if (singleParagraphMode)
                 newTextFieldValue.text
@@ -3643,6 +3643,23 @@ public class RichTextState internal constructor(
         richTextState.config.preserveStyleOnEmptyLine = config.preserveStyleOnEmptyLine
 
         return richTextState
+    }
+
+    /**
+     * Restore the [RichTextState] using the given [richTextState].
+     */
+    fun restoreState(richTextState: RichTextState) {
+        updateRichParagraphList(richTextState.richParagraphList)
+        updateTextFieldValue(richTextState.textFieldValue)
+        config.linkColor = richTextState.config.linkColor
+        config.linkTextDecoration = richTextState.config.linkTextDecoration
+        config.codeSpanColor = richTextState.config.codeSpanColor
+        config.codeSpanBackgroundColor = richTextState.config.codeSpanBackgroundColor
+        config.codeSpanStrokeColor = richTextState.config.codeSpanStrokeColor
+        config.listIndent = richTextState.config.listIndent
+        config.orderedListIndent = richTextState.config.orderedListIndent
+        config.unorderedListIndent = richTextState.config.unorderedListIndent
+        config.preserveStyleOnEmptyLine = richTextState.config.preserveStyleOnEmptyLine
     }
 
     /**

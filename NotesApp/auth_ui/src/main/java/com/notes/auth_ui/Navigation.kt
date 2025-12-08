@@ -42,9 +42,13 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                     navController.navigate(com.notes.notes_ui.getStartDestination())
                 }
 
+                val loginUIState = state.value as AuthViewModel.LoginUIState
+                val hasProgress = loginUIState.showProgress
+
                 LoginUI(
-                    state = state.value as AuthViewModel.LoginUIState,
-                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess) })
+                    state = loginUIState,
+                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess) },
+                    progress = hasProgress)
 
                 val context = LocalContext.current
                 BackHandler(enabled = true) {

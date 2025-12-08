@@ -34,6 +34,9 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val onNavigatedBack: () -> Unit = { viewModel.onNavigatedBack() }
 
+            val sendEditorCommand: (EditorCommand) -> Unit =
+                { viewModel.sendEditorCommand(it) }
+
             val toolsPaneItems = viewModel.richTools
 
             val context = LocalContext.current
@@ -47,7 +50,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onAddAction = onAddAction,
                 note = note,
                 onSelectAction = onSelectAction,
-                onNavigatedBack = onNavigatedBack
+                onNavigatedBack = onNavigatedBack,
+                onTextChanged = sendEditorCommand
             )
         }
 

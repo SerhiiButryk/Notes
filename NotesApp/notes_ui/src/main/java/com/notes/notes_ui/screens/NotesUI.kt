@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.notes.notes_ui.EditorCommand
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.NotesViewModel.Notes
 import com.notes.notes_ui.screens.components.NotesListUI
@@ -32,7 +33,8 @@ fun NotesUI(
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
-    onNavigatedBack: () -> Unit
+    onNavigatedBack: () -> Unit,
+    onTextChanged: (EditorCommand) -> Unit
 ) {
     NotesUIImpl(
         notes = notes,
@@ -40,7 +42,8 @@ fun NotesUI(
         onAddAction = onAddAction,
         note = note,
         onSelectAction = onSelectAction,
-        onNavigatedBack = onNavigatedBack
+        onNavigatedBack = onNavigatedBack,
+        onTextChanged = onTextChanged
     )
 }
 
@@ -51,7 +54,8 @@ private fun NotesUIImpl(
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
-    onNavigatedBack: () -> Unit
+    onNavigatedBack: () -> Unit,
+    onTextChanged: (EditorCommand) -> Unit
 ) {
 
     Row {
@@ -70,7 +74,8 @@ private fun NotesUIImpl(
             onAddAction = onAddAction,
             note = note,
             onSelectAction = onSelectAction,
-            onNavigatedBack = onNavigatedBack
+            onNavigatedBack = onNavigatedBack,
+            onTextChanged = onTextChanged
         )
     }
 
@@ -85,7 +90,8 @@ private fun ListDetailUI(
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
-    onNavigatedBack: () -> Unit
+    onNavigatedBack: () -> Unit,
+    onTextChanged: (EditorCommand) -> Unit
 ) {
 
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
@@ -155,7 +161,12 @@ private fun ListDetailUI(
                     }
                 }
 
-                NotesEditorUI(notes = note, state = state, toolsPaneItems = toolsPaneItems)
+                NotesEditorUI(
+                    notes = note,
+                    state = state,
+                    toolsPaneItems = toolsPaneItems,
+                    onTextChanged = onTextChanged
+                )
             }
         }
     )

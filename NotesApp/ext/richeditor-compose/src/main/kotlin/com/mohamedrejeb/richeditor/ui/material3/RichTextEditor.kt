@@ -116,7 +116,7 @@ public fun RichTextEditor(
         } else {
             RichTextEditorDefaults.richTextEditorWithLabelPadding()
         },
-    onTextChanged: (TextFieldValue) -> Unit = {},
+    onTextChanged: (String) -> Unit = { },
 ) {
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {

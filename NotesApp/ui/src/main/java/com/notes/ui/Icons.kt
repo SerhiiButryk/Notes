@@ -563,5 +563,173 @@ val Format_list_numbered: ImageVector
 
 private var _Format_list_numbered: ImageVector? = null
 
+val Undo: ImageVector
+    get() {
+        if (_Undo != null) return _Undo!!
+
+        _Undo = ImageVector.Builder(
+            name = "Undo",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 960f,
+            viewportHeight = 960f
+        ).apply {
+            path(
+                fill = SolidColor(Color(0xFF000000))
+            ) {
+                moveTo(280f, 760f)
+                verticalLineToRelative(-80f)
+                horizontalLineToRelative(284f)
+                quadToRelative(63f, 0f, 109.5f, -40f)
+                reflectiveQuadTo(720f, 540f)
+                reflectiveQuadToRelative(-46.5f, -100f)
+                reflectiveQuadTo(564f, 400f)
+                horizontalLineTo(312f)
+                lineToRelative(104f, 104f)
+                lineToRelative(-56f, 56f)
+                lineToRelative(-200f, -200f)
+                lineToRelative(200f, -200f)
+                lineToRelative(56f, 56f)
+                lineToRelative(-104f, 104f)
+                horizontalLineToRelative(252f)
+                quadToRelative(97f, 0f, 166.5f, 63f)
+                reflectiveQuadTo(800f, 540f)
+                reflectiveQuadToRelative(-69.5f, 157f)
+                reflectiveQuadTo(564f, 760f)
+                close()
+            }
+        }.build()
+
+        return _Undo!!
+    }
+
+private var _Undo: ImageVector? = null
+
+val UndoInactive: ImageVector
+    get() {
+        if (_UndoInactive != null) return _UndoInactive!!
+
+        _UndoInactive = ImageVector.Builder(
+            name = "Undo",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 960f,
+            viewportHeight = 960f
+        ).apply {
+            path(
+                fill = SolidColor(Color(0xFF000000))
+            ) {
+                moveTo(280f, 760f)
+                verticalLineToRelative(-80f)
+                horizontalLineToRelative(284f)
+                quadToRelative(63f, 0f, 109.5f, -40f)
+                reflectiveQuadTo(720f, 540f)
+                reflectiveQuadToRelative(-46.5f, -100f)
+                reflectiveQuadTo(564f, 400f)
+                horizontalLineTo(312f)
+                lineToRelative(104f, 104f)
+                lineToRelative(-56f, 56f)
+                lineToRelative(-200f, -200f)
+                lineToRelative(200f, -200f)
+                lineToRelative(56f, 56f)
+                lineToRelative(-104f, 104f)
+                horizontalLineToRelative(252f)
+                quadToRelative(97f, 0f, 166.5f, 63f)
+                reflectiveQuadTo(800f, 540f)
+                reflectiveQuadToRelative(-69.5f, 157f)
+                reflectiveQuadTo(564f, 760f)
+                close()
+            }
+        }.build()
+
+        return _UndoInactive!!
+    }
+
+private var _UndoInactive: ImageVector? = null
+
+val Redo: ImageVector
+    get() {
+        if (_Redo != null) return _Redo!!
+
+        _Redo = ImageVector.Builder(
+            name = "Redo",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 960f,
+            viewportHeight = 960f
+        ).apply {
+            path(
+                fill = SolidColor(Color(0xFF000000))
+            ) {
+                moveTo(396f, 760f)
+                quadToRelative(-97f, 0f, -166.5f, -63f)
+                reflectiveQuadTo(160f, 540f)
+                reflectiveQuadToRelative(69.5f, -157f)
+                reflectiveQuadTo(396f, 320f)
+                horizontalLineToRelative(252f)
+                lineTo(544f, 216f)
+                lineToRelative(56f, -56f)
+                lineToRelative(200f, 200f)
+                lineToRelative(-200f, 200f)
+                lineToRelative(-56f, -56f)
+                lineToRelative(104f, -104f)
+                horizontalLineTo(396f)
+                quadToRelative(-63f, 0f, -109.5f, 40f)
+                reflectiveQuadTo(240f, 540f)
+                reflectiveQuadToRelative(46.5f, 100f)
+                reflectiveQuadTo(396f, 680f)
+                horizontalLineToRelative(284f)
+                verticalLineToRelative(80f)
+                close()
+            }
+        }.build()
+
+        return _Redo!!
+    }
+
+private var _Redo: ImageVector? = null
+
+val RedoInactive: ImageVector
+    get() {
+        if (_RedoInactive != null) return _RedoInactive!!
+
+        _RedoInactive = ImageVector.Builder(
+            name = "Redo",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 960f,
+            viewportHeight = 960f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Gray)
+            ) {
+                moveTo(396f, 760f)
+                quadToRelative(-97f, 0f, -166.5f, -63f)
+                reflectiveQuadTo(160f, 540f)
+                reflectiveQuadToRelative(69.5f, -157f)
+                reflectiveQuadTo(396f, 320f)
+                horizontalLineToRelative(252f)
+                lineTo(544f, 216f)
+                lineToRelative(56f, -56f)
+                lineToRelative(200f, 200f)
+                lineToRelative(-200f, 200f)
+                lineToRelative(-56f, -56f)
+                lineToRelative(104f, -104f)
+                horizontalLineTo(396f)
+                quadToRelative(-63f, 0f, -109.5f, 40f)
+                reflectiveQuadTo(240f, 540f)
+                reflectiveQuadToRelative(46.5f, 100f)
+                reflectiveQuadTo(396f, 680f)
+                horizontalLineToRelative(284f)
+                verticalLineToRelative(80f)
+                close()
+            }
+        }.build()
+
+        return _RedoInactive!!
+    }
+
+private var _RedoInactive: ImageVector? = null
+
 
 

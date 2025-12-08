@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,7 +55,8 @@ internal fun AuthUIAdaptive(
     confirmPasswordState: MutableState<String>? = null,
     onEnter: (String, String, String) -> Unit,
     innerPadding: PaddingValues,
-    hasFocus: Boolean
+    hasFocus: Boolean,
+    progress: Boolean,
 ) {
 
     val emailFieldFocusRequester = remember { FocusRequester() }
@@ -120,7 +122,8 @@ internal fun AuthUIAdaptive(
                             passwordFieldFocusRequester = passFieldFocusRequester,
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
-                            onEnter = onEnter
+                            onEnter = onEnter,
+                            progress = progress
                         )
                     }
 
@@ -162,6 +165,7 @@ internal fun AuthUIAdaptive(
                             passwordFieldFocusRequester = passFieldFocusRequester,
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
+                            progress = progress,
                             onEnter = onEnter
                         )
                     }
@@ -197,6 +201,7 @@ internal fun AuthUIAdaptive(
                             passwordFieldFocusRequester = passFieldFocusRequester,
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
+                            progress = progress,
                             onEnter = onEnter
                         )
                     }
@@ -247,6 +252,7 @@ internal fun AuthBody(
     passwordState: MutableState<String>,
     confirmPasswordState: MutableState<String>? = null,
     onEnter: (String, String, String) -> Unit,
+    progress: Boolean,
 ) {
 
     var password by passwordState
@@ -311,18 +317,23 @@ internal fun AuthBody(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Login button
-        Button(
-            onClick = {
-                onEnter(password, confirmPassword?.value ?: "", email)
-            },
-            modifier = Modifier
-                .widthIn(max = 320.dp)
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-        ) {
-            Text(text = "Continue")
+        if (progress) {
+            CircularProgressIndicator()
+        } else {
+            // Login button
+            Button(
+                onClick = {
+                    onEnter(password, confirmPassword?.value ?: "", email)
+                },
+                modifier = Modifier
+                    .widthIn(max = 320.dp)
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp)
+            ) {
+                Text(text = "Continue")
+            }
         }
+
     }
 }
 
