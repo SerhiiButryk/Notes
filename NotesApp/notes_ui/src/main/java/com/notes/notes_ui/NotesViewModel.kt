@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
@@ -69,31 +68,35 @@ class NotesViewModel @Inject constructor(
         interaction.onClear()
     }
 
-    fun onSelectAction(note: Notes) {
+    suspend fun onSelectAction(note: Notes) {
         val found = _notesState.value.firstOrNull { note.id == it.id }
         if (found == null) {
-            viewModelScope.launch {
-                _noteState.update { interaction.getNotes(note.id).first()!! }
-            }
+                _noteState.emit(interaction.getNotes(note.id).first()!!)
         } else {
-            _noteState.update { found }
+            _noteState.emit(found)
         }
         interaction.onNoteOpened()
     }
 
-    fun onAddAction() {
-        _noteState.update { Notes.NewNote() }
+    suspend fun onAddAction() {
+        _noteState.emit(Notes.NewNote())
         interaction.onNoteOpened()
     }
 
-    override fun onAdded(id: Long) = onSelectAction(Notes(id = id))
-
-    override fun onDeleted(id: Long) {
-        _noteState.update { Notes.DeletedNote() }
+    override fun onAdded(id: Long) {
+        viewModelScope.launch {
+            onSelectAction(Notes(id = id))
+        }
     }
 
-    fun onNavigatedBack() {
-        _noteState.update { Notes.AbsentNote() }
+    override fun onDeleted(id: Long) {
+        viewModelScope.launch {
+            _noteState.emit( Notes.DeletedNote())
+        }
+    }
+
+    suspend fun onNavigatedBack() {
+        _noteState.emit( Notes.AbsentNote())
     }
 
     fun sendEditorCommand(command: EditorCommand) {

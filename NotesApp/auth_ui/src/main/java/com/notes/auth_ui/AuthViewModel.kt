@@ -11,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
@@ -84,10 +83,10 @@ internal class AuthViewModel @Inject constructor(
 
     fun login(state: LoginUIState, onSuccess: () -> Unit) {
         logger.logi("$TAG::login()")
-        // Show progress
-        val updated = (_uiState.value as LoginUIState).copy(showProgress = true)
-        _uiState.update { updated }
         viewModelScope.launch {
+            // Show progress
+            val showProgress = (_uiState.value as LoginUIState).copy(showProgress = true)
+            _uiState.emit(showProgress)
             val result = interaction.login(state)
             if (result.isSuccess()) {
                 onSuccess()
@@ -95,9 +94,9 @@ internal class AuthViewModel @Inject constructor(
                 handleResult(result)
             }
             // Hide progress
-            val updated = (_uiState.value as? LoginUIState)?.copy(showProgress = false)
-            if (updated != null) {
-                _uiState.update { updated }
+            val hideProgress = (_uiState.value as? LoginUIState)?.copy(showProgress = false)
+            if (hideProgress != null) {
+                _uiState.emit(showProgress)
             }
         }
     }
@@ -148,22 +147,24 @@ internal class AuthViewModel @Inject constructor(
 
     private suspend fun onShowLoginUI() {
         // Initially we are going to show a keyboard if ui is open
-        _uiState.update { LoginUIState(hasFocus = true, email = interaction.getUserEmail()) }
+        _uiState.emit(LoginUIState(hasFocus = true, email = interaction.getUserEmail()))
     }
 
     private suspend fun onShowVerificationUI() {
         val email = interaction.getUserEmail()
-        _uiState.update { VerificationUIState(email = email) }
+        _uiState.emit(VerificationUIState(email = email))
     }
 
-    private fun onShowRegisterUI() {
+    private suspend fun onShowRegisterUI() {
         // Initially we are going to show a keyboard if ui is open
-        _uiState.update { RegisterUIState(hasFocus = true) }
+        _uiState.emit(RegisterUIState(hasFocus = true))
     }
 
     fun dismissDialog() {
         logger.logi("$TAG::dismissDialog()")
-        _dialogState.update { null }
+        viewModelScope.launch {
+            _dialogState.emit(null)
+        }
     }
 
     override fun onCleared() {
@@ -171,19 +172,19 @@ internal class AuthViewModel @Inject constructor(
         interaction.onClear()
     }
 
-    private fun handleResult(result: AuthResult) {
+    private suspend fun handleResult(result: AuthResult) {
 
         logger.logi("$TAG::handleResult()")
 
         // Handle success
         if (result.status == AuthResult.verificationSentOk) {
-            _uiState.update { (_uiState.value as VerificationUIState).copy(emailVerificationSent = true) }
+            _uiState.emit( (_uiState.value as VerificationUIState).copy(emailVerificationSent = true) )
             return
         }
 
         // Handle specific errors
         if (result.status == AuthResult.verificationSentError) {
-            _uiState.update { (_uiState.value as VerificationUIState).copy(emailVerificationSent = false) }
+            _uiState.emit( (_uiState.value as VerificationUIState).copy(emailVerificationSent = false) )
             return
         }
 
@@ -192,7 +193,7 @@ internal class AuthViewModel @Inject constructor(
         val title = strings.first
         val subtitle = strings.second
 
-        _dialogState.update { DialogState(title = title, subtitle = subtitle) }
+        _dialogState.emit( DialogState(title = title, subtitle = subtitle) )
     }
 
 }

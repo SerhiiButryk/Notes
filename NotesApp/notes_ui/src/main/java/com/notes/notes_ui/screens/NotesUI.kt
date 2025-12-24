@@ -33,7 +33,7 @@ fun NotesUI(
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
-    onNavigatedBack: () -> Unit,
+    onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit
 ) {
     NotesUIImpl(
@@ -54,7 +54,7 @@ private fun NotesUIImpl(
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
-    onNavigatedBack: () -> Unit,
+    onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit
 ) {
 
@@ -90,7 +90,7 @@ private fun ListDetailUI(
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
-    onNavigatedBack: () -> Unit,
+    onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit
 ) {
 

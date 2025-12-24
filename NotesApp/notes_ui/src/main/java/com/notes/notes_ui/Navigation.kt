@@ -32,7 +32,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val onAddAction: suspend () -> Unit =
                 { viewModel.onAddAction() }
 
-            val onNavigatedBack: () -> Unit = { viewModel.onNavigatedBack() }
+            val onNavigatedBack: suspend () -> Unit = { viewModel.onNavigatedBack() }
 
             val sendEditorCommand: (EditorCommand) -> Unit =
                 { viewModel.sendEditorCommand(it) }
