@@ -1,6 +1,6 @@
 # Notes application
 
-![logo](images/icons/Dark/Kotlin Multiplatform Logo.png)
+![logo](./images/icons/Dark/Kotlin Multiplatform Logo.png)
 
 # What is it ? ✨
 
