@@ -1,4 +1,4 @@
-# Notes application
+# Notes application 💜💜💜
 
 <img src="images/icons/Dark/Kotlin Multiplatform Logo.png">
 
@@ -8,7 +8,7 @@ Cross-platform, secure, fluent and rich editor for your notes, which is built wi
 
 # Current state
 
-Under activate development.
+Under active development.
 
 # Design
 
