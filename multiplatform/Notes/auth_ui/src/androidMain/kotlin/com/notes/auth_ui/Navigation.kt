@@ -21,10 +21,8 @@ import com.notes.ui.AlertDialogUI
 import com.notes.ui.getViewModel
 
 fun NavGraphBuilder.authDestination(navController: NavController) {
-
     // Authentication graph
     navigation<Auth>(startDestination = Access) {
-
         composable<Access> { backStackEntry ->
 
             // Show login or register depending on UI state
@@ -33,11 +31,10 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
             val state = viewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(false) {
-               viewModel.onShowAuthUI()
+                viewModel.onShowAuthUI()
             }
 
             if (state.value is AuthViewModel.LoginUIState) {
-
                 val onSuccess = {
                     navController.popBackStack()
                     navController.navigate(getStartDestination())
@@ -49,18 +46,17 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                 LoginUI(
                     state = loginUIState,
                     onLogin = { viewModel.login(state = it, onSuccess = onSuccess) },
-                    progress = hasProgress)
+                    progress = hasProgress,
+                )
 
                 val context = LocalContext.current
                 BackHandler(enabled = true) {
                     val activity = context as? Activity
                     activity?.moveTaskToBack(true)
                 }
-
             }
 
             if (state.value is AuthViewModel.RegisterUIState) {
-
                 val onSuccess = {
                     navController.navigate(EmailVerification)
                 }
@@ -70,13 +66,13 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                     onRegister = {
                         viewModel.register(
                             state = it,
-                            onSuccess = onSuccess
+                            onSuccess = onSuccess,
                         )
-                    })
+                    },
+                )
             }
 
             Dialog(viewModel)
-
         }
 
         composable<EmailVerification> { backStackEntry ->
@@ -99,7 +95,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                 },
                 verificationEmailSent = uiState.emailVerificationSent,
                 title = uiState.title,
-                subTitle = uiState.subtitle
+                subTitle = uiState.subtitle,
             )
 
             val context = LocalContext.current
@@ -107,15 +103,12 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                 val activity = context as? Activity
                 activity?.moveTaskToBack(true)
             }
-
         }
-
     }
 }
 
 @Composable
 private fun Dialog(viewModel: AuthViewModel) {
-
     val dialogState = viewModel.dialogState.collectAsStateWithLifecycle()
 
     if (dialogState.value != null) {
@@ -123,10 +116,9 @@ private fun Dialog(viewModel: AuthViewModel) {
             onDismissRequest = { viewModel.dismissDialog() },
             onConfirmation = { viewModel.dismissDialog() },
             dialogTitle = dialogState.value!!.title,
-            dialogText = dialogState.value!!.subtitle
+            dialogText = dialogState.value!!.subtitle,
         )
     }
-
 }
 
 fun NavGraphBuilder.onboardingDestination(navController: NavController) {

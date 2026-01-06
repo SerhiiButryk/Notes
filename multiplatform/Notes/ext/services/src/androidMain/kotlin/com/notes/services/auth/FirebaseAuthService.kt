@@ -9,34 +9,34 @@ import com.notes.api.AuthService
 import com.notes.api.PlatformAPIs.logger
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-
 /**
  * Service which implements authentication with Google Firebase server.
  */
 class FirebaseAuthService : AuthService {
-
     private val tag = "FirebaseAuthService"
 
-    private var auth: FirebaseAuth = Firebase.auth
+    private val auth: FirebaseAuth = Firebase.auth
 
     override suspend fun createUser(
-        pass: String, email: String
+        pass: String,
+        email: String,
     ): AuthResult {
-        val result = suspendCancellableCoroutine { continuation ->
-            auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    logger.logi("$tag::createUser() success")
-                    continuation.resume(AuthResult.registrationSuccess(email)) { _, _, _ ->
-                        // no-op if coroutine is cancelled
-                    }
-                } else {
-                    logger.loge("$tag::createUser() failure: ${task.exception}")
-                    continuation.resume(AuthResult.registrationFailed(email)) { _, _, _ ->
-                        // no-op if coroutine is cancelled
+        val result =
+            suspendCancellableCoroutine { continuation ->
+                auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        logger.logi("$tag::createUser() success")
+                        continuation.resume(AuthResult.registrationSuccess(email)) { _, _, _ ->
+                            // no-op if coroutine is cancelled
+                        }
+                    } else {
+                        logger.loge("$tag::createUser() failure: ${task.exception}")
+                        continuation.resume(AuthResult.registrationFailed(email)) { _, _, _ ->
+                            // no-op if coroutine is cancelled
+                        }
                     }
                 }
             }
-        }
         return if (result.isSuccess()) {
             sendEmailVerify(fireBaseUser = auth.currentUser)
         } else {
@@ -44,8 +44,11 @@ class FirebaseAuthService : AuthService {
         }
     }
 
-    override suspend fun login(pass: String, email: String): AuthResult {
-        return suspendCancellableCoroutine { continuation ->
+    override suspend fun login(
+        pass: String,
+        email: String,
+    ): AuthResult =
+        suspendCancellableCoroutine { continuation ->
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     logger.logi("$tag::login() success")
@@ -60,7 +63,6 @@ class FirebaseAuthService : AuthService {
                 }
             }
         }
-    }
 
     override suspend fun sendEmailVerify(): AuthResult {
         logger.logi("$tag::sendVerification()")
@@ -92,8 +94,15 @@ class FirebaseAuthService : AuthService {
         return user.isEmailVerified
     }
 
-    override fun getUserEmail(): String {
-        return auth.currentUser?.email ?: ""
+    override fun getUserEmail(): String = auth.currentUser?.email ?: ""
+
+    override fun isAuthenticated(): Boolean = auth.currentUser?.uid != null
+
+    override fun getUserId(): String {
+        if (auth.currentUser?.uid == null) {
+            return ""
+        }
+        return auth.currentUser?.uid!!
     }
 
     private suspend fun sendEmailVerify(fireBaseUser: FirebaseUser?): AuthResult {
@@ -105,20 +114,20 @@ class FirebaseAuthService : AuthService {
                 if (task.isSuccessful) {
                     logger.logi("$tag::sendVerification() verification code is sent")
                     continuation.resume(
-                        AuthResult.verificationSentSuccess(user.email!!)
+                        AuthResult.verificationSentSuccess(user.email!!),
                     ) { _, _, _ ->
                         // no-op if coroutine is cancelled
                     }
                 } else {
                     logger.loge("$tag::sendVerification() failure: ${task.exception}")
                     continuation.resume(
-                        AuthResult.verificationSentFailed(user.email!!)
+                        AuthResult.verificationSentFailed(user.email!!),
                     ) { _, _, _ ->
                         // no-op if coroutine is cancelled
                     }
                 }
             } ?: continuation.resume(
-                AuthResult.verificationSentFailed("")
+                AuthResult.verificationSentFailed(""),
             ) { _, _, _ ->
                 // no-op if coroutine is cancelled
             }

@@ -12,7 +12,6 @@ const val TAG = "ViewModels"
 
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.getViewModel(navController: NavController): T {
-
     val parentNavGraph = destination.parent
     if (parentNavGraph == null) {
         logger.loge("$TAG::getViewModel: can't create view model")

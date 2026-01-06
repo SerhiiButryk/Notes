@@ -5,20 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.notes.api.AuthResult
-import com.notes.api.AuthService
 import com.notes.api.PlatformAPIs.logger
-import com.notes.services.auth.FirebaseAuthService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
 
-internal class AuthViewModel (
-    authService: AuthService = FirebaseAuthService()
-) : ViewModel() {
-
-    open class UIState()
+internal class AuthViewModel : ViewModel() {
+    open class UIState
 
     // This annotation could be redundant as
     // the class is already stable, because all properties are stable.
@@ -28,7 +23,7 @@ internal class AuthViewModel (
         val email: String = "",
         val password: String = "",
         val hasFocus: Boolean = false,
-        val showProgress: Boolean = false
+        val showProgress: Boolean = false,
     ) : UIState()
 
     // This annotation could be redundant as
@@ -39,7 +34,7 @@ internal class AuthViewModel (
         val email: String = "",
         val password: String = "",
         val confirmPassword: String = "",
-        val hasFocus: Boolean = false
+        val hasFocus: Boolean = false,
     ) : UIState()
 
     // This annotation could be redundant as
@@ -58,17 +53,19 @@ internal class AuthViewModel (
     data class VerificationUIState(
         val emailVerificationSent: Boolean = false,
         val email: String = "",
-        val isEmailVerified: Boolean = false
+        val isEmailVerified: Boolean = false,
     ) : UIState() {
-
         val title =
-            if (emailVerificationSent) "Verification email has been sent to you. " +
+            if (emailVerificationSent) {
+                "Verification email has been sent to you. " +
                     "Please, check your $email email."
-            else "We failed to send verification email to you. Please, retry later."
+            } else {
+                "We failed to send verification email to you. Please, retry later."
+            }
 
         val subtitle =
             "Look for email with 'Verify your email for fancynotesdevtest' title. " +
-                    "If you don't see such email check 'Spam' folder."
+                "If you don't see such email check 'Spam' folder."
     }
 
     private val _uiState = MutableStateFlow(UIState())
@@ -77,9 +74,12 @@ internal class AuthViewModel (
     private val _dialogState = MutableStateFlow<DialogState?>(null)
     val dialogState = _dialogState.asStateFlow()
 
-    private val interaction = Interaction(authService)
+    private val interaction = Interaction()
 
-    fun login(state: LoginUIState, onSuccess: () -> Unit) {
+    fun login(
+        state: LoginUIState,
+        onSuccess: () -> Unit,
+    ) {
         logger.logi("$TAG::login()")
         viewModelScope.launch {
             // Show progress
@@ -99,7 +99,10 @@ internal class AuthViewModel (
         }
     }
 
-    fun register(state: RegisterUIState, onSuccess: suspend () -> Unit) {
+    fun register(
+        state: RegisterUIState,
+        onSuccess: suspend () -> Unit,
+    ) {
         logger.logi("$TAG::register()")
         viewModelScope.launch {
             val result = interaction.register(state)
@@ -114,7 +117,10 @@ internal class AuthViewModel (
         }
     }
 
-    fun runConfirmationCheck(shouldResendVerification: Boolean = false, navController: NavController) {
+    fun runConfirmationCheck(
+        shouldResendVerification: Boolean = false,
+        navController: NavController,
+    ) {
         logger.logi("$TAG::runConfirmationCheck()")
         viewModelScope.launch {
             val isEmailVerified = interaction.isEmailVerified()
@@ -171,18 +177,17 @@ internal class AuthViewModel (
     }
 
     private suspend fun handleResult(result: AuthResult) {
-
         logger.logi("$TAG::handleResult()")
 
         // Handle success
         if (result.status == AuthResult.verificationSentOk) {
-            _uiState.emit( (_uiState.value as VerificationUIState).copy(emailVerificationSent = true) )
+            _uiState.emit((_uiState.value as VerificationUIState).copy(emailVerificationSent = true))
             return
         }
 
         // Handle specific errors
         if (result.status == AuthResult.verificationSentError) {
-            _uiState.emit( (_uiState.value as VerificationUIState).copy(emailVerificationSent = false) )
+            _uiState.emit((_uiState.value as VerificationUIState).copy(emailVerificationSent = false))
             return
         }
 
@@ -191,7 +196,6 @@ internal class AuthViewModel (
         val title = strings.first
         val subtitle = strings.second
 
-        _dialogState.emit( DialogState(title = title, subtitle = subtitle) )
+        _dialogState.emit(DialogState(title = title, subtitle = subtitle))
     }
-
 }

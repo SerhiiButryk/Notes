@@ -6,15 +6,11 @@ data class AuthResult private constructor(
     val status: Int = 0,
     val statusCode: Int = 0,
     val refreshToken: String = "",
-    val accessToken: String = ""
+    val accessToken: String = "",
 ) {
-
-    fun isSuccess(): Boolean {
-        return status > 0
-    }
+    fun isSuccess(): Boolean = status > 0
 
     companion object {
-
         // Encapsulating errors so call side don't need to depend on them
 
         const val passwordEmptyOrNotMatchingError: Int = -1
@@ -29,53 +25,41 @@ data class AuthResult private constructor(
         const val refreshTokenSuccess: Int = 3
         const val verificationSentOk: Int = 4
 
-        fun passwordEmptyOrNotMatching(email: String): AuthResult {
-            return AuthResult(email, passwordEmptyOrNotMatchingError)
-        }
+        fun passwordEmptyOrNotMatching(email: String): AuthResult = AuthResult(email, passwordEmptyOrNotMatchingError)
 
-        fun registrationSuccess(email: String): AuthResult {
-            return AuthResult(email = email, status = registrationSuccess)
-        }
+        fun registrationSuccess(email: String): AuthResult = AuthResult(email = email, status = registrationSuccess)
 
-        fun registrationFailed(email: String, statusCode: Int = 0): AuthResult {
-            return AuthResult(email = email, status = registrationFailed, statusCode = statusCode)
-        }
+        fun registrationFailed(
+            email: String,
+            statusCode: Int = 0,
+        ): AuthResult = AuthResult(email = email, status = registrationFailed, statusCode = statusCode)
 
-        fun emailOrPassEmpty(email: String): AuthResult {
-            return AuthResult(email = email, status = emailOrPassEmptyError)
-        }
+        fun emailOrPassEmpty(email: String): AuthResult = AuthResult(email = email, status = emailOrPassEmptyError)
 
-        fun refreshTokenSuccess(refreshToken: String, accessToken: String): AuthResult {
-            return AuthResult(refreshToken = refreshToken, accessToken = accessToken, status = refreshTokenSuccess)
-        }
+        fun refreshTokenSuccess(
+            refreshToken: String,
+            accessToken: String,
+        ): AuthResult = AuthResult(refreshToken = refreshToken, accessToken = accessToken, status = refreshTokenSuccess)
 
-        fun refreshTokenFailed(statusCode: Int): AuthResult {
-            return AuthResult(statusCode = statusCode, status = refreshTokenFailed)
-        }
+        fun refreshTokenFailed(statusCode: Int): AuthResult = AuthResult(statusCode = statusCode, status = refreshTokenFailed)
 
-        fun loginSuccess(email: String, refreshToken: String, accessToken: String): AuthResult {
-            return AuthResult(email = email, refreshToken = refreshToken, accessToken = accessToken, status = loginSuccess)
-        }
+        fun loginSuccess(
+            email: String,
+            refreshToken: String,
+            accessToken: String,
+        ): AuthResult = AuthResult(email = email, refreshToken = refreshToken, accessToken = accessToken, status = loginSuccess)
 
-        fun loginSuccess(): AuthResult {
-            return AuthResult(status = loginSuccess)
-        }
+        fun loginSuccess(): AuthResult = AuthResult(status = loginSuccess)
 
-        fun loginFailed(email: String, statusCode: Int): AuthResult {
-            return AuthResult(email = email, statusCode = statusCode, status = loginFailed)
-        }
+        fun loginFailed(
+            email: String,
+            statusCode: Int,
+        ): AuthResult = AuthResult(email = email, statusCode = statusCode, status = loginFailed)
 
-        fun loginFailed(): AuthResult {
-            return AuthResult(status = loginFailed)
-        }
+        fun loginFailed(): AuthResult = AuthResult(status = loginFailed)
 
-        fun verificationSentFailed(email: String): AuthResult {
-            return AuthResult(email = email, status = verificationSentError)
-        }
+        fun verificationSentFailed(email: String): AuthResult = AuthResult(email = email, status = verificationSentError)
 
-        fun verificationSentSuccess(email: String): AuthResult {
-            return AuthResult(email = email, status = verificationSentOk)
-        }
+        fun verificationSentSuccess(email: String): AuthResult = AuthResult(email = email, status = verificationSentOk)
     }
-
 }

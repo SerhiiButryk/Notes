@@ -33,13 +33,13 @@ internal fun VerificationEmailUI(
     onRetry: () -> Unit,
     verificationEmailSent: Boolean,
     title: String,
-    subTitle: String
+    subTitle: String,
 ) {
     VerificationEmailUIImpl(
         onRetry = onRetry,
         title = title,
         subTitle = subTitle,
-        verificationEmailSent = verificationEmailSent
+        verificationEmailSent = verificationEmailSent,
     )
 }
 
@@ -48,36 +48,37 @@ private fun VerificationEmailUIImpl(
     onRetry: () -> Unit,
     verificationEmailSent: Boolean,
     title: String,
-    subTitle: String
+    subTitle: String,
 ) {
-
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
 
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             Header(
                 text = title,
-                modifier = Modifier
-                    .padding(all = 20.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
+                modifier =
+                    Modifier
+                        .padding(all = 20.dp)
+                        .fillMaxWidth(),
+                textAlign = TextAlign.Center,
             )
 
             if (verificationEmailSent) {
                 SubHeader(
                     text = subTitle,
-                    modifier = Modifier
-                        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    modifier =
+                        Modifier
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                            .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -100,7 +101,7 @@ private fun VerificationEmailUIImpl(
                 Text(
                     modifier = Modifier.padding(top = 10.dp, bottom = 20.dp),
                     text = remainingTime.toString(),
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
                 )
             }
 
@@ -114,7 +115,6 @@ private fun VerificationEmailUIImpl(
                     Text(text = "Send again")
                 }
             }
-
         }
     }
 }
@@ -122,7 +122,7 @@ private fun VerificationEmailUIImpl(
 @Preview(showBackground = true)
 @Preview(
     showBackground = true,
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES
+    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun VerificationEmailUIPreview() {

@@ -8,7 +8,6 @@ import java.io.InputStreamReader
 private val tag = "NetUtils"
 
 fun inputStreamAsString(inputStream: InputStream?): String {
-
     if (inputStream == null) {
         logger.loge("$tag inputStreamAsString: input stream is null")
         return ""

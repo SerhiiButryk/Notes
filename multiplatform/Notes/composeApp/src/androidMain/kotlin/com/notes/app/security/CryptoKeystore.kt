@@ -18,14 +18,16 @@ import javax.crypto.spec.GCMParameterSpec
  * Class provides an access to Android keystore interface for crypto operations
  */
 class CryptoKeystore {
-
     private var keyStore: KeyStore? = null
     private var selectedKey: String? = null
 
-    enum class CryptoError(val code: Int, val errorName: String) {
+    enum class CryptoError(
+        val code: Int,
+        val errorName: String,
+    ) {
         OK(1, "NO_ERRORS"),
         USER_NOT_AUTHORIZED(2, "USER_NOT_AUTHORIZED"),
-        UNKNOWN(3, "UNKNOWN");
+        UNKNOWN(3, "UNKNOWN"),
     }
 
     fun selectKey(key: String) {
@@ -35,7 +37,11 @@ class CryptoKeystore {
         selectedKey = key
     }
 
-    fun createKey(key: String, timeOutSeconds: Int, authRequired: Boolean) {
+    fun createKey(
+        key: String,
+        timeOutSeconds: Int,
+        authRequired: Boolean,
+    ) {
         logger.logi("$TAG: createKey()")
         init(key, timeOutSeconds, authRequired)
     }
@@ -63,7 +69,10 @@ class CryptoKeystore {
         return Result(error = CryptoError.UNKNOWN)
     }
 
-    fun decrypt(message: String, inputIV: String = ""): Result {
+    fun decrypt(
+        message: String,
+        inputIV: String = "",
+    ): Result {
         // Throw exception in case of error. Cannot proceed.
         checkNotNull(selectedKey) { "No key is selected for cryptographic operation" }
         try {
@@ -93,7 +102,11 @@ class CryptoKeystore {
         return Result(error = CryptoError.UNKNOWN)
     }
 
-    private fun init(key: String, timeOutSeconds: Int, authRequired: Boolean) {
+    private fun init(
+        key: String,
+        timeOutSeconds: Int,
+        authRequired: Boolean,
+    ) {
         if (!isSecretKeyExists(key)) {
             // Gen a secret key entity
             _createKey(key, timeOutSeconds, authRequired)
@@ -134,14 +147,20 @@ class CryptoKeystore {
         return false
     }
 
-    private fun _createKey(key: String, timeOutSeconds: Int, authRequired: Boolean): Boolean {
+    private fun _createKey(
+        key: String,
+        timeOutSeconds: Int,
+        authRequired: Boolean,
+    ): Boolean {
         logger.logi("$TAG: _createKey(): $key $timeOutSeconds")
-        val builder = KeyGenParameterSpec.Builder(
-            key,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-        ) // More info on GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM) // GCM doesn't use padding
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+        val builder =
+            KeyGenParameterSpec
+                .Builder(
+                    key,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
+                ) // More info on GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM) // GCM doesn't use padding
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
         // User authentication is needed to user this key
         if (authRequired) {
             builder.setUserAuthenticationRequired(true)
@@ -155,7 +174,6 @@ class CryptoKeystore {
     }
 
     private fun createKeyForBiometricAuth(): Boolean {
-
         val key = DEFAULT_KEY_FOR_BIOMETRIC
 
         if (isSecretKeyExists(key)) {
@@ -163,18 +181,20 @@ class CryptoKeystore {
             return true
         }
 
-        val keySpecs = KeyGenParameterSpec.Builder(
-            key,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-            .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-            .setUserAuthenticationRequired(true)
-            // Invalidate the keys if the user has registered a new biometric
-            // credential, such as a new fingerprint. Can call this method only
-            // on Android 7.0 (API level 24) or higher. The variable
-            // "invalidatedByBiometricEnrollment" is true by default.
-            .setInvalidatedByBiometricEnrollment(true)
-            .build()
+        val keySpecs =
+            KeyGenParameterSpec
+                .Builder(
+                    key,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
+                ).setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                .setUserAuthenticationRequired(true)
+                // Invalidate the keys if the user has registered a new biometric
+                // credential, such as a new fingerprint. Can call this method only
+                // on Android 7.0 (API level 24) or higher. The variable
+                // "invalidatedByBiometricEnrollment" is true by default.
+                .setInvalidatedByBiometricEnrollment(true)
+                .build()
 
         val keyGenerator = getKeyGenerator(KeyProperties.KEY_ALGORITHM_AES)
 
@@ -216,7 +236,7 @@ class CryptoKeystore {
 
     private fun genSecretKey(
         keyGenerator: KeyGenerator,
-        keyGenParameterSpec: KeyGenParameterSpec
+        keyGenParameterSpec: KeyGenParameterSpec,
     ): Boolean {
         try {
             keyGenerator.init(keyGenParameterSpec)
@@ -230,7 +250,6 @@ class CryptoKeystore {
     }
 
     fun getSecretKeyForBiometricAuthOrCreate(): SecretKey? {
-
         if (!isSecretKeyExists(DEFAULT_KEY_FOR_BIOMETRIC)) {
             createKeyForBiometricAuth()
         }
@@ -238,11 +257,12 @@ class CryptoKeystore {
         return keyStore?.getKey(DEFAULT_KEY_FOR_BIOMETRIC, null) as? SecretKey
     }
 
-    fun getCipherForBiometricAuth(): Cipher {
-        return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
-                + KeyProperties.BLOCK_MODE_CBC + "/"
-                + KeyProperties.ENCRYPTION_PADDING_PKCS7)
-    }
+    fun getCipherForBiometricAuth(): Cipher =
+        Cipher.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES + "/" +
+                KeyProperties.BLOCK_MODE_CBC + "/" +
+                KeyProperties.ENCRYPTION_PADDING_PKCS7,
+        )
 
     companion object {
         private const val TAG = "AndroidProvider"
@@ -264,5 +284,4 @@ class CryptoKeystore {
             logger.loge("$TAG: init(): failed to load, error = $e")
         }
     }
-
 }

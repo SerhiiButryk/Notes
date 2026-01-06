@@ -53,41 +53,56 @@ fun InputTextField(
     OutlinedTextField(
         leadingIcon = {
             // Show an icon base on keyboard type
-            if (keyboardType == KeyboardType.Password) Icon(
-                imageVector = KEY_ICON, contentDescription = ""
-            )
-            else if (keyboardType == KeyboardType.Email) Icon(
-                imageVector = EMAIL_ICON, contentDescription = ""
-            )
+            if (keyboardType == KeyboardType.Password) {
+                Icon(
+                    imageVector = KEY_ICON,
+                    contentDescription = "",
+                )
+            } else if (keyboardType == KeyboardType.Email) {
+                Icon(
+                    imageVector = EMAIL_ICON,
+                    contentDescription = "",
+                )
+            }
         },
         trailingIcon = {
-            if (keyboardType == KeyboardType.Password) PasswordEye(
-                passwordShown = passwordShown,
-                onTogglePasswordVisibility = { passwordShown = !passwordShown })
+            if (keyboardType == KeyboardType.Password) {
+                PasswordEye(
+                    passwordShown = passwordShown,
+                    onTogglePasswordVisibility = { passwordShown = !passwordShown },
+                )
+            }
         },
         value = text,
         onValueChange = { onValueChange(it) },
         label = { Text(label) },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            showKeyboardOnFocus = true,
-            autoCorrectEnabled = false,
-            imeAction = imeAction
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                keyboardType = keyboardType,
+                showKeyboardOnFocus = true,
+                autoCorrectEnabled = false,
+                imeAction = imeAction,
+            ),
         keyboardActions = keyboardActions,
         modifier = localModifier,
         maxLines = 1,
-        visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email)
-            VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation =
+            if (passwordShown || keyboardType == KeyboardType.Email) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
         supportingText = {
 // TODO Enable error message for input validation errors
             //            ErrorMessage()
-        })
+        },
+    )
 }
 
 @Composable
 internal fun PasswordEye(
-    passwordShown: Boolean, onTogglePasswordVisibility: () -> Unit
+    passwordShown: Boolean,
+    onTogglePasswordVisibility: () -> Unit,
 ) {
     val image = if (passwordShown) EYE_HIDDEN_ICON else EYE_OPEN_ICON
 
@@ -99,12 +114,13 @@ internal fun PasswordEye(
 @Composable
 internal fun ErrorMessage(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Error !!!",
             color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
@@ -134,7 +150,7 @@ fun AlertDialogUI(
             TextButton(
                 onClick = {
                     onConfirmation()
-                }
+                },
             ) {
                 Text("Ok")
             }
@@ -143,11 +159,11 @@ fun AlertDialogUI(
             TextButton(
                 onClick = {
                     onDismissRequest()
-                }
+                },
             ) {
                 Text("Cancel")
             }
-        }
+        },
     )
 }
 
@@ -191,10 +207,10 @@ fun SearchBarField(
         },
         expanded = false,
         onExpandedChange = {},
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
     ) {
-
     }
 }

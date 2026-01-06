@@ -34,7 +34,7 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
-import com.notes.notes_ui.NotesViewModel
+import com.notes.api.data.Notes
 import com.notes.ui.SearchBarField
 import com.notes.ui.isTabletOrFoldableExpanded
 
@@ -43,8 +43,8 @@ fun NotesListUI(
     modifier: Modifier = Modifier,
     addAction: () -> Unit,
     onSettingsAction: () -> Unit = {},
-    onSelected: (NotesViewModel.Notes) -> Unit,
-    notes: List<NotesViewModel.Notes>,
+    onSelected: (Notes) -> Unit,
+    notes: List<Notes>,
     sizeClass: WindowSizeClass,
 ) {
     Scaffold(
@@ -55,7 +55,8 @@ fun NotesListUI(
                     // Show settings conditionally for phone devices
                     if (!isTabletOrFoldableExpanded(sizeClass)) {
                         IconButton(
-                            onClick = { onSettingsAction() }) {
+                            onClick = { onSettingsAction() },
+                        ) {
                             Icon(
                                 imageVector = Icons.Filled.Settings,
                                 contentDescription = null,
@@ -63,7 +64,8 @@ fun NotesListUI(
                             )
                         }
                     }
-                })
+                },
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -72,13 +74,13 @@ fun NotesListUI(
             ) {
                 Icon(Icons.Filled.Add, null)
             }
-        }
+        },
     ) { innerPadding ->
         NotesList(
             modifier = Modifier.padding(innerPadding),
             sizeClass = sizeClass,
             notes = notes,
-            onSelected = onSelected
+            onSelected = onSelected,
         )
     }
 }
@@ -86,22 +88,22 @@ fun NotesListUI(
 @Composable
 fun NotesList(
     modifier: Modifier = Modifier,
-    notes: List<NotesViewModel.Notes>,
-    onSelected: (NotesViewModel.Notes) -> Unit,
-    sizeClass: WindowSizeClass
+    notes: List<Notes>,
+    onSelected: (Notes) -> Unit,
+    sizeClass: WindowSizeClass,
 ) {
     if (notes.isEmpty()) {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text("Create your first note by tapping '+' button")
         }
     } else {
         if (!isTabletOrFoldableExpanded(sizeClass)) {
             LazyColumn(
-                modifier = modifier.fillMaxSize()
+                modifier = modifier.fillMaxSize(),
             ) {
                 for (note in notes) {
                     item(key = note.id) {
@@ -112,7 +114,7 @@ fun NotesList(
         } else {
             LazyVerticalStaggeredGrid(
                 modifier = modifier,
-                columns = StaggeredGridCells.Adaptive(160.dp)
+                columns = StaggeredGridCells.Adaptive(160.dp),
             ) {
                 for (note in notes) {
                     item(key = note.id) {
@@ -122,12 +124,13 @@ fun NotesList(
             }
         }
     }
-
 }
 
 @Composable
-private fun EditorPreviewStateful(content: String, onClicked: () -> Unit) {
-
+private fun EditorPreviewStateful(
+    content: String,
+    onClicked: () -> Unit,
+) {
     val state = rememberRichTextState()
 
     LaunchedEffect(content) {
@@ -142,38 +145,42 @@ private fun EditorPreviewStateful(content: String, onClicked: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EditorPreview(state: RichTextState, onClicked: () -> Unit) {
-
-    val contentModifier = Modifier
-        .fillMaxWidth()
-        .heightIn(max = 250.dp)
+private fun EditorPreview(
+    state: RichTextState,
+    onClicked: () -> Unit,
+) {
+    val contentModifier =
+        Modifier
+            .fillMaxWidth()
+            .heightIn(max = 250.dp)
 
     Box(
-        modifier = contentModifier
+        modifier = contentModifier,
     ) {
-
         // Readonly field doesn't react on click events
         RichTextEditor(
             state = state,
             shape = RoundedCornerShape(10),
             readOnly = true,
-            colors = richTextEditorColors(
-                // Remove bottom thin line
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            modifier = contentModifier
-                .padding(4.dp)
+            colors =
+                richTextEditorColors(
+                    // Remove bottom thin line
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+            modifier =
+                contentModifier
+                    .padding(4.dp),
         )
 
         // Composable to be able to intercept click events
         Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clickable {
-                    onClicked()
-                }
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .clickable {
+                        onClicked()
+                    },
         )
-
     }
 }

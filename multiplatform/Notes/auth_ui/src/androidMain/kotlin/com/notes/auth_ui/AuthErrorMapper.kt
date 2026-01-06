@@ -6,7 +6,6 @@ import com.notes.api.AuthResult.Companion.loginFailed
 import com.notes.api.AuthResult.Companion.passwordEmptyOrNotMatchingError
 
 fun getErrorTitleAndMessage(authResult: AuthResult): Pair<String, String> {
-
     var title = "Sorry, can't finish this operation."
     var message = "Please, try again."
 

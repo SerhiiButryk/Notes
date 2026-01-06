@@ -11,8 +11,14 @@ kotlin {
     androidLibrary {
         namespace = "com.notes.services"
 
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
@@ -35,6 +41,8 @@ kotlin {
             implementation(libs.firebase.ai)
             // Firebase auth
             implementation(libs.firebase.auth)
+            // Firestore APIs
+            implementation(libs.firebase.firestore)
         }
         commonMain.dependencies {
             // put your Multiplatform dependencies here

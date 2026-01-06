@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
-
     // Functions which return Flow are not suspended
     // This is not a strange thing. As flow defines some operation
     // but they are triggered and controlled by the caller. So it's nonsense
@@ -29,5 +28,4 @@ interface NoteDao {
 
     @Update
     suspend fun updateNote(note: NoteEntity)
-
 }

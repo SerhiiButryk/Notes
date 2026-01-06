@@ -16,8 +16,14 @@ kotlin {
     androidLibrary {
         namespace = "com.notes.auth_ui"
 
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
@@ -35,7 +41,6 @@ kotlin {
             implementation(projects.api)
             implementation(projects.notesUi)
             implementation(projects.ui)
-            implementation(projects.ext.services)
 
             implementation(libs.bundles.android.core)
 
@@ -60,5 +65,4 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
-
 }

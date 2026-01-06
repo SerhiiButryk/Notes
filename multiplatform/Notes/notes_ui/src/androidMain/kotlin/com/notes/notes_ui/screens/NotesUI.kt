@@ -16,9 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.notes.api.data.Notes
 import com.notes.notes_ui.EditorCommand
-import com.notes.notes_ui.NotesViewModel
-import com.notes.notes_ui.NotesViewModel.Notes
 import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail
 import com.notes.notes_ui.screens.editor.ToolsPane
@@ -34,7 +33,7 @@ fun NotesUI(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    onTextChanged: (EditorCommand) -> Unit
+    onTextChanged: (EditorCommand) -> Unit,
 ) {
     NotesUIImpl(
         notes = notes,
@@ -43,7 +42,7 @@ fun NotesUI(
         note = note,
         onSelectAction = onSelectAction,
         onNavigatedBack = onNavigatedBack,
-        onTextChanged = onTextChanged
+        onTextChanged = onTextChanged,
     )
 }
 
@@ -55,9 +54,8 @@ private fun NotesUIImpl(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    onTextChanged: (EditorCommand) -> Unit
+    onTextChanged: (EditorCommand) -> Unit,
 ) {
-
     Row {
         // TODO: Might need to pass this from outside. Recalculation every time might be slow.
         val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -75,10 +73,9 @@ private fun NotesUIImpl(
             note = note,
             onSelectAction = onSelectAction,
             onNavigatedBack = onNavigatedBack,
-            onTextChanged = onTextChanged
+            onTextChanged = onTextChanged,
         )
     }
-
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -91,28 +88,29 @@ private fun ListDetailUI(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    onTextChanged: (EditorCommand) -> Unit
+    onTextChanged: (EditorCommand) -> Unit,
 ) {
-
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
     // TODO: Dig deeper into this APIs
-    val customDirective = remember {
-        PaneScaffoldDirective(
-            // Applied workaround to remove a horizontal space between 2 panes
-            // which more likely is added to handle hinges
-            horizontalPartitionSpacerSize = 0.dp,
-            maxHorizontalPartitions = defaultDirective.maxHorizontalPartitions,
-            maxVerticalPartitions = defaultDirective.maxVerticalPartitions,
-            verticalPartitionSpacerSize = defaultDirective.verticalPartitionSpacerSize,
-            defaultPanePreferredWidth = defaultDirective.defaultPanePreferredWidth,
-            excludedBounds = defaultDirective.excludedBounds
-        )
-    }
+    val customDirective =
+        remember {
+            PaneScaffoldDirective(
+                // Applied workaround to remove a horizontal space between 2 panes
+                // which more likely is added to handle hinges
+                horizontalPartitionSpacerSize = 0.dp,
+                maxHorizontalPartitions = defaultDirective.maxHorizontalPartitions,
+                maxVerticalPartitions = defaultDirective.maxVerticalPartitions,
+                verticalPartitionSpacerSize = defaultDirective.verticalPartitionSpacerSize,
+                defaultPanePreferredWidth = defaultDirective.defaultPanePreferredWidth,
+                excludedBounds = defaultDirective.excludedBounds,
+            )
+        }
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<NotesViewModel.Notes>(
-        scaffoldDirective = customDirective
-    )
+    val navigator =
+        rememberListDetailPaneScaffoldNavigator<Notes>(
+            scaffoldDirective = customDirective,
+        )
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -137,13 +135,12 @@ private fun ListDetailUI(
                             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onAddAction()
                         }
-                    }
+                    },
                 )
             }
         },
         detailPane = {
             AnimatedPane {
-
                 val state = rememberRichTextState()
 
                 LaunchedEffect(note) {
@@ -165,9 +162,9 @@ private fun ListDetailUI(
                     notes = note,
                     state = state,
                     toolsPaneItems = toolsPaneItems,
-                    onTextChanged = onTextChanged
+                    onTextChanged = onTextChanged,
                 )
             }
-        }
+        },
     )
 }

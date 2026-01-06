@@ -1,11 +1,10 @@
 package com.notes.notes_ui
 
 import android.content.Context
-import android.os.Parcelable
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.notes.notes_ui.data.OfflineRepository
+import com.notes.api.data.Notes
+import com.notes.notes_ui.data.AppRepository
 import com.notes.notes_ui.screens.editor.getToolsList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -13,42 +12,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 
-class NotesViewModel (
-    repository: Repository = OfflineRepository()
-) : ViewModel(), Callback {
-
-    // Class to model different action for note data
-    // This annotation could be redundant as
-    // the class is already stable, because all properties are stable.
-    // However, keep it for clarity.
-    @Stable
-    @Parcelize
-    data class Notes(
-        val content: String = "",
-        val id: Long = 0,
-        val userId: String = "",
-        val time: String = ""
-    ) :
-        Parcelable {
-
-        companion object {
-            fun NewNote() = Notes(id = -1)
-            fun AbsentNote() = Notes(id = -2)
-            fun DeletedNote() = Notes(id = -3)
-        }
-    }
-
-    private val interaction: Interaction = Interaction(repository, this)
+class NotesViewModel(
+    appRepository: Repository = AppRepository(),
+) : ViewModel(),
+    Callback {
+    private val interaction: Interaction = Interaction(appRepository, this)
 
     // A state to hold all the notes
-    private val _notesState = interaction.getNotes()
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileSubscribed(stopTimeoutMillis = 5000),
-            emptyList()
-        )
+    private val _notesState =
+        interaction
+            .getNotes()
+            .stateIn(
+                scope = viewModelScope,
+                started = WhileSubscribed(stopTimeoutMillis = 5000),
+                emptyList(),
+            )
 
     val notesState = _notesState
 
@@ -69,7 +48,7 @@ class NotesViewModel (
     suspend fun onSelectAction(note: Notes) {
         val found = _notesState.value.firstOrNull { note.id == it.id }
         if (found == null) {
-                _noteState.emit(interaction.getNotes(note.id).first()!!)
+            _noteState.emit(interaction.getNotes(note.id).first()!!)
         } else {
             _noteState.emit(found)
         }
@@ -89,17 +68,15 @@ class NotesViewModel (
 
     override fun onDeleted(id: Long) {
         viewModelScope.launch {
-            _noteState.emit( Notes.DeletedNote())
+            _noteState.emit(Notes.DeletedNote())
         }
     }
 
     suspend fun onNavigatedBack() {
-        _noteState.emit( Notes.AbsentNote())
+        _noteState.emit(Notes.AbsentNote())
     }
 
     fun sendEditorCommand(command: EditorCommand) {
         interaction.sendEditorCommand(command)
     }
-
-
 }

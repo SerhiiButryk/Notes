@@ -29,12 +29,13 @@ fun VideoPlayer(
     var player by remember { mutableStateOf<Player?>(null) }
     LifecycleStartEffect(videoLink) {
         if (videoLink != null) {
-            player = ExoPlayer.Builder(context).build().apply {
-                setMediaItem(MediaItem.fromUri(videoLink))
-                repeatMode = Player.REPEAT_MODE_ALL
-                prepare()
-                play() // Play immediately
-            }
+            player =
+                ExoPlayer.Builder(context).build().apply {
+                    setMediaItem(MediaItem.fromUri(videoLink))
+                    repeatMode = Player.REPEAT_MODE_ALL
+                    prepare()
+                    play() // Play immediately
+                }
         }
         onStopOrDispose {
             player?.release()
@@ -43,9 +44,10 @@ fun VideoPlayer(
     }
 
     Box(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .then(modifier),
+        modifier =
+            Modifier
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .then(modifier),
     ) {
         // Render the video
         PlayerSurface(player, surfaceType = SURFACE_TYPE_TEXTURE_VIEW)

@@ -8,17 +8,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.notes.notes_ui.NotesViewModel.Notes
+import com.notes.api.data.Notes
 import com.notes.notes_ui.screens.NotesUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
-
     // Main app content graph
     navigation<MainContent>(startDestination = NotesPreview) {
-
         composable<NotesPreview> { backStackEntry ->
 
             val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController)
@@ -51,15 +49,13 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 note = note,
                 onSelectAction = onSelectAction,
                 onNavigatedBack = onNavigatedBack,
-                onTextChanged = sendEditorCommand
+                onTextChanged = sendEditorCommand,
             )
         }
-
     }
-
 }
 
-fun getStartDestination() : Screen = MainContent
+fun getStartDestination(): Screen = MainContent
 
 // Object: Use an object for routes without arguments.
 // Class: Use a class or data class for routes with arguments.

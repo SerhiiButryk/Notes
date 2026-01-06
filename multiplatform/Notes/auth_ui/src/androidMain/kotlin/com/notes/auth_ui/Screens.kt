@@ -20,7 +20,8 @@ internal object OnBoardingScreen : Screen("onboarding")
 internal object EmailVerification : Screen("email_verification")
 
 fun getStartRoute(): Screen {
-    if (isFirstLaunch())
+    if (isFirstLaunch()) {
         return OnBoardingScreen
+    }
     return Auth
 }

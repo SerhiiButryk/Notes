@@ -19,7 +19,7 @@ private const val TAG = "LoginUI"
 internal fun LoginUI(
     state: AuthViewModel.LoginUIState,
     progress: Boolean,
-    onLogin: (AuthViewModel.LoginUIState) -> Unit
+    onLogin: (AuthViewModel.LoginUIState) -> Unit,
 ) {
     LoginUIImpl(state = state, onLogin = onLogin, progress = progress)
 }
@@ -28,9 +28,8 @@ internal fun LoginUI(
 private fun LoginUIImpl(
     state: AuthViewModel.LoginUIState,
     progress: Boolean,
-    onLogin: (AuthViewModel.LoginUIState) -> Unit
+    onLogin: (AuthViewModel.LoginUIState) -> Unit,
 ) {
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
@@ -38,8 +37,9 @@ private fun LoginUIImpl(
         val email = rememberSaveable { mutableStateOf("") }
         val password = rememberSaveable { mutableStateOf("") }
 
-        if (email.value != state.email)
+        if (email.value != state.email) {
             email.value = state.email
+        }
 
         AuthUIAdaptive(
             title = "Welcome again !",
@@ -53,19 +53,18 @@ private fun LoginUIImpl(
                 onLogin(
                     AuthViewModel.LoginUIState(
                         email = emailValue,
-                        password = passwordValue
-                    )
+                        password = passwordValue,
+                    ),
                 )
-            }
+            },
         )
-
     }
 }
 
 @Preview(showBackground = true)
 @Preview(
     showBackground = true,
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES
+    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun LoginUIPreviewLight() {

@@ -11,22 +11,19 @@ private val DEFAULT_KEY_ITERATIONS = 100
 private val DEFAULT_KEY_SALT_LEN = 16 // bits
 
 class DerivedKeyProvider : DerivedKeyOperations {
+    override fun generatePDKey(
+        input: String,
+        salt: ByteArray,
+    ): String = generatePDKeyImpl(input, salt)
 
-    override fun generatePDKey(input: String, salt: ByteArray): String {
-        return generatePDKeyImpl(input, salt)
-    }
-
-    override fun generateSalt(): ByteArray {
-        return generateSaltImpl()
-    }
-
+    override fun generateSalt(): ByteArray = generateSaltImpl()
 }
 
 fun generatePDKeyImpl(
     input: String,
     salt: ByteArray,
     keyLen: Int = DEFAULT_KEY_LEN,
-    iterations: Int = DEFAULT_KEY_ITERATIONS
+    iterations: Int = DEFAULT_KEY_ITERATIONS,
 ): String {
     val keySpec = PBEKeySpec(input.toCharArray(), salt, iterations, keyLen)
     val keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
@@ -38,4 +35,3 @@ fun generateSaltImpl(len: Int = DEFAULT_KEY_SALT_LEN): ByteArray {
     SecureRandom().nextBytes(bytes)
     return bytes
 }
-

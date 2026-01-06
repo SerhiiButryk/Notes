@@ -22,7 +22,8 @@ fun NotesNavRail(onShowSettings: () -> Unit = {}) {
 //                Modifier.padding(vertical = 12.dp)
 //                tint = MaterialTheme.colorScheme.primary,
 //            )
-        }) {
+        },
+    ) {
         Spacer(Modifier.weight(1f))
 
         NavigationRailItem(

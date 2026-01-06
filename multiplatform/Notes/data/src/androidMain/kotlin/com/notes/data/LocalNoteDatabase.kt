@@ -18,64 +18,68 @@ abstract class NoteDatabase : RoomDatabase() {
 
 interface DBLifecycleCallback {
     fun onCreate()
+
     fun onOpen()
+
     fun onClose()
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 object LocalNoteDatabase {
-
     private var noteConnection: SQLiteConnection? = null
 
     private var noteDb: NoteDatabase? = null
 
     private val isCreated = AtomicBoolean(false)
 
-    private val localCallback: DBLifecycleCallback = object : DBLifecycleCallback {
+    private val localCallback: DBLifecycleCallback =
+        object : DBLifecycleCallback {
+            override fun onCreate() {
+                logger.logi("DBLifecycleCallback: onCreate()")
+                clientCallback?.onCreate()
+            }
 
-        override fun onCreate() {
-            logger.logi("DBLifecycleCallback: onCreate()")
-            clientCallback?.onCreate()
-        }
+            override fun onClose() {
+                logger.logi("DBLifecycleCallback: onClose()")
+                clientCallback?.onClose()
+            }
 
-        override fun onClose() {
-            logger.logi("DBLifecycleCallback: onClose()")
-            clientCallback?.onClose()
+            override fun onOpen() {
+                logger.logi("DBLifecycleCallback: onOpen()")
+                clientCallback?.onOpen()
+            }
         }
-
-        override fun onOpen() {
-            logger.logi("DBLifecycleCallback: onOpen()")
-            clientCallback?.onOpen()
-        }
-    }
 
     private var clientCallback: DBLifecycleCallback? = null
 
-    fun initialize(context: Context? = null, callback: DBLifecycleCallback? = null): NoteDatabase? {
+    fun initialize(
+        context: Context? = null,
+        callback: DBLifecycleCallback? = null,
+    ): NoteDatabase? {
         logger.logi("LocalDatabase: initialize()")
         if (isCreated.compareAndSet(false, true)) {
             clientCallback = callback
             val builder = Room.databaseBuilder<NoteDatabase>(context!!, "note_local_database")
-            builder.addCallback(object : RoomDatabase.Callback() {
+            builder.addCallback(
+                object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        logger.logi("LocalDatabase: Callback.onCreate()")
+                        super.onCreate(db)
+                        localCallback.onCreate()
+                    }
 
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    logger.logi("LocalDatabase: Callback.onCreate()")
-                    super.onCreate(db)
-                    localCallback.onCreate()
-                }
+                    override fun onCreate(connection: SQLiteConnection) {
+                        super.onCreate(connection)
+                        noteConnection = connection
+                    }
 
-                override fun onCreate(connection: SQLiteConnection) {
-                    super.onCreate(connection)
-                    noteConnection = connection
-                }
-
-                override fun onOpen(db: SupportSQLiteDatabase) {
-                    logger.logi("LocalDatabase: Callback.onOpen()")
-                    super.onOpen(db)
-                    localCallback.onOpen()
-                }
-
-            })
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        logger.logi("LocalDatabase: Callback.onOpen()")
+                        super.onOpen(db)
+                        localCallback.onOpen()
+                    }
+                },
+            )
             noteDb = builder.build()
             logger.logi("LocalDatabase: initialize(): done")
             return noteDb
@@ -94,9 +98,7 @@ object LocalNoteDatabase {
         return noteDb!!.noteDao()
     }
 
-    suspend fun access(): NoteDao {
-        return EncryptedNoteEntity(accessInternal())
-    }
+    suspend fun access(): NoteDao = EncryptedNoteEntity(accessInternal())
 
     fun close() {
         if (noteConnection != null) {
@@ -116,5 +118,4 @@ object LocalNoteDatabase {
 
         logger.logi("LocalDatabase: close(): done")
     }
-
 }

@@ -58,61 +58,61 @@ internal fun AuthUIAdaptive(
     hasFocus: Boolean,
     progress: Boolean,
 ) {
-
     val emailFieldFocusRequester = remember { FocusRequester() }
     val passFieldFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(hasFocus) {
         if (hasFocus) {
-            if (emailState.value.isEmpty())
+            if (emailState.value.isEmpty()) {
                 emailFieldFocusRequester.requestFocus()
-            else
+            } else {
                 passFieldFocusRequester.requestFocus()
+            }
         }
     }
 
     val sc = currentWindowAdaptiveInfo().windowSizeClass
 
-    val containerModifier = Modifier
-        .padding(innerPadding)
-        .fillMaxSize()
+    val containerModifier =
+        Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
 
-    val mainContentModifier = Modifier
-        .padding(20.dp)
-        .fillMaxWidth()
+    val mainContentModifier =
+        Modifier
+            .padding(20.dp)
+            .fillMaxWidth()
 
     // Add padding specifically for UI in portrait phone and tablet mode
     // to make UI a bit better
-    val keyboardPadding = Modifier
-        .consumeWindowInsets(innerPadding)
-        .imePadding()
+    val keyboardPadding =
+        Modifier
+            .consumeWindowInsets(innerPadding)
+            .imePadding()
 
     when {
-
         isTabletOrFoldableExpanded(sc) -> {
-
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = containerModifier.then(keyboardPadding)
+                modifier = containerModifier.then(keyboardPadding),
             ) {
-
                 SurfaceContainer(
-                    modifier = Modifier
-                        .widthIn(max = 600.dp)
-                        .wrapContentHeight()
+                    modifier =
+                        Modifier
+                            .widthIn(max = 600.dp)
+                            .wrapContentHeight(),
                 ) {
-
                     Column {
-
-                        val modifier = Modifier
-                            .padding(20.dp)
+                        val modifier =
+                            Modifier
+                                .padding(20.dp)
 
                         AuthHeader(
                             modifier = modifier,
                             alignment = Alignment.CenterHorizontally,
                             title = title,
-                            subTitle = subTitle
+                            subTitle = subTitle,
                         )
 
                         AuthBody(
@@ -123,39 +123,35 @@ internal fun AuthUIAdaptive(
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
                             onEnter = onEnter,
-                            progress = progress
+                            progress = progress,
                         )
                     }
-
                 }
-
             }
-
         }
 
         isPhoneLandScape(sc) -> {
-
             Row(modifier = containerModifier) {
-
-                val modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
+                val modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f)
 
                 Box(
-                    modifier = modifier
+                    modifier = modifier,
                 ) {
                     SurfaceContainer {
                         AuthHeader(
                             modifier = mainContentModifier,
                             bottomPadding = 10.dp,
                             title = title,
-                            subTitle = subTitle
+                            subTitle = subTitle,
                         )
                     }
                 }
 
                 Box(
-                    modifier = modifier
+                    modifier = modifier,
                 ) {
                     SurfaceContainer {
                         AuthBody(
@@ -166,32 +162,26 @@ internal fun AuthUIAdaptive(
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
                             progress = progress,
-                            onEnter = onEnter
+                            onEnter = onEnter,
                         )
                     }
                 }
-
             }
-
         }
 
         // Other configurations
         else -> {
-
             Box(
                 modifier = containerModifier.then(keyboardPadding),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
-
                 SurfaceContainer {
-
                     Column {
-
                         AuthHeader(
                             modifier = mainContentModifier,
                             alignment = Alignment.CenterHorizontally,
                             title = title,
-                            subTitle = subTitle
+                            subTitle = subTitle,
                         )
 
                         AuthBody(
@@ -202,13 +192,11 @@ internal fun AuthUIAdaptive(
                             passwordState = passwordState,
                             confirmPasswordState = confirmPasswordState,
                             progress = progress,
-                            onEnter = onEnter
+                            onEnter = onEnter,
                         )
                     }
                 }
-
             }
-
         }
     }
 }
@@ -219,26 +207,29 @@ internal fun AuthHeader(
     alignment: Alignment.Horizontal = Alignment.Start,
     bottomPadding: Dp = 0.dp,
     title: String,
-    subTitle: String
+    subTitle: String,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
-
         val textAlign = if (alignment == Alignment.Start) TextAlign.Start else TextAlign.Center
 
         Header(
-            text = title, modifier = Modifier
-                .padding(all = 10.dp)
-                .fillMaxWidth(), textAlign = textAlign
+            text = title,
+            modifier =
+                Modifier
+                    .padding(all = 10.dp)
+                    .fillMaxWidth(),
+            textAlign = textAlign,
         )
 
         SubHeader(
             text = subTitle,
-            modifier = Modifier
-                .padding(start = 10.dp, end = 10.dp, bottom = bottomPadding)
-                .fillMaxWidth(),
-            textAlign = textAlign
+            modifier =
+                Modifier
+                    .padding(start = 10.dp, end = 10.dp, bottom = bottomPadding)
+                    .fillMaxWidth(),
+            textAlign = textAlign,
         )
     }
 }
@@ -254,7 +245,6 @@ internal fun AuthBody(
     onEnter: (String, String, String) -> Unit,
     progress: Boolean,
 ) {
-
     var password by passwordState
     var email by emailState
     val confirmPassword: MutableState<String>? = confirmPasswordState
@@ -263,9 +253,8 @@ internal fun AuthBody(
 
     Column(
         modifier = modifier.verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         // Email input field
         InputTextField(
             text = email,
@@ -274,7 +263,7 @@ internal fun AuthBody(
             onValueChange = { email = it },
             keyboardType = KeyboardType.Email,
             modifier = Modifier.fillMaxWidth(),
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Next,
         )
 
         val focusManager = LocalFocusManager.current
@@ -284,9 +273,10 @@ internal fun AuthBody(
             focusManager.clearFocus()
         }
 
-        val keyboardActions = KeyboardActions(
-            onDone = { doneAction() },
-        )
+        val keyboardActions =
+            KeyboardActions(
+                onDone = { doneAction() },
+            )
 
         // Password input field
         InputTextField(
@@ -309,9 +299,10 @@ internal fun AuthBody(
                 keyboardType = KeyboardType.Password,
                 modifier = Modifier.fillMaxWidth(),
                 imeAction = ImeAction.Done,
-                keyboardActions = KeyboardActions(
-                    onDone = { doneAction() }
-                ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = { doneAction() },
+                    ),
             )
         }
 
@@ -325,49 +316,61 @@ internal fun AuthBody(
                 onClick = {
                     onEnter(password, confirmPassword?.value ?: "", email)
                 },
-                modifier = Modifier
-                    .widthIn(max = 320.dp)
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
+                modifier =
+                    Modifier
+                        .widthIn(max = 320.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
             ) {
                 Text(text = "Continue")
             }
         }
-
     }
 }
 
 @Composable
-fun SurfaceContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit = {}) {
+fun SurfaceContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {},
+) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         shadowElevation = 8.dp,
-        modifier = Modifier
-            .padding(all = 10.dp)
-            .then(modifier),
-        color = SurfaceColor()
+        modifier =
+            Modifier
+                .padding(all = 10.dp)
+                .then(modifier),
+        color = SurfaceColor(),
     ) {
         content()
     }
 }
 
 @Composable
-fun Header(text: String, modifier: Modifier = Modifier, textAlign: TextAlign? = null) {
+fun Header(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign? = null,
+) {
     Text(
         text = text,
         fontSize = 24.sp,
         style = MaterialTheme.typography.headlineSmall,
         modifier = modifier,
-        textAlign = textAlign
+        textAlign = textAlign,
     )
 }
 
 @Composable
-fun SubHeader(text: String, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
+fun SubHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start,
+) {
     Text(
         text = text,
         fontSize = 18.sp,
         style = TextStyle(fontWeight = FontWeight.Bold, textAlign = textAlign),
-        modifier = modifier
+        modifier = modifier,
     )
 }

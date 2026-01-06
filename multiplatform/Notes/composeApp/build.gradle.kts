@@ -28,6 +28,7 @@ kotlin {
             implementation(projects.ui)
             implementation(projects.notesUi)
             implementation(projects.authUi)
+            implementation(projects.ext.services)
 
             // Compose UI
             implementation(compose.preview)
@@ -65,12 +66,21 @@ kotlin {
 
 android {
     namespace = "com.notes.app"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk =
+        libs.versions.android.compileSdk
+            .get()
+            .toInt()
 
     defaultConfig {
         applicationId = "com.notes.app"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
         versionCode = 1
         versionName = "1.0"
     }

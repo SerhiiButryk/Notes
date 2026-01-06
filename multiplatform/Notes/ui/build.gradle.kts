@@ -15,8 +15,14 @@ kotlin {
     androidLibrary {
         namespace = "com.notes.ui"
 
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
@@ -72,5 +78,4 @@ kotlin {
             }
         }
     }
-
 }

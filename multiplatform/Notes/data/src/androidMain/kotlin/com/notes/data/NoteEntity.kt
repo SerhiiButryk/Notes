@@ -12,4 +12,6 @@ data class NoteEntity(
     // Html content
     @ColumnInfo("note_content") val content: String,
     @ColumnInfo("time") val time: String,
+    // Whether remote db has been updated
+    @ColumnInfo("pending_update") val pendingUpdate: Boolean,
 )

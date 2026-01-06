@@ -12,16 +12,19 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.lang.ref.WeakReference
 
-class StorageProvider (context: Context) :
-    StorageOperations {
-
+class StorageProvider(
+    context: Context,
+) : StorageOperations {
     // Keep context as weak ref for safety
     private val contextRef = WeakReference(context)
 
     private val fileName = "AppSettings"
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(fileName)
 
-    override suspend fun save(value: String, key: String): Boolean {
+    override suspend fun save(
+        value: String,
+        key: String,
+    ): Boolean {
         val ref = contextRef.get() ?: return false
         ref.datastore.edit { prefs ->
             val valueEnc = PlatformAPIs.crypto.encrypt(value)
@@ -33,12 +36,12 @@ class StorageProvider (context: Context) :
     override suspend fun get(key: String): String {
         val ref = contextRef.get() ?: return ""
         val result =
-            ref.datastore.data.map { prefs ->
-                val valueEnc = prefs[stringPreferencesKey(key)] ?: return@map ""
-                val valueDec = PlatformAPIs.crypto.decrypt(valueEnc)
-                valueDec
-            }.first()
+            ref.datastore.data
+                .map { prefs ->
+                    val valueEnc = prefs[stringPreferencesKey(key)] ?: return@map ""
+                    val valueDec = PlatformAPIs.crypto.decrypt(valueEnc)
+                    valueDec
+                }.first()
         return result
     }
-
 }

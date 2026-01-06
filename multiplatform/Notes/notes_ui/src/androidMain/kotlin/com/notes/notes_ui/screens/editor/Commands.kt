@@ -5,8 +5,9 @@ import androidx.compose.ui.text.SpanStyle
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.notes.notes_ui.EditorCommand
 
-open class UndoableCommand(protected val richTextState: RichTextState) : EditorCommand {
-
+open class UndoableCommand(
+    protected val richTextState: RichTextState,
+) : EditorCommand {
     private var savedState: RichTextState? = null
 
     override fun execCommand() {
@@ -18,9 +19,10 @@ open class UndoableCommand(protected val richTextState: RichTextState) : EditorC
     }
 }
 
-class EditCommand(val spanStyle: SpanStyle, richTextState: RichTextState) :
-    UndoableCommand(richTextState) {
-
+class EditCommand(
+    val spanStyle: SpanStyle,
+    richTextState: RichTextState,
+) : UndoableCommand(richTextState) {
     override fun execCommand() {
         super.execCommand()
         // Simulates toggle behavior. Will adding or removing style as needed
@@ -28,15 +30,19 @@ class EditCommand(val spanStyle: SpanStyle, richTextState: RichTextState) :
     }
 }
 
-class ClearCommand(richTextState: RichTextState) : UndoableCommand(richTextState) {
+class ClearCommand(
+    richTextState: RichTextState,
+) : UndoableCommand(richTextState) {
     override fun execCommand() {
         super.execCommand()
         richTextState.clear()
     }
 }
 
-class AlignCommand(richTextState: RichTextState, val paragraphStyle: ParagraphStyle) :
-    UndoableCommand(richTextState) {
+class AlignCommand(
+    richTextState: RichTextState,
+    val paragraphStyle: ParagraphStyle,
+) : UndoableCommand(richTextState) {
     override fun execCommand() {
         super.execCommand()
         // Simulates toggle behavior. Will adding or removing style as needed
@@ -44,14 +50,18 @@ class AlignCommand(richTextState: RichTextState, val paragraphStyle: ParagraphSt
     }
 }
 
-class OrderedListCommand(richTextState: RichTextState) : UndoableCommand(richTextState) {
+class OrderedListCommand(
+    richTextState: RichTextState,
+) : UndoableCommand(richTextState) {
     override fun execCommand() {
         super.execCommand()
         richTextState.toggleOrderedList()
     }
 }
 
-class UnorderedListCommand(richTextState: RichTextState) : UndoableCommand(richTextState) {
+class UnorderedListCommand(
+    richTextState: RichTextState,
+) : UndoableCommand(richTextState) {
     override fun execCommand() {
         richTextState.toggleUnorderedList()
     }
@@ -60,9 +70,8 @@ class UnorderedListCommand(richTextState: RichTextState) : UndoableCommand(richT
 class TextInputCommand(
     val new: String,
     val old: String,
-    val state: RichTextState
+    val state: RichTextState,
 ) : EditorCommand {
-
     override fun execCommand() {
         state.setHtml(new)
     }

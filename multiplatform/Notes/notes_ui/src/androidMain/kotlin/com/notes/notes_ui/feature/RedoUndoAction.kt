@@ -6,18 +6,19 @@ import com.notes.notes_ui.EditorCommand
  * Class which implements redo/undo functionality in text editor
  */
 class RedoUndoAction {
-
     private val commands: MutableList<EditorCommand> = mutableListOf()
+
     // Holds a command that we can undo
     private var undoCommand: EditorCommand? = null
+
     // Holds a command that we can reapply
     private var reappliedCommand: EditorCommand? = null
     private var applyFirst = false
     private var revertedFirst = false
 
-    fun hasUndoAction() : Boolean = undoCommand != null
+    fun hasUndoAction(): Boolean = undoCommand != null
 
-    fun hasRedoAction() : Boolean = reappliedCommand != null
+    fun hasRedoAction(): Boolean = reappliedCommand != null
 
     fun onEditAction(command: EditorCommand) {
         revertedFirst = false
@@ -82,5 +83,4 @@ class RedoUndoAction {
             return false
         }
     }
-
 }

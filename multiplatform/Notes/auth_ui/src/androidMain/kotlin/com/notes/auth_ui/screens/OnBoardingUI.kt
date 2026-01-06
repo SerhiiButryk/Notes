@@ -35,32 +35,30 @@ internal fun OnboardingScreen(onContinue: () -> Unit = {}) {
 @Composable
 private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
     Surface(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
-
         val sc = currentWindowAdaptiveInfo().windowSizeClass
 
-        val sizeModifier: Modifier = if (isTabletOrFoldableExpanded(sc)) {
-            // Add max width bound
-            Modifier.widthIn(max = 800.dp)
-        } else {
-            // Full size
-            Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-        }
+        val sizeModifier: Modifier =
+            if (isTabletOrFoldableExpanded(sc)) {
+                // Add max width bound
+                Modifier.widthIn(max = 800.dp)
+            } else {
+                // Full size
+                Modifier
+                    .fillMaxSize()
+                    .padding(24.dp)
+            }
 
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
-
             Column(
                 modifier = sizeModifier,
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-
                 // Generated using https://www.vidnoz.com/image-to-video-ai.html
                 // From image https://undraw.co/search/notes
                 val url = "asset:///preview_video.mp4"
@@ -68,16 +66,18 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
                 if (isPhoneLandScape(sc) && !isTabletOrFoldableExpanded(sc)) {
                     VideoPlayer(
                         videoLink = url,
-                        modifier = Modifier
-                            .size(200.dp)
-                            .padding(bottom = 32.dp)
+                        modifier =
+                            Modifier
+                                .size(200.dp)
+                                .padding(bottom = 32.dp),
                     )
                 } else {
                     VideoPlayer(
                         videoLink = url,
-                        modifier = Modifier
-                            .size(400.dp)
-                            .padding(bottom = 32.dp)
+                        modifier =
+                            Modifier
+                                .size(400.dp)
+                                .padding(bottom = 32.dp),
                     )
                 }
 
@@ -89,19 +89,18 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
                     text = "Capture your thoughts and ideas instantly, stay organized, and never forget a thing.",
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
                     onClick = onContinue,
-                    modifier = Modifier.widthIn(400.dp)
+                    modifier = Modifier.widthIn(400.dp),
                 ) {
                     Text("Continue")
                 }
             }
-
         }
     }
 }
@@ -109,10 +108,9 @@ private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
 @Preview(showBackground = true)
 @Preview(
     showBackground = true,
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES
+    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun OnboardingScreenPrev() {
     OnboardingScreen()
 }
-

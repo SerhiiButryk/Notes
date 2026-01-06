@@ -18,7 +18,7 @@ private const val TAG = "RegisterUI"
 @Composable
 internal fun RegisterUI(
     state: AuthViewModel.RegisterUIState,
-    onRegister: (AuthViewModel.RegisterUIState) -> Unit
+    onRegister: (AuthViewModel.RegisterUIState) -> Unit,
 ) {
     RegisterImpl(state, onRegister)
 }
@@ -26,11 +26,10 @@ internal fun RegisterUI(
 @Composable
 private fun RegisterImpl(
     state: AuthViewModel.RegisterUIState,
-    onRegister: (AuthViewModel.RegisterUIState) -> Unit
+    onRegister: (AuthViewModel.RegisterUIState) -> Unit,
 ) {
-
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
 
         val email = rememberSaveable { mutableStateOf("") }
@@ -39,7 +38,8 @@ private fun RegisterImpl(
 
         AuthUIAdaptive(
             title = "Register",
-            subTitle = "Enter your user email and create a password " +
+            subTitle =
+                "Enter your user email and create a password " +
                     "to access this application",
             emailState = email,
             passwordState = password,
@@ -52,19 +52,18 @@ private fun RegisterImpl(
                     AuthViewModel.RegisterUIState(
                         email = emailValue,
                         password = passwordValue,
-                        confirmPassword = confirmPasswordValue
-                    )
+                        confirmPassword = confirmPasswordValue,
+                    ),
                 )
-            }
+            },
         )
-
     }
 }
 
 @Preview(showBackground = true)
 @Preview(
     showBackground = true,
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES
+    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun RegisterUIPreviewLight() {

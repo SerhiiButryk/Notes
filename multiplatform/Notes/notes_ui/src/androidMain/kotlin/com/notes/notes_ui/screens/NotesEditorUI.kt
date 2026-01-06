@@ -24,8 +24,8 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
+import com.notes.api.data.Notes
 import com.notes.notes_ui.EditorCommand
-import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.screens.components.ToolsBar
 import com.notes.notes_ui.screens.editor.TextInputCommand
 import com.notes.notes_ui.screens.editor.ToolsPane
@@ -35,10 +35,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotesEditorUI(
     modifier: Modifier = Modifier,
-    notes: NotesViewModel.Notes,
+    notes: Notes,
     state: RichTextState,
     toolsPaneItems: List<ToolsPane> = emptyList(),
-    onTextChanged: (EditorCommand) -> Unit = {}
+    onTextChanged: (EditorCommand) -> Unit = {},
 ) {
     EditorUI(modifier, notes, state, toolsPaneItems, onTextChanged)
 }
@@ -46,28 +46,29 @@ fun NotesEditorUI(
 @Composable
 private fun EditorUI(
     modifier: Modifier = Modifier,
-    notes: NotesViewModel.Notes,
+    notes: Notes,
     state: RichTextState,
     toolsPaneItems: List<ToolsPane>,
-    onTextChanged: (EditorCommand) -> Unit
+    onTextChanged: (EditorCommand) -> Unit,
 ) {
     Scaffold(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         // Adds cross fade animation when selecting a note from the list
         Crossfade(
             targetState = notes,
             label = "Editor cross fade animation",
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .imePadding()
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding(),
         ) { note ->
-            if (note == NotesViewModel.Notes.AbsentNote()) {
+            if (note == Notes.AbsentNote()) {
                 InfoLabel()
             } else {
                 Column(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                     EditorLayout(
                         state = state,
@@ -75,12 +76,12 @@ private fun EditorUI(
                         // that the composable is measured after the other
                         // composable is measured specifically after the tools pane.
                         modifier = Modifier.weight(1f),
-                        onTextChanged = onTextChanged
+                        onTextChanged = onTextChanged,
                     )
                     ToolsBar(
                         state = state,
                         toolsPaneItems = toolsPaneItems,
-                        notes = notes
+                        notes = notes,
                     )
                 }
             }
@@ -93,22 +94,23 @@ private fun EditorUI(
 private fun EditorLayout(
     state: RichTextState,
     modifier: Modifier,
-    onTextChanged: (EditorCommand) -> Unit
+    onTextChanged: (EditorCommand) -> Unit,
 ) {
-
     val coroutineScope = rememberCoroutineScope()
 
     RichTextEditor(
         state = state,
-        modifier = Modifier
-            .focusable()
-            .fillMaxSize()
-            .then(modifier),
-        colors = richTextEditorColors(
-            // Remove bottom thin line
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
+        modifier =
+            Modifier
+                .focusable()
+                .fillMaxSize()
+                .then(modifier),
+        colors =
+            richTextEditorColors(
+                // Remove bottom thin line
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
         shape = RoundedCornerShape(4),
         onTextChanged = { old ->
             coroutineScope.launch {
@@ -119,7 +121,7 @@ private fun EditorLayout(
                 val command = TextInputCommand(new, old, state)
                 onTextChanged(command)
             }
-        }
+        },
     )
 }
 
@@ -128,7 +130,7 @@ private fun InfoLabel(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Text("Select an item")
     }
@@ -137,14 +139,14 @@ private fun InfoLabel(modifier: Modifier = Modifier) {
 @Preview
 @Preview(
     uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
-    device = "spec:parent=pixel_5,orientation=landscape"
+    device = "spec:parent=pixel_5,orientation=landscape",
 )
 @Composable
 fun NotesEditorUIPrev() {
     val state = rememberRichTextState()
     NotesEditorUI(
-        notes = NotesViewModel.Notes.NewNote(),
+        notes = Notes.NewNote(),
         state = state,
-        toolsPaneItems = emptyList()
+        toolsPaneItems = emptyList(),
     )
 }
