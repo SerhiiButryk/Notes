@@ -1,7 +1,7 @@
 package com.notes.app.security
 
-import com.notes.api.DerivedKeyOperations
-import com.notes.api.PlatformAPIs
+import api.DerivedKeyOperations
+import api.PlatformAPIs
 import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec

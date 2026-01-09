@@ -38,7 +38,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
-            implementation(projects.api)
             implementation(projects.data)
             implementation(projects.ui)
             implementation(projects.composeRichEditor)
@@ -64,7 +63,7 @@ kotlin {
             implementation(compose.preview)
         }
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(projects.api)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

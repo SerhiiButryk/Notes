@@ -2,14 +2,16 @@ package com.notes.services.storage
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import com.notes.api.PlatformAPIs.logger
-import com.notes.api.StorageService
-import com.notes.api.data.Notes
-import com.notes.api.provideAuthService
+import api.PlatformAPIs.logger
+import api.StorageService
+import api.data.Notes
+import api.provideAuthService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 /**
+ * Service which implements database storage with Google Firestore server.
+ *
  * Basic concepts of firestore:
  *
  * Google defines 'collection' and 'document'. 'Collection' is like a folder,

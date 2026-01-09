@@ -79,4 +79,8 @@ class TextInputCommand(
     override fun undo() {
         state.setHtml(old)
     }
+
+    override fun isTextInputCommand(): Boolean {
+        return false
+    }
 }

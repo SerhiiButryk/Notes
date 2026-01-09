@@ -43,6 +43,26 @@ isStatic = true
 }
 ```
 
+** Others
+
+```
+ 1. Ktlint run:
+ ./gradlew ktlintchec
+
+ 2. Android lint run:
+ ./gradlew lint
+
+ 3. Fix style Ktlint issues:
+ ./gradlew ktlintFormat
+
+4. Fresh detekt run:
+./gradlew detekt
+
+This may be required:
+./gradlew detektGenerateConfig
+./gradlew detektBaseline
+```
+
 **The ongoing TODO list**
 
 1. Investigate Android proguard settings:

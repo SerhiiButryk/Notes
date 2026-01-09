@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.notes.api.PlatformAPIs.logger
+import api.PlatformAPIs.logger
 
 const val TAG = "ViewModels"
 

@@ -14,9 +14,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.notes.api.data.Notes
+import api.data.Notes
+import api.ui.CommonIcons
 import com.notes.notes_ui.EditorState
-import com.notes.notes_ui.Interaction
+import com.notes.notes_ui.Interactor
 import com.notes.ui.*
 
 private var uuid: Long = 1
@@ -40,7 +41,7 @@ data class ToolsPane(
     val list: List<Tool>,
 )
 
-fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
+fun getToolsList(notesInteraction: Interactor): List<ToolsPane> {
     // ////////////////////////////////
     // Construct editor tool pane
     // ////////////////////////////////
@@ -282,7 +283,7 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
             ToolsPane(
                 listOf(
                     Tool(
-                        imageVector = com.notes.ui.List,
+                        imageVector = List,
                         onClick = { state, note ->
                             notesInteraction.sendEditorCommand(
                                 UnorderedListCommand(state),
@@ -291,7 +292,7 @@ fun getToolsList(notesInteraction: Interaction): List<ToolsPane> {
                         text = "Simple list",
                     ),
                     Tool(
-                        imageVector = com.notes.ui.Format_list_numbered,
+                        imageVector = Format_list_numbered,
                         onClick = { state, note ->
                             notesInteraction.sendEditorCommand(
                                 OrderedListCommand(state),

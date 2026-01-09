@@ -33,7 +33,7 @@ plugins {
 }
 
 include(":composeApp")
-include(":shared") // TODO: Remove later
+// include(":shared") // TODO: Remove later
 
 include(":api")
 include(":ui")

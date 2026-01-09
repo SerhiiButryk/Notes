@@ -2,8 +2,8 @@ package com.notes.notes_ui.data
 
 import android.content.Context
 import android.os.Build
-import com.notes.api.PlatformAPIs.logger
-import com.notes.api.data.Notes
+import api.PlatformAPIs.logger
+import api.data.Notes
 import com.notes.data.LocalNoteDatabase
 import com.notes.data.NoteEntity
 import com.notes.notes_ui.Repository
@@ -21,10 +21,10 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
-class AppRepository : Repository {
+class AppRepository(private val remoteRepository: RemoteRepository) : Repository {
+
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)
-    private val remoteRepository = RemoteRepository()
 
     override fun getNotes(): Flow<List<Notes>> =
         flow {
@@ -36,16 +36,34 @@ class AppRepository : Repository {
             // Trigger fetch from remote server
             remoteRepository.fetchNotes(scope)
 
-            val db = LocalNoteDatabase.access()
+            val db = LocalNoteDatabase.accessNoteMetadata()
 
             // Trigger load from local db
-            db
-                .getNotes()
-                .map { list ->
-                    list.map { it.toNote() }
-                }.collect {
-                    emit(it)
+            // 1. Load note mata data (additional info)
+            // 2. Check it and load a note which is referenced by 'original'
+
+            db.getAllMetadata().collect { metadata ->
+
+                val list = mutableListOf<Notes>()
+
+                metadata.forEach { item ->
+
+                    val noteId = item.original
+                    val pendingDelete = item.pendingDelete
+
+                    if (!pendingDelete) {
+
+                        val db = LocalNoteDatabase.access()
+                        val note = db.getNote(noteId!!).first()!!.toNote()
+
+                        list.add(note)
+                    }
+
                 }
+
+                emit(list)
+            }
+
         }.flowOn(Dispatchers.IO)
 
     override fun getNotes(id: Long): Flow<Notes?> =
@@ -93,8 +111,6 @@ class AppRepository : Repository {
         callback: (Long) -> Unit,
     ) = deleteNote(scope = scope, note = note, callback = callback)
 
-    // TODO: Double-check delete behavior
-    // What happens with the table ? Is private ket get reused ?
     fun deleteNote(
         scope: CoroutineScope,
         note: Notes,
@@ -102,19 +118,15 @@ class AppRepository : Repository {
     ) {
         scope.launch {
             logger.logi("OfflineRepository::deleteNote(${note.id})")
-            // Deliberately set default value, only uid is important
-            // as it is used as primary key to match the note
-            val noteEntity = NoteEntity(uid = note.id, "", "", "", true)
-            LocalNoteDatabase.access().deleteNote(noteEntity)
-            callback(note.id)
             remoteRepository.delete(scope, note)
+            callback(note.id)
         }
     }
 
-    override fun init(context: Context) {
+    override fun init(context: Any) {
         scope.launch {
             logger.logi("OfflineRepository::init()")
-            LocalNoteDatabase.initialize(context)
+            LocalNoteDatabase.initialize(context as Context)
         }
     }
 
@@ -139,11 +151,10 @@ fun Notes.toEntity(setId: Boolean = true): NoteEntity {
             uid = id,
             userId = userId,
             content = content,
-            time = time,
-            pendingUpdate = pendingUpdate,
+            time = time
         )
     } else {
-        NoteEntity(userId = userId, content = content, time = time, pendingUpdate = pendingUpdate)
+        NoteEntity(userId = userId, content = content, time = time)
     }
 }
 

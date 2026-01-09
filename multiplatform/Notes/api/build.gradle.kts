@@ -10,7 +10,7 @@ plugins {
 kotlin {
 
     androidLibrary {
-        namespace = "com.notes.api"
+        namespace = "com.api"
 
         compileSdk =
             libs.versions.android.compileSdk

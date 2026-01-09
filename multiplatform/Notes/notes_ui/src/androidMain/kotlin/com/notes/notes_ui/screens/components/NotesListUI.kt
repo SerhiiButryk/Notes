@@ -34,7 +34,7 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
-import com.notes.api.data.Notes
+import api.data.Notes
 import com.notes.ui.SearchBarField
 import com.notes.ui.isTabletOrFoldableExpanded
 

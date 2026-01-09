@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalComposeLibrary::class)
+
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -16,6 +20,8 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
     }
 
     jvm()
@@ -24,7 +30,6 @@ kotlin {
 
         androidMain.dependencies {
 
-            implementation(projects.api)
             implementation(projects.ui)
             implementation(projects.notesUi)
             implementation(projects.authUi)
@@ -43,6 +48,9 @@ kotlin {
         }
 
         commonMain.dependencies {
+
+            implementation(projects.api)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -60,6 +68,15 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+        }
+
+        androidInstrumentedTest.dependencies {
+            // Test modules
+            implementation(projects.data)
+            // Test deps
+            implementation(libs.androidx.espresso.core)
+            implementation(libs.truth)
+            implementation(kotlin("reflect"))
         }
     }
 }
@@ -83,6 +100,8 @@ android {
                 .toInt()
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -104,6 +123,9 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    // Common deps for android tests
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4.android)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 compose.desktop {

@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.notes.api.data.Notes
+import api.data.Notes
 import com.notes.notes_ui.screens.editor.Tool
 import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.AlertDialogUI

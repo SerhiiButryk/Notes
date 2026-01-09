@@ -1,8 +1,8 @@
 package com.notes.auth_ui
 
-import com.notes.api.AuthResult
-import com.notes.api.AuthService
-import com.notes.api.provideAuthService
+import api.auth.AuthResult
+import api.AuthService
+import api.provideAuthService
 import com.notes.auth_ui.AuthViewModel.LoginUIState
 import com.notes.auth_ui.AuthViewModel.RegisterUIState
 import com.notes.auth_ui.data.saveUserEmail
@@ -64,8 +64,7 @@ internal class Interaction(
 
     suspend fun getUserEmail(): String {
         val email =
-            com.notes.auth_ui.data
-                .getUserEmail()
+            com.notes.auth_ui.data.getUserEmail()
         return email.ifEmpty { authService.getUserEmail() }
     }
 

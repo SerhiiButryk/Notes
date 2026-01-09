@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.notes.api.data.Notes
+import api.data.Notes
 import com.notes.notes_ui.screens.NotesUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel

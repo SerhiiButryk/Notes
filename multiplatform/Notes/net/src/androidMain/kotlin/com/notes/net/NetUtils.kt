@@ -1,6 +1,6 @@
 package com.notes.net
 
-import com.notes.api.PlatformAPIs.logger
+import api.PlatformAPIs.logger
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader

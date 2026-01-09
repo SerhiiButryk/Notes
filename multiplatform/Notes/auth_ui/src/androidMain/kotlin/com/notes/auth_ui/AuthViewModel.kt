@@ -4,8 +4,10 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.notes.api.AuthResult
-import com.notes.api.PlatformAPIs.logger
+import api.auth.AuthResult
+import api.PlatformAPIs.logger
+import api.getErrorTitleAndMessage
+import api.getVerifyTitleAndMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -56,16 +58,11 @@ internal class AuthViewModel : ViewModel() {
         val isEmailVerified: Boolean = false,
     ) : UIState() {
         val title =
-            if (emailVerificationSent) {
-                "Verification email has been sent to you. " +
-                    "Please, check your $email email."
-            } else {
-                "We failed to send verification email to you. Please, retry later."
-            }
-
+            getVerifyTitleAndMessage(emailVerificationSent, email)
+                .first
         val subtitle =
-            "Look for email with 'Verify your email for fancynotesdevtest' title. " +
-                "If you don't see such email check 'Spam' folder."
+            getVerifyTitleAndMessage(emailVerificationSent, email)
+            .second
     }
 
     private val _uiState = MutableStateFlow(UIState())
@@ -179,15 +176,15 @@ internal class AuthViewModel : ViewModel() {
     private suspend fun handleResult(result: AuthResult) {
         logger.logi("$TAG::handleResult()")
 
-        // Handle success
-        if (result.status == AuthResult.verificationSentOk) {
-            _uiState.emit((_uiState.value as VerificationUIState).copy(emailVerificationSent = true))
+        if (result.isEmailVerificationPassed()) {
+            _uiState.emit((_uiState.value as VerificationUIState)
+                .copy(emailVerificationSent = true))
             return
         }
 
-        // Handle specific errors
-        if (result.status == AuthResult.verificationSentError) {
-            _uiState.emit((_uiState.value as VerificationUIState).copy(emailVerificationSent = false))
+        if (result.isEmailVerificationFailed()) {
+            _uiState.emit((_uiState.value as VerificationUIState)
+                .copy(emailVerificationSent = false))
             return
         }
 

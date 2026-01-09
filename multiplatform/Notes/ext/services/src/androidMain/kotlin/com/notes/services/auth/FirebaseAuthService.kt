@@ -4,9 +4,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
-import com.notes.api.AuthResult
-import com.notes.api.AuthService
-import com.notes.api.PlatformAPIs.logger
+import api.auth.AuthResult
+import api.AuthService
+import api.PlatformAPIs.logger
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**

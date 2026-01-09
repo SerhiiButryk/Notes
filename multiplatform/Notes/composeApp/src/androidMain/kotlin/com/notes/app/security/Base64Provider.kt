@@ -1,7 +1,7 @@
 package com.notes.app.security
 
 import android.util.Base64
-import com.notes.api.Base64Operations
+import api.Base64Operations
 
 class Base64Provider : Base64Operations {
     override fun encode(byteArray: ByteArray): String = Base64.encodeToString(byteArray, Base64.NO_WRAP)

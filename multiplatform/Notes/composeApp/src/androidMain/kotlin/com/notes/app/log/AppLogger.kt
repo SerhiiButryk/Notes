@@ -1,6 +1,6 @@
 package com.notes.app.log
 
-import com.notes.api.Log
+import api.Log
 
 class AppLogger : Log {
     override fun logi(message: String) {

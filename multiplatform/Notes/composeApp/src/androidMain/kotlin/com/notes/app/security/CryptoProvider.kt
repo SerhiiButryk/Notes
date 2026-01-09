@@ -1,6 +1,6 @@
 package com.notes.app.security
 
-import com.notes.api.CryptoOperations
+import api.CryptoOperations
 
 class CryptoProvider : CryptoOperations {
     private val provider = CryptoKeystore()

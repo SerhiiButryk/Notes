@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.notes.api.data.Notes
+import api.data.Notes
 import com.notes.notes_ui.EditorCommand
 import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail

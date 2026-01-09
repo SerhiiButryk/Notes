@@ -7,13 +7,22 @@ import androidx.room.RoomDatabase
 import androidx.room.concurrent.AtomicBoolean
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.notes.api.PlatformAPIs.logger
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import api.PlatformAPIs.logger
 import kotlinx.coroutines.delay
 
-@Database(entities = [NoteEntity::class], version = 1)
+@Database(entities = [NoteEntity::class, NotesMetadataEntity::class], version = 1)
 abstract class NoteDatabase : RoomDatabase() {
     abstract fun noteDao(): NoteDao
+    abstract fun noteMetadataDao(): NoteMetadataDao
+}
+
+object LocalNoteDatabase : LocalNoteDatabaseImpl() {
+
+    suspend fun testOnly_access(): NoteDao = accessInternal().noteDao()
+
+    suspend fun access(): NoteDao = EncryptedNoteDao(accessInternal().noteDao())
+
+    suspend fun accessNoteMetadata(): NoteMetadataDao = accessInternal().noteMetadataDao()
 }
 
 interface DBLifecycleCallback {
@@ -24,33 +33,30 @@ interface DBLifecycleCallback {
     fun onClose()
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-object LocalNoteDatabase {
+abstract class LocalNoteDatabaseImpl {
+
     private var noteConnection: SQLiteConnection? = null
-
     private var noteDb: NoteDatabase? = null
-
     private val isCreated = AtomicBoolean(false)
+    private var clientCallback: DBLifecycleCallback? = null
 
-    private val localCallback: DBLifecycleCallback =
-        object : DBLifecycleCallback {
-            override fun onCreate() {
-                logger.logi("DBLifecycleCallback: onCreate()")
-                clientCallback?.onCreate()
-            }
+    private val localCallback: DBLifecycleCallback = object : DBLifecycleCallback {
 
-            override fun onClose() {
-                logger.logi("DBLifecycleCallback: onClose()")
-                clientCallback?.onClose()
-            }
-
-            override fun onOpen() {
-                logger.logi("DBLifecycleCallback: onOpen()")
-                clientCallback?.onOpen()
-            }
+        override fun onCreate() {
+            logger.logi("DBLifecycleCallback: onCreate()")
+            clientCallback?.onCreate()
         }
 
-    private var clientCallback: DBLifecycleCallback? = null
+        override fun onClose() {
+            logger.logi("DBLifecycleCallback: onClose()")
+            clientCallback?.onClose()
+        }
+
+        override fun onOpen() {
+            logger.logi("DBLifecycleCallback: onOpen()")
+            clientCallback?.onOpen()
+        }
+    }
 
     fun initialize(
         context: Context? = null,
@@ -89,16 +95,14 @@ object LocalNoteDatabase {
         }
     }
 
-    suspend fun accessInternal(): NoteDao {
+    suspend fun accessInternal(): NoteDatabase {
         while (noteDb == null) {
             logger.logi("LocalDatabase: accessInternal() not initialized, waiting...")
             delay(100)
         }
         logger.logi("LocalDatabase: accessInternal() done")
-        return noteDb!!.noteDao()
+        return noteDb!!
     }
-
-    suspend fun access(): NoteDao = EncryptedNoteEntity(accessInternal())
 
     fun close() {
         if (noteConnection != null) {

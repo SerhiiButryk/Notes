@@ -2,8 +2,8 @@ package com.notes.app
 
 import android.app.Application
 import android.content.Context
-import com.notes.api.PlatformAPIs
-import com.notes.api.initServices
+import api.PlatformAPIs
+import api.initServices
 import com.notes.app.data.StorageProvider
 import com.notes.app.log.AppLogger
 import com.notes.app.security.Base64Provider
@@ -11,7 +11,7 @@ import com.notes.app.security.CryptoProvider
 import com.notes.app.security.DerivedKeyProvider
 import com.notes.services.auth.FirebaseAuthService
 import com.notes.services.storage.FirebaseFirestore
-import com.notes.ui.CommonIcons
+import api.ui.CommonIcons
 
 class Notes : Application() {
     override fun onCreate() {
