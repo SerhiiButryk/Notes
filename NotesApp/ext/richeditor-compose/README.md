@@ -1,1 +1,0 @@
-This is a modified copy of https://github.com/MohamedRejeb/compose-rich-editor for Android
