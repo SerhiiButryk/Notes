@@ -75,18 +75,14 @@ kotlin { androidLibrary { ...
 ...
 ```
 
-2. Enable kotlin android lint 
-
 **The ongoing improvements/features**
 
 1. Add html to pdf export feature
 
 Need to use WebView or native canvas drawing. No other approaches so far.
 
-2. Add back button on Editor UI screen
+2. Investigate memory issues during runtime
 
-3. Adjust colors for Dark mode
+3. Support backup
 
-4. Investigate memory issues during runtime
-
-5. Support backup
+4. Test with large notes > 1 GB

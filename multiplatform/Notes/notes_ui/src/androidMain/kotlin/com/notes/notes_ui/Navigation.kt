@@ -12,6 +12,7 @@ import api.data.Notes
 import com.notes.notes_ui.screens.NotesUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
@@ -35,6 +36,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val sendEditorCommand: (EditorCommand) -> Unit =
                 { viewModel.sendEditorCommand(it) }
 
+            val getEvents: suspend () -> Flow<NotesViewModel.UiEvent> = { viewModel.events }
+
             val toolsPaneItems = viewModel.richTools
 
             val context = LocalContext.current
@@ -50,6 +53,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onSelectAction = onSelectAction,
                 onNavigatedBack = onNavigatedBack,
                 onTextChanged = sendEditorCommand,
+                getEvents = getEvents
             )
         }
     }

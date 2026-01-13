@@ -14,10 +14,11 @@ interface EditorCommand {
     fun isTextInputCommand(): Boolean = false
 }
 
-interface Callback {
-    fun onAdded(id: Long)
+interface RepoCallback {
+    fun onNoteAdded(id: Long)
 
-    fun onDeleted(id: Long)
+    fun onNoteDeleted(id: Long)
+    fun onNoteNavigateBack()
 }
 
 interface Repository {
@@ -42,13 +43,17 @@ interface Repository {
 
 class Interactor(
     private val repository: Repository,
-    private val callback: Callback,
+    private val repoCallback: RepoCallback,
 ) {
     // Redo, undo edit command support. Called from the UI menu.
     val redoUndoAction = RedoUndoAction()
 
     fun onNoteOpened() {
         redoUndoAction.clearStates()
+    }
+
+    fun onNoteNavigateBack() {
+        repoCallback.onNoteNavigateBack()
     }
 
     // User changes text
@@ -67,13 +72,13 @@ class Interactor(
     ) {
         val html = state.getHtml()
         repository.saveNote(note.copy(content = html)) {
-            callback.onAdded(it)
+            repoCallback.onNoteAdded(it)
         }
     }
 
     fun deleteNote(note: Notes) {
         repository.deleteNote(note) {
-            callback.onDeleted(it)
+            repoCallback.onNoteDeleted(it)
         }
     }
 

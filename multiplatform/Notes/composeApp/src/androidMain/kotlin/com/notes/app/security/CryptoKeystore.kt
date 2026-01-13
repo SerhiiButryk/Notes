@@ -13,6 +13,7 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * Class provides an access to Android keystore interface for crypto operations
@@ -100,6 +101,49 @@ class CryptoKeystore {
             e.printStackTrace()
         }
         return Result(error = CryptoError.UNKNOWN)
+    }
+
+    fun encryptSymmetricWithKey(
+        message: String,
+        key: ByteArray,
+    ): String {
+
+        if (message.isEmpty()) return ""
+        if (key.isEmpty()) return ""
+
+        val secretKey = SecretKeySpec(key, "AES")
+        val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
+
+        val iv = ByteArray(12)
+        SecureRandom().nextBytes(iv)
+        val spec = GCMParameterSpec(128, iv)
+
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec)
+        val ciphertext = cipher.doFinal(message.toByteArray())
+
+        return String(Base64.encode(iv + ciphertext, Base64.NO_WRAP))
+    }
+
+    fun decryptSymmetricWithKey(
+        message: String,
+        key: ByteArray,
+    ): String {
+
+        if (message.isEmpty()) return ""
+        if (key.isEmpty()) return ""
+
+        val decoded = Base64.decode(message, Base64.NO_WRAP)
+
+        val secretKey = SecretKeySpec(key, "AES")
+        val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
+
+        val iv = decoded.take(12)
+        val spec = GCMParameterSpec(128, iv.toByteArray())
+
+        val messageBytes = decoded.slice(12 until decoded.size)
+
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+        return String(cipher.doFinal(messageBytes.toByteArray()))
     }
 
     private fun init(

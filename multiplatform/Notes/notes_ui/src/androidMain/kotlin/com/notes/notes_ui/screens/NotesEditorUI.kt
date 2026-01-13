@@ -2,8 +2,6 @@ package com.notes.notes_ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -20,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import api.data.Notes
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
-import api.data.Notes
 import com.notes.notes_ui.EditorCommand
 import com.notes.notes_ui.screens.components.ToolsBar
 import com.notes.notes_ui.screens.editor.TextInputCommand
@@ -54,8 +52,13 @@ private fun EditorUI(
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
+
+        // TODO:
+        // Crossfade() animation adds flickering ui issues
+        // and it doen't look good. Disabled for now.
+
         // Adds cross fade animation when selecting a note from the list
-        Crossfade(
+        /*Crossfade(
             targetState = notes,
             label = "Editor cross fade animation",
             modifier =
@@ -63,27 +66,31 @@ private fun EditorUI(
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .imePadding(),
-        ) { note ->
-            if (note == Notes.AbsentNote()) {
-                InfoLabel()
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    EditorLayout(
-                        state = state,
-                        // add weight modifier to the composable to ensure
-                        // that the composable is measured after the other
-                        // composable is measured specifically after the tools pane.
-                        modifier = Modifier.weight(1f),
-                        onTextChanged = onTextChanged,
-                    )
-                    ToolsBar(
-                        state = state,
-                        toolsPaneItems = toolsPaneItems,
-                        notes = notes,
-                    )
-                }
+        ) { note -> } */
+
+        if (notes == Notes.AbsentNote()) {
+            InfoLabel()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding(),
+            ) {
+                EditorLayout(
+                    state = state,
+                    // add weight modifier to the composable to ensure
+                    // that the composable is measured after the other
+                    // composable is measured specifically after the tools pane.
+                    modifier = Modifier.weight(1f),
+                    onTextChanged = onTextChanged,
+                )
+                ToolsBar(
+                    state = state,
+                    toolsPaneItems = toolsPaneItems,
+                    notes = notes,
+                )
             }
         }
     }
@@ -102,7 +109,6 @@ private fun EditorLayout(
         state = state,
         modifier =
             Modifier
-                .focusable()
                 .fillMaxSize()
                 .then(modifier),
         colors =

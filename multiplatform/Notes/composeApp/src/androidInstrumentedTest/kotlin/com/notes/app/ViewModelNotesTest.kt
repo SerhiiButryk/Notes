@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import api.StorageService
+import api.data.Document
 import api.data.Notes
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.Repository
@@ -73,7 +74,7 @@ class ViewModelNotesTest {
 
             override fun deleteNote(note: Notes, callback: (Long) -> Unit) {}
 
-            override fun init(context: Context) {
+            override fun init(context: Any) {
             }
 
             override fun clear() {
@@ -184,7 +185,7 @@ class ViewModelNotesTest {
             }
         }
 
-        viewModel?.onAdded(id = note3.id)
+        viewModel?.onNoteAdded(id = note3.id)
 
         assertThat(notes.receive()).isEqualTo(note3)
 
@@ -264,19 +265,19 @@ class ViewModelNotesTest {
 
         val mockedStoreService = object : StorageService {
 
-            override suspend fun store(name: String, value: String): Boolean {
+            override suspend fun store(document: Document): Boolean {
                 return true
             }
 
-            override suspend fun load(name: String): String? {
-                return ""
+            override suspend fun load(name: String): Document? {
+                return Document("", "")
             }
 
             override suspend fun delete(name: String): Boolean {
                 return setDelete
             }
 
-            override suspend fun fetchAll(): List<Notes> {
+            override suspend fun fetchAll(): List<Document> {
                 return emptyList()
             }
 

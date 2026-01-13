@@ -1,7 +1,6 @@
 [versions]
 agp = "8.12.0" # When updating check IOS & Android build. It could create build issues.
-ksp = "2.3.3"
-composeMultiplatform = "1.9.3"
+composeMultiplatform = "1.10.0"
 composeHotReload = "1.0.0"
 
 kotlin = "2.3.0"
@@ -10,35 +9,44 @@ android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
 
-androidx-activity = "1.12.0"
+androidx-activity = "1.12.2"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.9.6"
 kotlinx-coroutines = "1.10.2"
 adaptiveLayout = "1.2.0"
-media3 = "1.8.0"
-datastorePreferences = "1.1.7"
-firebaseBom = "34.5.0"
+material3 = "1.9.0"
+media3 = "1.9.0"
+datastorePreferences = "1.2.0"
+firebaseBom = "34.7.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 ksoupHtml = "0.6.0"
-lifecycleRuntimeKtx = "2.9.4"
-composeBom = "2025.10.01"
+lifecycleRuntimeKtx = "2.10.0"
+composeBom = "2026.01.00"
 materialIconsExtended = "1.7.8"
-okhttp = "5.2.1"
-roomRuntime = "2.8.3"
+okhttp = "5.3.2"
+roomRuntime = "2.8.4"
 jsonserialization = "1.9.0"
-navigation = "2.9.5"
-serialization = "2.2.21"
+navigation = "2.9.6"
+runtime = "1.10.0"
+serialization = "2.3.0"
 truth = "1.4.5"
 jetbrainsMarkdown = "0.7.3"
 klint = "14.0.1"
 detekt = "1.23.8"
-androidx-compose-ui = "1.10.0"
+androidx-compose-ui = "1.10.1"
 kotlinxCoroutinesCore = "1.10.2"
+ui = "1.10.0"
+uiToolingPreview = "1.10.0"
+componentsResources = "1.10.0"
+foundation = "1.10.0"
 
 [libraries]
+components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
+jetbrains-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
@@ -55,6 +63,8 @@ firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 ksoup-entities = { module = "com.mohamedrejeb.ksoup:ksoup-entities", version.ref = "ksoupHtml" }
 ksoup-html = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "ksoupHtml" }
+material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "adaptiveLayout" }
 androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout", version.ref = "adaptiveLayout" }
@@ -67,8 +77,6 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -78,6 +86,9 @@ navigation = { group = "androidx.navigation", name = "navigation-compose", versi
 jetbrains-markdown = { module = "org.jetbrains:markdown", version.ref = "jetbrainsMarkdown" }
 androidx-compose-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "androidx-compose-ui" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "androidx-compose-ui" }
+ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "ui" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -87,7 +98,7 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "klint" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

@@ -19,14 +19,16 @@ private const val TAG = "RegisterUI"
 internal fun RegisterUI(
     state: AuthViewModel.RegisterUIState,
     onRegister: (AuthViewModel.RegisterUIState) -> Unit,
+    onLogin: (() -> Unit)?
 ) {
-    RegisterImpl(state, onRegister)
+    RegisterImpl(state, onRegister, onLogin)
 }
 
 @Composable
 private fun RegisterImpl(
     state: AuthViewModel.RegisterUIState,
     onRegister: (AuthViewModel.RegisterUIState) -> Unit,
+    onLogin: (() -> Unit)?
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -56,6 +58,7 @@ private fun RegisterImpl(
                     ),
                 )
             },
+            onLogin = onLogin
         )
     }
 }
@@ -68,6 +71,6 @@ private fun RegisterImpl(
 @Composable
 private fun RegisterUIPreviewLight() {
     AppTheme {
-        RegisterImpl(AuthViewModel.RegisterUIState(), {})
+        RegisterImpl(AuthViewModel.RegisterUIState(), {}, {})
     }
 }

@@ -1,23 +1,21 @@
 package api
 
+import api.auth.AuthCallback
 import api.auth.AuthResult
-import api.data.Notes
+import api.data.Document
 
 /**
  * Application specific service declarations
  */
 
 interface StorageService {
-    suspend fun store(
-        name: String,
-        value: String,
-    ): Boolean
+    suspend fun store(document: Document): Boolean
 
-    suspend fun load(name: String): String?
+    suspend fun load(name: String): Document?
 
     suspend fun delete(name: String): Boolean
 
-    suspend fun fetchAll(): List<Notes>
+    suspend fun fetchAll(): List<Document>
 }
 
 interface AuthService {
@@ -40,6 +38,8 @@ interface AuthService {
     fun isAuthenticated(): Boolean
 
     fun getUserId(): String
+
+    fun setAuthCallback(callback: AuthCallback)
 }
 
 internal var dataStoreService: StorageService? = null
@@ -49,9 +49,11 @@ internal var authService: AuthService? = null
 fun initServices(
     storageServiceImpl: StorageService,
     authServiceImp: AuthService,
+    authCallback: AuthCallback
 ) {
     dataStoreService = storageServiceImpl
     authService = authServiceImp
+    authService!!.setAuthCallback(authCallback)
 }
 
 /**

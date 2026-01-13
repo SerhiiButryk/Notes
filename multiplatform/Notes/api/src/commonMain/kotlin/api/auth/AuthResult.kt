@@ -42,7 +42,7 @@ data class AuthResult private constructor(
         fun emailOrPassEmpty(email: String): AuthResult =
             AuthResult(email = email, status = emailOrPassEmptyError)
 
-        fun loginSuccess(): AuthResult = AuthResult(status = loginSuccess)
+        fun loginSuccess(email: String): AuthResult = AuthResult(status = loginSuccess, email = email)
 
         fun loginFailed(): AuthResult = AuthResult(status = loginFailed)
 

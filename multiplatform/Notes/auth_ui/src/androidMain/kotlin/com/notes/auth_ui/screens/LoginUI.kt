@@ -11,12 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.notes.auth_ui.AuthUIAdaptive
 import com.notes.auth_ui.AuthViewModel
+import com.notes.ui.AnimatedBackground
 import com.notes.ui.theme.AppTheme
 
 private const val TAG = "LoginUI"
 
 @Composable
-internal fun LoginUI(
+fun LoginUI(
     state: AuthViewModel.LoginUIState,
     progress: Boolean,
     onLogin: (AuthViewModel.LoginUIState) -> Unit,
@@ -34,30 +35,31 @@ private fun LoginUIImpl(
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
 
-        val email = rememberSaveable { mutableStateOf("") }
-        val password = rememberSaveable { mutableStateOf("") }
+        AnimatedBackground {
 
-        if (email.value != state.email) {
-            email.value = state.email
+            val email = rememberSaveable { mutableStateOf(state.email) }
+            val password = rememberSaveable { mutableStateOf("") }
+
+            AuthUIAdaptive(
+                title = "Welcome again !",
+                subTitle = "Sign in using your email and password",
+                emailState = email,
+                passwordState = password,
+                hasFocus = state.hasFocus,
+                innerPadding = innerPadding,
+                progress = progress,
+                onEnter = { passwordValue, _, emailValue ->
+                    onLogin(
+                        AuthViewModel.LoginUIState(
+                            email = emailValue,
+                            password = passwordValue,
+                        ),
+                    )
+                },
+            )
+
         }
 
-        AuthUIAdaptive(
-            title = "Welcome again !",
-            subTitle = "Login using your email and password",
-            emailState = email,
-            passwordState = password,
-            hasFocus = state.hasFocus,
-            innerPadding = innerPadding,
-            progress = progress,
-            onEnter = { passwordValue, _, emailValue ->
-                onLogin(
-                    AuthViewModel.LoginUIState(
-                        email = emailValue,
-                        password = passwordValue,
-                    ),
-                )
-            },
-        )
     }
 }
 

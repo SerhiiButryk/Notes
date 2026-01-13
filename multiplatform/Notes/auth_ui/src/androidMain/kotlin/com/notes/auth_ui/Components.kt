@@ -1,5 +1,6 @@
 package com.notes.auth_ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,7 @@ internal fun AuthUIAdaptive(
     innerPadding: PaddingValues,
     hasFocus: Boolean,
     progress: Boolean,
+    onLogin: (() -> Unit)? = null
 ) {
     val emailFieldFocusRequester = remember { FocusRequester() }
     val passFieldFocusRequester = remember { FocusRequester() }
@@ -113,6 +115,7 @@ internal fun AuthUIAdaptive(
                             alignment = Alignment.CenterHorizontally,
                             title = title,
                             subTitle = subTitle,
+                            onLogin = onLogin
                         )
 
                         AuthBody(
@@ -146,6 +149,7 @@ internal fun AuthUIAdaptive(
                             bottomPadding = 10.dp,
                             title = title,
                             subTitle = subTitle,
+                            onLogin = onLogin
                         )
                     }
                 }
@@ -182,6 +186,7 @@ internal fun AuthUIAdaptive(
                             alignment = Alignment.CenterHorizontally,
                             title = title,
                             subTitle = subTitle,
+                            onLogin = onLogin
                         )
 
                         AuthBody(
@@ -208,6 +213,7 @@ internal fun AuthHeader(
     bottomPadding: Dp = 0.dp,
     title: String,
     subTitle: String,
+    onLogin: (() -> Unit)?
 ) {
     Column(
         modifier = modifier,
@@ -231,6 +237,17 @@ internal fun AuthHeader(
                     .fillMaxWidth(),
             textAlign = textAlign,
         )
+
+        if (onLogin != null) {
+            Text(
+                text = "Have you already got your account ? Go ahead and sign in !",
+                fontSize = 18.sp,
+                style = TextStyle(fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+                modifier = Modifier.padding(top = 10.dp).clickable { onLogin() },
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
     }
 }
 

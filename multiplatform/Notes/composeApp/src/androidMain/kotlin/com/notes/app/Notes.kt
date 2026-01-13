@@ -12,6 +12,7 @@ import com.notes.app.security.DerivedKeyProvider
 import com.notes.services.auth.FirebaseAuthService
 import com.notes.services.storage.FirebaseFirestore
 import api.ui.CommonIcons
+import com.notes.services.storage.EncryptedStore
 
 class Notes : Application() {
     override fun onCreate() {
@@ -28,7 +29,8 @@ class Notes : Application() {
         PlatformAPIs.base64 = Base64Provider()
         PlatformAPIs.storage = StorageProvider(context)
         PlatformAPIs.derivedKey = DerivedKeyProvider()
-        PlatformAPIs.crypto = CryptoProvider()
+        val cryptoProvider = CryptoProvider()
+        PlatformAPIs.crypto = cryptoProvider
 
         // Looks like we can't access R class in shared module
         // which is a bit strange, so to work around this
@@ -46,10 +48,11 @@ class Notes : Application() {
         CommonIcons.replaceAllIcon = R.drawable.replace_all
         CommonIcons.syncIcon = R.drawable.sync
 
-        // Services which application depends on
+        // Set services
         initServices(
-            storageServiceImpl = FirebaseFirestore(),
+            storageServiceImpl = EncryptedStore(FirebaseFirestore()),
             authServiceImp = FirebaseAuthService(),
+            cryptoProvider
         )
     }
 }

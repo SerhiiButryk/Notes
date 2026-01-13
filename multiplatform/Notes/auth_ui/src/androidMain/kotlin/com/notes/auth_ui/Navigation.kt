@@ -69,6 +69,11 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                             onSuccess = onSuccess,
                         )
                     },
+                    onLogin = {
+                        viewModel.onShowAuthUI(uiForced = true)
+                        // Go to login screen
+                        navController.navigate(Access)
+                    }
                 )
             }
 

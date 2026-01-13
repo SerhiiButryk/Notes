@@ -7,6 +7,7 @@ import com.google.firebase.auth.auth
 import api.auth.AuthResult
 import api.AuthService
 import api.PlatformAPIs.logger
+import api.auth.AuthCallback
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
@@ -16,6 +17,11 @@ class FirebaseAuthService : AuthService {
     private val tag = "FirebaseAuthService"
 
     private val auth: FirebaseAuth = Firebase.auth
+    private var callback: AuthCallback? = null
+
+    override fun setAuthCallback(callback: AuthCallback) {
+        this.callback = callback
+    }
 
     override suspend fun createUser(
         pass: String,
@@ -47,12 +53,12 @@ class FirebaseAuthService : AuthService {
     override suspend fun login(
         pass: String,
         email: String,
-    ): AuthResult =
-        suspendCancellableCoroutine { continuation ->
+    ): AuthResult {
+        val result = suspendCancellableCoroutine { continuation ->
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     logger.logi("$tag::login() success")
-                    continuation.resume(AuthResult.loginSuccess()) { _, _, _ ->
+                    continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
                         // no-op if coroutine is cancelled
                     }
                 } else {
@@ -63,6 +69,11 @@ class FirebaseAuthService : AuthService {
                 }
             }
         }
+        if (result.isSuccess()) {
+            callback?.onLoginCompleted(pass, getUserId())
+        }
+        return result
+    }
 
     override suspend fun sendEmailVerify(): AuthResult {
         logger.logi("$tag::sendVerification()")

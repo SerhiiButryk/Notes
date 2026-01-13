@@ -1,5 +1,6 @@
 package com.notes.notes_ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -18,10 +19,12 @@ import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import api.data.Notes
 import com.notes.notes_ui.EditorCommand
+import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail
 import com.notes.notes_ui.screens.editor.ToolsPane
 import com.notes.ui.isTabletOrFoldableExpanded
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -34,6 +37,7 @@ fun NotesUI(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
+    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>
 ) {
     NotesUIImpl(
         notes = notes,
@@ -43,6 +47,7 @@ fun NotesUI(
         onSelectAction = onSelectAction,
         onNavigatedBack = onNavigatedBack,
         onTextChanged = onTextChanged,
+        getEvents = getEvents
     )
 }
 
@@ -55,6 +60,7 @@ private fun NotesUIImpl(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
+    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>
 ) {
     Row {
         // TODO: Might need to pass this from outside. Recalculation every time might be slow.
@@ -74,6 +80,7 @@ private fun NotesUIImpl(
             onSelectAction = onSelectAction,
             onNavigatedBack = onNavigatedBack,
             onTextChanged = onTextChanged,
+            getEvents = getEvents
         )
     }
 }
@@ -89,6 +96,7 @@ private fun ListDetailUI(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
+    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>
 ) {
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
@@ -114,6 +122,14 @@ private fun ListDetailUI(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val state = rememberRichTextState()
+
+    LaunchedEffect(false) {
+        // Set text when the editor is open
+        state.clear()
+        state.setHtml(note.content)
+    }
+
     NavigableListDetailPaneScaffold(
         navigator = navigator,
         listPane = {
@@ -121,17 +137,20 @@ private fun ListDetailUI(
                 // Note List screen
                 NotesListUI(
                     notes = notes,
-                    onSelected = { note ->
+                    onSelected = { selectedNote ->
                         // Open Note Editor Screen
                         coroutineScope.launch {
+                            state.clear() // Clear editor before opening
+                            state.setHtml(selectedNote.content) // Set content
                             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
-                            onSelectAction(note)
+                            onSelectAction(selectedNote)
                         }
                     },
                     sizeClass = sizeClass,
                     addAction = {
                         // Open Note Editor Screen
                         coroutineScope.launch {
+                            state.clear() // Clear editor before opening
                             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onAddAction()
                         }
@@ -141,14 +160,24 @@ private fun ListDetailUI(
         },
         detailPane = {
             AnimatedPane {
-                val state = rememberRichTextState()
 
                 LaunchedEffect(note) {
-                    // Clear previous styles and states
-                    state.clear()
-                    state.setHtml(note.content)
-                    // Close editor
-                    if (note == Notes.DeletedNote()) {
+                    getEvents().collect { event ->
+                        when (event) {
+                            // Close editor
+                            is NotesViewModel.UiEvent.NavigateToListPane -> {
+                                try {
+                                    navigator.navigateTo(ListDetailPaneScaffoldRole.List, null)
+                                } finally {
+                                    onNavigatedBack()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                BackHandler(enabled = true) {
+                    coroutineScope.launch {
                         try {
                             // Could throw cancellation exception
                             navigator.navigateBack()

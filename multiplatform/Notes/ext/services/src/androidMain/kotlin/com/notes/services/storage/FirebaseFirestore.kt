@@ -1,11 +1,10 @@
 package com.notes.services.storage
 
+import api.PlatformAPIs.logger
+import api.data.Document
+import api.provideAuthService
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import api.PlatformAPIs.logger
-import api.StorageService
-import api.data.Notes
-import api.provideAuthService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -21,19 +20,19 @@ import kotlin.coroutines.resume
  * Permissions can be controlled by special rules on firebase console.
  */
 
-class FirebaseFirestore : StorageService {
+class FirebaseFirestore {
     private val tag = "FirebaseFirestore"
 
     private val database = Firebase.firestore
 
-    override suspend fun store(
+    suspend fun store(
         name: String,
         value: String,
     ): Boolean = storeImpl(name, value)
 
-    override suspend fun load(name: String): String? = loadImpl(name)
+    suspend fun load(name: String): String? = loadImpl(name)
 
-    override suspend fun fetchAll(): List<Notes> {
+    suspend fun fetchAll(): List<Document> {
         logger.logi("$tag::fetchAll()")
 
         if (!isAuthenticated()) return emptyList()
@@ -47,12 +46,12 @@ class FirebaseFirestore : StorageService {
                 .get()
                 .addOnSuccessListener { result ->
                     logger.logi("$tag::fetchAll() got size = ${result.size()}")
-                    val list = mutableListOf<Notes>()
+                    val list = mutableListOf<Document>()
                     for (document in result) {
                         logger.logi("$tag::fetchAll() <= ${document.id}")
                         val content = document.data.getValue("content") as String
-                        val notes = Notes(content = content, id = document.id.toLong())
-                        list.add(notes)
+                        val doc = Document(data = content, name = document.id)
+                        list.add(doc)
                     }
                     continuation.resume(list)
                 }.addOnFailureListener { e ->
@@ -62,7 +61,7 @@ class FirebaseFirestore : StorageService {
         }
     }
 
-    override suspend fun delete(name: String): Boolean {
+    suspend fun delete(name: String): Boolean {
         logger.logi("$tag::delete()")
 
         if (!isAuthenticated()) return false

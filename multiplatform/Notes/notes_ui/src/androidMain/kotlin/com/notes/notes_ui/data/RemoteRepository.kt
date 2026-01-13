@@ -2,6 +2,7 @@ package com.notes.notes_ui.data
 
 import api.PlatformAPIs.logger
 import api.StorageService
+import api.data.Document
 import api.data.Notes
 import com.notes.data.LocalNoteDatabase
 import com.notes.data.NoteEntity
@@ -26,7 +27,7 @@ class RemoteRepository(private val remoteDataStore: StorageService) {
 
             updateMetadata(note = note, pendingUpdate = true)
 
-            val result = remoteDataStore.store(value = note.content, name = note.id.toString())
+            val result = remoteDataStore.store(Document(data = note.content, name = note.id.toString()))
 
             if (result) {
                 updateMetadata(note = note, pendingUpdate = false)
@@ -40,7 +41,9 @@ class RemoteRepository(private val remoteDataStore: StorageService) {
     fun fetchNotes(scope: CoroutineScope) {
         logger.logi("RemoteRepository::fetchNotes()")
         scope.launch {
-            val list = remoteDataStore.fetchAll()
+            val list = remoteDataStore.fetchAll().map { document ->
+                Notes(id = document.name.toLong(), content = document.data)
+            }
             processNotes(list)
         }
     }

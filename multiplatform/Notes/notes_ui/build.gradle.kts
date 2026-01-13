@@ -31,7 +31,7 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_1_8)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
@@ -50,6 +50,10 @@ kotlin {
             implementation(project.dependencies.platform(libs.androidx.compose.bom))
             implementation(libs.bundles.composeui)
 
+            // Compose preview
+            implementation(libs.ui.tooling)
+            implementation(libs.ui.tooling.preview)
+
             // Compose navigation
             implementation(libs.navigation)
             implementation(libs.serializationJson)
@@ -59,11 +63,14 @@ kotlin {
             implementation(libs.androidx.adaptive.navigation)
             implementation(libs.androidx.adaptive.layout)
 
-            // Preview support
-            implementation(compose.preview)
+            // Android coroutines
+            implementation(libs.kotlinx.coroutines.android)
         }
         commonMain.dependencies {
             implementation(projects.api)
+
+            // Common coroutines
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

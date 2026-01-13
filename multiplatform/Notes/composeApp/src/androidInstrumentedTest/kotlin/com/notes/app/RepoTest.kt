@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import api.StorageService
+import api.data.Document
 import api.data.Notes
 import com.notes.data.LocalNoteDatabase
 import com.notes.notes_ui.data.AppRepository
@@ -32,19 +33,19 @@ class RepoTest {
 
     val mockedStoreService = object : StorageService {
 
-        override suspend fun store(name: String, value: String): Boolean {
+        override suspend fun store(document: Document): Boolean {
             return mockedStoreServiceStoreResult
         }
 
-        override suspend fun load(name: String): String? {
-            return ""
+        override suspend fun load(name: String): Document? {
+            return Document("", "")
         }
 
         override suspend fun delete(name: String): Boolean {
             return mockedStoreServiceDeleteResult
         }
 
-        override suspend fun fetchAll(): List<Notes> {
+        override suspend fun fetchAll(): List<Document> {
             return emptyList()
         }
 

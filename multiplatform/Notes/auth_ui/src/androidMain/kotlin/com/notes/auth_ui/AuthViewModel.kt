@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
 
-internal class AuthViewModel : ViewModel() {
+class AuthViewModel : ViewModel() {
     open class UIState
 
     // This annotation could be redundant as
@@ -26,6 +26,7 @@ internal class AuthViewModel : ViewModel() {
         val password: String = "",
         val hasFocus: Boolean = false,
         val showProgress: Boolean = false,
+        val uiForced: Boolean = true
     ) : UIState()
 
     // This annotation could be redundant as
@@ -62,7 +63,7 @@ internal class AuthViewModel : ViewModel() {
                 .first
         val subtitle =
             getVerifyTitleAndMessage(emailVerificationSent, email)
-            .second
+                .second
     }
 
     private val _uiState = MutableStateFlow(UIState())
@@ -71,7 +72,7 @@ internal class AuthViewModel : ViewModel() {
     private val _dialogState = MutableStateFlow<DialogState?>(null)
     val dialogState = _dialogState.asStateFlow()
 
-    private val interaction = Interaction()
+    private val interactor = Interactor()
 
     fun login(
         state: LoginUIState,
@@ -82,7 +83,7 @@ internal class AuthViewModel : ViewModel() {
             // Show progress
             val showProgress = (_uiState.value as LoginUIState).copy(showProgress = true)
             _uiState.emit(showProgress)
-            val result = interaction.login(state)
+            val result = interactor.login(state.password, state.email)
             if (result.isSuccess()) {
                 onSuccess()
             } else {
@@ -102,7 +103,7 @@ internal class AuthViewModel : ViewModel() {
     ) {
         logger.logi("$TAG::register()")
         viewModelScope.launch {
-            val result = interaction.register(state)
+            val result = interactor.register(state.confirmPassword, state.password, state.email)
             if (result.isSuccess()) {
                 onShowVerificationUI()
                 // Handle possible errors
@@ -120,7 +121,7 @@ internal class AuthViewModel : ViewModel() {
     ) {
         logger.logi("$TAG::runConfirmationCheck()")
         viewModelScope.launch {
-            val isEmailVerified = interaction.isEmailVerified()
+            val isEmailVerified = interactor.isEmailVerified()
             if (isEmailVerified) {
                 logger.logi("$TAG::runConfirmationCheck() passed")
                 onShowLoginUI()
@@ -128,7 +129,7 @@ internal class AuthViewModel : ViewModel() {
                 navController.navigate(Access)
             } else if (shouldResendVerification) {
                 logger.logi("$TAG::runConfirmationCheck() resending verification")
-                val result = interaction.sendEmailVerification()
+                val result = interactor.sendEmailVerification()
                 handleResult(result)
             } else {
                 logger.logi("$TAG::runConfirmationCheck() failed, no-op")
@@ -136,9 +137,20 @@ internal class AuthViewModel : ViewModel() {
         }
     }
 
-    fun onShowAuthUI() {
+    fun onShowAuthUI(uiForced: Boolean = false) {
         viewModelScope.launch {
-            if (interaction.getUserEmail().isEmpty()) {
+            if (uiForced) {
+                onShowLoginUI(uiForced)
+                return@launch
+            }
+            // Special case to handle if user don't want to register
+            // and to allow he/she to go to sing in ui from register ui
+            if (_uiState.value is LoginUIState) {
+                if ((_uiState.value as LoginUIState).uiForced) {
+                    return@launch
+                }
+            }
+            if (interactor.getEmail().isEmpty()) {
                 onShowRegisterUI()
             } else {
                 onShowLoginUI()
@@ -146,13 +158,14 @@ internal class AuthViewModel : ViewModel() {
         }
     }
 
-    private suspend fun onShowLoginUI() {
+    private suspend fun onShowLoginUI(uiForced: Boolean = false) {
         // Initially we are going to show a keyboard if ui is open
-        _uiState.emit(LoginUIState(hasFocus = true, email = interaction.getUserEmail()))
+        val newState = LoginUIState(hasFocus = true, email = interactor.getEmail(), uiForced = uiForced)
+        _uiState.emit(newState)
     }
 
     private suspend fun onShowVerificationUI() {
-        val email = interaction.getUserEmail()
+        val email = interactor.getEmail()
         _uiState.emit(VerificationUIState(email = email))
     }
 
@@ -170,21 +183,25 @@ internal class AuthViewModel : ViewModel() {
 
     override fun onCleared() {
         logger.logi("$TAG::onCleared()")
-        interaction.onClear()
+        interactor.onClear()
     }
 
     private suspend fun handleResult(result: AuthResult) {
         logger.logi("$TAG::handleResult()")
 
         if (result.isEmailVerificationPassed()) {
-            _uiState.emit((_uiState.value as VerificationUIState)
-                .copy(emailVerificationSent = true))
+            _uiState.emit(
+                (_uiState.value as VerificationUIState)
+                    .copy(emailVerificationSent = true)
+            )
             return
         }
 
         if (result.isEmailVerificationFailed()) {
-            _uiState.emit((_uiState.value as VerificationUIState)
-                .copy(emailVerificationSent = false))
+            _uiState.emit(
+                (_uiState.value as VerificationUIState)
+                    .copy(emailVerificationSent = false)
+            )
             return
         }
 
