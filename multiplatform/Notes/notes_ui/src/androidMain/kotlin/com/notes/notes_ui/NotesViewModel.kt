@@ -3,8 +3,8 @@ package com.notes.notes_ui
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import api.AppServices
 import api.data.Notes
-import api.provideDataStoreService
 import com.notes.notes_ui.data.AppRepository
 import com.notes.notes_ui.data.RemoteRepository
 import com.notes.notes_ui.screens.editor.getToolsList
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 class NotesViewModel(
     // TODO: This may be simplified
     appRepository: Repository = AppRepository(
-        RemoteRepository(provideDataStoreService())
+        RemoteRepository(AppServices.getStoreService())
     ),
     // For test support
     scopeOverride: CoroutineScope? = null

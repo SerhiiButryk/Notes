@@ -1,5 +1,6 @@
 package com.notes.services.auth
 
+import android.app.Activity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -8,6 +9,7 @@ import api.auth.AuthResult
 import api.AuthService
 import api.PlatformAPIs.logger
 import api.auth.AuthCallback
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
@@ -19,7 +21,9 @@ class FirebaseAuthService : AuthService {
     private val auth: FirebaseAuth = Firebase.auth
     private var callback: AuthCallback? = null
 
-    override fun setAuthCallback(callback: AuthCallback) {
+    override val name: String = "firebase"
+
+    override fun setAuthCallback(callback: AuthCallback?) {
         this.callback = callback
     }
 
@@ -75,6 +79,32 @@ class FirebaseAuthService : AuthService {
         return result
     }
 
+    override suspend fun login(tokenId: String, activityContext: Any?): AuthResult {
+        logger.loge("$tag::login()")
+
+        val credential = GoogleAuthProvider.getCredential(tokenId, null)
+
+        val result = suspendCancellableCoroutine { continuation ->
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener(activityContext as Activity) { task ->
+                    if (task.isSuccessful) {
+                        logger.logi("$tag::login() done")
+                        val email = task.result.user?.email ?: ""
+                        continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
+                            // no-op if coroutine is cancelled
+                        }
+                    } else {
+                        logger.loge("$tag::login() failed to sign in with credential")
+                        continuation.resume(AuthResult.loginFailed()) { _, _, _ ->
+                            // no-op if coroutine is cancelled
+                        }
+                    }
+                }
+        }
+
+        return result
+    }
+
     override suspend fun sendEmailVerify(): AuthResult {
         logger.logi("$tag::sendVerification()")
         return sendEmailVerify(null)
@@ -114,6 +144,11 @@ class FirebaseAuthService : AuthService {
             return ""
         }
         return auth.currentUser?.uid!!
+    }
+
+    override suspend fun signOut(): Boolean {
+        auth.signOut()
+        return true
     }
 
     private suspend fun sendEmailVerify(fireBaseUser: FirebaseUser?): AuthResult {

@@ -7,12 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.notes.auth_ui.AuthViewModel
 import com.notes.auth_ui.authDestination
 import com.notes.auth_ui.getStartRoute
 import com.notes.auth_ui.onboardingDestination
-import com.notes.auth_ui.screens.LoginUI
 import com.notes.notes_ui.mainContentDestination
+import com.notes.notes_ui.screens.AccountUI
+import com.notes.notes_ui.screens.SettingsUI
 import com.notes.ui.theme.AppTheme
 
 @Composable
@@ -45,6 +45,6 @@ fun EntryScreen(modifier: Modifier = Modifier) {
 @Preview(name = "Light mode landscape", device = "spec:parent=pixel_5,orientation=landscape")
 fun TestOnly() {
     AppTheme {
-        //LoginUI(AuthViewModel.LoginUIState(), false, {})
+        //AccountUI({})
     }
 }

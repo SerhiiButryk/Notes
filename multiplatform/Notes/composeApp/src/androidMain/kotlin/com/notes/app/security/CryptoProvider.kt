@@ -1,6 +1,7 @@
 package com.notes.app.security
 
 import android.util.Base64
+import api.AuthService
 import api.CryptoOperations
 import api.PlatformAPIs
 import api.PlatformAPIs.logger
@@ -8,7 +9,7 @@ import api.auth.AuthCallback
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-class CryptoProvider : CryptoOperations, AuthCallback {
+class CryptoProvider : CryptoOperations {
     private val provider = CryptoKeystore()
     private val DERIVED_PASS_KEY = "derived_key_pass"
 
@@ -33,6 +34,16 @@ class CryptoProvider : CryptoOperations, AuthCallback {
             logger.logi("onLoginCompleted() key is stored")
         } else {
             logger.logi("onLoginCompleted() key is present")
+        }
+    }
+
+    override suspend fun addAuthCallbackFor(authService: AuthService) {
+        val key = PlatformAPIs.storage.get(DERIVED_PASS_KEY)
+        if (key.isEmpty()) {
+            authService.setAuthCallback(this)
+            logger.logi("addAuthCallback() added")
+        } else {
+            logger.logi("addAuthCallback() no-op")
         }
     }
 

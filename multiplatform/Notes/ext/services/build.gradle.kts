@@ -43,6 +43,11 @@ kotlin {
             implementation(libs.firebase.auth)
             // Firestore APIs
             implementation(libs.firebase.firestore)
+
+            // For Google sing in
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation(libs.googleid)
         }
         commonMain.dependencies {
             // put your Multiplatform dependencies here

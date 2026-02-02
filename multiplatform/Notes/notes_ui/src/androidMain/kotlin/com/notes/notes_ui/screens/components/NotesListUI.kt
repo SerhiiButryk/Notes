@@ -42,10 +42,11 @@ import com.notes.ui.isTabletOrFoldableExpanded
 fun NotesListUI(
     modifier: Modifier = Modifier,
     addAction: () -> Unit,
-    onSettingsAction: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     onSelected: (Notes) -> Unit,
     notes: List<Notes>,
     sizeClass: WindowSizeClass,
+    onBackClick: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -55,7 +56,7 @@ fun NotesListUI(
                     // Show settings conditionally for phone devices
                     if (!isTabletOrFoldableExpanded(sizeClass)) {
                         IconButton(
-                            onClick = { onSettingsAction() },
+                            onClick = { onSettingsClick() },
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Settings,
@@ -65,6 +66,7 @@ fun NotesListUI(
                         }
                     }
                 },
+                onBackClick = onBackClick,
             )
         },
         floatingActionButton = {

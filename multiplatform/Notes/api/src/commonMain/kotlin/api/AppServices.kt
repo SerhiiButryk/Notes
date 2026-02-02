@@ -19,47 +19,78 @@ interface StorageService {
 }
 
 interface AuthService {
+
+    val name: String
+
     suspend fun createUser(
         pass: String,
         email: String,
-    ): AuthResult
+    ): AuthResult = AuthResult.registrationFailed("")
 
     suspend fun login(
         pass: String,
         email: String,
-    ): AuthResult
+    ): AuthResult = AuthResult.loginFailed()
 
-    suspend fun sendEmailVerify(): AuthResult
+    suspend fun login(
+        pass: String,
+        email: String,
+        activityContext: Any?
+    ): AuthResult = AuthResult.loginFailed()
 
-    suspend fun isEmailVerified(): Boolean
+    suspend fun login(
+        tokenId: String,
+        activityContext: Any?
+    ): AuthResult = AuthResult.loginFailed()
 
-    fun getUserEmail(): String
+    suspend fun sendEmailVerify(): AuthResult = AuthResult.verificationSentFailed("")
+
+    suspend fun isEmailVerified(): Boolean = false
+
+    fun getUserEmail(): String = ""
 
     fun isAuthenticated(): Boolean
 
-    fun getUserId(): String
+    fun getUserId(): String = ""
 
-    fun setAuthCallback(callback: AuthCallback)
+    fun setAuthCallback(callback: AuthCallback?) {}
+
+    fun init(context: Any?) {}
+
+    suspend fun signOut(): Boolean
 }
 
-internal var dataStoreService: StorageService? = null
+object AppServices {
 
-internal var authService: AuthService? = null
+    private val authServices = mutableListOf<AuthService>()
+    private var dataStoreService: StorageService? = null
 
-fun initServices(
-    storageServiceImpl: StorageService,
-    authServiceImp: AuthService,
-    authCallback: AuthCallback
-) {
-    dataStoreService = storageServiceImpl
-    authService = authServiceImp
-    authService!!.setAuthCallback(authCallback)
+    fun getAuthServiceByName(name: String): AuthService? {
+        if (authServices.isEmpty()) return null
+        for (item in authServices) {
+            if (item.name == name) return item
+        }
+        return null
+    }
+
+    fun getDefaultAuthService(): AuthService {
+        return getAuthServiceByName("firebase")!!
+    }
+
+    fun getStoreService(): StorageService {
+        return dataStoreService!!
+    }
+
+    fun addService(
+        storageService: StorageService,
+    ) {
+        dataStoreService = storageService
+    }
+
+    fun addService(
+        authService: AuthService,
+    ) {
+        authServices.add(authService)
+    }
+
 }
-
-/**
- * Factories for convenience
- */
-
-fun provideDataStoreService(): StorageService = dataStoreService!!
-
-fun provideAuthService(): AuthService = authService!!

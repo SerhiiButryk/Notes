@@ -37,7 +37,9 @@ fun NotesUI(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>
+    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>,
+    onSettingsClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
     NotesUIImpl(
         notes = notes,
@@ -47,7 +49,9 @@ fun NotesUI(
         onSelectAction = onSelectAction,
         onNavigatedBack = onNavigatedBack,
         onTextChanged = onTextChanged,
-        getEvents = getEvents
+        getEvents = getEvents,
+        onSettingsClick = onSettingsClick,
+        onBackClick = onBackClick,
     )
 }
 
@@ -60,7 +64,9 @@ private fun NotesUIImpl(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>
+    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>,
+    onSettingsClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
     Row {
         // TODO: Might need to pass this from outside. Recalculation every time might be slow.
@@ -80,7 +86,9 @@ private fun NotesUIImpl(
             onSelectAction = onSelectAction,
             onNavigatedBack = onNavigatedBack,
             onTextChanged = onTextChanged,
-            getEvents = getEvents
+            getEvents = getEvents,
+            onSettingsClick = onSettingsClick,
+            onBackClick = onBackClick,
         )
     }
 }
@@ -96,7 +104,9 @@ private fun ListDetailUI(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>
+    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>,
+    onSettingsClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
@@ -155,6 +165,8 @@ private fun ListDetailUI(
                             onAddAction()
                         }
                     },
+                    onSettingsClick = onSettingsClick,
+                    onBackClick = onBackClick,
                 )
             }
         },

@@ -7,4 +7,5 @@ interface StorageOperations {
     ): Boolean
 
     suspend fun get(key: String): String
+    suspend fun clearAll()
 }

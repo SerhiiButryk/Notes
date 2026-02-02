@@ -74,6 +74,10 @@ class AuthViewModel : ViewModel() {
 
     private val interactor = Interactor()
 
+    fun <T> MutableStateFlow<T>.copyLoginUIState(showProgress: Boolean): UIState? {
+        return (value as? LoginUIState)?.copy(showProgress = showProgress)
+    }
+
     fun login(
         state: LoginUIState,
         onSuccess: () -> Unit,
@@ -81,18 +85,19 @@ class AuthViewModel : ViewModel() {
         logger.logi("$TAG::login()")
         viewModelScope.launch {
             // Show progress
-            val showProgress = (_uiState.value as LoginUIState).copy(showProgress = true)
-            _uiState.emit(showProgress)
+            val newState = _uiState.copyLoginUIState(showProgress = true)
+            _uiState.emit(newState!!)
+
             val result = interactor.login(state.password, state.email)
             if (result.isSuccess()) {
                 onSuccess()
             } else {
                 handleResult(result)
             }
-            // Hide progress
-            val hideProgress = (_uiState.value as? LoginUIState)?.copy(showProgress = false)
-            if (hideProgress != null) {
-                _uiState.emit(showProgress)
+
+            val updateProgress = _uiState.copyLoginUIState(showProgress = result.isSuccess())
+            if (updateProgress != null) {
+                _uiState.emit(updateProgress)
             }
         }
     }

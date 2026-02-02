@@ -1,8 +1,9 @@
 package com.notes.services.storage
 
+import api.AppServices
 import api.PlatformAPIs.logger
+import api.StorageService
 import api.data.Document
-import api.provideAuthService
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -20,24 +21,21 @@ import kotlin.coroutines.resume
  * Permissions can be controlled by special rules on firebase console.
  */
 
-class FirebaseFirestore {
+class FirebaseFirestore : StorageService {
     private val tag = "FirebaseFirestore"
 
     private val database = Firebase.firestore
 
-    suspend fun store(
-        name: String,
-        value: String,
-    ): Boolean = storeImpl(name, value)
+    override suspend fun store(document: Document): Boolean = storeImpl(document)
 
-    suspend fun load(name: String): String? = loadImpl(name)
+    override suspend fun load(name: String): Document? = loadImpl(name)
 
-    suspend fun fetchAll(): List<Document> {
+    override suspend fun fetchAll(): List<Document> {
         logger.logi("$tag::fetchAll()")
 
         if (!isAuthenticated()) return emptyList()
 
-        val authService = provideAuthService()
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         return suspendCancellableCoroutine { continuation ->
@@ -61,7 +59,7 @@ class FirebaseFirestore {
         }
     }
 
-    suspend fun delete(name: String): Boolean {
+    override suspend fun delete(name: String): Boolean {
         logger.logi("$tag::delete()")
 
         if (!isAuthenticated()) return false
@@ -82,7 +80,7 @@ class FirebaseFirestore {
             return false
         }
 
-        val authService = provideAuthService()
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         return suspendCancellableCoroutine { continuation ->
@@ -100,23 +98,22 @@ class FirebaseFirestore {
     }
 
     private suspend fun storeImpl(
-        name: String,
-        data: String,
+        document: Document
     ): Boolean {
-        val authService = provideAuthService()
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
-        logger.logi("$tag::storeImpl() noteId = $name")
+        logger.logi("$tag::storeImpl() noteId = ${document.name}")
 
         if (!isAuthenticated()) return false
 
-        if (name.isEmpty() || data.isEmpty()) {
+        if (document.name.isEmpty() || document.data.isEmpty()) {
             logger.loge("$tag::storeImpl() stop cos empty data")
             return false
         }
 
         try {
-            val noteIdCheck = name.toInt()
+            val noteIdCheck = document.name.toInt()
             if (noteIdCheck < 0) {
                 logger.loge("$tag::storeImpl() stop cos not valid note id")
                 return false
@@ -128,11 +125,11 @@ class FirebaseFirestore {
 
         return suspendCancellableCoroutine { continuation ->
 
-            val noteId = name
+            val noteId = document.name
 
             val newData =
                 hashMapOf(
-                    "content" to data,
+                    "content" to document.data,
                 )
 
             // Matches the location:
@@ -156,8 +153,8 @@ class FirebaseFirestore {
         }
     }
 
-    private suspend fun loadImpl(name: String): String? {
-        val authService = provideAuthService()
+    private suspend fun loadImpl(name: String): Document? {
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         if (!isAuthenticated()) return null
@@ -196,7 +193,7 @@ class FirebaseFirestore {
                             continuation.resume(null)
                         } else {
                             logger.logi("$tag::loadImpl() got content")
-                            continuation.resume(content)
+                            continuation.resume(Document(name,content))
                         }
                     }
                 }.addOnFailureListener { e ->
@@ -207,7 +204,7 @@ class FirebaseFirestore {
     }
 
     private fun isAuthenticated(): Boolean {
-        val authService = provideAuthService()
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         if (!authService.isAuthenticated()) {

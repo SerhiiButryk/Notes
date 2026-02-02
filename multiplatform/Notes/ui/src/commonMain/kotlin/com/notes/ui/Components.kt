@@ -1,23 +1,18 @@
 package com.notes.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,12 +22,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+
+/**
+ * Material input text component
+ */
 
 @Composable
 fun InputTextField(
@@ -45,8 +46,7 @@ fun InputTextField(
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
-    val localModifier =
-        if (focusRequester == null) modifier else modifier.focusRequester(focusRequester)
+    val localModifier = if (focusRequester == null) modifier else modifier.focusRequester(focusRequester)
 
     var passwordShown by rememberSaveable { mutableStateOf(false) }
 
@@ -55,12 +55,12 @@ fun InputTextField(
             // Show an icon base on keyboard type
             if (keyboardType == KeyboardType.Password) {
                 Icon(
-                    imageVector = KEY_ICON,
+                    imageVector = Icons.Default.Lock,
                     contentDescription = "",
                 )
             } else if (keyboardType == KeyboardType.Email) {
                 Icon(
-                    imageVector = EMAIL_ICON,
+                    imageVector = Icons.Default.Email,
                     contentDescription = "",
                 )
             }
@@ -76,22 +76,20 @@ fun InputTextField(
         value = text,
         onValueChange = { onValueChange(it) },
         label = { Text(label) },
-        keyboardOptions =
-            KeyboardOptions(
-                keyboardType = keyboardType,
-                showKeyboardOnFocus = true,
-                autoCorrectEnabled = false,
-                imeAction = imeAction,
-            ),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            showKeyboardOnFocus = true,
+            autoCorrectEnabled = false,
+            imeAction = imeAction,
+        ),
         keyboardActions = keyboardActions,
         modifier = localModifier,
         maxLines = 1,
-        visualTransformation =
-            if (passwordShown || keyboardType == KeyboardType.Email) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
+        visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        },
         supportingText = {
 // TODO Enable error message for input validation errors
             //            ErrorMessage()
@@ -124,6 +122,10 @@ internal fun ErrorMessage(modifier: Modifier = Modifier) {
         )
     }
 }
+
+/**
+ * Material dialog component
+ */
 
 @Composable
 fun AlertDialogUI(
@@ -167,11 +169,14 @@ fun AlertDialogUI(
     )
 }
 
+/**
+ * Search bar component
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBarField(
-    modifier: Modifier = Modifier,
-    trailingIcon: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier, trailingIcon: @Composable (() -> Unit)? = null, onBackClick: () -> Unit = {}
 ) {
     SearchBar(
         inputField = {
@@ -185,6 +190,7 @@ fun SearchBarField(
                 leadingIcon = {
 //                    if (true) {
                     IconButton(onClick = {
+                        onBackClick()
 //                            active = false
 //                            query = "" // Clear query when collapsing with back button
                     }) {
@@ -207,10 +213,26 @@ fun SearchBarField(
         },
         expanded = false,
         onExpandedChange = {},
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
+    ) {}
+}
+
+/**
+ * Material button component
+ */
+
+@Composable
+fun AccentButton(
+    onClick: () -> Unit, label: String, modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = { onClick() },
+        modifier = modifier.fillMaxWidth().background(
+            brush = Brush.horizontalGradient(listOf(Color(0xFF9DCEFF), Color(0xFFC58BF2))),
+            shape = RoundedCornerShape(50.dp)
+        ),
+        colors = ButtonDefaults.buttonColors(Color.Transparent)
     ) {
+        Text(text = label, color = Color.White)
     }
 }

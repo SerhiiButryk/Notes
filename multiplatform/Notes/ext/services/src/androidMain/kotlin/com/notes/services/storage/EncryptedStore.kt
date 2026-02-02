@@ -4,17 +4,17 @@ import api.PlatformAPIs
 import api.StorageService
 import api.data.Document
 
-class EncryptedStore(private val service: FirebaseFirestore) : StorageService {
+class EncryptedStore(private val service: StorageService) : StorageService {
 
     override suspend fun store(document: Document): Boolean {
         val encrypted = PlatformAPIs.crypto.encryptWithDerivedKey(document.data)
-        return service.store(document.name, encrypted)
+        return service.store(Document(document.name, encrypted))
     }
 
     override suspend fun load(name: String): Document? {
         val data = service.load(name)
         if (data != null) {
-            val decrypted = PlatformAPIs.crypto.decryptWithDerivedKey(data)
+            val decrypted = PlatformAPIs.crypto.decryptWithDerivedKey(data.data)
             return Document(data = decrypted, name = name)
         }
         return null

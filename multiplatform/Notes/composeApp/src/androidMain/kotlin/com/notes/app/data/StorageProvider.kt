@@ -19,6 +19,8 @@ class StorageProvider(
     private val contextRef = WeakReference(context)
 
     private val fileName = "AppSettings"
+
+    // This should be a single instance across whole app !
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(fileName)
 
     override suspend fun save(
@@ -26,7 +28,7 @@ class StorageProvider(
         key: String,
     ): Boolean {
         val ref = contextRef.get() ?: return false
-        ref.datastore.edit { prefs ->
+        ref.applicationContext.datastore.edit { prefs ->
             val valueEnc = PlatformAPIs.crypto.encrypt(value)
             prefs[stringPreferencesKey(key)] = valueEnc
         }
@@ -36,12 +38,19 @@ class StorageProvider(
     override suspend fun get(key: String): String {
         val ref = contextRef.get() ?: return ""
         val result =
-            ref.datastore.data
+            ref.applicationContext.datastore.data
                 .map { prefs ->
                     val valueEnc = prefs[stringPreferencesKey(key)] ?: return@map ""
                     val valueDec = PlatformAPIs.crypto.decrypt(valueEnc)
                     valueDec
                 }.first()
         return result
+    }
+
+    override suspend fun clearAll() {
+        val ref = contextRef.get() ?: return
+        ref.applicationContext.datastore.edit { preferences ->
+            preferences.clear()
+        }
     }
 }

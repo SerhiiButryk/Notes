@@ -2,8 +2,8 @@ package com.notes.app
 
 import android.app.Application
 import android.content.Context
+import api.AppServices
 import api.PlatformAPIs
-import api.initServices
 import com.notes.app.data.StorageProvider
 import com.notes.app.log.AppLogger
 import com.notes.app.security.Base64Provider
@@ -12,6 +12,7 @@ import com.notes.app.security.DerivedKeyProvider
 import com.notes.services.auth.FirebaseAuthService
 import com.notes.services.storage.FirebaseFirestore
 import api.ui.CommonIcons
+import com.notes.services.auth.GoogleSignInService
 import com.notes.services.storage.EncryptedStore
 
 class Notes : Application() {
@@ -49,10 +50,11 @@ class Notes : Application() {
         CommonIcons.syncIcon = R.drawable.sync
 
         // Set services
-        initServices(
-            storageServiceImpl = EncryptedStore(FirebaseFirestore()),
-            authServiceImp = FirebaseAuthService(),
-            cryptoProvider
-        )
+        AppServices.addService(EncryptedStore(FirebaseFirestore()))
+        AppServices.addService(FirebaseAuthService())
+
+        val googleSignInService = GoogleSignInService()
+        googleSignInService.init(applicationContext)
+        AppServices.addService(googleSignInService)
     }
 }

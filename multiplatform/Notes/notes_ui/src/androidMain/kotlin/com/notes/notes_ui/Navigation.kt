@@ -1,5 +1,6 @@
 package com.notes.notes_ui
 
+import android.app.Activity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -9,7 +10,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import api.data.Notes
+import com.notes.notes_ui.screens.AccountUI
 import com.notes.notes_ui.screens.NotesUI
+import com.notes.notes_ui.screens.SettingsUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
 import kotlinx.coroutines.flow.Flow
@@ -38,11 +41,19 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val getEvents: suspend () -> Flow<NotesViewModel.UiEvent> = { viewModel.events }
 
+            val onSettingsClicked = { navController.navigate(NotesSettings) }
+
             val toolsPaneItems = viewModel.richTools
 
             val context = LocalContext.current
             LaunchedEffect(false) {
                 viewModel.init(context)
+            }
+
+            val onBackButtonClicked: () -> Unit = {
+                // Back stack is empty at this point so we use activity context
+                val activity = context as? Activity
+                activity?.moveTaskToBack(true)
             }
 
             NotesUI(
@@ -53,8 +64,25 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onSelectAction = onSelectAction,
                 onNavigatedBack = onNavigatedBack,
                 onTextChanged = sendEditorCommand,
-                getEvents = getEvents
+                getEvents = getEvents,
+                onSettingsClick = onSettingsClicked,
+                onBackClick = onBackButtonClicked
             )
+        }
+
+        composable<NotesSettings> {
+
+            val onBackClicked: () -> Unit = { navController.popBackStack() }
+            val onAccountClicked = { navController.navigate(NotesAccount) }
+
+            SettingsUI(onBackClick = onBackClicked, onAccountClick = onAccountClicked)
+        }
+
+        composable<NotesAccount> {
+
+            val onBackClicked: () -> Unit = { navController.popBackStack() }
+
+            AccountUI(onBackClick = onBackClicked)
         }
     }
 }
@@ -69,3 +97,9 @@ internal object NotesPreview : Screen("notes_preview")
 
 @Serializable
 object MainContent : Screen("main_content")
+
+@Serializable
+internal object NotesSettings : Screen("settings")
+
+@Serializable
+internal object NotesAccount : Screen("account")

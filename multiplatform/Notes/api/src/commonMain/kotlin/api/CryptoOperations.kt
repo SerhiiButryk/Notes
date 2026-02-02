@@ -1,6 +1,8 @@
 package api
 
-interface CryptoOperations {
+import api.auth.AuthCallback
+
+interface CryptoOperations : AuthCallback {
     fun encrypt(message: String): String
 
     fun decrypt(message: String): String
