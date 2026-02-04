@@ -1,9 +1,9 @@
 package com.notes.notes_ui.features
 
-import com.notes.notes_ui.EditorCommand
+import com.notes.notes_ui.editor.EditorCommand
 
 /**
- * Class which implements redo/undo functionality in text editor
+ * Class which implements basic redo/undo functionality in text editor
  */
 class RedoUndoAction {
     private val commands: MutableList<EditorCommand> = mutableListOf()
@@ -12,75 +12,75 @@ class RedoUndoAction {
     private var undoCommand: EditorCommand? = null
 
     // Holds a command that we can reapply
-    private var reappliedCommand: EditorCommand? = null
+    private var lastReappliedCommand: EditorCommand? = null
     private var applyFirst = false
-    private var revertedFirst = false
-
-    fun hasUndoAction(): Boolean = undoCommand != null
-
-    fun hasRedoAction(): Boolean = reappliedCommand != null
+    private var pickLast = true
+    private var ignoreNextCommand = false
 
     fun onEditAction(command: EditorCommand) {
-        revertedFirst = false
-        reappliedCommand = null
+
+        // Do not track the first editor command
+        // this is the actual note we are opening in the editor
+        if (!command.canUndo()) return
+
+        // This is not user action and we ignore this
+        if (ignoreNextCommand) { ignoreNextCommand = false; return }
+
+        pickLast = true
+        lastReappliedCommand = null
         commands.add(command)
     }
 
-    fun clearStates() {
+    fun clear() {
         commands.clear()
         undoCommand = null
-        reappliedCommand = null
+        lastReappliedCommand = null
         applyFirst = false
-        revertedFirst = false
+        pickLast = true
     }
 
     fun undoAction(): Boolean {
-        // Undo last
-        if (!revertedFirst) {
-            val command = commands.lastOrNull() ?: return false
-            undoCommand = command
-            command.undo()
-            reappliedCommand = undoCommand
-            applyFirst = true
-            revertedFirst = true
-            return true
-        }
-        // Get previous
-        val currIndex = commands.indexOf(undoCommand)
-        val previous = commands.getOrNull(currIndex - 1)
-        if (previous != null) {
-            undoCommand = previous
-            previous.undo()
-            reappliedCommand = undoCommand
-            applyFirst = true
-            return true
+
+        val command: EditorCommand? = if (pickLast) {
+            pickLast = false
+            commands.lastOrNull()
         } else {
-            // Went to the start, nothing to undo
-            return false
+            val currIndex = commands.indexOf(undoCommand)
+            commands.getOrNull(currIndex - 1)
         }
+
+        if (command == null) return false
+
+        undoCommand = command
+        command.undo()
+        lastReappliedCommand = undoCommand
+        applyFirst = true
+        ignoreNextCommand = true
+
+        return true
     }
 
     fun reapplyAction(): Boolean {
-        if (reappliedCommand == null) {
+
+        if (lastReappliedCommand == null) {
             // Can't reapply
             return false
         }
 
-        if (applyFirst) {
-            reappliedCommand!!.execCommand()
+        val command: EditorCommand? = if (applyFirst) {
             applyFirst = false
-            return true
+            lastReappliedCommand
+        } else {
+            val currIndex = commands.indexOf(lastReappliedCommand)
+            lastReappliedCommand = commands.getOrNull(currIndex + 1)
+            lastReappliedCommand
         }
 
-        val currIndex = commands.indexOf(reappliedCommand)
-        val next = commands.getOrNull(currIndex + 1)
-        if (next != null) {
-            reappliedCommand = next
-            reappliedCommand!!.execCommand()
-            return true
-        } else {
-            // Went to the end, nothing to redo
-            return false
-        }
+        if (command == null) return false
+
+        lastReappliedCommand!!.execCommand()
+        ignoreNextCommand = true
+
+        return true
     }
 }

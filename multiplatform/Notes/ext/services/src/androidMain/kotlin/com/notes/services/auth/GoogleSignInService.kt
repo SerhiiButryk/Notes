@@ -8,16 +8,20 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import api.AppServices
-import api.AuthService
 import api.PlatformAPIs.logger
+import api.auth.AbstractAuthService
 import api.auth.AuthResult
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.notes.services.storage.GoogleDriveService
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-class GoogleSignInService : AuthService {
+/**
+ * Service which implements Google Sing In authentication.
+ */
+class GoogleSignInService : AbstractAuthService() {
 
     private var credentialManager: CredentialManager? = null
     @OptIn(ExperimentalAtomicApi::class)
@@ -25,18 +29,35 @@ class GoogleSignInService : AuthService {
 
     override val name: String = "google"
 
+    // Whether to select account automatically if it's possible
+    private var autoSelectEnabled = false
+    private var filterByAuthorizedAccounts = false
+
     override fun init(context: Any?) {
         credentialManager = CredentialManager.create(context as Context)
+    }
+
+    fun setAutoSelectEnabled(autoSelectEnabled: Boolean) {
+        this.autoSelectEnabled = autoSelectEnabled
+    }
+
+    fun setFilterByAuthorizedAccounts(filterByAuthorizedAccounts: Boolean) {
+        this.filterByAuthorizedAccounts = filterByAuthorizedAccounts
+    }
+
+    override fun resetSettings() {
+        setFilterByAuthorizedAccounts(false)
+        setAutoSelectEnabled(false)
     }
 
     override suspend fun login(pass: String, email: String, activityContext: Any?): AuthResult {
         logger.logi("GoogleSignInService::login()")
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(true)
             .setServerClientId("411307947225-6rlasngq8a1is80pq5tt3ang6hjpen9o.apps.googleusercontent.com")
-            .setAutoSelectEnabled(false)
-            .setFilterByAuthorizedAccounts(false) // Allow all Google accounts on the device to show up
+            .setAutoSelectEnabled(autoSelectEnabled)
+            // Allow all Google accounts on the device to show up
+            .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
             // nonce string to use when generating a Google ID token might be usefully
             // .setNonce(nonce)
             .build()
@@ -46,7 +67,7 @@ class GoogleSignInService : AuthService {
             .addCredentialOption(googleIdOption)
             .build()
 
-        val result = try {
+        val response = try {
             credentialManager!!.getCredential(
                 request = request,
                 context = activityContext as Context,
@@ -56,7 +77,7 @@ class GoogleSignInService : AuthService {
             return AuthResult.loginFailed()
         }
 
-        return handleResponse(result.credential, activityContext)
+        return handleResponse(response.credential, activityContext)
     }
 
     @OptIn(ExperimentalAtomicApi::class)
@@ -71,8 +92,18 @@ class GoogleSignInService : AuthService {
             val result = AppServices
                 .getDefaultAuthService()
                 .login(idToken, activityContext)
+
             if (result.isSuccess()) {
+
                 authenticated.store(true)
+
+                requestGoogleDriveAccess(activityContext)
+
+                val email = AppServices
+                    .getDefaultAuthService()
+                    .getUserEmail()
+
+                return AuthResult.loginSuccess(email)
             }
         } else {
             logger.loge("GoogleSignInService::handleResponse() wrong credentials")
@@ -85,13 +116,14 @@ class GoogleSignInService : AuthService {
         return authenticated.load()
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
     override suspend fun signOut(): Boolean {
         logger.logi("GoogleSignInService::signOut()")
         // Firebase sign out
         AppServices
             .getDefaultAuthService()
             .signOut()
-
+        authenticated.store(false)
         try {
             val clearRequest = ClearCredentialStateRequest()
             credentialManager?.clearCredentialState(clearRequest)
@@ -101,5 +133,11 @@ class GoogleSignInService : AuthService {
         }
 
         return false
+    }
+
+    // This should show a dialog for a user to confirm permissions
+    private suspend fun requestGoogleDriveAccess(activityContext: Any?) {
+        val googleDriveService = AppServices.getStoreService("googledrive") as GoogleDriveService
+        googleDriveService.askForAccess(activityContext, callback)
     }
 }

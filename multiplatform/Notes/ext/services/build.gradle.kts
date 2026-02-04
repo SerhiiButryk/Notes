@@ -48,6 +48,19 @@ kotlin {
             implementation(libs.androidx.credentials)
             implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.googleid)
+
+            // Google Drive APIs and dependencies
+            implementation(libs.play.services.auth)
+            implementation(libs.google.api.services.drive)
+            implementation(libs.google.http.client.android)
+            implementation(libs.google.http.client.jackson2)
+            implementation(libs.google.api.client.android)
+
+            // To fix undef grpc class issue. TODO: workaround need to analyze deps and get rid of this
+            implementation(libs.grpc.okhttp)
+            implementation(libs.grpc.android)
+            implementation(libs.grpc.stub)
+            implementation(libs.grpc.protobuf.lite)
         }
         commonMain.dependencies {
             // put your Multiplatform dependencies here

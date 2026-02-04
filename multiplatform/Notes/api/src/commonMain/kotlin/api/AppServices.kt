@@ -1,71 +1,17 @@
 package api
 
-import api.auth.AuthCallback
-import api.auth.AuthResult
-import api.data.Document
+import api.auth.AbstractAuthService
+import api.data.AbstractStorageService
 
 /**
- * Application specific service declarations
+ * Application's services holder
  */
-
-interface StorageService {
-    suspend fun store(document: Document): Boolean
-
-    suspend fun load(name: String): Document?
-
-    suspend fun delete(name: String): Boolean
-
-    suspend fun fetchAll(): List<Document>
-}
-
-interface AuthService {
-
-    val name: String
-
-    suspend fun createUser(
-        pass: String,
-        email: String,
-    ): AuthResult = AuthResult.registrationFailed("")
-
-    suspend fun login(
-        pass: String,
-        email: String,
-    ): AuthResult = AuthResult.loginFailed()
-
-    suspend fun login(
-        pass: String,
-        email: String,
-        activityContext: Any?
-    ): AuthResult = AuthResult.loginFailed()
-
-    suspend fun login(
-        tokenId: String,
-        activityContext: Any?
-    ): AuthResult = AuthResult.loginFailed()
-
-    suspend fun sendEmailVerify(): AuthResult = AuthResult.verificationSentFailed("")
-
-    suspend fun isEmailVerified(): Boolean = false
-
-    fun getUserEmail(): String = ""
-
-    fun isAuthenticated(): Boolean
-
-    fun getUserId(): String = ""
-
-    fun setAuthCallback(callback: AuthCallback?) {}
-
-    fun init(context: Any?) {}
-
-    suspend fun signOut(): Boolean
-}
-
 object AppServices {
 
-    private val authServices = mutableListOf<AuthService>()
-    private var dataStoreService: StorageService? = null
+    private val authServices = mutableListOf<AbstractAuthService>()
+    private var dataStoreService = mutableListOf<AbstractStorageService>()
 
-    fun getAuthServiceByName(name: String): AuthService? {
+    fun getAuthServiceByName(name: String): AbstractAuthService? {
         if (authServices.isEmpty()) return null
         for (item in authServices) {
             if (item.name == name) return item
@@ -73,22 +19,26 @@ object AppServices {
         return null
     }
 
-    fun getDefaultAuthService(): AuthService {
+    fun getDefaultAuthService(): AbstractAuthService {
         return getAuthServiceByName("firebase")!!
     }
 
-    fun getStoreService(): StorageService {
-        return dataStoreService!!
+    fun getStoreService(name: String): AbstractStorageService? {
+        if (dataStoreService.isEmpty()) return null
+        for (item in dataStoreService) {
+            if (item.name == name) return item
+        }
+        return null
     }
 
     fun addService(
-        storageService: StorageService,
+        storageService: AbstractStorageService,
     ) {
-        dataStoreService = storageService
+        dataStoreService.add(storageService)
     }
 
     fun addService(
-        authService: AuthService,
+        authService: AbstractAuthService,
     ) {
         authServices.add(authService)
     }

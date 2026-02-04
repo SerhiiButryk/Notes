@@ -13,4 +13,7 @@ object CommonIcons {
     var replaceIcon: Int = 0
     var replaceAllIcon: Int = 0
     var syncIcon: Int = 0
+    var googleIcon: Int = 0
+    var firebaseIcon: Int = 0
+    var googleDriveIcon: Int = 0
 }

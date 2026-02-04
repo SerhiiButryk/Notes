@@ -1,11 +1,10 @@
 package com.notes.app.security
 
 import android.util.Base64
-import api.AuthService
 import api.CryptoOperations
 import api.PlatformAPIs
 import api.PlatformAPIs.logger
-import api.auth.AuthCallback
+import api.auth.AbstractAuthService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -37,7 +36,7 @@ class CryptoProvider : CryptoOperations {
         }
     }
 
-    override suspend fun addAuthCallbackFor(authService: AuthService) {
+    override suspend fun addAuthCallbackFor(authService: AbstractAuthService) {
         val key = PlatformAPIs.storage.get(DERIVED_PASS_KEY)
         if (key.isEmpty()) {
             authService.setAuthCallback(this)

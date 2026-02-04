@@ -2,7 +2,7 @@ package com.notes.services.storage
 
 import api.AppServices
 import api.PlatformAPIs.logger
-import api.StorageService
+import api.data.AbstractStorageService
 import api.data.Document
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -21,10 +21,12 @@ import kotlin.coroutines.resume
  * Permissions can be controlled by special rules on firebase console.
  */
 
-class FirebaseFirestore : StorageService {
-    private val tag = "FirebaseFirestore"
+class FirebaseFirestore : AbstractStorageService() {
 
+    private val tag = "FirebaseFirestore"
     private val database = Firebase.firestore
+
+    override val name: String = "firebase"
 
     override suspend fun store(document: Document): Boolean = storeImpl(document)
 

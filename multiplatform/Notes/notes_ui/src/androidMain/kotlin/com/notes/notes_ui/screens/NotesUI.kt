@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import api.data.Notes
-import com.notes.notes_ui.EditorCommand
 import com.notes.notes_ui.NotesViewModel
+import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.screens.components.NotesListUI
 import com.notes.notes_ui.screens.components.NotesNavRail
 import com.notes.notes_ui.screens.editor.ToolsPane
@@ -74,7 +74,7 @@ private fun NotesUIImpl(
 
         // Show nav rail for large screens
         if (isTabletOrFoldableExpanded(sizeClass)) {
-            NotesNavRail()
+            NotesNavRail(onSettingsClick = onSettingsClick)
         }
 
         ListDetailUI(

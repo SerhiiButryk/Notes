@@ -3,7 +3,7 @@ package com.notes.notes_ui.screens.editor
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.notes.notes_ui.EditorCommand
+import com.notes.notes_ui.editor.EditorCommand
 
 open class UndoableCommand(
     protected val richTextState: RichTextState,
@@ -72,6 +72,7 @@ class TextInputCommand(
     val old: String,
     val state: RichTextState,
 ) : EditorCommand {
+
     override fun execCommand() {
         state.setHtml(new)
     }
@@ -81,6 +82,10 @@ class TextInputCommand(
     }
 
     override fun isTextInputCommand(): Boolean {
-        return false
+        return true
+    }
+
+    override fun canUndo(): Boolean {
+        return new != old
     }
 }

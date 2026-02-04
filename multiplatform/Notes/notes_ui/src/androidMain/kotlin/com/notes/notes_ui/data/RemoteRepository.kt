@@ -1,7 +1,7 @@
 package com.notes.notes_ui.data
 
 import api.PlatformAPIs.logger
-import api.StorageService
+import api.data.AbstractStorageService
 import api.data.Document
 import api.data.Notes
 import com.notes.data.LocalNoteDatabase
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 /**
  * Class which handles data synchronization between remote and locale datastore
  */
-class RemoteRepository(private val remoteDataStore: StorageService) {
+class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
 
     fun saveNote(
         scope: CoroutineScope,

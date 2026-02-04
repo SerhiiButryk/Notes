@@ -1,8 +1,8 @@
 package com.notes.auth_ui
 
 import api.AppServices
-import api.AuthService
 import api.PlatformAPIs
+import api.auth.AbstractAuthService
 import api.auth.AuthResult
 import com.notes.auth_ui.data.getUserEmail
 import com.notes.auth_ui.data.saveUserEmail
@@ -13,12 +13,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 
 internal class Interactor(
-    private val authService: AuthService = AppServices.getDefaultAuthService(),
+    private val authService: AbstractAuthService = AppServices.getDefaultAuthService(),
 ) {
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)
 
-    suspend fun login(password: String, email: String): AuthResult {
+    suspend fun login(password: String, email: String, context: Any?): AuthResult {
         if (password.isEmpty() || email.isEmpty()) {
             return AuthResult.Companion.emailOrPassEmpty(email)
         }
@@ -26,7 +26,7 @@ internal class Interactor(
         val job =
             scope.async {
                 PlatformAPIs.crypto.addAuthCallbackFor(authService)
-                val result = authService.login(password, email)
+                val result = authService.login(password, email, context)
                 // Save user email if it's not saved
                 // It's the case if user didn't register and did sing in with
                 // an existed account

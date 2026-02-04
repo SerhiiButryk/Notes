@@ -2,6 +2,7 @@ package com.notes.auth_ui
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -43,9 +44,11 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                 val loginUIState = state.value as AuthViewModel.LoginUIState
                 val hasProgress = loginUIState.showProgress
 
+                val activityContext: Any? = LocalActivity.current
+
                 LoginUI(
                     state = loginUIState,
-                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess) },
+                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess, context = activityContext) },
                     progress = hasProgress,
                 )
 

@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun NotesNavRail(onShowSettings: () -> Unit = {}) {
+fun NotesNavRail(onSettingsClick: () -> Unit = {}) {
     NavigationRail(
         header = {
 //            TODO Set app icon
@@ -28,7 +28,7 @@ fun NotesNavRail(onShowSettings: () -> Unit = {}) {
 
         NavigationRailItem(
             selected = true,
-            onClick = { onShowSettings() },
+            onClick = { onSettingsClick() },
             icon = {
                 Icon(
                     imageVector = Icons.Filled.Settings,

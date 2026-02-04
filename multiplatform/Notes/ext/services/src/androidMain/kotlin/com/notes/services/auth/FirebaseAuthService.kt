@@ -1,31 +1,27 @@
 package com.notes.services.auth
 
 import android.app.Activity
+import api.AppServices
+import api.PlatformAPIs.logger
+import api.auth.AbstractAuthService
+import api.auth.AuthResult
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import api.auth.AuthResult
-import api.AuthService
-import api.PlatformAPIs.logger
-import api.auth.AuthCallback
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Service which implements authentication with Google Firebase server.
  */
-class FirebaseAuthService : AuthService {
+class FirebaseAuthService : AbstractAuthService() {
+
     private val tag = "FirebaseAuthService"
 
     private val auth: FirebaseAuth = Firebase.auth
-    private var callback: AuthCallback? = null
 
     override val name: String = "firebase"
-
-    override fun setAuthCallback(callback: AuthCallback?) {
-        this.callback = callback
-    }
 
     override suspend fun createUser(
         pass: String,
@@ -37,12 +33,12 @@ class FirebaseAuthService : AuthService {
                     if (task.isSuccessful) {
                         logger.logi("$tag::createUser() success")
                         continuation.resume(AuthResult.registrationSuccess(email)) { _, _, _ ->
-                            // no-op if coroutine is cancelled
+                            // no-op if coroutine is canceled
                         }
                     } else {
                         logger.loge("$tag::createUser() failure: ${task.exception}")
                         continuation.resume(AuthResult.registrationFailed(email)) { _, _, _ ->
-                            // no-op if coroutine is cancelled
+                            // no-op if coroutine is canceled
                         }
                     }
                 }
@@ -57,30 +53,35 @@ class FirebaseAuthService : AuthService {
     override suspend fun login(
         pass: String,
         email: String,
+        activityContext: Any?
     ): AuthResult {
         val result = suspendCancellableCoroutine { continuation ->
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     logger.logi("$tag::login() success")
                     continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
-                        // no-op if coroutine is cancelled
+                        // no-op if coroutine is canceled
                     }
                 } else {
                     logger.loge("$tag::login() failure: ${task.exception}")
                     continuation.resume(AuthResult.loginFailed()) { _, _, _ ->
-                        // no-op if coroutine is cancelled
+                        // no-op if coroutine is canceled
                     }
                 }
             }
         }
         if (result.isSuccess()) {
+            // User is authenticated
+            // Now we can try sign in silently with Google account to get access to Google APIs
+            signInUsingGoogleSilent(activityContext)
+            // Done
             callback?.onLoginCompleted(pass, getUserId())
         }
         return result
     }
 
     override suspend fun login(tokenId: String, activityContext: Any?): AuthResult {
-        logger.loge("$tag::login()")
+        logger.logi("$tag::login() requesting sign with Google creds")
 
         val credential = GoogleAuthProvider.getCredential(tokenId, null)
 
@@ -88,15 +89,15 @@ class FirebaseAuthService : AuthService {
             auth.signInWithCredential(credential)
                 .addOnCompleteListener(activityContext as Activity) { task ->
                     if (task.isSuccessful) {
-                        logger.logi("$tag::login() done")
+                        logger.logi("$tag::login() logged in with Google token")
                         val email = task.result.user?.email ?: ""
                         continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
-                            // no-op if coroutine is cancelled
+                            // no-op if coroutine is canceled
                         }
                     } else {
                         logger.loge("$tag::login() failed to sign in with credential")
                         continuation.resume(AuthResult.loginFailed()) { _, _, _ ->
-                            // no-op if coroutine is cancelled
+                            // no-op if coroutine is canceled
                         }
                     }
                 }
@@ -177,6 +178,29 @@ class FirebaseAuthService : AuthService {
             ) { _, _, _ ->
                 // no-op if coroutine is cancelled
             }
+        }
+    }
+
+    private suspend fun signInUsingGoogleSilent(activityContext: Any?) {
+        if (activityContext != null) {
+            logger.logi("$tag::signInUsingGoogleSilent() try to perform silent login")
+
+            // Try to perform silent Google Sing In to get auth token
+            // and then to finish firebase authentication
+
+            val googleSignInService = AppServices
+                .getAuthServiceByName("google") as GoogleSignInService
+
+            googleSignInService.setAutoSelectEnabled(true)
+            googleSignInService.setFilterByAuthorizedAccounts(true)
+
+            val result = googleSignInService.login("", "", activityContext)
+
+            if (result.isSuccess()) {
+                logger.logi("$tag::signInUsingGoogleSilent() done silent login with Google service")
+            }
+        } else {
+            logger.logi("$tag::signInUsingGoogleSilent() can't perform silent login")
         }
     }
 }

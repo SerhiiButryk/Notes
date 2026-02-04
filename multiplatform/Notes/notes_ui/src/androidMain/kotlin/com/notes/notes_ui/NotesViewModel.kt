@@ -7,6 +7,7 @@ import api.AppServices
 import api.data.Notes
 import com.notes.notes_ui.data.AppRepository
 import com.notes.notes_ui.data.RemoteRepository
+import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.screens.editor.getToolsList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class NotesViewModel(
     // TODO: This may be simplified
     appRepository: Repository = AppRepository(
-        RemoteRepository(AppServices.getStoreService())
+        RemoteRepository(AppServices.getStoreService("firebase")!!)
     ),
     // For test support
     scopeOverride: CoroutineScope? = null

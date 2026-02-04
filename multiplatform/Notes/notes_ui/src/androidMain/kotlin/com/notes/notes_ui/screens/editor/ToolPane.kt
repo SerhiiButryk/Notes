@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.richeditor.model.RichTextState
 import api.data.Notes
 import api.ui.CommonIcons
-import com.notes.notes_ui.EditorState
 import com.notes.notes_ui.Interactor
+import com.notes.notes_ui.editor.EditorState
 import com.notes.ui.*
 
 private var uuid: Long = 1

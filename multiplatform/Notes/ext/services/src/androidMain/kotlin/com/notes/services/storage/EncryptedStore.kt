@@ -1,10 +1,15 @@
 package com.notes.services.storage
 
 import api.PlatformAPIs
-import api.StorageService
+import api.data.AbstractStorageService
 import api.data.Document
 
-class EncryptedStore(private val service: StorageService) : StorageService {
+/**
+ * Service which adds a layer of encryption on storage service
+ */
+class EncryptedStore(private val service: AbstractStorageService) : AbstractStorageService() {
+
+    override val name: String = service.name
 
     override suspend fun store(document: Document): Boolean {
         val encrypted = PlatformAPIs.crypto.encryptWithDerivedKey(document.data)

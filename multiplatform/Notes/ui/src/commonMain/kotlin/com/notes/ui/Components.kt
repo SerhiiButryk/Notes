@@ -236,3 +236,18 @@ fun AccentButton(
         Text(text = label, color = Color.White)
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SimpleTopBar(
+    title: String, onBackClick: () -> Unit
+) {
+    TopAppBar(
+        title = { Text(title) },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        }
+    )
+}

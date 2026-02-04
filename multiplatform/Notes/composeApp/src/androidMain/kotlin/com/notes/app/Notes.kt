@@ -14,6 +14,7 @@ import com.notes.services.storage.FirebaseFirestore
 import api.ui.CommonIcons
 import com.notes.services.auth.GoogleSignInService
 import com.notes.services.storage.EncryptedStore
+import com.notes.services.storage.GoogleDriveService
 
 class Notes : Application() {
     override fun onCreate() {
@@ -48,10 +49,14 @@ class Notes : Application() {
         CommonIcons.replaceIcon = R.drawable.replace
         CommonIcons.replaceAllIcon = R.drawable.replace_all
         CommonIcons.syncIcon = R.drawable.sync
+        CommonIcons.googleIcon = R.drawable.google
+        CommonIcons.googleDriveIcon = R.drawable.googledrive
+        CommonIcons.firebaseIcon = R.drawable.firebase
 
         // Set services
         AppServices.addService(EncryptedStore(FirebaseFirestore()))
         AppServices.addService(FirebaseAuthService())
+        AppServices.addService(GoogleDriveService())
 
         val googleSignInService = GoogleSignInService()
         googleSignInService.init(applicationContext)

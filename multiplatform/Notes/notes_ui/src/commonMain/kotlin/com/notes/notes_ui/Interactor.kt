@@ -1,18 +1,10 @@
 package com.notes.notes_ui
 
 import api.data.Notes
+import com.notes.notes_ui.editor.EditorCommand
+import com.notes.notes_ui.editor.EditorState
 import com.notes.notes_ui.features.RedoUndoAction
 import kotlinx.coroutines.flow.Flow
-
-interface EditorState {
-    fun getHtml(): String
-}
-
-interface EditorCommand {
-    fun execCommand()
-    fun undo()
-    fun isTextInputCommand(): Boolean = false
-}
 
 interface RepoCallback {
     fun onNoteAdded(id: Long)
@@ -49,7 +41,7 @@ class Interactor(
     val redoUndoAction = RedoUndoAction()
 
     fun onNoteOpened() {
-        redoUndoAction.clearStates()
+        redoUndoAction.clear()
     }
 
     fun onNoteNavigateBack() {

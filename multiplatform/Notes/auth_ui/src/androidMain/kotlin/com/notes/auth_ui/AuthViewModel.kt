@@ -81,6 +81,7 @@ class AuthViewModel : ViewModel() {
     fun login(
         state: LoginUIState,
         onSuccess: () -> Unit,
+        context: Any?
     ) {
         logger.logi("$TAG::login()")
         viewModelScope.launch {
@@ -88,7 +89,7 @@ class AuthViewModel : ViewModel() {
             val newState = _uiState.copyLoginUIState(showProgress = true)
             _uiState.emit(newState!!)
 
-            val result = interactor.login(state.password, state.email)
+            val result = interactor.login(state.password, state.email, context)
             if (result.isSuccess()) {
                 onSuccess()
             } else {

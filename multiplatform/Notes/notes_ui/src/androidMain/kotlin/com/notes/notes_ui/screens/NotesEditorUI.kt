@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,11 +25,10 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
-import com.notes.notes_ui.EditorCommand
+import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.screens.components.ToolsBar
 import com.notes.notes_ui.screens.editor.TextInputCommand
 import com.notes.notes_ui.screens.editor.ToolsPane
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -104,6 +105,7 @@ private fun EditorLayout(
     onTextChanged: (EditorCommand) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val lastHtml = remember { mutableStateOf(state.toHtml()) }
 
     RichTextEditor(
         state = state,
@@ -118,13 +120,11 @@ private fun EditorLayout(
                 unfocusedIndicatorColor = Color.Transparent,
             ),
         shape = RoundedCornerShape(4),
-        onTextChanged = { old ->
+        onTextChanged = { newHtml ->
+            val oldHtml = lastHtml.value
+            lastHtml.value = newHtml
             coroutineScope.launch {
-                // Some delay is necessary because we don't get current UI state immediately
-                // Might be a better way, but just a simple fix for now
-                delay(100)
-                val new = state.toHtml() // Getting the current UI state
-                val command = TextInputCommand(new, old, state)
+                val command = TextInputCommand(newHtml, oldHtml, state)
                 onTextChanged(command)
             }
         },

@@ -19,13 +19,14 @@ adaptiveLayout = "1.2.0"
 material3 = "1.9.0"
 media3 = "1.9.0"
 datastorePreferences = "1.2.0"
-firebaseBom = "34.7.0"
+firebaseBom = "34.8.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 ksoupHtml = "0.6.0"
 lifecycleRuntimeKtx = "2.10.0"
 composeBom = "2026.01.00"
 materialIconsExtended = "1.7.8"
 okhttp = "5.3.2"
+playServicesAuth = "21.5.0"
 roomRuntime = "2.8.4"
 jsonserialization = "1.9.0"
 navigation = "2.9.6"
@@ -43,6 +44,11 @@ componentsResources = "1.10.0"
 foundation = "1.10.0"
 credentials = "1.5.0"
 googleid = "1.2.0"
+googleApiClientAndroid = "2.8.1"
+googleApiServicesDrive = "v3-rev20230822-2.0.0"
+googleHttpClientAndroid = "1.44.1"
+googleHttpClientJackson2 = "2.1.0"
+grpc = "1.79.0"
 
 [libraries]
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
@@ -50,6 +56,10 @@ androidx-credentials-play-services-auth = { module = "androidx.credentials:crede
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
+google-api-client-android = { module = "com.google.api-client:google-api-client-android", version.ref = "googleApiClientAndroid" }
+google-api-services-drive = { module = "com.google.apis:google-api-services-drive", version.ref = "googleApiServicesDrive" }
+google-http-client-android = { module = "com.google.http-client:google-http-client-android", version.ref = "googleHttpClientAndroid" }
+google-http-client-jackson2 = { module = "com.google.http-client:google-http-client-jackson2", version.ref = "googleHttpClientJackson2" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 jetbrains-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -69,6 +79,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 ksoup-entities = { module = "com.mohamedrejeb.ksoup:ksoup-entities", version.ref = "ksoupHtml" }
 ksoup-html = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "ksoupHtml" }
 material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "adaptiveLayout" }
@@ -94,6 +105,10 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "ui" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "grpc" }
+grpc-android = { module = "io.grpc:grpc-android", version.ref = "grpc" }
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+grpc-protobuf-lite = { module = "io.grpc:grpc-protobuf-lite", version.ref = "grpc" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

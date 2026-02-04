@@ -1,6 +1,9 @@
 package com.notes.notes_ui
 
 import android.app.Activity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -10,6 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import api.data.Notes
+import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.screens.AccountUI
 import com.notes.notes_ui.screens.NotesUI
 import com.notes.notes_ui.screens.SettingsUI
@@ -70,19 +74,37 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             )
         }
 
-        composable<NotesSettings> {
+        composable<NotesSettings> { backStackEntry ->
+
+            val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
             val onBackClicked: () -> Unit = { navController.popBackStack() }
-            val onAccountClicked = { navController.navigate(NotesAccount) }
+            val onAccountSelected = { navController.navigate(NotesAccount) }
 
-            SettingsUI(onBackClick = onBackClicked, onAccountClick = onAccountClicked)
+            SettingsUI(onBackClick = onBackClicked, onAccountClick = onAccountSelected)
         }
 
-        composable<NotesAccount> {
+        composable<NotesAccount> { backStackEntry ->
+
+            val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
             val onBackClicked: () -> Unit = { navController.popBackStack() }
+            val onSignOut = { viewModel.singOut() }
+            val requestPermissions: (context: Any?, launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) -> Unit =
+                { ctx, launcher -> viewModel.requestPermissions(ctx, launcher) }
 
-            AccountUI(onBackClick = onBackClicked)
+            val onActivityResult: () -> Unit = { viewModel.onActivityResult() }
+
+            val accountInfo by viewModel.accountInfo.collectAsStateWithLifecycle()
+
+            AccountUI(
+                onBackClick = onBackClicked,
+                requestPermissions = requestPermissions,
+                onSignOut = onSignOut,
+                onActivityResult = onActivityResult,
+                accountInfo = accountInfo
+            )
+
         }
     }
 }
