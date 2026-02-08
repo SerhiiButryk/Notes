@@ -2,6 +2,7 @@ package com.notes.auth_ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -12,9 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.notes.auth_ui.AuthUIAdaptive
 import com.notes.auth_ui.AuthViewModel
 import com.notes.ui.AnimatedBackground
+import com.notes.ui.NetworkStateMessage
 import com.notes.ui.theme.AppTheme
-
-private const val TAG = "LoginUI"
 
 @Composable
 fun LoginUI(
@@ -35,29 +35,36 @@ private fun LoginUIImpl(
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
 
-        AnimatedBackground {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-            val email = rememberSaveable { mutableStateOf(state.email) }
-            val password = rememberSaveable { mutableStateOf("") }
+            NetworkStateMessage()
 
-            AuthUIAdaptive(
-                title = "Welcome again !",
-                subTitle = "Sign in using your email and password",
-                emailState = email,
-                passwordState = password,
-                hasFocus = state.hasFocus,
-                innerPadding = innerPadding,
-                progress = progress,
-                onEnter = { passwordValue, _, emailValue ->
-                    onLogin(
-                        AuthViewModel.LoginUIState(
-                            email = emailValue,
-                            password = passwordValue,
-                        ),
-                    )
-                },
-            )
+            AnimatedBackground {
 
+                val email = rememberSaveable { mutableStateOf(state.email) }
+                val password = rememberSaveable { mutableStateOf("") }
+
+                AuthUIAdaptive(
+                    title = "Welcome again !",
+                    subTitle = "Sign in using your email and password",
+                    emailState = email,
+                    passwordState = password,
+                    hasFocus = state.hasFocus,
+                    innerPadding = innerPadding,
+                    progress = progress,
+                    onEnter = { passwordValue, _, emailValue ->
+                        onLogin(
+                            AuthViewModel.LoginUIState(
+                                email = emailValue,
+                                password = passwordValue,
+                            ),
+                        )
+                    },
+                )
+
+            }
         }
 
     }

@@ -33,41 +33,64 @@ interface DBLifecycleCallback {
     fun onClose()
 }
 
+class LocalCallback(private val callbackList: Set<DBLifecycleCallback>) : DBLifecycleCallback {
+
+    private val closed = AtomicBoolean(false)
+    private val opened = AtomicBoolean(false)
+    private val created = AtomicBoolean(false)
+
+    override fun onCreate() {
+        logger.logi("DBLifecycleCallback: onCreate()")
+        callbackList.forEach { it.onCreate() }
+        created.set(true)
+    }
+
+    override fun onClose() {
+        logger.logi("DBLifecycleCallback: onClose()")
+        callbackList.forEach { it.onClose() }
+        closed.set(true)
+    }
+
+    override fun onOpen() {
+        logger.logi("DBLifecycleCallback: onOpen()")
+        callbackList.forEach { it.onOpen() }
+        opened.set(true)
+    }
+
+    fun invokeCallbacksIfNeeded(callback: DBLifecycleCallback) {
+        if (closed.get()) {
+            callback.onClose()
+        }
+        if (opened.get()) {
+            callback.onOpen()
+        }
+        if (created.get()) {
+            callback.onCreate()
+        }
+    }
+}
+
 abstract class LocalNoteDatabaseImpl {
 
     private var noteConnection: SQLiteConnection? = null
     private var noteDb: NoteDatabase? = null
-    private val isCreated = AtomicBoolean(false)
+    private val initNotStarted = AtomicBoolean(false)
     private var clientCallback: DBLifecycleCallback? = null
 
-    private val localCallback: DBLifecycleCallback = object : DBLifecycleCallback {
-
-        override fun onCreate() {
-            logger.logi("DBLifecycleCallback: onCreate()")
-            clientCallback?.onCreate()
-        }
-
-        override fun onClose() {
-            logger.logi("DBLifecycleCallback: onClose()")
-            clientCallback?.onClose()
-        }
-
-        override fun onOpen() {
-            logger.logi("DBLifecycleCallback: onOpen()")
-            clientCallback?.onOpen()
-        }
-    }
+    private val callbackList = mutableSetOf<DBLifecycleCallback>()
+    private val localCallback = LocalCallback(callbackList)
 
     fun initialize(
         context: Context? = null,
         callback: DBLifecycleCallback? = null,
     ): NoteDatabase? {
         logger.logi("LocalDatabase: initialize()")
-        if (isCreated.compareAndSet(false, true)) {
-            clientCallback = callback
+        if (initNotStarted.compareAndSet(false, true)) {
+            if (callback != null) callbackList.add(callback)
             val builder = Room.databaseBuilder<NoteDatabase>(context!!, "note_local_database")
             builder.addCallback(
                 object : RoomDatabase.Callback() {
+
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         logger.logi("LocalDatabase: Callback.onCreate()")
                         super.onCreate(db)
@@ -90,6 +113,10 @@ abstract class LocalNoteDatabaseImpl {
             logger.logi("LocalDatabase: initialize(): done")
             return noteDb
         } else {
+            if (callback != null) {
+                callbackList.add(callback)
+                localCallback.invokeCallbacksIfNeeded(callback)
+            }
             logger.logi("LocalDatabase: initialize(): no-op")
             return noteDb
         }
@@ -100,7 +127,6 @@ abstract class LocalNoteDatabaseImpl {
             logger.logi("LocalDatabase: accessInternal() not initialized, waiting...")
             delay(100)
         }
-        logger.logi("LocalDatabase: accessInternal() done")
         return noteDb!!
     }
 
@@ -115,7 +141,7 @@ abstract class LocalNoteDatabaseImpl {
 
         noteDb?.close()
         noteDb = null
-        isCreated.set(false)
+        initNotStarted.set(false)
 
         localCallback.onClose()
         clientCallback = null

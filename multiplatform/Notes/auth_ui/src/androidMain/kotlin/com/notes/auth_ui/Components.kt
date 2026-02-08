@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -57,9 +58,12 @@ internal fun AuthUIAdaptive(
 
     val sc = currentWindowAdaptiveInfo().windowSizeClass
 
+    val left = innerPadding.calculateLeftPadding(LocalLayoutDirection.current)
+    val right = innerPadding.calculateLeftPadding(LocalLayoutDirection.current)
+
     val containerModifier =
         Modifier
-            .padding(innerPadding)
+            .padding(start = left, end = right)
             .fillMaxSize()
 
     val mainContentModifier =
@@ -71,15 +75,19 @@ internal fun AuthUIAdaptive(
     // to make UI a bit better
     val keyboardPadding =
         Modifier
-            .consumeWindowInsets(innerPadding)
             .imePadding()
 
     when {
         isTabletOrFoldableExpanded(sc) -> {
+
+            val scrollState = rememberScrollState()
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = containerModifier.then(keyboardPadding),
+                modifier = containerModifier
+                    .then(keyboardPadding)
+                    .verticalScroll(scrollState),
             ) {
                 SurfaceContainer(
                     modifier =
@@ -140,16 +148,21 @@ internal fun AuthUIAdaptive(
                     modifier = modifier,
                 ) {
                     SurfaceContainer {
-                        AuthBody(
-                            modifier = mainContentModifier,
-                            emailState = emailState,
-                            emailFieldFocusRequester = emailFieldFocusRequester,
-                            passwordFieldFocusRequester = passFieldFocusRequester,
-                            passwordState = passwordState,
-                            confirmPasswordState = confirmPasswordState,
-                            progress = progress,
-                            onEnter = onEnter,
-                        )
+
+                        val scrollState = rememberScrollState()
+
+                        Column(modifier = Modifier.verticalScroll(scrollState)) {
+                            AuthBody(
+                                modifier = mainContentModifier,
+                                emailState = emailState,
+                                emailFieldFocusRequester = emailFieldFocusRequester,
+                                passwordFieldFocusRequester = passFieldFocusRequester,
+                                passwordState = passwordState,
+                                confirmPasswordState = confirmPasswordState,
+                                progress = progress,
+                                onEnter = onEnter,
+                            )
+                        }
                     }
                 }
             }
@@ -162,7 +175,10 @@ internal fun AuthUIAdaptive(
                 contentAlignment = Alignment.Center,
             ) {
                 SurfaceContainer {
-                    Column {
+
+                    val scrollState = rememberScrollState()
+
+                    Column(modifier = Modifier.verticalScroll(scrollState)) {
                         AuthHeader(
                             modifier = mainContentModifier,
                             alignment = Alignment.CenterHorizontally,
@@ -248,10 +264,8 @@ internal fun AuthBody(
     var email by emailState
     val confirmPassword: MutableState<String>? = confirmPasswordState
 
-    val scrollState = rememberScrollState()
-
     Column(
-        modifier = modifier.verticalScroll(scrollState),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Email input field

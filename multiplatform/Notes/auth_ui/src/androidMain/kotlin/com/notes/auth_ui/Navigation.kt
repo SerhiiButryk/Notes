@@ -20,6 +20,7 @@ import com.notes.auth_ui.screens.VerificationEmailUI
 import com.notes.notes_ui.getStartDestination
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.getViewModel
+import com.notes.ui.navAndPopUpCurrent
 
 fun NavGraphBuilder.authDestination(navController: NavController) {
     // Authentication graph
@@ -37,8 +38,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
             if (state.value is AuthViewModel.LoginUIState) {
                 val onSuccess = {
-                    navController.popBackStack()
-                    navController.navigate(getStartDestination())
+                    navController.navAndPopUpCurrent(getStartDestination())
                 }
 
                 val loginUIState = state.value as AuthViewModel.LoginUIState

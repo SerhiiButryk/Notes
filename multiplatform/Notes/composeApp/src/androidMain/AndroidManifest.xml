@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!--  Allows an app to prevent non-system-overlay windows from being drawn on top of it  -->
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS"/>
 
     <application
             android:name="com.notes.app.Notes"

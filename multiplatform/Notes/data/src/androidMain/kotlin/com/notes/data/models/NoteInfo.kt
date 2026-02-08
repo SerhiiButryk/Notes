@@ -5,7 +5,6 @@ package com.notes.data.models
  */
 data class NoteInfo(
     val noteId: Long,
-    val pendingUpdate: Boolean?,
-    val pendingDelete: Boolean?,
+    val metadata: String?,
     val metadataId: Long?,
 )

@@ -54,7 +54,7 @@ class GoogleSignInService : AbstractAuthService() {
         logger.logi("GoogleSignInService::login()")
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId("411307947225-6rlasngq8a1is80pq5tt3ang6hjpen9o.apps.googleusercontent.com")
+            .setServerClientId(AppServices.serverClientId)
             .setAutoSelectEnabled(autoSelectEnabled)
             // Allow all Google accounts on the device to show up
             .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
@@ -90,7 +90,7 @@ class GoogleSignInService : AbstractAuthService() {
             // Sign in to Firebase using the token
             val idToken = googleIdTokenCredential.idToken
             val result = AppServices
-                .getDefaultAuthService()
+                .getDefaultAuthService()!!
                 .login(idToken, activityContext)
 
             if (result.isSuccess()) {
@@ -100,7 +100,7 @@ class GoogleSignInService : AbstractAuthService() {
                 requestGoogleDriveAccess(activityContext)
 
                 val email = AppServices
-                    .getDefaultAuthService()
+                    .getDefaultAuthService()!!
                     .getUserEmail()
 
                 return AuthResult.loginSuccess(email)
@@ -121,7 +121,7 @@ class GoogleSignInService : AbstractAuthService() {
         logger.logi("GoogleSignInService::signOut()")
         // Firebase sign out
         AppServices
-            .getDefaultAuthService()
+            .getDefaultAuthService()!!
             .signOut()
         authenticated.store(false)
         try {
@@ -137,7 +137,8 @@ class GoogleSignInService : AbstractAuthService() {
 
     // This should show a dialog for a user to confirm permissions
     private suspend fun requestGoogleDriveAccess(activityContext: Any?) {
-        val googleDriveService = AppServices.getStoreService("googledrive") as GoogleDriveService
+        val googleDriveService = AppServices
+            .__delicateCall_getOriginalStoreService("googledrive") as GoogleDriveService
         googleDriveService.askForAccess(activityContext, callback)
     }
 }

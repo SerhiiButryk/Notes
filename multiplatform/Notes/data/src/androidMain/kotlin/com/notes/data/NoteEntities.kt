@@ -28,16 +28,16 @@ data class NoteEntity(
             entity = NoteEntity::class,
             parentColumns = ["uid"],
             childColumns = ["original"],
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.CASCADE // Delete metadata if note is deleted locally
         )
     ]
 )
 data class NotesMetadataEntity(
     @PrimaryKey(autoGenerate = true)
     val uid: Long = 0,
-    // Whether we need to update note data on the remote (by default it's not updated)
-    @ColumnInfo("pending_update") val pendingUpdate: Boolean = true,
-    // Whether we need to delete note data on the remote
+    // Additional data in json format
+    @ColumnInfo("meta_data") val metadata: String = "",
+    // Whether deletion should be done locally
     @ColumnInfo("pending_delete") val pendingDelete: Boolean = false,
     val original: Long? = null
 )

@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import api.PlatformAPIs
-import api.StorageService
+import api.data.AbstractStorageService
 import api.data.Document
+import api.data.toDocument
+import api.data.toJson
 import com.google.common.truth.Truth.assertThat
 import com.notes.app.security.CryptoProvider
-import com.notes.services.storage.EncryptedStore
+import api.data.EncryptedStore
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -23,7 +25,7 @@ class BasicTests {
 
     private val mockedStoreService = MockedService()
 
-    class MockedService : StorageService {
+    class MockedService : AbstractStorageService() {
 
         private val list = mutableListOf<Document>()
 
@@ -52,6 +54,8 @@ class BasicTests {
         fun clear() {
             list.clear()
         }
+
+        override val name: String = ""
     }
 
     @Before
@@ -124,6 +128,47 @@ class BasicTests {
         // Clear derived key
         PlatformAPIs.storage.clearAll()
 
+    }
+
+    @Test
+    fun test03_jsonTest() = runTest {
+
+        val doc = Document("name1", "data1")
+
+        val expected = """{"name":"name1","content":"data1"}"""
+
+        val result = doc.toJson()
+        assertThat(result).isNotEmpty()
+        assertThat(result).isEqualTo(expected)
+
+        val docExpected = Document("name1", "content1")
+        val json = """{"name":"name1", "content":"content1"}"""
+        val json2 = """{"content":"content1","name":"name1"}"""
+
+        val doc1 = json.toDocument()
+        assertThat(doc1).isEqualTo(docExpected)
+
+        val doc2 = json2.toDocument()
+        assertThat(doc2).isEqualTo(docExpected)
+
+        val doc3 = Document("", "")
+        val expected2 = """{"name":"","content":""}"""
+
+        val result2 = doc3.toJson()
+        assertThat(result2).isNotEmpty()
+        assertThat(result2).isEqualTo(expected2)
+
+        val json3 = """"""
+        val json4 = """{}"""
+        val json5 = """{"keyUnknown":""}"""
+
+        // Just to check that we don't crash
+        val doc4 = json3.toDocument()
+        assertThat(doc4).isEqualTo(Document("", ""))
+        val doc5 = json4.toDocument()
+        assertThat(doc5).isEqualTo(Document("", ""))
+        val doc6 = json5.toDocument()
+        assertThat(doc6).isEqualTo(Document("", ""))
     }
 
 }

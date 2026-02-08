@@ -3,6 +3,7 @@ agp = "8.12.0" # When updating check IOS & Android build. It could create build 
 composeMultiplatform = "1.10.0"
 composeHotReload = "1.0.0"
 
+googleAuthLibraryOauth2Http = "1.42.1"
 kotlin = "2.3.0"
 
 android-compileSdk = "36"
@@ -58,6 +59,7 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
 google-api-client-android = { module = "com.google.api-client:google-api-client-android", version.ref = "googleApiClientAndroid" }
 google-api-services-drive = { module = "com.google.apis:google-api-services-drive", version.ref = "googleApiServicesDrive" }
+google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "googleAuthLibraryOauth2Http" }
 google-http-client-android = { module = "com.google.http-client:google-http-client-android", version.ref = "googleHttpClientAndroid" }
 google-http-client-jackson2 = { module = "com.google.http-client:google-http-client-jackson2", version.ref = "googleHttpClientJackson2" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }

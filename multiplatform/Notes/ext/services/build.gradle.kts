@@ -52,9 +52,8 @@ kotlin {
             // Google Drive APIs and dependencies
             implementation(libs.play.services.auth)
             implementation(libs.google.api.services.drive)
-            implementation(libs.google.http.client.android)
             implementation(libs.google.http.client.jackson2)
-            implementation(libs.google.api.client.android)
+            implementation(libs.google.auth.library.oauth2.http)
 
             // To fix undef grpc class issue. TODO: workaround need to analyze deps and get rid of this
             implementation(libs.grpc.okhttp)

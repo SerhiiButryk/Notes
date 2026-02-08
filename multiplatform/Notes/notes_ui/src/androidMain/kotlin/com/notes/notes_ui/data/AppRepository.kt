@@ -1,11 +1,12 @@
 package com.notes.notes_ui.data
 
-import android.content.Context
-import android.os.Build
 import api.PlatformAPIs.logger
 import api.data.Notes
 import com.notes.data.LocalNoteDatabase
-import com.notes.data.NoteEntity
+import com.notes.data.json.isPendingDeletionOnRemote
+import com.notes.data.toEntity
+import com.notes.data.toNote
+import com.notes.data.updateMetadataForNote
 import com.notes.notes_ui.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +18,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
 
 class AppRepository(private val remoteRepository: RemoteRepository) : Repository {
 
@@ -32,7 +30,6 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
 
             // TODO: Might do this periodically
             // in Work manager or something else
-
             // Trigger fetch from remote server
             remoteRepository.fetchNotes(scope)
 
@@ -42,20 +39,17 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
             // 1. Load note mata data (additional info)
             // 2. Check it and load a note which is referenced by 'original'
 
-            db.getAllMetadata().collect { metadata ->
+            db.getAllMetadata().collect { metadataList ->
 
                 val list = mutableListOf<Notes>()
 
-                metadata.forEach { item ->
+                metadataList.forEach { metadata ->
 
-                    val noteId = item.original
-                    val pendingDelete = item.pendingDelete
+                    val noteId = metadata.original
 
-                    if (!pendingDelete) {
-
+                    if (!metadata.isPendingDeletionOnRemote() && !metadata.pendingDelete) {
                         val db = LocalNoteDatabase.access()
                         val note = db.getNote(noteId!!).first()!!.toNote()
-
                         list.add(note)
                     }
 
@@ -118,44 +112,25 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
     ) {
         scope.launch {
             logger.logi("OfflineRepository::deleteNote(${note.id})")
-            remoteRepository.delete(scope, note)
-            callback(note.id)
-        }
-    }
 
-    override fun init(context: Any) {
-        scope.launch {
-            logger.logi("OfflineRepository::init()")
-            LocalNoteDatabase.initialize(context as Context)
+            // 1. Update metadata
+            // 2. Delete note on remote. Will update metadata on success
+            // 3. Then can delete note locally
+
+            // Remember that we are going to delete current notes
+            updateMetadataForNote(note = note, pendingDelete = true)
+
+            // Notify UI
+            callback(note.id)
+
+            // Trigger remote deletion
+            remoteRepository.delete(scope, note)
         }
     }
 
     override fun clear() {
         logger.logi("OfflineRepository::clear()")
         scope.cancel()
-        LocalNoteDatabase.close()
     }
-}
 
-fun Notes.toEntity(setId: Boolean = true): NoteEntity {
-    // TODO: Add test
-    val time: String =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            LocalDateTime.now().format(formatter)
-        } else {
-            Calendar.getInstance().getTime().toString()
-        }
-    return if (setId) {
-        NoteEntity(
-            uid = id,
-            userId = userId,
-            content = content,
-            time = time
-        )
-    } else {
-        NoteEntity(userId = userId, content = content, time = time)
-    }
 }
-
-fun NoteEntity.toNote(): Notes = Notes(content = content, id = uid, userId = userId, time = time)

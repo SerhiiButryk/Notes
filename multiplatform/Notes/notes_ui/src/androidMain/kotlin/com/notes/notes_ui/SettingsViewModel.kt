@@ -1,12 +1,11 @@
 package com.notes.notes_ui
 
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.AppServices
 import api.auth.AuthCallback
+import com.notes.data.isAllInSyncWithRemote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +22,7 @@ class SettingsViewModel(
         val googleIsActive: Boolean = false,
         val firebaseIsActive: Boolean = false,
         val googleDriveIsActive: Boolean = false,
+        val syncCompleted: Boolean = false,
         val showGrantPermissions: Boolean = false,
         val pending: Boolean = false,
     )
@@ -36,21 +36,17 @@ class SettingsViewModel(
         updateAccountInfo()
     }
 
-    fun onActivityResult() {
-        updateAccountInfo()
-    }
-
     // Request permissions for Google Drive
-    fun requestPermissions(context: Any?, launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) {
-        updateAccountInfo(pending = true)
+    fun requestPermissions(context: Any?, onSuccess: (IntentSenderRequest) -> Unit) {
         scope.launch {
+            updateAccountInfo(pending = true)
             val service = AppServices
                 .getAuthServiceByName("google")!!
             service.resetSettings()
             val callback = object : AuthCallback {
                 override fun onUserAction(data: Any?) {
                     if (data != null) {
-                        launcher.launch(data as IntentSenderRequest)
+                        onSuccess(data as IntentSenderRequest)
                     }
                     service.setAuthCallback(null)
                     updateAccountInfo()
@@ -72,33 +68,37 @@ class SettingsViewModel(
         }
     }
 
-    private fun updateAccountInfo(pending: Boolean = false) {
+    fun updateAccountInfo(pending: Boolean = false) {
+        scope.launch {
+            val email = AppServices
+                .getDefaultAuthService()!!
+                .getUserEmail()
 
-        val email = AppServices
-            .getDefaultAuthService()
-            .getUserEmail()
+            val googleIsActive = AppServices
+                .getAuthServiceByName("google")!!
+                .isAuthenticated()
 
-        val googleIsActive = AppServices
-            .getAuthServiceByName("google")!!
-            .isAuthenticated()
+            val firebaseIsActive = AppServices
+                .getAuthServiceByName("firebase")!!
+                .isAuthenticated()
 
-        val firebaseIsActive = AppServices
-            .getAuthServiceByName("firebase")!!
-            .isAuthenticated()
+            val googleDriveIsActive = AppServices
+                .getStoreService("googledrive")!!
+                .canUse
 
-        val googleDriveIsActive = AppServices
-            .getStoreService("googledrive")!!
-            .canUse
+            val grantPermission = !googleDriveIsActive
 
-        val grantPermission = !googleDriveIsActive
+            val syncCompleted = isAllInSyncWithRemote()
 
-        _accountInfo.update { AccountInfo(
-            email = email,
-            googleIsActive = googleIsActive,
-            firebaseIsActive = firebaseIsActive,
-            googleDriveIsActive = googleDriveIsActive,
-            showGrantPermissions = grantPermission,
-            pending = pending
-        ) }
+            _accountInfo.update { AccountInfo(
+                email = email,
+                googleIsActive = googleIsActive,
+                firebaseIsActive = firebaseIsActive,
+                googleDriveIsActive = googleDriveIsActive,
+                showGrantPermissions = grantPermission,
+                pending = pending,
+                syncCompleted = syncCompleted
+            ) }
+        }
     }
 }

@@ -4,10 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import api.data.AbstractStorageService
 import com.google.common.truth.Truth.assertThat
-import api.StorageService
 import api.data.Document
 import api.data.Notes
+import com.notes.data.LocalNoteDatabase
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.Repository
 import com.notes.notes_ui.data.AppRepository
@@ -53,6 +54,8 @@ class ViewModelNotesTest {
     @Before
     fun onStart() {
 
+        LocalNoteDatabase.initialize(appContext)
+
         val repo = object : Repository {
             override fun getNotes(): Flow<List<Notes>> {
                 Log.i("ViewModelNotesTests", "getNotes()")
@@ -74,9 +77,6 @@ class ViewModelNotesTest {
 
             override fun deleteNote(note: Notes, callback: (Long) -> Unit) {}
 
-            override fun init(context: Any) {
-            }
-
             override fun clear() {
                 Log.i("ViewModelNotesTests", "clear()")
                 cleared.store(true)
@@ -84,7 +84,6 @@ class ViewModelNotesTest {
         }
 
         viewModel = NotesViewModel(repo)
-        viewModel?.init(appContext)
     }
 
     @After
@@ -97,6 +96,7 @@ class ViewModelNotesTest {
         }
         assertThat(cleared.load()).isTrue()
         viewModel = null
+        LocalNoteDatabase.close()
     }
 
     @Test
@@ -257,13 +257,14 @@ class ViewModelNotesTest {
 
     private fun setupVMWithRealRepo(repo: AppRepository, scope: CoroutineScope): NotesViewModel {
         val viewModel = NotesViewModel(repo, scope)
-        viewModel.init(appContext)
         return viewModel
     }
 
     private fun setupRealRemoteRepo(setDelete: Boolean): AppRepository {
 
-        val mockedStoreService = object : StorageService {
+        val mockedStoreService = object : AbstractStorageService() {
+
+            override val name: String = "firebase"
 
             override suspend fun store(document: Document): Boolean {
                 return true
@@ -283,7 +284,7 @@ class ViewModelNotesTest {
 
         }
 
-        return AppRepository(RemoteRepository(mockedStoreService))
+        return AppRepository(RemoteRepository(listOf(mockedStoreService)))
     }
 
 }

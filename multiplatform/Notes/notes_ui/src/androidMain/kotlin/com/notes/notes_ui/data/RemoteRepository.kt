@@ -7,15 +7,33 @@ import api.data.Notes
 import com.notes.data.LocalNoteDatabase
 import com.notes.data.NoteEntity
 import com.notes.data.NotesMetadataEntity
+import com.notes.data.json.isPendingDeletionOnRemote
+import com.notes.data.json.isPendingUpdateOnRemote
+import com.notes.data.json.update
+import com.notes.data.json.updateForDatastore
+import com.notes.data.toEntity
+import com.notes.data.toNote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
- * Class which handles data synchronization between remote and locale datastore
+ * Class which handles data synchronization between remote and local datastore
  */
-class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
+class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
+
+    private val _allServicesList: List<AbstractStorageService> = remoteDataStore
+
+    private fun getServices(): List<AbstractStorageService> {
+        val services = mutableListOf<AbstractStorageService>()
+        for (service in _allServicesList) {
+            if (service.canUse)
+                services.add(service)
+        }
+        logger.logi("RemoteRepository::getServices() available services = '$services'")
+        return services
+    }
 
     fun saveNote(
         scope: CoroutineScope,
@@ -23,16 +41,20 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
     ) {
         scope.launch {
 
-            logger.logi("RemoteRepository::saveNote()")
+            for (dataStore in getServices()) {
 
-            updateMetadata(note = note, pendingUpdate = true)
+                logger.logi("RemoteRepository::saveNote() to '${dataStore.name}'...")
 
-            val result = remoteDataStore.store(Document(data = note.content, name = note.id.toString()))
+                updateMetadata(dataStore = dataStore, note = note, pendingUpdate = true)
 
-            if (result) {
-                updateMetadata(note = note, pendingUpdate = false)
-            } else {
-                logger.loge("RemoteRepository::saveNote() failed to save in remote")
+                val result =
+                    dataStore.store(Document(data = note.content, name = note.id.toString()))
+
+                if (result) {
+                    updateMetadata(dataStore = dataStore, note = note, pendingUpdate = false)
+                } else {
+                    logger.loge("RemoteRepository::saveNote() failed for '${dataStore.name}'")
+                }
             }
 
         }
@@ -41,10 +63,21 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
     fun fetchNotes(scope: CoroutineScope) {
         logger.logi("RemoteRepository::fetchNotes()")
         scope.launch {
-            val list = remoteDataStore.fetchAll().map { document ->
-                Notes(id = document.name.toLong(), content = document.data)
+            val notesFound = mutableListOf<Notes>()
+            // Merge results from several sources
+            // Ideally it should have exact list but do check a merge for safety
+            for (dataStore in getServices()) {
+                val result = dataStore.fetchAll().map { document ->
+                    Notes(id = document.name.toLong(), content = document.data)
+                }
+                for (item in result) {
+                    if (notesFound.find { note -> item.id == note.id } == null) {
+                        notesFound.add(item)
+                    }
+                }
             }
-            processNotes(list)
+            logger.logi("RemoteRepository::fetchNotes() got ${notesFound.size}")
+            processNotes(notesFound)
         }
     }
 
@@ -57,18 +90,23 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
             val currMetadata = metaDb.getAllMetadata().first()
 
             for (metadata in currMetadata) {
+
                 launch {
 
-                    if (metadata.pendingUpdate) {
-                        val db = LocalNoteDatabase.access()
-                        val note = db.getNote(metadata.original!!).first()
-                        saveNote(this, note!!.toNote())
-                    }
+                    val db = LocalNoteDatabase.access()
+                    val note = db.getNote(metadata.original!!).first()
 
-                    if (metadata.pendingDelete) {
-                        val db = LocalNoteDatabase.access()
-                        val note = db.getNote(metadata.original!!).first()
-                        delete(this, note!!.toNote())
+                    if (note != null) {
+
+                        val noteLocal = note.toNote()
+
+                        if (metadata.isPendingUpdateOnRemote()) {
+                            saveNote(this, noteLocal)
+                        }
+
+                        if (metadata.isPendingDeletionOnRemote()) {
+                            delete(this, noteLocal)
+                        }
                     }
 
                 }
@@ -81,41 +119,51 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
         note: Notes,
     ) {
 
-        logger.logi("RemoteRepository::delete() note id = ${note.id}")
+        logger.logi("RemoteRepository::delete() note = '${note.id}'")
 
         scope.launch {
 
-            // TODO: Might need to handle additional
-            // We shouldn't return notes which are pending deletion
+            for (dataStore in getServices()) {
 
-            updateMetadata(note, pendingDelete = true)
+                updateMetadata(dataStore = dataStore, note = note, pendingDelete = true)
 
-            val result = remoteDataStore.delete(note.id.toString())
-
-            if (result) {
-
-                val db = LocalNoteDatabase.access()
-                val noteInfo = db.getNoteWithMetadata(note.id).first()
-
-                if (noteInfo != null && noteInfo.metadataId != null) {
-                    val metaDb = LocalNoteDatabase.accessNoteMetadata()
-                    val entity = NotesMetadataEntity(uid = noteInfo.metadataId!!)
-                    metaDb.deleteMetadata(entity)
-                    logger.logi("RemoteRepository::delete() note metadata is deleted = ${noteInfo.noteId}")
+                val result = dataStore.delete(note.id.toString())
+                if (result) {
+                    updateMetadata(dataStore = dataStore, note = note, pendingDelete = false)
+                    logger.logi("RemoteRepository::delete() deleted = '${note.id}' for '${dataStore.name}'")
+                } else {
+                    logger.loge("RemoteRepository::delete() failed for '${dataStore.name}'")
                 }
 
+            }
+
+            checkIfNeedDeleteNoteLocally(note)
+
+            logger.logi("RemoteRepository::delete() done")
+        }
+    }
+
+    private suspend fun checkIfNeedDeleteNoteLocally(note: Notes) {
+
+        val db = LocalNoteDatabase.access()
+        val metaDb = LocalNoteDatabase.accessNoteMetadata()
+
+        val noteInfo = db.getNoteWithMetadata(note.id).first()
+
+        if (noteInfo != null && noteInfo.metadataId != null) {
+
+            val metadata = metaDb.getMetadata(noteInfo.metadataId!!).first()
+
+            // Can delete locally
+            if (metadata != null
+                && !metadata.isPendingDeletionOnRemote()
+                && metadata.pendingDelete) {
                 // Deliberately set default value, only uid is important
                 // as it is used to select the record
                 val noteEntity = NoteEntity(uid = note.id)
-                db.deleteNote(noteEntity)
-
-                logger.logi("RemoteRepository::delete() local note is deleted = ${note.id}")
-
-            } else {
-                logger.loge("RemoteRepository::delete() failed to delete in remote")
+                LocalNoteDatabase.access().deleteNote(noteEntity)
+                logger.logi("RemoteRepository::checkIfNeedDeleteNoteLocally() deleted locally = ${note.id}")
             }
-
-            logger.logi("RemoteRepository::delete() done")
         }
     }
 
@@ -128,7 +176,10 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
         for (note in notes) {
 
             launch {
+
                 val db = LocalNoteDatabase.access()
+                val metadataDb = LocalNoteDatabase.accessNoteMetadata()
+
                 val data = db.getNote(note.id).first()
                 if (data == null) {
 
@@ -136,10 +187,16 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
 
                     val id = db.insertNote(note.toEntity())
 
-                    val metadataDb = LocalNoteDatabase.accessNoteMetadata()
+                    val metadata = NotesMetadataEntity(original = id, metadata = "")
 
-                    val metadata = NotesMetadataEntity(pendingUpdate = false, original = id)
-                    val metaId = metadataDb.insertMetadata(metadata)
+                    val newMetadata = metadata.update(
+                        pendingUpdateFirebase = false,
+                        pendingUpdateGoogle = false,
+                        pendingDeleteGoogle = false,
+                        pendingDeleteFirebase = false
+                    )
+
+                    val metaId = metadataDb.insertMetadata(metadata.copy(metadata = newMetadata))
 
                     logger.logi(
                         "RemoteRepository::processNotes() " +
@@ -154,32 +211,39 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
     }
 
     private suspend fun updateMetadata(
+        dataStore: AbstractStorageService,
         note: Notes,
-        pendingUpdate: Boolean = false,
-        pendingDelete: Boolean = false
+        pendingUpdate: Boolean? = null,
+        pendingDelete: Boolean? = null
     ) {
 
         val db = LocalNoteDatabase.access()
+        val metaDb = LocalNoteDatabase.accessNoteMetadata()
+
         val noteInfo = db.getNoteWithMetadata(note.id).first()
 
         if (noteInfo != null && noteInfo.metadataId != null) {
 
             // Update current
 
-            val metaDb = LocalNoteDatabase.accessNoteMetadata()
             val currMetadata = metaDb.getMetadata(noteInfo.metadataId!!).first()
 
             if (currMetadata != null) {
 
-                metaDb.updateMetadata(
-                    currMetadata.copy(
-                        pendingUpdate = pendingUpdate,
-                        pendingDelete = pendingDelete
-                    )
+                val newMetadata = currMetadata.updateForDatastore(
+                    dataStore = dataStore,
+                    pendingDelete = pendingDelete,
+                    pendingUpdate = pendingUpdate
                 )
 
+                metaDb.updateMetadata(currMetadata.copy(metadata = newMetadata))
+
                 logger.logi(
-                    "RemoteRepository::updateMetadata() updated = ${currMetadata.uid}"
+                    "RemoteRepository::updateMetadata() updated = '${currMetadata.uid}' for '${dataStore.name}'"
+                )
+            } else {
+                logger.loge(
+                    "RemoteRepository::updateMetadata() absent for '${dataStore.name}'"
                 )
             }
 
@@ -187,18 +251,21 @@ class RemoteRepository(private val remoteDataStore: AbstractStorageService) {
 
             // If there are no metadata then create it
 
-            val metaDb = LocalNoteDatabase.accessNoteMetadata()
-
             val newMetadata = NotesMetadataEntity(
                 original = note.id,
-                pendingUpdate = pendingUpdate,
-                pendingDelete = pendingDelete
+                metadata = "",
             )
 
-            val id = metaDb.insertMetadata(newMetadata)
+            val updated = newMetadata.updateForDatastore(
+                dataStore = dataStore,
+                pendingDelete = pendingDelete,
+                pendingUpdate = pendingUpdate
+            )
+
+            val id = metaDb.insertMetadata(newMetadata.copy(metadata = updated))
 
             logger.logi(
-                "RemoteRepository::updateMetadata() added new = $id"
+                "RemoteRepository::updateMetadata() added new metadata = '$id' for ${dataStore.name}"
             )
 
         }

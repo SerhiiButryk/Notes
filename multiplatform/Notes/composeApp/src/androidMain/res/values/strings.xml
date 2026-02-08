@@ -3,4 +3,6 @@
 
     <string name="verification_server_domain">fancynotesdevtest.firebaseapp.com</string>
     <string name="verification_path">/__/auth/action</string>
+    <!-- For firebase and other google services -->
+    <string name="server_client_id">411307947225-6rlasngq8a1is80pq5tt3ang6hjpen9o.apps.googleusercontent.com</string>
 </resources>

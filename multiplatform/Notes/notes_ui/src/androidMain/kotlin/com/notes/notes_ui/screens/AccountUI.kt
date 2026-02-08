@@ -1,12 +1,5 @@
 package com.notes.notes_ui.screens
 
-import android.app.Activity
-import androidx.activity.compose.LocalActivity
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import api.PlatformAPIs.logger
 import api.ui.CommonIcons
 import com.notes.notes_ui.SettingsViewModel
 import com.notes.ui.SimpleTopBar
@@ -54,8 +46,7 @@ import com.notes.ui.SimpleTopBar
 fun AccountUI(
     onBackClick: () -> Unit,
     onSignOut: () -> Unit,
-    requestPermissions: (context: Any?, launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) -> Unit,
-    onActivityResult: () -> Unit,
+    onGrantPermissionClick: () -> Unit,
     accountInfo: SettingsViewModel.AccountInfo,
 ) {
     Scaffold(
@@ -106,17 +97,9 @@ fun AccountUI(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val activity = LocalActivity.current
-
-            val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.StartIntentSenderForResult()
-            ) { result ->
-                val result = result.resultCode == Activity.RESULT_OK
-                logger.logi("AccountUI::activity result = $result")
-                onActivityResult()
-            }
-
-            val modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth()
+            val modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth()
 
             val status1 = if (accountInfo.googleIsActive) "Active" else "Not active"
 
@@ -152,6 +135,18 @@ fun AccountUI(
                 modifier = modifier
             )
 
+            val status4 = if (accountInfo.syncCompleted) "Active" else "Not active"
+
+            AccountStatusCard(
+                title = "Cloud sync",
+                status = status4,
+                iconRes = CommonIcons.cloudSyncIcon,
+                iconTint = Color.Unspecified,
+                showStatusDot = true,
+                isOnline = accountInfo.syncCompleted,
+                modifier = modifier
+            )
+
             val modifierBtn = Modifier.padding(bottom = 10.dp, top = 10.dp)
 
             if (accountInfo.pending) {
@@ -159,16 +154,17 @@ fun AccountUI(
             } else {
                 if (accountInfo.showGrantPermissions) {
                     Button(
-                        modifier = modifierBtn, onClick = { requestPermissions(activity, launcher) }) {
+                        modifier = modifierBtn, onClick = { onGrantPermissionClick() }) {
                         Text(text = "Grant permissions for Google Drive")
                     }
                 }
             }
 
-            Button(
-                modifier = modifierBtn, onClick = { onSignOut() }) {
-                Text(text = "Sing out")
-            }
+            // TODO: Not properly supported yet
+//            Button(
+//                modifier = modifierBtn, onClick = { onSignOut() }) {
+//                Text(text = "Sing out")
+//            }
 
         }
     }

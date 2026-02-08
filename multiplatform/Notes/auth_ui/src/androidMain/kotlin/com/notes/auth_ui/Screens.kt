@@ -8,16 +8,16 @@ import kotlinx.serialization.Serializable
 // Class: Use a class or data class for routes with arguments.
 
 @Serializable
-internal object Auth : Screen("auth")
+internal object Auth : Screen()
 
 @Serializable
-internal object Access : Screen("access")
+internal object Access : Screen()
 
 @Serializable
-internal object OnBoardingScreen : Screen("onboarding")
+internal object OnBoardingScreen : Screen()
 
 @Serializable
-internal object EmailVerification : Screen("email_verification")
+internal object EmailVerification : Screen()
 
 fun getStartRoute(): Screen {
     if (isFirstLaunch()) {

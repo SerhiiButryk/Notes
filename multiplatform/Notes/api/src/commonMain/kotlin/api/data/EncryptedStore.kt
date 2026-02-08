@@ -1,23 +1,24 @@
-package com.notes.services.storage
+package api.data
 
 import api.PlatformAPIs
-import api.data.AbstractStorageService
-import api.data.Document
 
 /**
  * Service which adds a layer of encryption on storage service
  */
-class EncryptedStore(private val service: AbstractStorageService) : AbstractStorageService() {
+class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageService() {
 
-    override val name: String = service.name
+    override val name: String = delegate.name
+
+    override var canUse: Boolean = delegate.canUse
+        get() = delegate.canUse
 
     override suspend fun store(document: Document): Boolean {
         val encrypted = PlatformAPIs.crypto.encryptWithDerivedKey(document.data)
-        return service.store(Document(document.name, encrypted))
+        return delegate.store(Document(document.name, encrypted))
     }
 
     override suspend fun load(name: String): Document? {
-        val data = service.load(name)
+        val data = delegate.load(name)
         if (data != null) {
             val decrypted = PlatformAPIs.crypto.decryptWithDerivedKey(data.data)
             return Document(data = decrypted, name = name)
@@ -26,11 +27,11 @@ class EncryptedStore(private val service: AbstractStorageService) : AbstractStor
     }
 
     override suspend fun delete(name: String): Boolean {
-        return service.delete(name)
+        return delegate.delete(name)
     }
 
     override suspend fun fetchAll(): List<Document> {
-        val documents = service.fetchAll()
+        val documents = delegate.fetchAll()
         return documents.map { doc ->
             val decrypted = PlatformAPIs.crypto.decryptWithDerivedKey(doc.data)
             Document(name = doc.name, data = decrypted)

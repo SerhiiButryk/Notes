@@ -1,10 +1,11 @@
 package com.notes.notes_ui
 
 import android.app.Activity
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
-import androidx.compose.runtime.LaunchedEffect
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -12,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import api.PlatformAPIs.logger
 import api.data.Notes
 import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.screens.AccountUI
@@ -19,6 +21,7 @@ import com.notes.notes_ui.screens.NotesUI
 import com.notes.notes_ui.screens.SettingsUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
+import com.notes.ui.navAndPopUpCurrent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -50,14 +53,14 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val toolsPaneItems = viewModel.richTools
 
             val context = LocalContext.current
-            LaunchedEffect(false) {
-                viewModel.init(context)
-            }
-
             val onBackButtonClicked: () -> Unit = {
                 // Back stack is empty at this point so we use activity context
                 val activity = context as? Activity
                 activity?.moveTaskToBack(true)
+            }
+
+            BackHandler(enabled = true) {
+                onBackButtonClicked()
             }
 
             NotesUI(
@@ -78,7 +81,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val onBackClicked: () -> Unit = { navController.popBackStack() }
+            val onBackClicked: () -> Unit = { navController.navAndPopUpCurrent(NotesPreview) }
+
             val onAccountSelected = { navController.navigate(NotesAccount) }
 
             SettingsUI(onBackClick = onBackClicked, onAccountClick = onAccountSelected)
@@ -88,20 +92,33 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val onBackClicked: () -> Unit = { navController.popBackStack() }
-            val onSignOut = { viewModel.singOut() }
-            val requestPermissions: (context: Any?, launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) -> Unit =
-                { ctx, launcher -> viewModel.requestPermissions(ctx, launcher) }
+            val onBackClick: () -> Unit = { navController.navAndPopUpCurrent(NotesSettings) }
 
-            val onActivityResult: () -> Unit = { viewModel.onActivityResult() }
+            val onSignOut = { viewModel.singOut() }
 
             val accountInfo by viewModel.accountInfo.collectAsStateWithLifecycle()
 
+            val activity = LocalActivity.current
+
+            val launcher = rememberLauncherForActivityResult(
+                ActivityResultContracts.StartIntentSenderForResult()
+            ) { result ->
+                val result = result.resultCode == Activity.RESULT_OK
+                logger.logi("AccountUI::activity result = $result")
+                viewModel.updateAccountInfo()
+            }
+
+            val onSuccess = { sender: IntentSenderRequest ->
+                launcher.launch(sender)
+            }
+
+            val onGrantPermissionClick: () -> Unit =
+                { viewModel.requestPermissions(activity, onSuccess) }
+
             AccountUI(
-                onBackClick = onBackClicked,
-                requestPermissions = requestPermissions,
+                onBackClick = onBackClick,
+                onGrantPermissionClick = onGrantPermissionClick,
                 onSignOut = onSignOut,
-                onActivityResult = onActivityResult,
                 accountInfo = accountInfo
             )
 
@@ -115,13 +132,13 @@ fun getStartDestination(): Screen = MainContent
 // Class: Use a class or data class for routes with arguments.
 
 @Serializable
-internal object NotesPreview : Screen("notes_preview")
+object NotesPreview : Screen()
 
 @Serializable
-object MainContent : Screen("main_content")
+object MainContent : Screen()
 
 @Serializable
-internal object NotesSettings : Screen("settings")
+internal object NotesSettings : Screen()
 
 @Serializable
-internal object NotesAccount : Screen("account")
+internal object NotesAccount : Screen()

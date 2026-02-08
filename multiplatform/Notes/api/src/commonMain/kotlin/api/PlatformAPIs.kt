@@ -9,4 +9,5 @@ object PlatformAPIs {
     lateinit var derivedKey: DerivedKeyOperations
     lateinit var logger: Log
     lateinit var crypto: CryptoOperations
+    lateinit var netStateManager: NetStateManager
 }

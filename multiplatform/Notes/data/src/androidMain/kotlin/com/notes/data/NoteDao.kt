@@ -33,8 +33,7 @@ interface NoteDao {
 
     @Query("""
        select notes_data.uid as noteId, 
-              notes_metadata.pending_update, 
-              notes_metadata.pending_delete, 
+              notes_metadata.meta_data as metadata,  
               notes_metadata.uid as metadataId
        from notes_data
        left outer join notes_metadata on notes_data.uid = notes_metadata.original

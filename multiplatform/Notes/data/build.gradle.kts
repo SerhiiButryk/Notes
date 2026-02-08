@@ -38,6 +38,7 @@ kotlin {
 
             // Room
             implementation(libs.androidx.room.runtime)
+            implementation(libs.serializationJson)
         }
         commonMain.dependencies {
             // put your Multiplatform dependencies here

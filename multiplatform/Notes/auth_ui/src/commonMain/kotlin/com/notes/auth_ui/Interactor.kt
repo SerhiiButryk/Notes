@@ -13,7 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 
 internal class Interactor(
-    private val authService: AbstractAuthService = AppServices.getDefaultAuthService(),
+    private val authService: AbstractAuthService = AppServices.getDefaultAuthService()!!,
 ) {
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)

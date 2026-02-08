@@ -1,6 +1,5 @@
 package com.notes.notes_ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.AppServices
@@ -23,7 +22,7 @@ import kotlinx.coroutines.launch
 class NotesViewModel(
     // TODO: This may be simplified
     appRepository: Repository = AppRepository(
-        RemoteRepository(AppServices.getStoreService("firebase")!!)
+        RemoteRepository(AppServices.dataStoreService)
     ),
     // For test support
     scopeOverride: CoroutineScope? = null
@@ -53,10 +52,6 @@ class NotesViewModel(
 
     sealed class UiEvent {
         class NavigateToListPane : UiEvent()
-    }
-
-    fun init(context: Context) {
-        interaction.init(context)
     }
 
     override fun onCleared() {

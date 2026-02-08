@@ -28,8 +28,6 @@ interface Repository {
         callback: (Long) -> Unit,
     )
 
-    fun init(context: Any)
-
     fun clear()
 }
 
@@ -77,10 +75,6 @@ class Interactor(
     fun getNotes(): Flow<List<Notes>> = repository.getNotes()
 
     fun getNotes(id: Long): Flow<Notes?> = repository.getNotes(id)
-
-    fun init(context: Any) {
-        repository.init(context)
-    }
 
     fun onClear() {
         repository.clear()

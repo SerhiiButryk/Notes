@@ -34,6 +34,8 @@ kotlin {
             implementation(projects.notesUi)
             implementation(projects.authUi)
             implementation(projects.ext.services)
+            implementation(projects.net)
+            implementation(projects.data)
 
             // Compose UI
             implementation(project.dependencies.platform(libs.androidx.compose.bom))
@@ -106,6 +108,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/INDEX.LIST"
         }
     }
     buildTypes {
