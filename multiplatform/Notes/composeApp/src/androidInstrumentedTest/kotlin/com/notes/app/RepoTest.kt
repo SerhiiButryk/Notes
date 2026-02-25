@@ -23,7 +23,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @OptIn(ExperimentalAtomicApi::class)
 @RunWith(AndroidJUnit4::class)
-class RepoTest {
+class RepoTest : AppTest() {
 
     private val appContext: Context = InstrumentationRegistry
         .getInstrumentation().targetContext.applicationContext
@@ -94,6 +94,8 @@ class RepoTest {
     @Test
     fun test01_insert_new_note() = runTest {
 
+        preConditionCheck()
+
         val repo = AppRepository(remoteRepository = remoteRepo)
 
         // Check that no data
@@ -133,11 +135,15 @@ class RepoTest {
 
         repo.clear()
 
+        postConditionCheck()
+
         Log.i(tag, "test01_insert_new_note: done")
     }
 
     @Test
     fun test02_update_existed_note() = runTest {
+
+        preConditionCheck()
 
         val repo = AppRepository(remoteRepository = remoteRepo)
 
@@ -200,11 +206,15 @@ class RepoTest {
 
         repo.clear()
 
+        postConditionCheck()
+
         Log.i(tag, "test02_update_existed_note: done")
     }
 
     @Test
     fun test03_failed_to_save_note_to_remote() = runTest {
+
+        preConditionCheck()
 
         val repo = AppRepository(remoteRepository = remoteRepo)
 
@@ -252,11 +262,15 @@ class RepoTest {
         verifyDBIsEmpty(repo)
         repo.clear()
 
+        postConditionCheck()
+
         Log.i(tag, "test03_failed_to_save_note_to_remote: done")
     }
 
     @Test
     fun test04_failed_to_delete_note_in_remote() = runTest {
+
+        preConditionCheck()
 
         val repo = AppRepository(remoteRepository = remoteRepo)
 
@@ -329,6 +343,8 @@ class RepoTest {
 
         verifyDBIsEmpty(repo)
         repo.clear()
+
+        postConditionCheck()
 
         Log.i(tag, "test04_failed_to_delete_note_in_remote: done")
     }

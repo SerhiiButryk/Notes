@@ -32,7 +32,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @OptIn(ExperimentalAtomicApi::class)
 @RunWith(AndroidJUnit4::class)
-class DatabaseTest {
+class DatabaseTest : AppTest() {
 
     val appContext: Context = InstrumentationRegistry
         .getInstrumentation().targetContext.applicationContext
@@ -70,43 +70,6 @@ class DatabaseTest {
     @After
     fun onFinish() {
         LocalNoteDatabase.close()
-    }
-
-    private suspend fun preConditionCheck() {
-
-        assertThat(LocalNoteDatabase.initialize()).isNotNull()
-        assertThat(LocalNoteDatabase.access()).isNotNull()
-        assertThat(LocalNoteDatabase.accessNoteMetadata()).isNotNull()
-
-        assertThat(LocalNoteDatabase.access()
-            .getNotes().first().isEmpty()).isTrue()
-
-        assertThat(LocalNoteDatabase.accessNoteMetadata().
-            getAllMetadata().first().isEmpty()).isTrue()
-    }
-
-    private suspend fun postConditionCheck() {
-
-        val listMetaData = LocalNoteDatabase.accessNoteMetadata()
-            .getAllMetadata().first()
-
-        for (item in listMetaData) {
-            LocalNoteDatabase.accessNoteMetadata().deleteMetadata(item)
-        }
-
-        val listNotes = LocalNoteDatabase.access()
-            .getNotes().first()
-
-        for (item in listNotes) {
-            LocalNoteDatabase.access().deleteNote(item)
-        }
-
-        assertThat(LocalNoteDatabase.access()
-            .getNotes().first().isEmpty()).isTrue()
-
-        assertThat(LocalNoteDatabase.accessNoteMetadata()
-            .getAllMetadata().first().isEmpty()).isTrue()
-
     }
 
     @Test
