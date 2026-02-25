@@ -1,16 +1,14 @@
 #!/bin/bash
 
-# Copyright 2022. Happy coding ! :)
+# Copyright 2026. Happy coding ! :)
 # Author: Serhii Butryk 
 
-# Simple script.
+# Perfomrs the next steps:
 # 1) Build Notes App
 # 2) Generates reports
 
 # Fail if somthing is wrong
 set -e
-
-chmod +x ./build_app.sh
 
 # Add untility scripts
 SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
@@ -18,8 +16,8 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 
-PROJECT_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes"
-OUTPUT_FOLDER="${SCRIPT_RELEVANT_PATH}/../Notes/app/build/outputs"
+PROJECT_FOLDER="${SCRIPT_RELEVANT_PATH}/../multiplatform/Notes"
+OUTPUT_FOLDER="${SCRIPT_RELEVANT_PATH}/../multiplatform/Notes/composeApp/build/outputs"
 
 ARTIFACT_FOLDER_NAME="Notes-App"
 REPORTS_FOLDER_NAME="reports"
@@ -47,7 +45,7 @@ if [ "$BUILD_APK" == true ]; then
 
     # Build apk
     pushd ${PROJECT_FOLDER}
-    ./gradlew assemble
+    ./gradlew assemble --console=plain
     popd
 fi
 
@@ -57,7 +55,7 @@ if [ "$BUILD_BUNDLE" == true ]; then
     
     # Build app bundle
     pushd ${PROJECT_FOLDER}
-    ./gradlew bundle
+    ./gradlew bundle --console=plain
     popd
 fi
 
@@ -69,7 +67,7 @@ print_message "******** Running static analysis *********"
 # Run static analysis
 # About lint: https://developer.android.com/studio/write/lint
 pushd ${PROJECT_FOLDER}
-./gradlew lint
+./gradlew lint --console=plain
 popd
 
 print_message "******** Finished *********"
@@ -86,10 +84,10 @@ pushd ${SCRIPT_RELEVANT_PATH}/../
 popd
 
 # This will contains mappings, apk & bundle files and native symbols
-cp -rf -v ${PROJECT_FOLDER}/app/build/outputs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+cp -rf -v ${PROJECT_FOLDER}/composeApp/build/outputs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 # Copy reports
-cp -rf -v ${PROJECT_FOLDER}/app/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
+cp -rf -v ${PROJECT_FOLDER}/composeApp/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
 
 # Print folder content
 print_message "******** Log output folder *********"

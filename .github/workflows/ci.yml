@@ -1,4 +1,4 @@
-name: CI master
+name: Project Build
 
 on:
   push:
@@ -7,65 +7,49 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  
+  # Job 1: Build Android and JVM targets on Linux
+  build-android-jvm:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        api-level: [26]
-        target: [default]
-
     steps:
-    - name: Checking out
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Set to 'true' to fetch the default submodules
+          # Set to 'recursive' if your submodules have their own submodules
+          # submodules: recursive 
+          # Optional: ensure you get the latest changes
+          fetch-depth: 0
 
-    - name: Setting up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'zulu'
-        cache: gradle
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
 
-    - name: Building app
-      run: |
-        chmod +x build.sh
-        ./build.sh
-      working-directory: tools
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
 
-    - name: "Cache AVD"
-      uses: "actions/cache@v4"
-      id: "avd-cache"
-      with:
-        path: |
-          ~/.android/avd/*
-          ~/.android/adb*
-        key: "avd-v${{ matrix.api-level }}"  
+      - name: Build and Test Android/JVM
+        run: |
+          chmod +x build.sh
+          ./build.sh
+        working-directory: tools
 
-    - name: "Create AVD for caching"
-      if: "steps.avd-cache.outputs.cache-hit != 'true'"
-      uses: "reactivecircus/android-emulator-runner@v2"
-      with:
-        api-level: "${{ matrix.api-level }}"
-        arch: "x86_64"
-        force-avd-creation: false
-        emulator-options: "-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
-        script: "echo 'Generated AVD snapshot for caching.'"
+  # Job 2: Build iOS/Apple targets on macOS
+  # build-ios:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-    - name: Run Android tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        force-avd-creation: false
-        emulator-options: "-no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
-        target: default
-        arch: x86_64
-        script: tools/run_tests.sh
+  #     - name: Set up JDK
+  #       uses: actions/setup-java@v4
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'zulu'
 
-    - name: Upload Artifacts
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: Application_Artifact
-        path: ${{ github.workspace }}/Notes-App
-        overwrite: true
-        if-no-files-found: error
+  #     - name: Build iOS Target
+  #       uses: gradle/actions/setup-gradle@v3
+  #       with:
+  #         arguments: :shared:iosArm64MainBinaries # Or :shared:linkReleaseFrameworkIosArm64
