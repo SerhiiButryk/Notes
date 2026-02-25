@@ -14,70 +14,67 @@ jobs:
     strategy:
       matrix:
         api-level: [26]
-        target: [default]
+        target: [default]  
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          # Set to 'true' to fetch the default submodules
-          # Set to 'recursive' if your submodules have their own submodules
-          submodules: true 
-          # Optional: ensure you get the latest changes
-          fetch-depth: 0
+          - name: Checkout code
+            uses: actions/checkout@v4
+            with:
+              submodules: true 
+              fetch-depth: 0
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'zulu'
-          cache: gradle
+          - name: Set up JDK
+            uses: actions/setup-java@v4
+            with:
+              java-version: '21'
+              distribution: 'zulu'
+              cache: gradle
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
+          - name: Validate Gradle Wrapper
+            uses: gradle/actions/wrapper-validation@v3
 
-      - name: Build Android/JVM
-        run: |
-          chmod +x build.sh
-          ./build.sh
-        working-directory: tools
+          - name: Build Android/JVM
+            run: |
+              chmod +x build.sh
+              ./build.sh
+            working-directory: tools
 
-      - name: "Cache AVD"
-      uses: "actions/cache@v4"
-      id: "avd-cache"
-      with:
-        path: |
-          ~/.android/avd/*
-          ~/.android/adb*
-        key: "avd-v${{ matrix.api-level }}"    
+          - name: "Cache AVD"
+            uses: "actions/cache@v4"
+            id: "avd-cache"
+            with:
+              path: |
+                ~/.android/avd/*
+                ~/.android/adb*
+              key: "avd-v${{ matrix.api-level }}"    
 
-      - name: "Create AVD for caching"
-      if: "steps.avd-cache.outputs.cache-hit != 'true'"
-      uses: "reactivecircus/android-emulator-runner@v2"
-      with:
-        api-level: "${{ matrix.api-level }}"
-        arch: "x86_64"
-        force-avd-creation: false
-        emulator-options: "-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
-        script: "echo 'Generated AVD snapshot for caching.'"
+          - name: "Create AVD for caching"
+            if: steps.avd-cache.outputs.cache-hit != 'true'
+            uses: "reactivecircus/android-emulator-runner@v2"
+            with:
+              api-level: "${{ matrix.api-level }}"
+              arch: "x86_64"
+              force-avd-creation: false
+              emulator-options: "-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
+              script: "echo 'Generated AVD snapshot for caching.'"
 
-      - name: Run Android/JVM tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        force-avd-creation: false
-        emulator-options: "-no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
-        target: default
-        arch: x86_64
-        script: tools/run_tests.sh    
+          - name: Run Android/JVM tests
+            uses: reactivecircus/android-emulator-runner@v2
+            with:
+              api-level: ${{ matrix.api-level }}
+              force-avd-creation: false
+              emulator-options: "-no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
+              target: default
+              arch: x86_64
+              script: tools/run_tests.sh    
 
-      - name: Upload Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Application_Artifact
-          path: ${{ github.workspace }}/Notes-App
-          overwrite: true
-          if-no-files-found: error      
+          - name: Upload Artifacts
+            if: always()
+            uses: actions/upload-artifact@v4
+            with:
+              name: Application_Artifact
+              path: ${{ github.workspace }}/Notes-App
+              overwrite: true
+              if-no-files-found: error
 
   # Job 2: Build iOS/Apple targets on macOS
   # build-ios:
