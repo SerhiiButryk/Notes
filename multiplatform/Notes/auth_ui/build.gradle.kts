@@ -35,11 +35,12 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         androidMain.dependencies {
 
             implementation(projects.notesUi)
-            implementation(projects.ui)
 
             implementation(libs.bundles.android.core)
 
@@ -61,9 +62,20 @@ kotlin {
         commonMain.dependencies {
 
             implementation(projects.api)
+            implementation(projects.ui)
 
             // Kotlin coroutines
             implementation(libs.kotlinx.coroutines.core)
+
+            // Compose
+            implementation(libs.runtime)
+            implementation(libs.foundation)
+            implementation(libs.material3)
+            implementation(libs.ui)
+            implementation(libs.components.resources)
+            implementation(libs.jetbrains.ui.tooling.preview)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

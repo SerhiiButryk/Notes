@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import com.notes.app.ui.EntryScreen
 import com.notes.auth_ui.data.loadUserData
-import com.notes.ui.theme.AppTheme
+import com.notes.ui.AppTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

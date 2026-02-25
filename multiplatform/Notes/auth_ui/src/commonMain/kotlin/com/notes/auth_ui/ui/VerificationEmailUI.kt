@@ -1,7 +1,5 @@
-package com.notes.auth_ui.screens
+package com.notes.auth_ui.ui
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,11 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.notes.auth_ui.Header
-import com.notes.auth_ui.SubHeader
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -117,14 +112,4 @@ private fun VerificationEmailUIImpl(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Preview(
-    showBackground = true,
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
-)
-@Composable
-private fun VerificationEmailUIPreview() {
-    VerificationEmailUI(onRetry = {}, true, "Title", "Subtitle")
 }

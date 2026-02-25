@@ -18,6 +18,7 @@ androidx-lifecycle = "2.9.6"
 kotlinx-coroutines = "1.10.2"
 adaptiveLayout = "1.2.0"
 material3 = "1.9.0"
+materialIconsExtendedVersion = "1.7.3"
 media3 = "1.9.0"
 datastorePreferences = "1.2.0"
 firebaseBom = "34.8.0"
@@ -63,6 +64,7 @@ google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-librar
 google-http-client-android = { module = "com.google.http-client:google-http-client-android", version.ref = "googleHttpClientAndroid" }
 google-http-client-jackson2 = { module = "com.google.http-client:google-http-client-jackson2", version.ref = "googleHttpClientJackson2" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
 jetbrains-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }

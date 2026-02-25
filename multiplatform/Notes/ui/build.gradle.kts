@@ -34,6 +34,8 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         androidMain.dependencies {
 
@@ -64,6 +66,7 @@ kotlin {
             implementation(projects.api)
 
             implementation(libs.runtime)
+            implementation(libs.jetbrains.material.icons.extended)
             implementation(libs.foundation)
             implementation(libs.material3)
             implementation(libs.ui)

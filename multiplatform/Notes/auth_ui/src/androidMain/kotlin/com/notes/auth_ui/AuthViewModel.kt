@@ -1,13 +1,16 @@
 package com.notes.auth_ui
 
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import api.auth.AuthResult
 import api.PlatformAPIs.logger
+import api.auth.AuthResult
 import api.getErrorTitleAndMessage
-import api.getVerifyTitleAndMessage
+import com.notes.auth_ui.ui.DialogState
+import com.notes.auth_ui.ui.LoginUIState
+import com.notes.auth_ui.ui.RegisterUIState
+import com.notes.auth_ui.ui.UIState
+import com.notes.auth_ui.ui.VerificationUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -15,56 +18,6 @@ import kotlinx.coroutines.launch
 private const val TAG = "AuthViewModel"
 
 class AuthViewModel : ViewModel() {
-    open class UIState
-
-    // This annotation could be redundant as
-    // the class is already stable, because all properties are stable.
-    // However, keep it for clarity.
-    @Stable
-    data class LoginUIState(
-        val email: String = "",
-        val password: String = "",
-        val hasFocus: Boolean = false,
-        val showProgress: Boolean = false,
-        val uiForced: Boolean = true
-    ) : UIState()
-
-    // This annotation could be redundant as
-    // the class is already stable, because all properties are stable.
-    // However, keep it for clarity.
-    @Stable
-    data class RegisterUIState(
-        val email: String = "",
-        val password: String = "",
-        val confirmPassword: String = "",
-        val hasFocus: Boolean = false,
-    ) : UIState()
-
-    // This annotation could be redundant as
-    // the class is already stable, because all properties are stable.
-    // However, keep it for clarity.
-    @Stable
-    data class DialogState(
-        val title: String,
-        val subtitle: String,
-    )
-
-    // This annotation could be redundant as
-    // the class is already stable, because all properties are stable.
-    // However, keep it for clarity.
-    @Stable
-    data class VerificationUIState(
-        val emailVerificationSent: Boolean = false,
-        val email: String = "",
-        val isEmailVerified: Boolean = false,
-    ) : UIState() {
-        val title =
-            getVerifyTitleAndMessage(emailVerificationSent, email)
-                .first
-        val subtitle =
-            getVerifyTitleAndMessage(emailVerificationSent, email)
-                .second
-    }
 
     private val _uiState = MutableStateFlow(UIState())
     val uiState = _uiState.asStateFlow()

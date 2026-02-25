@@ -52,6 +52,8 @@ kotlin {
         commonMain.dependencies {
 
             implementation(projects.api)
+            implementation(projects.ui)
+            implementation(projects.authUi)
 
             implementation(libs.runtime)
             implementation(libs.foundation)
