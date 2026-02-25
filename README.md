@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/SerhiiButryk/Notes/actions/workflows/ci.yml/badge.svg)](https://github.com/SerhiiButryk/Notes/actions)
+
 # Notes application 💜💜💜
 
 <img src="images/icons/Dark/Kotlin Multiplatform Logo.png">
