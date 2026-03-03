@@ -53,6 +53,7 @@ kotlin {
 
             implementation(projects.api)
             implementation(projects.ui)
+            implementation(projects.notesUi)
             implementation(projects.authUi)
 
             implementation(libs.runtime)
@@ -72,6 +73,9 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
+            // Resources
+            implementation(compose.components.resources)
         }
 
         androidInstrumentedTest.dependencies {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import api.AppServices
 import api.auth.AuthCallback
 import com.notes.data.isAllInSyncWithRemote
+import com.notes.notes_ui.data.AccountInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,16 +17,6 @@ class SettingsViewModel(
     // For test support
     scopeOverride: CoroutineScope? = null
 ) : ViewModel() {
-
-    data class AccountInfo(
-        val email: String = "",
-        val googleIsActive: Boolean = false,
-        val firebaseIsActive: Boolean = false,
-        val googleDriveIsActive: Boolean = false,
-        val syncCompleted: Boolean = false,
-        val showGrantPermissions: Boolean = false,
-        val pending: Boolean = false,
-    )
 
     private val _accountInfo = MutableStateFlow(AccountInfo())
     val accountInfo = _accountInfo.asStateFlow()

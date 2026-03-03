@@ -1,9 +1,8 @@
-package com.notes.notes_ui.screens.editor
+package com.notes.notes_ui.editor
 
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.notes.notes_ui.editor.EditorCommand
 
 open class UndoableCommand(
     protected val richTextState: RichTextState,

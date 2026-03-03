@@ -8,6 +8,7 @@ import com.notes.auth_ui.data.getUserEmail
 import com.notes.auth_ui.data.saveUserEmail
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel

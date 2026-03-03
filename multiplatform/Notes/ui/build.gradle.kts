@@ -65,6 +65,7 @@ kotlin {
 
             implementation(projects.api)
 
+            // Compose
             implementation(libs.runtime)
             implementation(libs.jetbrains.material.icons.extended)
             implementation(libs.foundation)

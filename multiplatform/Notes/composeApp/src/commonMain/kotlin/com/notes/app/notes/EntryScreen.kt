@@ -1,6 +1,5 @@
 package com.notes.app.notes
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
@@ -11,13 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.notes.auth_ui.ui.AuthLayoutWideScreen
-import com.notes.auth_ui.ui.LoginUIImpl
-import com.notes.auth_ui.ui.LoginUIState
-import com.notes.auth_ui.ui.OnBoardingUIImpl
-import com.notes.auth_ui.ui.RegisterUIImpl
-import com.notes.auth_ui.ui.RegisterUIState
+import api.data.Notes
+import com.notes.auth_ui.ui.*
+import com.notes.notes_ui.Interactor
+import com.notes.notes_ui.NotesCommonUI
+import com.notes.notes_ui.RepoCallback
+import com.notes.notes_ui.Repository
+import com.notes.notes_ui.data.getToolsList
 import com.notes.ui.theme.AppThemeCommon
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 @Preview
@@ -25,8 +26,72 @@ fun EntryScreen() {
     AppThemeCommon {
 //        LoginScreenImpl()
 //        OnBoardingScreenImpl()
-         RegisterScreenImpl()
+//         RegisterScreenImpl()
+        NotesScreenImpl()
     }
+}
+
+@Composable
+fun NotesScreenImpl() {
+
+    val repo = object : Repository {
+        override fun getNotes(): Flow<List<Notes>> {
+            TODO("Not yet implemented")
+        }
+
+        override fun getNotes(id: Long): Flow<Notes?> {
+            TODO("Not yet implemented")
+        }
+
+        override fun saveNote(note: Notes, onNewAdded: suspend (Long) -> Unit) {
+            TODO("Not yet implemented")
+        }
+
+        override fun deleteNote(note: Notes, callback: (Long) -> Unit) {
+            TODO("Not yet implemented")
+        }
+
+        override fun clear() {
+            TODO("Not yet implemented")
+        }
+    }
+
+    val inter = Interactor(repo, object : RepoCallback {
+        override fun onNoteAdded(id: Long) {
+        }
+
+        override fun onNoteDeleted(id: Long) {
+        }
+
+        override fun onNoteNavigateBack() {
+        }
+    })
+
+    NotesCommonUI(
+        notes = listOf(Notes("content1", id = 1), Notes("content2", id = 2)),
+        note = Notes(),
+        toolsPaneItems = getToolsList(inter),
+        onAddAction = {},
+        onSelectAction = {},
+        onTextChanged = { _ ->
+
+        },
+        onSettingsClick = {},
+        onBackClick = {},
+        showNavRail = true,
+        isPhoneSize = false
+    )
+
+}
+
+@Composable
+fun AccountScreenImpl() {
+
+}
+
+@Composable
+fun SettingsScreenImpl() {
+
 }
 
 @Composable

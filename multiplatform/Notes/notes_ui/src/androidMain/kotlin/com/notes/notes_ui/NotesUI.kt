@@ -1,9 +1,8 @@
-package com.notes.notes_ui.screens
+package com.notes.notes_ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
@@ -15,15 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import api.data.Notes
-import com.notes.notes_ui.NotesViewModel
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.notes.notes_ui.components.NotesNavRail
+import com.notes.notes_ui.data.ToolsPane
+import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
-import com.notes.notes_ui.screens.components.NotesListUI
-import com.notes.notes_ui.screens.components.NotesNavRail
-import com.notes.notes_ui.screens.editor.ToolsPane
-import com.notes.ui.isTabletOrFoldableExpanded
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -37,9 +33,11 @@ fun NotesUI(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>,
+    getEvents: suspend () -> Flow<UiEvent>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
+    showNavRail: Boolean,
+    isPhoneSize: Boolean
 ) {
     NotesUIImpl(
         notes = notes,
@@ -52,6 +50,8 @@ fun NotesUI(
         getEvents = getEvents,
         onSettingsClick = onSettingsClick,
         onBackClick = onBackClick,
+        showNavRail = showNavRail,
+        isPhoneSize = isPhoneSize
     )
 }
 
@@ -64,22 +64,21 @@ private fun NotesUIImpl(
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>,
+    getEvents: suspend () -> Flow<UiEvent>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
+    showNavRail: Boolean,
+    isPhoneSize: Boolean
 ) {
     Row {
-        // TODO: Might need to pass this from outside. Recalculation every time might be slow.
-        val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
         // Show nav rail for large screens
-        if (isTabletOrFoldableExpanded(sizeClass)) {
+        if (showNavRail) {
             NotesNavRail(onSettingsClick = onSettingsClick)
         }
 
         ListDetailUI(
             notes = notes,
-            sizeClass = sizeClass,
             toolsPaneItems = toolsPaneItems,
             onAddAction = onAddAction,
             note = note,
@@ -89,6 +88,7 @@ private fun NotesUIImpl(
             getEvents = getEvents,
             onSettingsClick = onSettingsClick,
             onBackClick = onBackClick,
+            isPhoneSize = isPhoneSize
         )
     }
 }
@@ -97,16 +97,16 @@ private fun NotesUIImpl(
 @Composable
 private fun ListDetailUI(
     notes: List<Notes>,
-    sizeClass: WindowSizeClass,
     toolsPaneItems: List<ToolsPane>,
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
     onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<NotesViewModel.UiEvent>,
+    getEvents: suspend () -> Flow<UiEvent>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
+    isPhoneSize: Boolean
 ) {
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
@@ -156,7 +156,6 @@ private fun ListDetailUI(
                             onSelectAction(selectedNote)
                         }
                     },
-                    sizeClass = sizeClass,
                     addAction = {
                         // Open Note Editor Screen
                         coroutineScope.launch {
@@ -167,6 +166,7 @@ private fun ListDetailUI(
                     },
                     onSettingsClick = onSettingsClick,
                     onBackClick = onBackClick,
+                    isPhoneSize = isPhoneSize
                 )
             }
         },
@@ -177,7 +177,7 @@ private fun ListDetailUI(
                     getEvents().collect { event ->
                         when (event) {
                             // Close editor
-                            is NotesViewModel.UiEvent.NavigateToListPane -> {
+                            is UiEvent.NavigateToListPane -> {
                                 try {
                                     navigator.navigateTo(ListDetailPaneScaffoldRole.List, null)
                                 } finally {

@@ -1,13 +1,6 @@
-package com.notes.notes_ui.screens
+package com.notes.notes_ui
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -19,16 +12,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import api.data.Notes
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
+import com.notes.notes_ui.components.ToolsBar
+import com.notes.notes_ui.data.ToolsPane
 import com.notes.notes_ui.editor.EditorCommand
-import com.notes.notes_ui.screens.components.ToolsBar
-import com.notes.notes_ui.screens.editor.TextInputCommand
-import com.notes.notes_ui.screens.editor.ToolsPane
+import com.notes.notes_ui.editor.TextInputCommand
 import kotlinx.coroutines.launch
 
 @Composable
@@ -140,19 +131,4 @@ private fun InfoLabel(modifier: Modifier = Modifier) {
     ) {
         Text("Select an item")
     }
-}
-
-@Preview
-@Preview(
-    uiMode = UI_MODE_TYPE_NORMAL or UI_MODE_NIGHT_YES,
-    device = "spec:parent=pixel_5,orientation=landscape",
-)
-@Composable
-fun NotesEditorUIPrev() {
-    val state = rememberRichTextState()
-    NotesEditorUI(
-        notes = Notes.NewNote(),
-        state = state,
-        toolsPaneItems = emptyList(),
-    )
 }

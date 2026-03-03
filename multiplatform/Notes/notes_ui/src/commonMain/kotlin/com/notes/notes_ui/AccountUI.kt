@@ -1,16 +1,7 @@
-package com.notes.notes_ui.screens
+package com.notes.notes_ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,28 +9,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import api.ui.CommonIcons
-import com.notes.notes_ui.SettingsViewModel
-import com.notes.ui.SimpleTopBar
+import com.notes.notes_ui.data.AccountInfo
+import com.notes.ui.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +27,7 @@ fun AccountUI(
     onBackClick: () -> Unit,
     onSignOut: () -> Unit,
     onGrantPermissionClick: () -> Unit,
-    accountInfo: SettingsViewModel.AccountInfo,
+    accountInfo: AccountInfo,
 ) {
     Scaffold(
         topBar = {
@@ -106,7 +86,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Google Account",
                 status = status1,
-                iconRes = CommonIcons.googleIcon,
+                icon = getIconByKey(googleIcon),
                 iconTint = Color.Unspecified,
                 modifier = modifier,
                 isOnline = accountInfo.googleIsActive,
@@ -117,7 +97,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Firebase Sync",
                 status = status2,
-                iconRes = CommonIcons.firebaseIcon,
+                icon = getIconByKey(firebaseIcon),
                 iconTint = Color(0xFFFFCA28),
                 modifier = modifier,
                 isOnline = accountInfo.firebaseIsActive,
@@ -128,7 +108,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Cloud Storage",
                 status = status3,
-                iconRes = CommonIcons.googleDriveIcon,
+                icon = getIconByKey(googleIcon),
                 iconTint = Color.Unspecified,
                 showStatusDot = true,
                 isOnline = accountInfo.googleDriveIsActive,
@@ -137,10 +117,12 @@ fun AccountUI(
 
             val status4 = if (accountInfo.syncCompleted) "Active" else "Not active"
 
+
+
             AccountStatusCard(
                 title = "Cloud sync",
                 status = status4,
-                iconRes = CommonIcons.cloudSyncIcon,
+                icon = getIconByKey(cloudSyncIcon),
                 iconTint = Color.Unspecified,
                 showStatusDot = true,
                 isOnline = accountInfo.syncCompleted,
@@ -174,7 +156,7 @@ fun AccountUI(
 fun AccountStatusCard(
     title: String,
     status: String,
-    iconRes: Int,
+    icon: Painter,
     iconTint: Color,
     showStatusDot: Boolean = true,
     isOnline: Boolean = true,
@@ -190,7 +172,7 @@ fun AccountStatusCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(id = iconRes),
+                painter = icon,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = iconTint

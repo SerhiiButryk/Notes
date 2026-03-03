@@ -1,22 +1,10 @@
-package com.notes.notes_ui.screens
+package com.notes.notes_ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notes.ui.SimpleTopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsUI(onBackClick: () -> Unit, onAccountClick: () -> Unit) {
     Scaffold(
@@ -34,7 +21,10 @@ fun SettingsUI(onBackClick: () -> Unit, onAccountClick: () -> Unit) {
             SimpleTopBar(title = "Settings", onBackClick = onBackClick)
         }) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding).fillMaxSize().padding(vertical = 8.dp)
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(vertical = 8.dp)
         ) {
             // Account Setting Item
             SettingsListItem(
@@ -67,9 +57,7 @@ fun SettingsListItem(
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
+                    text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = subtitle,

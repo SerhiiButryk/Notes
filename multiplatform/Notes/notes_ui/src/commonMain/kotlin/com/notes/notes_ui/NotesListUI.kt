@@ -1,9 +1,10 @@
-package com.notes.notes_ui.screens.components
+package com.notes.notes_ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -29,14 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import api.data.Notes
 import com.notes.ui.SearchBarField
-import com.notes.ui.isTabletOrFoldableExpanded
 
 @Composable
 fun NotesListUI(
@@ -45,8 +44,8 @@ fun NotesListUI(
     onSettingsClick: () -> Unit = {},
     onSelected: (Notes) -> Unit,
     notes: List<Notes>,
-    sizeClass: WindowSizeClass,
     onBackClick: () -> Unit = {},
+    isPhoneSize: Boolean
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -54,7 +53,7 @@ fun NotesListUI(
             SearchBarField(
                 trailingIcon = {
                     // Show settings conditionally for phone devices
-                    if (!isTabletOrFoldableExpanded(sizeClass)) {
+                    if (isPhoneSize) {
                         IconButton(
                             onClick = { onSettingsClick() },
                         ) {
@@ -80,9 +79,9 @@ fun NotesListUI(
     ) { innerPadding ->
         NotesList(
             modifier = Modifier.padding(innerPadding),
-            sizeClass = sizeClass,
             notes = notes,
             onSelected = onSelected,
+            isPhoneSize = isPhoneSize
         )
     }
 }
@@ -92,7 +91,7 @@ fun NotesList(
     modifier: Modifier = Modifier,
     notes: List<Notes>,
     onSelected: (Notes) -> Unit,
-    sizeClass: WindowSizeClass,
+    isPhoneSize: Boolean
 ) {
     if (notes.isEmpty()) {
         Column(
@@ -103,7 +102,7 @@ fun NotesList(
             Text("Create your first note by tapping '+' button")
         }
     } else {
-        if (!isTabletOrFoldableExpanded(sizeClass)) {
+        if (isPhoneSize) {
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
             ) {
