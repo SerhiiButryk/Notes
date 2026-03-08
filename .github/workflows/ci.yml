@@ -90,6 +90,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: JVM_Desktop_Artifact
-          # Pointing directly to the typical Compose Desktop JAR location
-          path: "**/build/compose/binaries/main/jar/*.jar"
+          path: "**/build/compose/jars/*.jar"
           if-no-files-found: warn
