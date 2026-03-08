@@ -8,8 +8,8 @@ on:
 
 jobs:
   
-  # Job 1: Build Android and JVM targets on Linux
-  build-android-jvm:
+  # Job 1: Build Android target
+  build-android:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,7 +32,7 @@ jobs:
           - name: Validate Gradle Wrapper
             uses: gradle/actions/wrapper-validation@v5
 
-          - name: Build Android/JVM
+          - name: Build Android
             run: |
               chmod +x build.sh
               ./build.sh
@@ -57,7 +57,7 @@ jobs:
               emulator-options: "-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none"
               script: "echo 'Generated AVD snapshot for caching.'"
 
-          - name: Run Android/JVM tests
+          - name: Run Android tests
             uses: reactivecircus/android-emulator-runner@v2
             with:
               api-level: ${{ matrix.api-level }}
@@ -71,10 +71,45 @@ jobs:
             if: always()
             uses: actions/upload-artifact@v4
             with:
-              name: Application_Artifact
+              name: Android_Artifact
               path: ${{ github.workspace }}/Notes-App
               overwrite: true
               if-no-files-found: error
+    
+    # Job 2: Build JVM Desktop target
+    build-jvm-desktop::
+      runs-on: ubuntu-latest
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+            with:
+              submodules: true 
+              fetch-depth: 0
+
+          - name: Set up JDK
+            uses: actions/setup-java@v4
+            with:
+              java-version: '21'
+              distribution: 'zulu'
+              cache: gradle
+
+          - name: Validate Gradle Wrapper
+            uses: gradle/actions/wrapper-validation@v5  
+
+          - name: Build Jvm Desktop
+            run: |
+              chmod +x build_jvm_desktop.sh
+              ./build_jvm_desktop.sh
+            working-directory: tools
+
+          - name: Upload Artifacts
+            if: always()
+            uses: actions/upload-artifact@v4
+            with:
+              name: JVM_Desktop_Artifact
+              path: ${{ github.workspace }}/Notes-App
+              overwrite: true
+              if-no-files-found: error  
 
   # Job 2: Build iOS/Apple targets on macOS
   # build-ios:
