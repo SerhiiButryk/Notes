@@ -77,7 +77,7 @@ jobs:
               if-no-files-found: error
     
     # Job 2: Build JVM Desktop target
-    build-jvm-desktop::
+    build-jvm-desktop:
       runs-on: ubuntu-latest
       steps:
           - name: Checkout code
