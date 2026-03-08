@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2022. Happy coding ! :)
+# Copyright 2026. Happy coding ! :)
 # Author: Serhii Butryk 
 
 SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )

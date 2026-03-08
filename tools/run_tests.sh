@@ -18,10 +18,14 @@ EMULATOR_DIR="${ANDROID_SDK_ROOT}/emulator"
 TEST_RESULT_DIR="${SCRIPT_RELEVANT_PATH}/../Notes-App/test-results"
 CODE_COVERAGE_FOLDER_NAME="${SCRIPT_RELEVANT_PATH}/../Notes-App/test-coverage"
 
-# Run tests
-pushd ${SCRIPT_RELEVANT_PATH}/../Notes/ > /dev/null
+PROJECT_FOLDER="${SCRIPT_RELEVANT_PATH}/../multiplatform/Notes"
 
-./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.serhii.apps.notes.AllTests connectedDebugAndroidTest
+print_message "******** Tests are starting *********"
+
+# Run tests
+pushd ${PROJECT_FOLDER}/ > /dev/null
+
+./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.notes.app.AllTests connectedDebugAndroidTest
 
 popd > /dev/null
 
@@ -30,6 +34,6 @@ popd > /dev/null
 mkdir -p $CODE_COVERAGE_FOLDER_NAME
 mkdir -p $TEST_RESULT_DIR
 
-cp -rf ${SCRIPT_RELEVANT_PATH}/../Notes/app/build/reports/androidTests/connected/*  $TEST_RESULT_DIR
+cp -rf ${PROJECT_FOLDER}/composeApp/build/reports/androidTests/connected/*  $TEST_RESULT_DIR
 
-print_message "******** Tests are completed *********"
+print_message "******** Tests are completed, results are saved *********"
