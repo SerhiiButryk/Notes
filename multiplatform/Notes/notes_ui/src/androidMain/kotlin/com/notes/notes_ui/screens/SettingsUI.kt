@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,22 +25,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notes.ui.SimpleTopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsUI(onBackClick: () -> Unit, onAccountClick: () -> Unit) {
+fun SettingsUI(
+    onBackClick: () -> Unit,
+    onAccountClick: () -> Unit,
+    onExportClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             SimpleTopBar(title = "Settings", onBackClick = onBackClick)
         }) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding).fillMaxSize().padding(vertical = 8.dp)
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(vertical = 8.dp)
         ) {
-            // Account Setting Item
+
             SettingsListItem(
                 title = "Account",
                 subtitle = "Profile, privacy, and security",
                 icon = Icons.Default.Person,
                 onClick = onAccountClick
+            )
+
+            SettingsListItem(
+                title = "Export to a PDF file",
+                subtitle = "Save your notes to a pdf file",
+                icon = Icons.Default.Person,
+                onClick = onExportClick
             )
         }
     }

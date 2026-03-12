@@ -65,6 +65,12 @@ kotlin {
 
             // Android coroutines
             implementation(libs.kotlinx.coroutines.android)
+
+            // File storage
+            implementation(libs.androidx.documentfile)
+
+            // Compose tracing
+            // implementation(libs.androidx.compose.runtime.tracing)
         }
         commonMain.dependencies {
             implementation(projects.api)

@@ -1,6 +1,8 @@
 package com.notes.notes_ui
 
 import android.app.Activity
+import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -79,13 +81,31 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
         composable<NotesSettings> { backStackEntry ->
 
+            val context = LocalContext.current
+
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
             val onBackClicked: () -> Unit = { navController.navAndPopUpCurrent(NotesPreview) }
 
             val onAccountSelected = { navController.navigate(NotesAccount) }
+            val onExport: (uri: Uri?, context: Context) -> Unit = { uri, context ->
+                viewModel.onExport(uri, context)
+            }
 
-            SettingsUI(onBackClick = onBackClicked, onAccountClick = onAccountSelected)
+            val launcher = rememberLauncherForActivityResult(
+                ActivityResultContracts.OpenDocumentTree()
+            ) { result ->
+                onExport(result, context)
+            }
+
+            SettingsUI(
+                onBackClick = onBackClicked,
+                onAccountClick = onAccountSelected,
+                onExportClick = {
+                    // Ask User to select a folder for notes export
+                    launcher.launch(null)
+                }
+            )
         }
 
         composable<NotesAccount> { backStackEntry ->
