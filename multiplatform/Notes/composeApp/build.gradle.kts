@@ -52,6 +52,9 @@ kotlin {
         commonMain.dependencies {
 
             implementation(projects.api)
+            implementation(projects.ui)
+            implementation(projects.notesUi)
+            implementation(projects.authUi)
 
             implementation(libs.runtime)
             implementation(libs.foundation)
@@ -70,6 +73,9 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
+            // Resources
+            implementation(compose.components.resources)
         }
 
         androidInstrumentedTest.dependencies {

@@ -35,12 +35,12 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         androidMain.dependencies {
 
             implementation(projects.data)
-            implementation(projects.ui)
-            implementation(projects.composeRichEditor)
 
             implementation(libs.bundles.android.core)
             // For style attributes like attr/colorControlNormal
@@ -73,10 +73,24 @@ kotlin {
             // implementation(libs.androidx.compose.runtime.tracing)
         }
         commonMain.dependencies {
-            implementation(projects.api)
 
-            // Common coroutines
+            implementation(projects.api)
+            implementation(projects.ui)
+            implementation(projects.composeRichEditor)
+
+            // Kotlin coroutines
             implementation(libs.kotlinx.coroutines.core)
+
+            // Compose
+            implementation(libs.runtime)
+            implementation(libs.foundation)
+            implementation(libs.material3)
+            implementation(libs.ui)
+            implementation(libs.components.resources)
+            implementation(libs.jetbrains.ui.tooling.preview)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.jetbrains.material.icons.extended)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

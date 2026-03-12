@@ -11,9 +11,7 @@ import com.notes.auth_ui.authDestination
 import com.notes.auth_ui.getStartRoute
 import com.notes.auth_ui.onboardingDestination
 import com.notes.notes_ui.mainContentDestination
-import com.notes.notes_ui.screens.AccountUI
-import com.notes.notes_ui.screens.SettingsUI
-import com.notes.ui.theme.AppTheme
+import com.notes.ui.AppTheme
 
 @Composable
 fun EntryScreen(modifier: Modifier = Modifier) {

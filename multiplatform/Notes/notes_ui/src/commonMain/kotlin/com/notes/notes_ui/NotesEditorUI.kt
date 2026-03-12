@@ -1,0 +1,134 @@
+package com.notes.notes_ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import api.data.Notes
+import com.mohamedrejeb.richeditor.model.RichTextState
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
+import com.notes.notes_ui.components.ToolsBar
+import com.notes.notes_ui.data.ToolsPane
+import com.notes.notes_ui.editor.EditorCommand
+import com.notes.notes_ui.editor.TextInputCommand
+import kotlinx.coroutines.launch
+
+@Composable
+fun NotesEditorUI(
+    modifier: Modifier = Modifier,
+    notes: Notes,
+    state: RichTextState,
+    toolsPaneItems: List<ToolsPane> = emptyList(),
+    onTextChanged: (EditorCommand) -> Unit = {},
+) {
+    EditorUI(modifier, notes, state, toolsPaneItems, onTextChanged)
+}
+
+@Composable
+private fun EditorUI(
+    modifier: Modifier = Modifier,
+    notes: Notes,
+    state: RichTextState,
+    toolsPaneItems: List<ToolsPane>,
+    onTextChanged: (EditorCommand) -> Unit,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+    ) { innerPadding ->
+
+        // TODO:
+        // Crossfade() animation adds flickering ui issues
+        // and it doen't look good. Disabled for now.
+
+        // Adds cross fade animation when selecting a note from the list
+        /*Crossfade(
+            targetState = notes,
+            label = "Editor cross fade animation",
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding(),
+        ) { note -> } */
+
+        if (notes == Notes.AbsentNote()) {
+            InfoLabel()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding(),
+            ) {
+                EditorLayout(
+                    state = state,
+                    // add weight modifier to the composable to ensure
+                    // that the composable is measured after the other
+                    // composable is measured specifically after the tools pane.
+                    modifier = Modifier.weight(1f),
+                    onTextChanged = onTextChanged,
+                )
+                ToolsBar(
+                    state = state,
+                    toolsPaneItems = toolsPaneItems,
+                    notes = notes,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditorLayout(
+    state: RichTextState,
+    modifier: Modifier,
+    onTextChanged: (EditorCommand) -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val lastHtml = remember { mutableStateOf(state.toHtml()) }
+
+    RichTextEditor(
+        state = state,
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .then(modifier),
+        colors =
+            richTextEditorColors(
+                // Remove bottom thin line
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
+        shape = RoundedCornerShape(4),
+        onTextChanged = { newHtml ->
+            val oldHtml = lastHtml.value
+            lastHtml.value = newHtml
+            coroutineScope.launch {
+                val command = TextInputCommand(newHtml, oldHtml, state)
+                onTextChanged(command)
+            }
+        },
+    )
+}
+
+@Composable
+private fun InfoLabel(modifier: Modifier = Modifier) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Text("Select an item")
+    }
+}

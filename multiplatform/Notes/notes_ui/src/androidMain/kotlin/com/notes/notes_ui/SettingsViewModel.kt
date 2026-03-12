@@ -18,16 +18,6 @@ class SettingsViewModel(
     scopeOverride: CoroutineScope? = null
 ) : ViewModel() {
 
-    data class AccountInfo(
-        val email: String = "",
-        val googleIsActive: Boolean = false,
-        val firebaseIsActive: Boolean = false,
-        val googleDriveIsActive: Boolean = false,
-        val syncCompleted: Boolean = false,
-        val showGrantPermissions: Boolean = false,
-        val pending: Boolean = false,
-    )
-
     private val _accountInfo = MutableStateFlow(AccountInfo())
     val accountInfo = _accountInfo.asStateFlow()
 

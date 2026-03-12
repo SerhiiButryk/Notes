@@ -34,6 +34,8 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         androidMain.dependencies {
 
@@ -63,7 +65,9 @@ kotlin {
 
             implementation(projects.api)
 
+            // Compose
             implementation(libs.runtime)
+            implementation(libs.jetbrains.material.icons.extended)
             implementation(libs.foundation)
             implementation(libs.material3)
             implementation(libs.ui)

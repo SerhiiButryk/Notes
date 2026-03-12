@@ -4,7 +4,6 @@ import android.app.Application
 import android.net.ConnectivityManager
 import api.AppServices
 import api.PlatformAPIs
-import api.ui.CommonIcons
 import com.notes.app.data.StorageProvider
 import com.notes.app.log.AppLogger
 import com.notes.app.security.Base64Provider
@@ -16,6 +15,7 @@ import com.notes.services.auth.FirebaseAuthService
 import com.notes.services.auth.GoogleSignInService
 import com.notes.services.storage.FirebaseFirestore
 import com.notes.services.storage.GoogleDriveService
+import com.notes.ui.*
 
 class Notes : Application() {
 
@@ -39,26 +39,17 @@ class Notes : Application() {
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         PlatformAPIs.netStateManager = NetStateManager(connectivityManager)
 
-        // Icons came from - https://icons8.com/icons/set/cloud
-        // Looks like we can't access R class in shared module
-        // which is a bit strange, so to work around this
-        // I added this class
-        CommonIcons.h1FormatIcon = R.drawable.format_h1
-        CommonIcons.h2FormatIcon = R.drawable.format_h2
-        CommonIcons.h3FormatIcon = R.drawable.format_h3
-        CommonIcons.h4FormatIcon = R.drawable.format_h4
-        CommonIcons.h5FormatIcon = R.drawable.format_h5
-        CommonIcons.h6FormatIcon = R.drawable.format_h6
-        CommonIcons.addIcon = R.drawable.add
-        CommonIcons.redoIcon = R.drawable.redo
-        CommonIcons.undoIcon = R.drawable.undo
-        CommonIcons.replaceIcon = R.drawable.replace
-        CommonIcons.replaceAllIcon = R.drawable.replace_all
-        CommonIcons.syncIcon = R.drawable.sync
-        CommonIcons.googleIcon = R.drawable.google
-        CommonIcons.googleDriveIcon = R.drawable.googledrive
-        CommonIcons.firebaseIcon = R.drawable.firebase
-        CommonIcons.cloudSyncIcon = R.drawable.cloud_sync_icon
+        // Icons: https://icons8.com/icons/set/cloud
+        iconsCollection[h1FormatIcon] = CommonIcon(R.drawable.format_h1)
+        iconsCollection[h2FormatIcon] = CommonIcon(R.drawable.format_h2)
+        iconsCollection[h3FormatIcon] = CommonIcon(R.drawable.format_h3)
+        iconsCollection[h4FormatIcon] = CommonIcon(R.drawable.format_h4)
+        iconsCollection[h5FormatIcon] = CommonIcon(R.drawable.format_h5)
+        iconsCollection[h6FormatIcon] = CommonIcon(R.drawable.format_h6)
+        iconsCollection[googleIcon] = CommonIcon(R.drawable.google)
+        iconsCollection[googleDriveIcon] = CommonIcon(R.drawable.googledrive)
+        iconsCollection[firebaseIcon] = CommonIcon(R.drawable.firebase)
+        iconsCollection[cloudSyncIcon] = CommonIcon(R.drawable.cloud_sync_icon)
 
         AppServices.serverClientId = getString(R.string.server_client_id)
 

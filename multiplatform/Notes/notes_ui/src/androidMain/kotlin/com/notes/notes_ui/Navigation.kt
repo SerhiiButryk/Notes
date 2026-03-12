@@ -8,6 +8,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,12 +18,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import api.PlatformAPIs.logger
 import api.data.Notes
+import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
-import com.notes.notes_ui.screens.AccountUI
-import com.notes.notes_ui.screens.NotesUI
-import com.notes.notes_ui.screens.SettingsUI
 import com.notes.ui.Screen
 import com.notes.ui.getViewModel
+import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.navAndPopUpCurrent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
@@ -48,7 +48,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val sendEditorCommand: (EditorCommand) -> Unit =
                 { viewModel.sendEditorCommand(it) }
 
-            val getEvents: suspend () -> Flow<NotesViewModel.UiEvent> = { viewModel.events }
+            val getEvents: suspend () -> Flow<UiEvent> = { viewModel.events }
 
             val onSettingsClicked = { navController.navigate(NotesSettings) }
 
@@ -65,6 +65,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onBackButtonClicked()
             }
 
+            val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
             NotesUI(
                 notes = noteList,
                 toolsPaneItems = toolsPaneItems,
@@ -75,7 +77,9 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onTextChanged = sendEditorCommand,
                 getEvents = getEvents,
                 onSettingsClick = onSettingsClicked,
-                onBackClick = onBackButtonClicked
+                onBackClick = onBackButtonClicked,
+                showNavRail = isTabletOrFoldableExpanded(sizeClass),
+                isPhoneSize = !isTabletOrFoldableExpanded(sizeClass)
             )
         }
 

@@ -6,8 +6,9 @@ import api.AppServices
 import api.data.Notes
 import com.notes.notes_ui.data.AppRepository
 import com.notes.notes_ui.data.RemoteRepository
+import com.notes.notes_ui.data.UiEvent
+import com.notes.notes_ui.data.getToolsList
 import com.notes.notes_ui.editor.EditorCommand
-import com.notes.notes_ui.screens.editor.getToolsList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,10 +50,6 @@ class NotesViewModel(
 
     private val uiEvents = Channel<UiEvent>(capacity = Channel.BUFFERED)
     val events = uiEvents.receiveAsFlow()
-
-    sealed class UiEvent {
-        class NavigateToListPane : UiEvent()
-    }
 
     override fun onCleared() {
         interaction.onClear()
