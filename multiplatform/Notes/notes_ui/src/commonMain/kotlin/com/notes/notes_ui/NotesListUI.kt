@@ -1,10 +1,10 @@
 package com.notes.notes_ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -16,58 +16,45 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
+import api.Platform
+import api.data.AppSettings
 import api.data.Notes
-import com.notes.ui.SearchBarField
+import api.data.NotesCollection
+import com.notes.notes_ui.editor.createEditorState
+import com.notes.ui.StyledChip
+import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.editor.RichTextState
 
 @Composable
 fun NotesListUI(
     modifier: Modifier = Modifier,
     addAction: () -> Unit,
-    onSettingsClick: () -> Unit = {},
     onSelected: (Notes) -> Unit,
-    notes: List<Notes>,
-    onBackClick: () -> Unit = {},
-    isPhoneSize: Boolean
+    notes: NotesCollection,
+    isPhoneSize: Boolean,
+    topBar: @Composable () -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            SearchBarField(
-                trailingIcon = {
-                    // Show settings conditionally for phone devices
-                    if (isPhoneSize) {
-                        IconButton(
-                            onClick = { onSettingsClick() },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                },
-                onBackClick = onBackClick,
-            )
-        },
+        topBar =  { topBar() },
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.imePadding(),
@@ -78,10 +65,13 @@ fun NotesListUI(
         },
     ) { innerPadding ->
         NotesList(
-            modifier = Modifier.padding(innerPadding),
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .testTag("notes_list"),
             notes = notes,
             onSelected = onSelected,
-            isPhoneSize = isPhoneSize
+            isPhoneSize = isPhoneSize,
         )
     }
 }
@@ -89,26 +79,34 @@ fun NotesListUI(
 @Composable
 fun NotesList(
     modifier: Modifier = Modifier,
-    notes: List<Notes>,
+    notes: NotesCollection,
     onSelected: (Notes) -> Unit,
-    isPhoneSize: Boolean
+    isPhoneSize: Boolean,
 ) {
-    if (notes.isEmpty()) {
+    if (notes.collection.isEmpty()) {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text("Create your first note by tapping '+' button")
+            SuggestionChip(
+                onClick = {},
+                label = {
+                    Text("Create your first note by tapping '+' button")
+                },
+            )
         }
     } else {
         if (isPhoneSize) {
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
             ) {
-                for (note in notes) {
+                for (note in notes.collection) {
                     item(key = note.id) {
-                        EditorPreviewStateful(content = note.content) { onSelected(note) }
+                        Platform().logger.logi("LazyColumn: adding key = ${note.id}")
+                        EditorPreviewStateful(note = note) {
+                            onSelected(note)
+                        }
                     }
                 }
             }
@@ -117,9 +115,11 @@ fun NotesList(
                 modifier = modifier,
                 columns = StaggeredGridCells.Adaptive(160.dp),
             ) {
-                for (note in notes) {
+                for (note in notes.collection) {
                     item(key = note.id) {
-                        EditorPreviewStateful(content = note.content) { onSelected(note) }
+                        EditorPreviewStateful(note = note) {
+                            onSelected(note)
+                        }
                     }
                 }
             }
@@ -129,18 +129,32 @@ fun NotesList(
 
 @Composable
 private fun EditorPreviewStateful(
-    content: String,
-    onClicked: () -> Unit,
+    note: Notes,
+    onClick: () -> Unit,
 ) {
-    val state = rememberRichTextState()
-
-    LaunchedEffect(content) {
-        state.clear()
-        state.setHtml(content)
+    var title by rememberSaveable {
+        mutableStateOf("")
     }
 
-    EditorPreview(state = state) {
-        onClicked()
+    val state =
+        remember(note.content) {
+            createEditorState(note)
+        }
+
+    LaunchedEffect(note.content) {
+        // Get first line as a title
+        val textContent = (note.richString as RichString).text
+        val firstLine = textContent.substringBefore('\n')
+        title =
+            if (AppSettings.isDebugEnabled) {
+                "[id=${note.id}] $firstLine"
+            } else {
+                firstLine
+            }
+    }
+
+    EditorPreview(state = state, title = title) {
+        onClick()
     }
 }
 
@@ -148,31 +162,26 @@ private fun EditorPreviewStateful(
 @Composable
 private fun EditorPreview(
     state: RichTextState,
+    title: String,
     onClicked: () -> Unit,
 ) {
     val contentModifier =
         Modifier
             .fillMaxWidth()
             .heightIn(max = 250.dp)
+            .padding(4.dp)
 
     Box(
-        modifier = contentModifier,
+        modifier =
+            contentModifier.background(
+                shape = RoundedCornerShape(10),
+                color = MaterialTheme.colorScheme.surface,
+            ),
     ) {
         // Readonly field doesn't react on click events
-        RichTextEditor(
-            state = state,
-            shape = RoundedCornerShape(10),
-            readOnly = true,
-            colors =
-                richTextEditorColors(
-                    // Remove bottom thin line
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-            modifier =
-                contentModifier
-                    .padding(4.dp),
-        )
+        EditorLayout(state = state, readOnly = true)
+
+        StyledChip(title)
 
         // Composable to be able to intercept click events
         Box(

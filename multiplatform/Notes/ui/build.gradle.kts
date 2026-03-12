@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -12,7 +11,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.ui"
 
         compileSdk =
@@ -30,7 +29,8 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = libs.versions.javaversion.get()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
 
@@ -51,7 +51,6 @@ kotlin {
 
             // Compose navigation
             implementation(libs.navigation)
-            implementation(libs.serializationJson)
 
             // Adaptive layout
             implementation(libs.androidx.adaptive)
@@ -74,20 +73,16 @@ kotlin {
             implementation(libs.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-        }
+            implementation(libs.jetbrains.ui.tooling.preview)
 
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
+            // Resources
+            implementation(libs.components.resources)
 
-        getByName("androidHostTest") {
-            dependencies {
-            }
-        }
+            // Serialization
+            implementation(libs.serializationJson)
 
-        getByName("androidDeviceTest") {
-            dependencies {
-            }
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
         }
     }
 }

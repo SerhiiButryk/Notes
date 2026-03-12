@@ -84,10 +84,10 @@ pushd ${SCRIPT_RELEVANT_PATH}/../
 popd
 
 # This will contains mappings, apk & bundle files and native symbols
-cp -rf -v ${PROJECT_FOLDER}/composeApp/build/outputs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+cp -rf -v ${PROJECT_FOLDER}/androidApp/build/outputs/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 # Copy reports
-cp -rf -v ${PROJECT_FOLDER}/composeApp/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
+cp -rf -v ${PROJECT_FOLDER}/androidApp/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/${REPORTS_FOLDER_NAME}/lint
 
 # Print folder content
 print_message "******** Log output folder *********"

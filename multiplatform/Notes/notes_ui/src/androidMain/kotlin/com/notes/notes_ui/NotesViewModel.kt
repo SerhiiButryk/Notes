@@ -1,105 +1,96 @@
 package com.notes.notes_ui
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import api.AppServices
-import api.data.Notes
-import com.notes.notes_ui.data.AppRepository
-import com.notes.notes_ui.data.RemoteRepository
-import com.notes.notes_ui.data.UiEvent
-import com.notes.notes_ui.data.getToolsList
-import com.notes.notes_ui.editor.EditorCommand
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import api.Platform
+import api.data.Attachments
+import api.data.UserFile
+import api.repo.RepoCallback
+import api.repo.Repository
+import com.notes.notes_ui.components.ViewModelCommand
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class NotesViewModel(
-    // TODO: This may be simplified
-    appRepository: Repository = AppRepository(
-        RemoteRepository(AppServices.dataStoreService)
-    ),
+    appRepository: Repository = Platform().appRepo,
     // For test support
-    scopeOverride: CoroutineScope? = null
-) : ViewModel(), RepoCallback {
+    scopeOverride: CoroutineScope? = null,
+) : NotesVMBase(scopeOverride, appRepository), RepoCallback {
 
-    private val scope: CoroutineScope = scopeOverride ?: viewModelScope
+    companion object {
+        fun getFactory(): ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    NotesViewModel()
+                }
+            }
+    }
 
-    private val interaction: Interactor = Interactor(appRepository, this)
+    // Attachments of the user notes
+    val attachments =
+        interactor
+            .getAttachments()
+            .stateIn(
+                scope = scope,
+                started = WhileSubscribed(stopTimeoutMillis = 5000),
+                Attachments(),
+            )
 
-    // A state to hold all the notes
-    val notesState: StateFlow<List<Notes>> = interaction
-        .getNotes()
-        .stateIn(
-            scope = scope,
-            started = WhileSubscribed(stopTimeoutMillis = 5000),
-            emptyList(),
+    override fun onEditorNavBack() {
+        scope.launch {
+            viewModelCommand.send(ViewModelCommand.NavigateToListPane())
+        }
+    }
+
+    fun onShowFilePicker(launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>) {
+        // Show dialog
+        scope.launch {
+            showLoadingDialog()
+        }
+        // Ask User to select an image
+        launcher.launch(
+            PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.ImageOnly,
+            ),
         )
-
-    // A state to hold the note which is open in Editor
-    private val _noteState = MutableStateFlow(Notes.AbsentNote())
-    val noteState = _noteState.asStateFlow()
-
-    val richTools = getToolsList(interaction)
-
-    private val uiEvents = Channel<UiEvent>(capacity = Channel.BUFFERED)
-    val events = uiEvents.receiveAsFlow()
-
-    override fun onCleared() {
-        interaction.onClear()
     }
 
-    // User selected a note from list ui
-    suspend fun onSelectAction(note: Notes) {
-        val found = notesState.value.firstOrNull { note.id == it.id }
-        if (found == null) {
-            val note = interaction.getNotes(note.id).first()!!
-            _noteState.emit(note)
-        } else {
-            _noteState.emit(found)
-        }
-        interaction.onNoteOpened()
-    }
-
-    // User clicked on '+' button in ui to create an empty note
-    suspend fun onAddAction() {
-        _noteState.emit(Notes.NewNote())
-        interaction.onNoteOpened()
-    }
-
-    override fun onNoteAdded(id: Long) { // Note has been updated in repository
+    fun onAttachments(
+        uri: Uri?,
+        context: Context,
+    ) {
         scope.launch {
-            // Select updated note to make sure that ui has the latest state
-            onSelectAction(Notes(id = id))
+            dismissLoadingDialog()
         }
-    }
-
-    override fun onNoteDeleted(id: Long) { // Note has been deleted in repository
+        if (uri == null) return
         scope.launch {
-            uiEvents.send(UiEvent.NavigateToListPane())
+            val openNoteId = _noteState.value.id
+            val result = interactor.onAttachments(uri, openNoteId, context)
+            if (!result) {
+                val title = "An error"
+                val subtitle = "Sorry, failed to add the file. Please, try again."
+                showDialog(title = title, subtitle = subtitle)
+            }
         }
     }
 
-    override fun onNoteNavigateBack() {
+    fun onDeleteAttachment(file: UserFile) {
         scope.launch {
-            uiEvents.send(UiEvent.NavigateToListPane())
+            val result = interactor.onDeleteAttachment(file)
+            if (!result) {
+                val title = "An error"
+                val subtitle = "Sorry, failed to delete. Please, try again."
+                showDialog(title = title, subtitle = subtitle)
+            }
         }
     }
 
-    suspend fun onNavigatedBack() {
-        // Emitting 'AbsentNote' to show 'Select an item' message in
-        // the editor to inform user that editor is inactive
-        // he/she should select a note from list ui
-        _noteState.emit(Notes.AbsentNote())
-    }
-
-    fun sendEditorCommand(command: EditorCommand) {
-        interaction.sendEditorCommand(command)
-    }
 }

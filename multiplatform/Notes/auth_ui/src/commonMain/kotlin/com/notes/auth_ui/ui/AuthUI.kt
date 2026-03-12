@@ -31,7 +31,6 @@ fun AuthLayoutWideScreen(
     emailFieldFocusRequester: FocusRequester,
     passwordFieldFocusRequester: FocusRequester,
 ) {
-
     val scrollState = rememberScrollState()
 
     Column(
@@ -48,18 +47,17 @@ fun AuthLayoutWideScreen(
             Column {
                 val modifier =
                     Modifier
-                        .padding(20.dp)
+                        .padding(start = 20.dp, end = 20.dp, top = 20.dp)
 
                 AuthHeader(
                     modifier = modifier,
                     alignment = Alignment.CenterHorizontally,
                     title = title,
                     subTitle = subTitle,
-                    onLogin = onLogin
                 )
 
                 AuthBody(
-                    modifier = modifier,
+                    modifier = Modifier.padding(20.dp),
                     emailState = emailState,
                     confirmPasswordState = confirmPasswordState,
                     emailFieldFocusRequester = emailFieldFocusRequester,
@@ -67,6 +65,7 @@ fun AuthLayoutWideScreen(
                     passwordState = passwordState,
                     onEnter = onEnter,
                     hasProgress = hasProgress,
+                    onLogin = onLogin,
                 )
             }
         }
@@ -75,7 +74,7 @@ fun AuthLayoutWideScreen(
 
 @Composable
 fun AuthLayoutLandscapeSmallScreen(
-    containerModifier: Modifier,
+    modifier: Modifier,
     mainContentModifier: Modifier,
     title: String,
     subTitle: String,
@@ -88,7 +87,7 @@ fun AuthLayoutLandscapeSmallScreen(
     emailFieldFocusRequester: FocusRequester,
     passwordFieldFocusRequester: FocusRequester,
 ) {
-    Row(modifier = containerModifier) {
+    Row(modifier = modifier) {
         val modifier =
             Modifier
                 .fillMaxSize()
@@ -103,7 +102,6 @@ fun AuthLayoutLandscapeSmallScreen(
                     bottomPadding = 10.dp,
                     title = title,
                     subTitle = subTitle,
-                    onLogin = onLogin
                 )
             }
         }
@@ -112,7 +110,6 @@ fun AuthLayoutLandscapeSmallScreen(
             modifier = modifier,
         ) {
             SurfaceContainer {
-
                 val scrollState = rememberScrollState()
 
                 Column(modifier = Modifier.verticalScroll(scrollState)) {
@@ -125,6 +122,7 @@ fun AuthLayoutLandscapeSmallScreen(
                         confirmPasswordState = confirmPasswordState,
                         hasProgress = hasProgress,
                         onEnter = onEnter,
+                        onLogin = onLogin,
                     )
                 }
             }
@@ -134,7 +132,7 @@ fun AuthLayoutLandscapeSmallScreen(
 
 @Composable
 fun AuthLayoutCommonScreen(
-    containerModifier: Modifier,
+    modifier: Modifier,
     mainContentModifier: Modifier,
     title: String,
     subTitle: String,
@@ -148,11 +146,10 @@ fun AuthLayoutCommonScreen(
     passwordFieldFocusRequester: FocusRequester,
 ) {
     Box(
-        modifier = containerModifier,
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         SurfaceContainer {
-
             val scrollState = rememberScrollState()
 
             Column(modifier = Modifier.verticalScroll(scrollState)) {
@@ -161,7 +158,6 @@ fun AuthLayoutCommonScreen(
                     alignment = Alignment.CenterHorizontally,
                     title = title,
                     subTitle = subTitle,
-                    onLogin = onLogin
                 )
 
                 AuthBody(
@@ -173,6 +169,7 @@ fun AuthLayoutCommonScreen(
                     passwordState = passwordState,
                     hasProgress = hasProgress,
                     onEnter = onEnter,
+                    onLogin = onLogin,
                 )
             }
         }

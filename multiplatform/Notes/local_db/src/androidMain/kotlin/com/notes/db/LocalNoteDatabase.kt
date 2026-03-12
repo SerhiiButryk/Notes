@@ -1,0 +1,153 @@
+package com.notes.db
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.concurrent.AtomicBoolean
+import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.db.SupportSQLiteDatabase
+import api.Platform
+import kotlinx.coroutines.delay
+
+@Database(entities = [NoteEntity::class, NotesMetadataEntity::class], version = 1)
+abstract class NoteDatabase : RoomDatabase() {
+    abstract fun noteDao(): NoteDao
+
+    abstract fun noteMetadataDao(): NoteMetadataDao
+}
+
+/**
+ * Access point to our Room database
+ */
+object LocalNoteDatabase : LocalNoteDatabaseImpl() {
+    suspend fun testOnly_access(): NoteDao = accessInternal().noteDao()
+
+    suspend fun access(): NoteDao = EncryptedNoteDao(accessInternal().noteDao())
+
+    suspend fun accessNoteMetadata(): NoteMetadataDao = accessInternal().noteMetadataDao()
+}
+
+interface DBLifecycleCallback {
+    fun onCreate()
+
+    fun onOpen()
+
+    fun onClose()
+}
+
+class LocalCallback(
+    private val callbackList: Set<DBLifecycleCallback>,
+) : DBLifecycleCallback {
+    private val closed = AtomicBoolean(false)
+    private val opened = AtomicBoolean(false)
+    private val created = AtomicBoolean(false)
+
+    override fun onCreate() {
+        Platform().logger.logi("DBLifecycleCallback: onCreate()")
+        callbackList.forEach { it.onCreate() }
+        created.set(true)
+    }
+
+    override fun onClose() {
+        Platform().logger.logi("DBLifecycleCallback: onClose()")
+        callbackList.forEach { it.onClose() }
+        closed.set(true)
+    }
+
+    override fun onOpen() {
+        Platform().logger.logi("DBLifecycleCallback: onOpen()")
+        callbackList.forEach { it.onOpen() }
+        opened.set(true)
+    }
+
+    fun invokeCallbacksIfNeeded(callback: DBLifecycleCallback) {
+        if (closed.get()) {
+            callback.onClose()
+        }
+        if (opened.get()) {
+            callback.onOpen()
+        }
+        if (created.get()) {
+            callback.onCreate()
+        }
+    }
+}
+
+abstract class LocalNoteDatabaseImpl {
+    private var noteConnection: SQLiteConnection? = null
+    private var noteDb: NoteDatabase? = null
+    private val initNotStarted = AtomicBoolean(false)
+    private var clientCallback: DBLifecycleCallback? = null
+
+    private val callbackList = mutableSetOf<DBLifecycleCallback>()
+    private val localCallback = LocalCallback(callbackList)
+
+    fun initialize(
+        context: Context? = null,
+        callback: DBLifecycleCallback? = null,
+    ): NoteDatabase? {
+        Platform().logger.logi("LocalDatabase: initialize()")
+        if (initNotStarted.compareAndSet(false, true)) {
+            if (callback != null) callbackList.add(callback)
+            val builder = Room.databaseBuilder<NoteDatabase>(context!!, "note_local_database")
+            builder.addCallback(
+                object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        Platform().logger.logi("LocalDatabase: Callback.onCreate()")
+                        super.onCreate(db)
+                        localCallback.onCreate()
+                    }
+
+                    override fun onCreate(connection: SQLiteConnection) {
+                        super.onCreate(connection)
+                        noteConnection = connection
+                    }
+
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        Platform().logger.logi("LocalDatabase: Callback.onOpen()")
+                        super.onOpen(db)
+                        localCallback.onOpen()
+                    }
+                },
+            )
+            noteDb = builder.build()
+            Platform().logger.logi("LocalDatabase: initialize(): done")
+            return noteDb
+        } else {
+            if (callback != null) {
+                callbackList.add(callback)
+                localCallback.invokeCallbacksIfNeeded(callback)
+            }
+            Platform().logger.logi("LocalDatabase: initialize(): no-op")
+            return noteDb
+        }
+    }
+
+    suspend fun accessInternal(): NoteDatabase {
+        while (noteDb == null) {
+            Platform().logger.logi("LocalDatabase: accessInternal() not initialized, waiting...")
+            delay(100)
+        }
+        return noteDb!!
+    }
+
+    fun close() {
+        if (noteConnection != null) {
+            noteConnection?.close()
+            noteConnection = null
+            Platform().logger.logi("LocalDatabase: close(): connection is closed")
+        } else {
+            Platform().logger.logi("LocalDatabase: close(): connection is invalid")
+        }
+
+        noteDb?.close()
+        noteDb = null
+        initNotStarted.set(false)
+
+        localCallback.onClose()
+        clientCallback = null
+
+        Platform().logger.logi("LocalDatabase: close(): done")
+    }
+}

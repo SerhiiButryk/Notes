@@ -3,25 +3,32 @@ package com.notes.auth_ui.ui
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import com.notes.auth_ui.data.RegisterUIState
 
 @Composable
 internal fun RegisterUI(
     state: RegisterUIState,
     onRegister: (RegisterUIState) -> Unit,
-    onLogin: (() -> Unit)
+    onLogin: (() -> Unit)? = null,
+    title: String,
+    subTitle: String,
 ) {
-
     RegisterUIImpl(
+        modifier =
+            Modifier.semantics {
+                testTagsAsResourceId = true
+            },
         onRegister = onRegister,
     ) {
-
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues ->
+        innerPadding: PaddingValues,
+        ->
 
         AuthUIAdaptive(
             title = title,
@@ -33,8 +40,7 @@ internal fun RegisterUI(
             innerPadding = innerPadding,
             hasProgress = false,
             onEnter = onEnter,
-            onLogin = onLogin
+            onLogin = onLogin,
         )
-
     }
 }

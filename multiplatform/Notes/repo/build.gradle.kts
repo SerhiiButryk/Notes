@@ -1,0 +1,41 @@
+plugins {
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
+}
+
+kotlin {
+
+    android {
+        namespace = "com.notes.repo"
+        compileSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
+
+        withHostTestBuilder {
+        }
+
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
+    }
+
+    jvm()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.api)
+            implementation(projects.ui)
+            implementation(projects.localDb)
+
+            // Kotlin coroutines
+            implementation(libs.kotlinx.coroutines.core)
+        }
+    }
+}

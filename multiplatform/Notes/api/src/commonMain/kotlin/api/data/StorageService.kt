@@ -1,25 +1,25 @@
 package api.data
 
+import api.AppService
 import api.AppServices
-import api.PlatformAPIs.logger
+import api.Platform
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-interface StorageService {
-
-    val name: String
-
+interface StorageService : AppService {
     suspend fun store(document: Document): Boolean
 
-    suspend fun load(name: String): Document?
+    suspend fun load(document: Document): Document?
 
-    suspend fun delete(name: String): Boolean
+    suspend fun delete(document: Document): Boolean
+
+    // TODO: Revisit this looks wrong, maybe there is a better way?
+    suspend fun selectDocName(initial: Long = 1): Long? = null
 
     suspend fun fetchAll(): List<Document>
 }
 
 abstract class AbstractStorageService : StorageService {
-
     private val tag = "AbstractStorageService"
 
     @OptIn(ExperimentalAtomicApi::class)
@@ -30,27 +30,26 @@ abstract class AbstractStorageService : StorageService {
         get() {
             return _canUse.load()
         }
-    set(value) {
-        _canUse.store(value)
-    }
+        set(value) {
+            _canUse.store(value)
+        }
 
     protected fun paramsCheck(name: String): Boolean {
-
         if (!isAuthenticated()) return false
 
         if (name.isEmpty()) {
-            logger.loge("$tag::paramsCheck() stop cos empty data")
+            Platform().logger.loge("$tag::paramsCheck() stop cos empty data")
             return false
         }
 
         try {
             val nameCheck = name.toInt()
-            if (nameCheck < 0) {
-                logger.loge("$tag::paramsCheck() stop cos not valid name")
+            if (nameCheck <= 0) {
+                Platform().logger.loge("$tag::paramsCheck() stop cos not valid name")
                 return false
             }
         } catch (e: NumberFormatException) {
-            logger.loge("$tag::paramsCheck() stop cos not a number")
+            Platform().logger.loge("$tag::paramsCheck() stop cos not a number")
             return false
         }
 
@@ -59,19 +58,18 @@ abstract class AbstractStorageService : StorageService {
 
     protected fun isAuthenticated(): Boolean {
         val authService = AppServices.getDefaultAuthService()
-        val uid = authService?.getUserId()
+        val uid = authService.getUserId()
 
-        if (authService == null || !authService.isAuthenticated()) {
-            logger.loge("$tag::isAuthenticated() not authenticated")
+        if (!authService.isAuthenticated()) {
+            Platform().logger.loge("$tag::isAuthenticated() not authenticated")
             return false
         }
 
-        if (uid.isNullOrEmpty()) {
-            logger.loge("$tag::isAuthenticated() uid is invalid")
+        if (uid.isEmpty()) {
+            Platform().logger.loge("$tag::isAuthenticated() uid is invalid")
             return false
         }
 
         return true
     }
-
 }

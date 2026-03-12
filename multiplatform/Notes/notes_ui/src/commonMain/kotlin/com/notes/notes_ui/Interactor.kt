@@ -1,82 +1,91 @@
 package com.notes.notes_ui
 
+import api.Platform
+import api.data.Attachments
 import api.data.Notes
-import com.notes.notes_ui.editor.EditorCommand
-import com.notes.notes_ui.editor.EditorState
-import com.notes.notes_ui.features.RedoUndoAction
+import api.data.UserFile
+import api.repo.RepoCallback
+import api.repo.Repository
+import com.notes.notes_ui.editor.Command
+import com.notes.notes_ui.editor.HtmlParser
+import com.notes.notes_ui.editor.RichEditor
+import com.notes.notes_ui.editor.toHtml
+import dev.mkeeda.arranger.richtext.editor.RichTextState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-
-interface RepoCallback {
-    fun onNoteAdded(id: Long)
-
-    fun onNoteDeleted(id: Long)
-    fun onNoteNavigateBack()
-}
-
-interface Repository {
-    fun getNotes(): Flow<List<Notes>>
-
-    fun getNotes(id: Long): Flow<Notes?>
-
-    fun saveNote(
-        note: Notes,
-        onNewAdded: suspend (Long) -> Unit,
-    )
-
-    fun deleteNote(
-        note: Notes,
-        callback: (Long) -> Unit,
-    )
-
-    fun clear()
-}
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 class Interactor(
     private val repository: Repository,
     private val repoCallback: RepoCallback,
+    private val textEditor: RichEditor = RichEditor(),
+    private val scope: CoroutineScope,
 ) {
-    // Redo, undo edit command support. Called from the UI menu.
-    val redoUndoAction = RedoUndoAction()
-
-    fun onNoteOpened() {
-        redoUndoAction.clear()
+    fun onEditorOpen() {
     }
 
-    fun onNoteNavigateBack() {
-        repoCallback.onNoteNavigateBack()
+    fun onEditorNavBack() {
+        repoCallback.onEditorNavBack()
     }
 
-    // User changes text
-    fun sendEditorCommand(command: EditorCommand) {
-        redoUndoAction.onEditAction(command)
-        // It has already been applied
-        if (command.isTextInputCommand()) {
-            return
-        }
-        command.execCommand()
+    fun sendEditorCommand(
+        command: Command,
+        state: RichTextState,
+    ) {
+        textEditor.onCommand(command, state)
     }
 
-    fun saveContent(
-        state: EditorState,
+    fun saveNote(
+        state: RichTextState,
         note: Notes,
     ) {
-        val html = state.getHtml()
-        repository.saveNote(note.copy(content = html)) {
-            repoCallback.onNoteAdded(it)
+        // Transforms rich state to HTML and saves it
+        scope.launch(Dispatchers.Default) {
+            repository.saveNote(note.copy(content = state.toHtml())) {
+                repoCallback.onNoteAdded(it)
+            }
         }
     }
 
     fun deleteNote(note: Notes) {
         repository.deleteNote(note) {
-            repoCallback.onNoteDeleted(it)
+            repoCallback.onEditorNavBack()
         }
     }
 
-    fun getNotes(): Flow<List<Notes>> = repository.getNotes()
+    // Transforms HTML to rich state and sets 'richString' field
+    fun getNotes(): Flow<List<Notes>> =
+        flow {
+            repository
+                .getNotes()
+                .collect { list ->
+                    val newList = mutableListOf<Notes>()
+                    list.forEach { note ->
+                        Platform().logger.logi("getNotes(): Parsing note ('${note.id}')...")
+                        val richString = HtmlParser().parse(note.content)
+                        note.richString = richString
+                        newList.add(note)
+                    }
+                    emit(newList)
+                }
+        }.flowOn(Dispatchers.Default)
 
     fun getNotes(id: Long): Flow<Notes?> = repository.getNotes(id)
 
     fun onClear() {
         repository.clear()
     }
+
+    suspend fun onAttachments(
+        file: Any,
+        noteId: Long,
+        info: Any?,
+    ): Boolean = repository.onAttachments(file, noteId, info)
+
+    fun getAttachments(): Flow<Attachments> = repository.getAttachments()
+
+    suspend fun onDeleteAttachment(file: UserFile): Boolean = repository.onDeleteAttachment(file)
 }

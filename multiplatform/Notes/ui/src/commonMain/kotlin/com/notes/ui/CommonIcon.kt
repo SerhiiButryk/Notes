@@ -1,9 +1,14 @@
 package com.notes.ui
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 
-expect class CommonIcon(resource: Any) {
+expect class CommonIcon(
+    resource: Any,
+) {
 
     val resource: Any
 
@@ -18,6 +23,20 @@ fun getIconByKey(key: Int): Painter {
     return iconsCollection[key]!!.painter()
 }
 
+@Composable
+fun toPainter(key: Int): Painter {
+    val painter = iconsCollection[key]?.painter()
+    if (painter == null) {
+        // Workaround to avoid nullable return type
+        val painter =
+            rememberVectorPainter(
+                image = Icons.Default.Search,
+            )
+        return painter
+    }
+    return painter
+}
+
 const val h1FormatIcon: Int = 1
 const val h2FormatIcon: Int = 2
 const val h3FormatIcon: Int = 3
@@ -28,3 +47,4 @@ const val googleIcon: Int = 7
 const val firebaseIcon: Int = 8
 const val googleDriveIcon: Int = 9
 const val cloudSyncIcon: Int = 10
+const val previewIcon: Int = 11

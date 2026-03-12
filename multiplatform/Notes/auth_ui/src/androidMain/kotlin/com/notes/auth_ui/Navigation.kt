@@ -3,31 +3,33 @@ package com.notes.auth_ui
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
+import com.notes.auth_ui.data.LoginUIState
+import com.notes.auth_ui.data.RegisterUIState
+import com.notes.auth_ui.data.VerificationUIState
 import com.notes.auth_ui.ui.LoginUI
 import com.notes.auth_ui.ui.OnboardingScreen
 import com.notes.auth_ui.ui.RegisterUI
 import com.notes.auth_ui.ui.VerificationEmailUI
-import com.notes.auth_ui.ui.LoginUIState
-import com.notes.auth_ui.ui.RegisterUIState
-import com.notes.auth_ui.ui.VerificationUIState
-import com.notes.notes_ui.getStartDestination
-import com.notes.ui.AlertDialogUI
+import com.notes.ui.Access
+import com.notes.ui.AlertDialogStateful
+import com.notes.ui.Auth
+import com.notes.ui.EmailVerification
+import com.notes.ui.MainContent
+import com.notes.ui.OnBoardingScreen
 import com.notes.ui.getViewModel
 import com.notes.ui.navAndPopUpCurrent
 
 fun NavGraphBuilder.authDestination(navController: NavController) {
     // Authentication graph
-    navigation<Auth>(startDestination = Access) {
+    navigation<Auth>(startDestination = Access()) {
         composable<Access> { backStackEntry ->
 
             // Show login or register depending on UI state
@@ -35,13 +37,19 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
             val viewModel = backStackEntry.getViewModel<AuthViewModel>(navController)
             val state = viewModel.uiState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(false) {
-                viewModel.onShowAuthUI()
+            // Arguments
+            val args: Access = backStackEntry.toRoute()
+
+            val title = state.value.title
+            val subTitle = state.value.subtitle
+
+            LaunchedEffect(args.forceLoginUI) {
+                viewModel.onShowAccessUI(args)
             }
 
             if (state.value is LoginUIState) {
                 val onSuccess = {
-                    navController.navAndPopUpCurrent(getStartDestination())
+                    navController.navAndPopUpCurrent(MainContent())
                 }
 
                 val loginUIState = state.value as LoginUIState
@@ -50,38 +58,59 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
                 LoginUI(
                     state = loginUIState,
-                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess, context = activityContext) },
+                    onLogin = {
+                        viewModel.login(state = it, onSuccess = onSuccess, context = activityContext, args = args)
+                    },
+                    title = title,
+                    subTitle = subTitle,
                 )
 
                 val context = LocalContext.current
-                BackHandler(enabled = true) {
-                    val activity = context as? Activity
-                    activity?.moveTaskToBack(true)
+                if (!args.showChangePasswordUI) {
+                    BackHandler(enabled = true) {
+                        val activity = context as? Activity
+                        activity?.moveTaskToBack(true)
+                    }
                 }
             }
 
             if (state.value is RegisterUIState) {
-                val onSuccess = {
-                    navController.navigate(EmailVerification)
+
+                val onLogin = {
+                    // Go to login screen
+                    navController.navigate(Access(forceLoginUI = true))
                 }
 
-                RegisterUI(
-                    state = state.value as RegisterUIState,
-                    onRegister = {
+                val onRegister: (RegisterUIState) -> Unit = {
+                    if (args.showChangePasswordUI) {
+                        val onSuccess = {
+                            navController.popBackStack()
+                            Unit
+                        }
+
+                        viewModel.changePassword(state = it, onSuccess = onSuccess)
+                    } else {
+                        val onSuccess = {
+                            navController.navigate(EmailVerification())
+                        }
+
                         viewModel.register(
                             state = it,
                             onSuccess = onSuccess,
                         )
-                    },
-                    onLogin = {
-                        viewModel.onShowAuthUI(uiForced = true)
-                        // Go to login screen
-                        navController.navigate(Access)
                     }
+                }
+
+                RegisterUI(
+                    state = state.value as RegisterUIState,
+                    onRegister = onRegister,
+                    onLogin = if (args.showChangePasswordUI) null else onLogin,
+                    title = title,
+                    subTitle = subTitle,
                 )
             }
 
-            Dialog(viewModel)
+            AlertDialogStateful(viewModel)
         }
 
         composable<EmailVerification> { backStackEntry ->
@@ -90,11 +119,6 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
             val state = viewModel.uiState.collectAsStateWithLifecycle()
 
             val uiState = state.value as VerificationUIState
-
-            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-                // Run a check to see if we got confirmation of user email
-                viewModel.runConfirmationCheck(navController = navController)
-            }
 
             VerificationEmailUI(
                 onRetry = {
@@ -116,24 +140,17 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
     }
 }
 
-@Composable
-private fun Dialog(viewModel: AuthViewModel) {
-    val dialogState = viewModel.dialogState.collectAsStateWithLifecycle()
-
-    if (dialogState.value != null) {
-        AlertDialogUI(
-            onDismissRequest = { viewModel.dismissDialog() },
-            onConfirmation = { viewModel.dismissDialog() },
-            dialogTitle = dialogState.value!!.title,
-            dialogText = dialogState.value!!.subtitle,
-        )
-    }
-}
-
 fun NavGraphBuilder.onboardingDestination(navController: NavController) {
     composable<OnBoardingScreen> { backStackEntry ->
+
+        val viewModel = backStackEntry.getViewModel<AuthViewModel>(navController)
+
+        LaunchedEffect(false) {
+            viewModel.onShowOnBoardingUI(navController)
+        }
+
         OnboardingScreen {
-            navController.navigate(route = Auth)
+            navController.navigate(Auth())
         }
     }
 }

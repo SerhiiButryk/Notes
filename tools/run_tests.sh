@@ -34,6 +34,6 @@ popd > /dev/null
 mkdir -p $CODE_COVERAGE_FOLDER_NAME
 mkdir -p $TEST_RESULT_DIR
 
-cp -rf ${PROJECT_FOLDER}/composeApp/build/reports/androidTests/connected/*  $TEST_RESULT_DIR
+cp -rf ${PROJECT_FOLDER}/androidApp/build/reports/androidTests/connected/*  $TEST_RESULT_DIR
 
 print_message "******** Tests are completed, results are saved *********"

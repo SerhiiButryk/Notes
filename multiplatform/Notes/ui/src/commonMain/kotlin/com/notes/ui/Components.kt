@@ -1,13 +1,22 @@
 package com.notes.ui
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -15,30 +24,52 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import api.PlatformAPIs
-import api.PlatformAPIs.logger
+import androidx.compose.ui.window.DialogProperties
+import api.Platform
 import kotlinx.coroutines.delay
 
 /**
@@ -86,20 +117,22 @@ fun InputTextField(
         value = text,
         onValueChange = { onValueChange(it) },
         label = { Text(label) },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            showKeyboardOnFocus = true,
-            autoCorrectEnabled = false,
-            imeAction = imeAction,
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                keyboardType = keyboardType,
+                showKeyboardOnFocus = true,
+                autoCorrectEnabled = false,
+                imeAction = imeAction,
+            ),
         keyboardActions = keyboardActions,
         modifier = localModifier,
         maxLines = 1,
-        visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email) {
-            VisualTransformation.None
-        } else {
-            PasswordVisualTransformation()
-        },
+        visualTransformation =
+            if (passwordShown || keyboardType == KeyboardType.Email) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
         supportingText = {
 // TODO Enable error message for input validation errors
             //            ErrorMessage()
@@ -168,15 +201,53 @@ fun AlertDialogUI(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                },
-            ) {
-                Text("Cancel")
+            // Button is disabled
+            if (false) {
+                TextButton(
+                    onClick = {
+                        onDismissRequest()
+                    },
+                ) {
+                    Text("Cancel")
+                }
             }
         },
     )
+}
+
+/**
+ * Loading dialog component
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoadingDialog(isLoading: Boolean) {
+    if (isLoading) {
+        BasicAlertDialog(
+            onDismissRequest = { },
+            properties =
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+        ) {
+            Surface(
+                modifier = Modifier.size(100.dp),
+                shape =
+                    androidx.compose.foundation.shape
+                        .RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(16.dp),
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFF6200EE),
+                    )
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -188,10 +259,10 @@ fun AlertDialogUI(
 fun SearchBarField(
     modifier: Modifier = Modifier,
     trailingIcon: @Composable (() -> Unit)? = null,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
 ) {
-
     val focusManager = LocalFocusManager.current
+    var shouldClear by remember { mutableStateOf(true) }
 
     SearchBar(
         inputField = {
@@ -228,32 +299,123 @@ fun SearchBarField(
         },
         expanded = false,
         onExpandedChange = {},
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
-            .onFocusEvent {
-                if (it.hasFocus) {
-                    focusManager.clearFocus()
-                }
-            },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
+                .onFocusEvent {
+                    // TODO: Can cause crashes
+//                if (it.hasFocus && shouldClear) {
+//                    focusManager.clearFocus()
+//                    shouldClear = false
+//                }
+                },
     ) {}
 }
 
 /**
- * Material button component
+ * A variant of search bar component
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBarFieldV2(
+    query: String = "",
+    onQueryChange: (String) -> Unit = {},
+    modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    BasicTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyMedium.copy(
+            color = MaterialTheme.colorScheme.onSurface
+        ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .height(40.dp) // Direct compact height
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+        decorationBox = { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (query.isEmpty()) {
+                        Text(
+                            text = "Search your notes...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    innerTextField()
+                }
+
+                trailingIcon?.invoke()
+            }
+        }
+    )
+}
+
+/**
+ * Material button animated component
  */
 
 @Composable
 fun AccentButton(
-    onClick: () -> Unit, label: String, modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    start: Color = Color(0xFF9DCEFF),
+    end: Color = Color(0xFFC58BF2),
 ) {
+    val transition = rememberInfiniteTransition(label = "accent-button")
+
+    val colorPhaseState =
+        transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "accent-button-color-phase",
+        )
+
     Button(
         onClick = { onClick() },
-        modifier = modifier.fillMaxWidth().background(
-            brush = Brush.horizontalGradient(listOf(Color(0xFF9DCEFF), Color(0xFFC58BF2))),
-            shape = RoundedCornerShape(50.dp)
-        ),
-        colors = ButtonDefaults.buttonColors(Color.Transparent)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    val phase = colorPhaseState.value
+
+                    val currentStart = lerp(start, end, phase)
+                    val currentEnd = lerp(end, start, phase)
+
+                    // Replicate the 50.dp RoundedCornerShape (50.dp in pixels is height / 2)
+                    val cornerRadius = CornerRadius(size.height / 2f, size.height / 2f)
+
+                    drawRoundRect(
+                        brush =
+                            Brush.horizontalGradient(
+                                listOf(currentStart, currentEnd),
+                            ),
+                        cornerRadius = cornerRadius,
+                    )
+                },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
     ) {
         Text(text = label, color = Color.White)
     }
@@ -265,7 +427,8 @@ fun AccentButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleTopBar(
-    title: String, onBackClick: () -> Unit
+    title: String,
+    onBackClick: () -> Unit,
 ) {
     TopAppBar(
         title = { Text(title) },
@@ -273,7 +436,7 @@ fun SimpleTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-        }
+        },
     )
 }
 
@@ -282,18 +445,17 @@ fun SimpleTopBar(
  */
 @Composable
 fun NetworkStateMessage() {
-
     var networkIsAvailable by rememberSaveable { mutableStateOf(true) }
     var show by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(false) {
-        if (!PlatformAPIs.netStateManager.isNetworkAvailable()) {
+        if (!Platform().netStateManager.isNetworkAvailable()) {
             // Network is NOT available show it permanently
             networkIsAvailable = false
             show = true
         }
-        PlatformAPIs.netStateManager.observerChanges().collect { netState ->
-            logger.logi("NetworkStateMessage() netState = $netState, currState = $networkIsAvailable")
+        Platform().netStateManager.observerChanges().collect { netState ->
+            Platform().logger.logi("NetworkStateMessage() netState = $netState, currState = $networkIsAvailable")
             if (netState.networkIsAvailable && !networkIsAvailable) {
                 // Network is now available show it
                 networkIsAvailable = true
@@ -312,17 +474,25 @@ fun NetworkStateMessage() {
     val color = if (networkIsAvailable) Color(0xFF46923c) else Color(0xFFc30010)
 
     if (show) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .background(color),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom,
+        Surface(
+            color = color,
         ) {
-            val message = if (networkIsAvailable) "Network is available" else "Network is not available"
-            Text(text = message, fontSize = 16.sp)
+            val message =
+                if (networkIsAvailable) {
+                    "Network is available"
+                } else {
+                    "Network is not available"
+                }
+            Text(
+                text = message,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .systemBarsPadding(),
+            )
         }
     }
-
 }

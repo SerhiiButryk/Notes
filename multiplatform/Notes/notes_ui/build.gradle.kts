@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -13,7 +12,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.notes_ui"
 
         compileSdk =
@@ -31,7 +30,8 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = libs.versions.javaversion.get()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
 
@@ -40,7 +40,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
-            implementation(projects.data)
+            implementation(projects.localDb)
 
             implementation(libs.bundles.android.core)
             // For style attributes like attr/colorControlNormal
@@ -50,13 +50,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.androidx.compose.bom))
             implementation(libs.bundles.composeui)
 
-            // Compose preview
-            implementation(libs.ui.tooling)
-            implementation(libs.ui.tooling.preview)
-
             // Compose navigation
             implementation(libs.navigation)
-            implementation(libs.serializationJson)
 
             // For currentWindowAdaptiveInfo() & List Detail composable
             implementation(libs.androidx.adaptive)
@@ -65,12 +60,27 @@ kotlin {
 
             // Android coroutines
             implementation(libs.kotlinx.coroutines.android)
+
+            // File storage
+            implementation(libs.androidx.documentfile)
+
+            // Compose tracing
+            // implementation(libs.androidx.compose.runtime.tracing)
+
+            // Image loading
+            implementation(libs.coil.compose)
         }
         commonMain.dependencies {
 
             implementation(projects.api)
             implementation(projects.ui)
-            implementation(projects.composeRichEditor)
+
+            // Type-safe Rich Text Editor Engine for Compose Multiplatform
+            // Github: https://github.com/mkeeda/arranger
+            implementation(libs.arranger.richtext.editor)
+            implementation(libs.arranger.richtext.editor.material3)
+            // Html parsing
+            implementation(libs.ksoup)
 
             // Kotlin coroutines
             implementation(libs.kotlinx.coroutines.core)
@@ -88,6 +98,18 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+
+            implementation(libs.components.splitpane)
+
+            // Image loading
+            implementation(libs.coil.compose)
+
+            // Serialization
+            implementation(libs.serializationJson)
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
+            // View Model
+            implementation(libs.androidx.lifecycle.viewmodel)
         }
     }
 }

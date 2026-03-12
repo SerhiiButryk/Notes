@@ -1,11 +1,9 @@
 package api.auth
 
+import api.AppService
 import java.lang.ref.WeakReference
 
-interface AuthService {
-
-    val name: String
-
+interface AuthService : AppService {
     suspend fun createUser(
         pass: String,
         email: String,
@@ -14,15 +12,19 @@ interface AuthService {
     suspend fun login(
         pass: String,
         email: String,
-        activityContext: Any?
+        activityContext: Any?,
     ): AuthResult = AuthResult.loginFailed()
 
     suspend fun login(
         tokenId: String,
-        activityContext: Any?
+        activityContext: Any?,
     ): AuthResult = AuthResult.loginFailed()
 
     suspend fun sendEmailVerify(): AuthResult = AuthResult.verificationSentFailed("")
+
+    suspend fun verifyCode(code: String): Boolean = false
+
+    suspend fun changePassword(newPass: String): Boolean = false
 
     suspend fun isEmailVerified(): Boolean = false
 
@@ -38,18 +40,16 @@ interface AuthService {
 
     suspend fun signOut(): Boolean
 
-    fun resetSettings() {}
+    fun setAccountAutoselect(enable: Boolean) {}
 }
 
 abstract class AbstractAuthService : AuthService {
-
     private var _callback: WeakReference<AuthCallback>? = null
 
-    protected var callback: AuthCallback?
+    protected val callback: AuthCallback?
         get() {
             return _callback?.get()
         }
-        private set(value) {}
 
     override fun setAuthCallback(callback: AuthCallback?) {
         this._callback = WeakReference(callback)

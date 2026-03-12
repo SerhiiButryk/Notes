@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,7 +7,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.net"
 
         compileSdk =
@@ -26,37 +25,20 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = libs.versions.javaversion.get()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
 
     sourceSets {
         androidMain.dependencies {
-
-            implementation(projects.api)
-
             // OkHttp
             implementation(libs.okhttp)
             // Coroutines
             implementation(libs.kotlinx.coroutines.android)
         }
-
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
-        }
-
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
-
-        getByName("androidHostTest") {
-            dependencies {
-            }
-        }
-
-        getByName("androidDeviceTest") {
-            dependencies {
-            }
+            implementation(projects.api)
         }
     }
 }

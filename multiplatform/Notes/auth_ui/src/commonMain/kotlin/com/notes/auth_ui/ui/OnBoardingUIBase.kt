@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 fun OnBoardingUIImpl(
     modifier: Modifier,
     preview: @Composable (() -> Unit)? = null,
-    onContinue: () -> Unit = {}
+    onContinue: () -> Unit = {},
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -36,7 +36,6 @@ fun OnBoardingUIImpl(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-
                 if (preview != null) {
                     preview()
                 }

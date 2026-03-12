@@ -2,21 +2,10 @@ import OSLog
 
 class AppViewModel {
     
-    private let logTag = "AppViewModel"
-    private let logger: Logger
-    
-    init() {
-        var bundleId = ""
-        
-        if let bundleIdentifier = Bundle.main.bundleIdentifier {
-            bundleId = bundleIdentifier
-        }
-        
-        self.logger = Logger(subsystem: bundleId, category: logTag)
-    }
+    private let logger = createLogger(withTag: "AppViewModel")
     
     func login(_ username: String, _ password: String) -> Bool {
-        logger.info("login: done")
+        logger.info("login: called")
         return true
     }
     

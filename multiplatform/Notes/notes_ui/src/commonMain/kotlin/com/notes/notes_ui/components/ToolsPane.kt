@@ -21,16 +21,17 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import api.data.Notes
-import com.mohamedrejeb.richeditor.model.RichTextState
-import com.notes.notes_ui.data.Tool
-import com.notes.notes_ui.data.ToolsPane
+import com.notes.notes_ui.models.Tool
+import com.notes.notes_ui.models.ToolCollection
+import com.notes.notes_ui.models.Tools
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.Arrow_up
+import dev.mkeeda.arranger.richtext.editor.RichTextState
 
 @Composable
 fun ToolsBar(
     state: RichTextState,
-    toolsPaneItems: List<ToolsPane>,
+    tools: Tools,
     notes: Notes,
 ) {
     Surface(
@@ -57,7 +58,7 @@ fun ToolsBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
-            for (tools in toolsPaneItems) {
+            for (tools in tools.collection) {
                 // Add one option
                 if (tools.list.size == 1) {
                     val option = tools.list.first()
@@ -85,9 +86,9 @@ fun ToolsBar(
         }
 
         if (savedOption != 0L) {
-            for (tools in toolsPaneItems) {
-                val option = tools.list.first()
-                if (tools.list.size == 1 && option.key == savedOption) {
+            for (tool in tools.collection) {
+                val option = tool.list.first()
+                if (tool.list.size == 1 && option.key == savedOption) {
                     AlertDialogUI(
                         onDismissRequest = { savedOption = 0 },
                         onConfirmation = {
@@ -171,7 +172,7 @@ private fun ToolButton(
 
 @Composable
 private fun ToolsMenu(
-    tools: ToolsPane,
+    tools: ToolCollection,
     state: RichTextState,
     notes: Notes,
 ) {

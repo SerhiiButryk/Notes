@@ -3,24 +3,31 @@ package com.notes.auth_ui.ui
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import com.notes.auth_ui.data.LoginUIState
 
 @Composable
 fun LoginUI(
     state: LoginUIState,
     onLogin: (LoginUIState) -> Unit,
+    title: String,
+    subTitle: String,
 ) {
-
     LoginUIImpl(
+        modifier =
+            Modifier.semantics {
+                testTagsAsResourceId = true
+            },
         state = state,
-        onLogin = onLogin
+        onLogin = onLogin,
     ) {
-
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues ->
+        innerPadding: PaddingValues,
+        ->
 
         AuthUIAdaptive(
             title = title,
@@ -33,5 +40,4 @@ fun LoginUI(
             onEnter = onEnter,
         )
     }
-
 }

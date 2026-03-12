@@ -1,15 +1,15 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     id("kotlin-parcelize") // For 'kotlinx.parcelize.Parcelize'
+    alias(libs.plugins.composeCompiler) // For 'androidx.compose.runtime.Immutable'
 }
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.api"
 
         compileSdk =
@@ -27,7 +27,8 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = libs.versions.javaversion.get()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
 
@@ -37,9 +38,11 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.serializationJson)
             implementation(libs.kotlinx.coroutines.core)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+
+            // Compose
+
+            // For 'androidx.compose.runtime.Immutable'
+            implementation(libs.runtime)
         }
     }
 }

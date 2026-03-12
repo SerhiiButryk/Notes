@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,14 +5,13 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize") // For 'kotlinx.parcelize.Parcelize'
 }
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.auth_ui"
 
         compileSdk =
@@ -31,7 +29,8 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = libs.versions.javaversion.get()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
 
@@ -54,7 +53,6 @@ kotlin {
 
             // Compose navigation
             implementation(libs.navigation)
-            implementation(libs.serializationJson)
 
             // Adaptive layout
             implementation(libs.androidx.adaptive)
@@ -76,6 +74,13 @@ kotlin {
             implementation(libs.jetbrains.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // Serialization
+            implementation(libs.serializationJson)
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
+            // View Model
+            implementation(libs.androidx.lifecycle.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

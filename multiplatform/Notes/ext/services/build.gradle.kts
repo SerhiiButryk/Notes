@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,7 +7,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.services"
 
         compileSdk =
@@ -26,14 +25,17 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = libs.versions.javaversion.get()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
+
+    jvm()
 
     sourceSets {
         androidMain.dependencies {
 
-            implementation(projects.api)
+            implementation(projects.repo)
 
             // Firebase SDK
             implementation(project.dependencies.platform(libs.firebase.bom))
@@ -55,17 +57,21 @@ kotlin {
             implementation(libs.google.http.client.jackson2)
             implementation(libs.google.auth.library.oauth2.http)
 
-            // To fix undef grpc class issue. TODO: workaround need to analyze deps and get rid of this
+            // To fix undef grpc class issue.
             implementation(libs.grpc.okhttp)
             implementation(libs.grpc.android)
             implementation(libs.grpc.stub)
             implementation(libs.grpc.protobuf.lite)
         }
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(projects.api)
+
+            // Firebase SDK for KMP
+            implementation(libs.firebase.app )
+            implementation(libs.gitlive.firebase.firestore)
+            implementation(libs.devfirebase.auth)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+        jvmMain.dependencies {
         }
     }
 }

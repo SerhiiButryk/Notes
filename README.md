@@ -16,75 +16,20 @@ Under active development.
 
 <img src="images/package_structure.png">
 
-# Docs/Dev notes
-
-**Cloning with submodules**
+**Cloning the repo with submodules**
 
 ```
-$ git clone /url/to/repo/with/submodules
+$ git clone git@github.com:SerhiiButryk/Notes.git
 $ git submodule init
 $ git submodule update
-
-Add new submodule:
-
-$ git submodule add https://bitbucket.org/jaredw/awesomelibrary
-```
-
-**Declaring IOS targets**
-
-```
-listOf(
-iosX64(),
-iosArm64(),
-iosSimulatorArm64(),
-).forEach { iosTarget ->
-iosTarget.binaries.framework {
-baseName = "Shared"
-isStatic = true
-}
-}
-```
-
-** Others
-
-```
- 1. Ktlint run:
- ./gradlew ktlintchec
-
- 2. Android lint run:
- ./gradlew lint
-
- 3. Fix style Ktlint issues:
- ./gradlew ktlintFormat
-
-4. Fresh detekt run:
-./gradlew detekt
-
-This may be required:
-./gradlew detektGenerateConfig
-./gradlew detektBaseline
-```
-
-**The ongoing TODO list**
-
-1. Investigate Android proguard settings:
-
-```
-kotlin { androidLibrary { ...
-   optimization {
-   // TODO: Might need to set proguard rules here
-   }
-...
 ```
 
 **The ongoing improvements/features**
 
-1. Add html to pdf export feature
+1. Investigate memory issues during runtime
 
-Need to use WebView or native canvas drawing. No other approaches so far.
+2. Test with large notes > 1 GB
 
-2. Investigate memory issues during runtime
+3. Implement UI improvements (Search, Labels ...)
 
-3. Support backup
-
-4. Test with large notes > 1 GB
+4. Can add PlayIntgrity check using Firebase. However, it needs Google Play console configuration which is not possible now.

@@ -1,14 +1,50 @@
 package api.data
 
+import androidx.compose.runtime.Immutable
+
+@Immutable // To mark it stable for compose
 data class Notes(
     val content: String = "",
     val id: Long = 0,
     val userId: String = "",
-    val time: String = ""
+    val time: String = "",
 ) {
+    // Rich string representing this note
+    var richString: Any? = null
+
     companion object {
         fun NewNote() = Notes(id = -1)
 
         fun AbsentNote() = Notes(id = -2)
     }
+}
+
+@Immutable // To mark it stable for compose
+data class NotesCollection(
+    val collection: List<Notes> = emptyList(),
+)
+
+fun Notes.getStringRep(): String = content
+
+fun String.getNoteRep(id: Long): Notes = Notes(content = this, id = id, userId = "", time = "")
+
+fun List<Notes>.isEqualTo(list: List<Notes>): Boolean {
+    if (size != list.size) {
+        return false
+    }
+    forEach { item ->
+
+        val found = list.find { it.id == item.id }
+
+        if (found == null) {
+            return false
+        }
+
+        val identical = found.content == item.content && found.userId == item.userId
+
+        if (!identical) {
+            return false
+        }
+    }
+    return true
 }

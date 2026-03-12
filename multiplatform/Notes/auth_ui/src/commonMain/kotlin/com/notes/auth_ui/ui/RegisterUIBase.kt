@@ -9,24 +9,25 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import com.notes.auth_ui.data.RegisterUIState
 import com.notes.ui.NetworkStateMessage
 
 @Composable
 fun RegisterUIImpl(
+    modifier: Modifier = Modifier,
     onRegister: (RegisterUIState) -> Unit,
     content: @Composable (
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues
-    ) -> Unit
+        innerPadding: PaddingValues,
+    ) -> Unit,
 ) {
+    val finalModifier = Modifier.fillMaxSize().then(modifier)
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = finalModifier,
     ) { innerPadding ->
 
         val email = rememberSaveable { mutableStateOf("") }
@@ -34,15 +35,11 @@ fun RegisterUIImpl(
         val confirmPassword = rememberSaveable { mutableStateOf("") }
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
-
             NetworkStateMessage()
 
             content(
-                "Register",
-                "Enter your user email and create a password " +
-                        "to access this application",
                 email,
                 password,
                 confirmPassword,
@@ -57,7 +54,6 @@ fun RegisterUIImpl(
                 },
                 innerPadding,
             )
-
         }
     }
 }
