@@ -6,7 +6,7 @@ import androidx.activity.result.IntentSenderRequest
 import api.AppServices
 import api.auth.AuthCallback
 import com.notes.data.isAllInSyncWithRemote
-import com.notes.notes_ui.SettingsViewModel.AccountInfo
+import com.notes.notes_ui.data.AccountInfo
 import com.notes.notes_ui.data.AppRepository
 import com.notes.notes_ui.data.RemoteRepository
 import com.notes.notes_ui.features.PdfConverter
@@ -72,22 +72,29 @@ class SettingsInteractor {
         )
     }
 
-    suspend fun requestPermissions(context: Any?, onSuccess: (IntentSenderRequest) -> Unit, onUpdate: () -> Unit) {
-            val service = AppServices
-                .getAuthServiceByName("google")!!
-            service.resetSettings()
-            val callback = object : AuthCallback {
-                override fun onUserAction(data: Any?) {
-                    if (data != null) {
-                        onSuccess(data as IntentSenderRequest)
-                    }
-                    service.setAuthCallback(null)
-                    onUpdate()
+    suspend fun requestPermissions(
+        context: Any?,
+        onSuccess: (IntentSenderRequest) -> Unit,
+        onUpdate: () -> Unit
+    ) {
+        val service = AppServices
+            .getAuthServiceByName("google")!!
+        service.resetSettings()
+        val callback = object : AuthCallback {
+            override fun onUserAction(data: Any?) {
+                if (data != null) {
+                    onSuccess(data as IntentSenderRequest)
                 }
+                service.setAuthCallback(null)
+                // Update status
+                onUpdate()
             }
-            service.setAuthCallback(callback)
-            // Will sign in and ask permission from user
-            service.login(activityContext = context, pass = "", email = "")
+        }
+        service.setAuthCallback(callback)
+        // Will sign in and ask permission from user
+        service.login(activityContext = context, pass = "", email = "")
+        // Update status
+        onUpdate()
     }
 
 }

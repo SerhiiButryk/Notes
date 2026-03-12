@@ -39,14 +39,16 @@ fun SettingsUI(
                 title = "Account",
                 subtitle = "Profile, privacy, and security",
                 icon = Icons.Default.Person,
-                onClick = onAccountClick
+                onClick = onAccountClick,
+                showRightSign = true
             )
 
             SettingsListItem(
                 title = "Export to a PDF file",
                 subtitle = "Save your notes to a pdf file",
                 icon = Icons.Default.Person,
-                onClick = onExportClick
+                onClick = onExportClick,
+                showRightSign = false
             )
         }
     }
@@ -54,7 +56,11 @@ fun SettingsUI(
 
 @Composable
 fun SettingsListItem(
-    title: String, subtitle: String, icon: ImageVector, onClick: () -> Unit
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    showRightSign: Boolean,
 ) {
     Surface(
         onClick = onClick, color = Color.Transparent // Keeps the Ripple effect visible
@@ -80,11 +86,13 @@ fun SettingsListItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            if (showRightSign) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

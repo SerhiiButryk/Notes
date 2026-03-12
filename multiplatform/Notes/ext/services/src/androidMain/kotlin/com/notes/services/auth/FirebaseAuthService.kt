@@ -198,6 +198,8 @@ class FirebaseAuthService : AbstractAuthService() {
 
             if (result.isSuccess()) {
                 logger.logi("$tag::signInUsingGoogleSilent() done silent login with Google service")
+            } else {
+                logger.loge("$tag::signInUsingGoogleSilent() silent login has failed")
             }
         } else {
             logger.logi("$tag::signInUsingGoogleSilent() can't perform silent login")

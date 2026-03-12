@@ -106,9 +106,9 @@ fun AccountUI(
             val status3 = if (accountInfo.googleDriveIsActive) "Active" else "Not active"
 
             AccountStatusCard(
-                title = "Cloud Storage",
+                title = "Google drive",
                 status = status3,
-                icon = getIconByKey(googleIcon),
+                icon = getIconByKey(googleDriveIcon),
                 iconTint = Color.Unspecified,
                 showStatusDot = true,
                 isOnline = accountInfo.googleDriveIsActive,
@@ -116,8 +116,6 @@ fun AccountUI(
             )
 
             val status4 = if (accountInfo.syncCompleted) "Active" else "Not active"
-
-
 
             AccountStatusCard(
                 title = "Cloud sync",

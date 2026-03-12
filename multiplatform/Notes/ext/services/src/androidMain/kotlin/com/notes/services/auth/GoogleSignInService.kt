@@ -73,7 +73,7 @@ class GoogleSignInService : AbstractAuthService() {
                 context = activityContext as Context,
             )
         } catch (e: NoCredentialException) {
-            logger.logi("GoogleSignInService::login() error: $e")
+            logger.loge("GoogleSignInService::login() error: $e")
             return AuthResult.loginFailed()
         }
 

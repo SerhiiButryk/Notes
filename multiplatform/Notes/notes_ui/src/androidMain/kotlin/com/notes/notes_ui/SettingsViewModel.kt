@@ -6,6 +6,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.PlatformAPIs.logger
+import com.notes.notes_ui.data.AccountInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +49,7 @@ class SettingsViewModel(
 
     fun onExport(uri: Uri?, context: Context) {
 
-        logger.logi("onExport() uri - $uri")
+        logger.logi("onExport() uri = ${uri != null}")
 
         if (uri == null) {
             logger.loge("onExport() error: uri is empty")

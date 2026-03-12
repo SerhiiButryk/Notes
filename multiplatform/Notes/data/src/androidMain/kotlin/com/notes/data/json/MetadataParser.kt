@@ -142,6 +142,7 @@ fun toJson(
 }
 
 private fun parseJson(metadata: String): JsonElement? {
+    if (metadata.isEmpty()) return null
     val json = Json { ignoreUnknownKeys = true }
     val deserializedElement: JsonElement = try {
         json.parseToJsonElement(metadata)
