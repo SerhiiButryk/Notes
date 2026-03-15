@@ -30,9 +30,6 @@ kotlin {
 
         androidMain.dependencies {
 
-            implementation(projects.ui)
-            implementation(projects.notesUi)
-            implementation(projects.authUi)
             implementation(projects.ext.services)
             implementation(projects.net)
             implementation(projects.data)

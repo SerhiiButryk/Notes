@@ -50,6 +50,7 @@ class Notes : Application() {
         iconsCollection[googleDriveIcon] = CommonIcon(R.drawable.googledrive)
         iconsCollection[firebaseIcon] = CommonIcon(R.drawable.firebase)
         iconsCollection[cloudSyncIcon] = CommonIcon(R.drawable.cloud_sync_icon)
+        iconsCollection[previewIcon] = CommonIcon(R.drawable.image_preview)
 
         AppServices.serverClientId = getString(R.string.server_client_id)
 

@@ -28,3 +28,4 @@ const val googleIcon: Int = 7
 const val firebaseIcon: Int = 8
 const val googleDriveIcon: Int = 9
 const val cloudSyncIcon: Int = 10
+const val previewIcon: Int = 11

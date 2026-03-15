@@ -16,6 +16,9 @@ abstract class NoteDatabase : RoomDatabase() {
     abstract fun noteMetadataDao(): NoteMetadataDao
 }
 
+/**
+ * Access point to our Room database
+ */
 object LocalNoteDatabase : LocalNoteDatabaseImpl() {
 
     suspend fun testOnly_access(): NoteDao = accessInternal().noteDao()

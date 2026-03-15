@@ -4,8 +4,8 @@ import api.AppServices
 import api.PlatformAPIs
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
-import com.notes.auth_ui.data.getUserEmail
-import com.notes.auth_ui.data.saveUserEmail
+import api.data.getUserEmail
+import api.data.saveUserEmail
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

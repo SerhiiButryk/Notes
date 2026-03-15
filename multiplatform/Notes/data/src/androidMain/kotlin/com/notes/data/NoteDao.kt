@@ -41,4 +41,7 @@ interface NoteDao {
     """)
     fun getNoteWithMetadata(id: Long): Flow<NoteInfo?>
 
+    @Query("delete from notes_data")
+    fun delete()
+
 }

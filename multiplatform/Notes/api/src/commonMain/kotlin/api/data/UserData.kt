@@ -1,10 +1,20 @@
-package com.notes.auth_ui.data
+package api.data
 
 import api.PlatformAPIs
 import api.PlatformAPIs.logger
 import kotlinx.coroutines.flow.MutableStateFlow
 
+private data class UserInfo(val email: String = "")
+
 private val userDataState = MutableStateFlow(UserInfo())
+
+private const val REGISTERED_USER_EMAIL = "REGISTERED_USER_EMAIL"
+
+suspend fun saveUserEmail(email: String) {
+    PlatformAPIs.storage.save(email, REGISTERED_USER_EMAIL)
+}
+
+suspend fun getUserEmail(): String = PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
 
 suspend fun loadUserData() {
     val userEmail = PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
@@ -18,6 +28,6 @@ fun isFirstLaunch(): Boolean {
 }
 
 fun isUserRegistered(): Boolean {
-    // If we have saved used email then more likely user has already passed registration flow
+    // If we have saved an email then it's more likely user has already passed registration
     return userDataState.value.email.isNotEmpty()
 }

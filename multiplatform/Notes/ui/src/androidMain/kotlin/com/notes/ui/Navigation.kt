@@ -12,8 +12,6 @@ import kotlinx.serialization.Serializable
 /**
  * Define new screen using this base class.
  */
-@Serializable
-open class Screen
 
 // To navigate back safely
 fun NavController.navAndPopUpCurrent(destination: Any) {

@@ -41,9 +41,16 @@ class SettingsViewModel(
     }
 
     // Will sign out from Google and Firebase
-    fun singOut() {
-        scope.launch {
-            interactor.singOut { updateAccountInfo() }
+    fun singOut(onSuccess: () -> Unit) {
+        scope.launch(Dispatchers.Default) {
+            interactor.singOut { result ->
+                if (result) {
+                    launch(Dispatchers.Main) {
+                        onSuccess()
+                    }
+                }
+                updateAccountInfo()
+            }
         }
     }
 

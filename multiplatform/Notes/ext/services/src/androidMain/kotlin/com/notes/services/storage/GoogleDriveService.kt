@@ -22,7 +22,7 @@ import com.google.auth.oauth2.AccessToken
 import com.google.auth.oauth2.GoogleCredentials
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
-import kotlin.collections.find
+import java.io.IOException
 
 
 /**
@@ -55,10 +55,15 @@ class GoogleDriveService : AbstractStorageService() {
 
         val content = ByteArrayContent.fromString("application/json", payload)
 
-        drive!!
-            .files()
-            .create(fileMetadata, content)
-            .execute()
+        try {
+            drive!!
+                .files()
+                .create(fileMetadata, content)
+                .execute()
+        } catch (e: IOException) {
+            logger.loge("GoogleDriveService::store() error = $e")
+            return false
+        }
 
         logger.logi("GoogleDriveService::store() done")
 
@@ -72,7 +77,13 @@ class GoogleDriveService : AbstractStorageService() {
         val file = getFile(name) ?: return null
 
         val outputStream = ByteArrayOutputStream()
-        drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
+
+        try {
+            drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
+        } catch (e: IOException) {
+            logger.loge("GoogleDriveService::load() error = $e")
+            return null
+        }
 
         val responseJson = outputStream.toString()
 
@@ -86,7 +97,12 @@ class GoogleDriveService : AbstractStorageService() {
         try {
             val file = getFile(name)
             if (file != null) {
-                drive!!.files().delete(file.id).execute()
+                try {
+                    drive!!.files().delete(file.id).execute()
+                } catch (e: IOException) {
+                    logger.loge("GoogleDriveService::delete() error = $e")
+                    return false
+                }
                 logger.logi("GoogleDriveService::delete() done")
                 return true
             }
@@ -99,10 +115,15 @@ class GoogleDriveService : AbstractStorageService() {
     }
 
     private fun getFile(name: String): File? {
-        val fileList = drive!!.files()
-            .list()
-            .setSpaces(appDataFolder)
-            .execute()
+        val fileList = try {
+            drive!!.files()
+                .list()
+                .setSpaces(appDataFolder)
+                .execute()
+        } catch (e: IOException) {
+            logger.loge("GoogleDriveService::getFile() error = $e")
+            return null
+        }
         return fileList.files.find { file ->
             file.name == getDataFileName(name)
         }
@@ -114,15 +135,26 @@ class GoogleDriveService : AbstractStorageService() {
 
         val list = mutableListOf<Document>()
 
-        val fileList = drive!!.files()
-            .list()
-            .setSpaces(appDataFolder)
-            .execute()
+        val fileList = try {
+            drive!!.files()
+                .list()
+                .setSpaces(appDataFolder)
+                .execute()
+        } catch (e: IOException) {
+            logger.loge("GoogleDriveService::fetchAll() error = $e")
+            return emptyList()
+        }
 
         for (file in fileList.files) {
 
             val outputStream = ByteArrayOutputStream()
-            drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
+
+            try {
+                drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
+            } catch (e: IOException) {
+                logger.loge("GoogleDriveService::fetchAll() failed error = $e")
+                return list
+            }
 
             val responseJson = outputStream.toString()
             list.add(responseJson.toDocument())

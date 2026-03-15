@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.result.IntentSenderRequest
 import api.AppServices
+import api.PlatformAPIs.logger
 import api.auth.AuthCallback
+import com.notes.data.LocalNoteDatabase
 import com.notes.data.isAllInSyncWithRemote
 import com.notes.notes_ui.data.AccountInfo
 import com.notes.notes_ui.data.AppRepository
@@ -32,11 +34,15 @@ class SettingsInteractor {
         }
     }
 
-    suspend fun singOut(callback: () -> Unit) {
-        AppServices
+    suspend fun singOut(callback: (Boolean) -> Unit) {
+        val result = AppServices
             .getAuthServiceByName("google")!!
             .signOut()
-        callback()
+        callback(result)
+        if (result) {
+            // Will be clearing database completely
+            LocalNoteDatabase.access().delete()
+        }
     }
 
     suspend fun getAccountInfo(pending: Boolean = false): AccountInfo {

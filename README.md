@@ -54,6 +54,4 @@ This may be required:
 
 2. Test with large notes > 1 GB
 
-3. Implement sign out 
-
-4. Implement UI improvements (Search, Labels ...)
+3. Implement UI improvements (Search, Labels ...)

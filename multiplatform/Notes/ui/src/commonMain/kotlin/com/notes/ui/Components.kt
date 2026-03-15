@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -192,6 +193,7 @@ fun SearchBarField(
 ) {
 
     val focusManager = LocalFocusManager.current
+    var shouldClear by remember { mutableStateOf(true) }
 
     SearchBar(
         inputField = {
@@ -232,8 +234,9 @@ fun SearchBarField(
             .fillMaxWidth()
             .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
             .onFocusEvent {
-                if (it.hasFocus) {
+                if (it.hasFocus && shouldClear) {
                     focusManager.clearFocus()
+                    shouldClear = false
                 }
             },
     ) {}

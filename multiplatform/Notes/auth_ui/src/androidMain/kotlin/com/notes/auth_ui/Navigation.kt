@@ -13,6 +13,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.notes.ui.Access
+import com.notes.ui.Auth
+import com.notes.ui.EmailVerification
+import com.notes.ui.OnBoardingScreen
+import com.notes.ui.getStartDestination
 import com.notes.auth_ui.ui.LoginUI
 import com.notes.auth_ui.ui.OnboardingScreen
 import com.notes.auth_ui.ui.RegisterUI
@@ -20,7 +25,6 @@ import com.notes.auth_ui.ui.VerificationEmailUI
 import com.notes.auth_ui.ui.LoginUIState
 import com.notes.auth_ui.ui.RegisterUIState
 import com.notes.auth_ui.ui.VerificationUIState
-import com.notes.notes_ui.getStartDestination
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.getViewModel
 import com.notes.ui.navAndPopUpCurrent

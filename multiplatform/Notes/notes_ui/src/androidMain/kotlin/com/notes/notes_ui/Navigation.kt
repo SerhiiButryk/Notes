@@ -16,16 +16,19 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.notes.ui.Auth
+import com.notes.ui.MainContent
+import com.notes.ui.NotesAccount
+import com.notes.ui.NotesPreview
+import com.notes.ui.NotesSettings
 import api.PlatformAPIs.logger
 import api.data.Notes
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
-import com.notes.ui.Screen
 import com.notes.ui.getViewModel
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.navAndPopUpCurrent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
     // Main app content graph
@@ -118,7 +121,11 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val onBackClick: () -> Unit = { navController.navAndPopUpCurrent(NotesSettings) }
 
-            val onSignOut = { viewModel.singOut() }
+            val onSignOut = {
+                viewModel.singOut {
+                    navController.navigate(Auth)
+                }
+            }
 
             val accountInfo by viewModel.accountInfo.collectAsStateWithLifecycle()
 
@@ -149,20 +156,3 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
         }
     }
 }
-
-fun getStartDestination(): Screen = MainContent
-
-// Object: Use an object for routes without arguments.
-// Class: Use a class or data class for routes with arguments.
-
-@Serializable
-object NotesPreview : Screen()
-
-@Serializable
-object MainContent : Screen()
-
-@Serializable
-internal object NotesSettings : Screen()
-
-@Serializable
-internal object NotesAccount : Screen()

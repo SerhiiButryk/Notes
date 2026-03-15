@@ -40,8 +40,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
-            implementation(projects.notesUi)
-
             implementation(libs.bundles.android.core)
 
             // Compose UI

@@ -140,11 +140,10 @@ fun AccountUI(
                 }
             }
 
-            // TODO: Not properly supported yet
-//            Button(
-//                modifier = modifierBtn, onClick = { onSignOut() }) {
-//                Text(text = "Sing out")
-//            }
+            Button(
+                modifier = modifierBtn, onClick = { onSignOut() }) {
+                Text(text = "Sing out")
+            }
 
         }
     }
