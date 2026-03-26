@@ -1,7 +1,7 @@
 package com.notes.auth_ui
 
 import api.AppServices
-import api.PlatformAPIs
+import api.Platform
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
 import api.data.getUserEmail
@@ -21,12 +21,12 @@ internal class Interactor(
 
     suspend fun login(password: String, email: String, context: Any?): AuthResult {
         if (password.isEmpty() || email.isEmpty()) {
-            return AuthResult.Companion.emailOrPassEmpty(email)
+            return AuthResult.emailOrPassEmpty(email)
         }
 
         val job =
             scope.async {
-                PlatformAPIs.crypto.addAuthCallbackFor(authService)
+                Platform().crypto.addAuthCallbackFor(authService)
                 val result = authService.login(password, email, context)
                 // Save user email if it's not saved
                 // It's the case if user didn't register and did sing in with
@@ -60,13 +60,20 @@ internal class Interactor(
         return job.await()
     }
 
+    suspend fun verifyCode(code: String): Boolean {
+        val job = scope.async { authService.verifyCode(code) }
+        return job.await()
+    }
+
     suspend fun isEmailVerified(): Boolean {
         val job =
             scope.async {
                 if (authService.isEmailVerified()) {
                     saveUserEmail(email = authService.getUserEmail())
+                    Platform().logger.logi("isEmailVerified(): email is verified")
                     true
                 } else {
+                    Platform().logger.loge("isEmailVerified(): email is not verified")
                     false
                 }
             }

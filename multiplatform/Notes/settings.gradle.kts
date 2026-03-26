@@ -33,16 +33,13 @@ plugins {
 }
 
 include(":composeApp")
-// include(":shared") // TODO: Remove later
-
 include(":api")
 include(":ui")
 include(":auth_ui")
 include(":net")
 include(":notes_ui")
 include(":data")
-
 include(":ext:services")
-
 include(":compose-rich-editor")
 project(":compose-rich-editor").projectDir = file("ext/compose-rich-editor/richeditor-compose")
+include(":os")

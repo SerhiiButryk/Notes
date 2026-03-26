@@ -1,7 +1,7 @@
 package api.data
 
 import api.AppServices
-import api.PlatformAPIs.logger
+import api.Platform
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
@@ -39,18 +39,18 @@ abstract class AbstractStorageService : StorageService {
         if (!isAuthenticated()) return false
 
         if (name.isEmpty()) {
-            logger.loge("$tag::paramsCheck() stop cos empty data")
+            Platform().logger.loge("$tag::paramsCheck() stop cos empty data")
             return false
         }
 
         try {
             val nameCheck = name.toInt()
             if (nameCheck < 0) {
-                logger.loge("$tag::paramsCheck() stop cos not valid name")
+                Platform().logger.loge("$tag::paramsCheck() stop cos not valid name")
                 return false
             }
         } catch (e: NumberFormatException) {
-            logger.loge("$tag::paramsCheck() stop cos not a number")
+            Platform().logger.loge("$tag::paramsCheck() stop cos not a number")
             return false
         }
 
@@ -62,12 +62,12 @@ abstract class AbstractStorageService : StorageService {
         val uid = authService?.getUserId()
 
         if (authService == null || !authService.isAuthenticated()) {
-            logger.loge("$tag::isAuthenticated() not authenticated")
+            Platform().logger.loge("$tag::isAuthenticated() not authenticated")
             return false
         }
 
         if (uid.isNullOrEmpty()) {
-            logger.loge("$tag::isAuthenticated() uid is invalid")
+            Platform().logger.loge("$tag::isAuthenticated() uid is invalid")
             return false
         }
 

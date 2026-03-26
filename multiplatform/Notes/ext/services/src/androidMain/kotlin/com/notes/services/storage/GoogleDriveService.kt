@@ -2,7 +2,7 @@ package com.notes.services.storage
 
 import android.content.Context
 import androidx.activity.result.IntentSenderRequest
-import api.PlatformAPIs.logger
+import api.Platform
 import api.auth.AuthCallback
 import api.data.AbstractStorageService
 import api.data.Document
@@ -61,11 +61,11 @@ class GoogleDriveService : AbstractStorageService() {
                 .create(fileMetadata, content)
                 .execute()
         } catch (e: IOException) {
-            logger.loge("GoogleDriveService::store() error = $e")
+            Platform().logger.loge("GoogleDriveService::store() error = $e")
             return false
         }
 
-        logger.logi("GoogleDriveService::store() done")
+        Platform().logger.logi("GoogleDriveService::store() done")
 
         return true
     }
@@ -81,13 +81,13 @@ class GoogleDriveService : AbstractStorageService() {
         try {
             drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
         } catch (e: IOException) {
-            logger.loge("GoogleDriveService::load() error = $e")
+            Platform().logger.loge("GoogleDriveService::load() error = $e")
             return null
         }
 
         val responseJson = outputStream.toString()
 
-        logger.logi("GoogleDriveService::load() done")
+        Platform().logger.logi("GoogleDriveService::load() done")
 
         return responseJson.toDocument()
     }
@@ -100,15 +100,15 @@ class GoogleDriveService : AbstractStorageService() {
                 try {
                     drive!!.files().delete(file.id).execute()
                 } catch (e: IOException) {
-                    logger.loge("GoogleDriveService::delete() error = $e")
+                    Platform().logger.loge("GoogleDriveService::delete() error = $e")
                     return false
                 }
-                logger.logi("GoogleDriveService::delete() done")
+                Platform().logger.logi("GoogleDriveService::delete() done")
                 return true
             }
         } catch (e: Exception) {
             // Handle cases where file might already be gone
-            logger.loge("GoogleDriveService::delete() error = $e")
+            Platform().logger.loge("GoogleDriveService::delete() error = $e")
             e.printStackTrace()
         }
         return false
@@ -121,7 +121,7 @@ class GoogleDriveService : AbstractStorageService() {
                 .setSpaces(appDataFolder)
                 .execute()
         } catch (e: IOException) {
-            logger.loge("GoogleDriveService::getFile() error = $e")
+            Platform().logger.loge("GoogleDriveService::getFile() error = $e")
             return null
         }
         return fileList.files.find { file ->
@@ -141,7 +141,7 @@ class GoogleDriveService : AbstractStorageService() {
                 .setSpaces(appDataFolder)
                 .execute()
         } catch (e: IOException) {
-            logger.loge("GoogleDriveService::fetchAll() error = $e")
+            Platform().logger.loge("GoogleDriveService::fetchAll() error = $e")
             return emptyList()
         }
 
@@ -152,7 +152,7 @@ class GoogleDriveService : AbstractStorageService() {
             try {
                 drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
             } catch (e: IOException) {
-                logger.loge("GoogleDriveService::fetchAll() failed error = $e")
+                Platform().logger.loge("GoogleDriveService::fetchAll() failed error = $e")
                 return list
             }
 
@@ -160,7 +160,7 @@ class GoogleDriveService : AbstractStorageService() {
             list.add(responseJson.toDocument())
         }
 
-        logger.logi("GoogleDriveService::fetchAll() size = '${list.size}'")
+        Platform().logger.logi("GoogleDriveService::fetchAll() size = '${list.size}'")
 
         return list
     }
@@ -171,7 +171,7 @@ class GoogleDriveService : AbstractStorageService() {
      */
     suspend fun askForAccess(activityContext: Any?, callback: AuthCallback?) {
 
-        logger.logi("GoogleDriveService::askForAccess()")
+        Platform().logger.logi("GoogleDriveService::askForAccess()")
 
         val requestedScopes = listOf(Scope(DriveScopes.DRIVE_APPDATA))
 
@@ -184,21 +184,21 @@ class GoogleDriveService : AbstractStorageService() {
                 .authorize(authorizationRequest)
                 .addOnSuccessListener { authorizationResult ->
                     if (authorizationResult.hasResolution()) {
-                        logger.logi("GoogleDriveService::askForAccess() Success.")
+                        Platform().logger.logi("GoogleDriveService::askForAccess() Success.")
                         // The user needs to grant permission via a popup
                         val pendingIntent = authorizationResult.pendingIntent
                         val intentSenderRequest = IntentSenderRequest.Builder(pendingIntent!!).build()
                         callback?.onUserAction(intentSenderRequest)
                     } else {
                         // Permission already granted
-                        logger.logi("GoogleDriveService::askForAccess() Drive access already authorized.")
+                        Platform().logger.logi("GoogleDriveService::askForAccess() Drive access already authorized.")
                     }
                     continuation.resume(authorizationResult.accessToken) { _, _, _ ->
                         // no-op if coroutine is canceled
                     }
                 }
                 .addOnFailureListener { e ->
-                    logger.loge("GoogleDriveService::askForAccess() Authorization failed: ${e.message}")
+                    Platform().logger.loge("GoogleDriveService::askForAccess() Authorization failed: ${e.message}")
                     continuation.resume("") { _, _, _ ->
                         // no-op if coroutine is canceled
                     }
@@ -209,7 +209,7 @@ class GoogleDriveService : AbstractStorageService() {
             drive = getDriveService(token)
         }
 
-        logger.logi("GoogleDriveService::askForAccess() ready = $canUse")
+        Platform().logger.logi("GoogleDriveService::askForAccess() ready = $canUse")
 
         // Notify about update
         callback?.onUserAction(null)

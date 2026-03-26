@@ -16,12 +16,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import api.Platform
 import com.notes.ui.Auth
 import com.notes.ui.MainContent
 import com.notes.ui.NotesAccount
 import com.notes.ui.NotesPreview
 import com.notes.ui.NotesSettings
-import api.PlatformAPIs.logger
 import api.data.Notes
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
@@ -135,7 +135,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 ActivityResultContracts.StartIntentSenderForResult()
             ) { result ->
                 val result = result.resultCode == Activity.RESULT_OK
-                logger.logi("AccountUI::activity result = $result")
+                Platform().logger.logi("AccountUI::activity result = $result")
                 viewModel.updateAccountInfo()
             }
 

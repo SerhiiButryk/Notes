@@ -2,7 +2,7 @@ package com.notes.services.auth
 
 import android.app.Activity
 import api.AppServices
-import api.PlatformAPIs.logger
+import api.Platform
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
 import com.google.firebase.Firebase
@@ -31,12 +31,12 @@ class FirebaseAuthService : AbstractAuthService() {
             suspendCancellableCoroutine { continuation ->
                 auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        logger.logi("$tag::createUser() success")
+                        Platform().logger.logi("$tag::createUser() success")
                         continuation.resume(AuthResult.registrationSuccess(email)) { _, _, _ ->
                             // no-op if coroutine is canceled
                         }
                     } else {
-                        logger.loge("$tag::createUser() failure: ${task.exception}")
+                        Platform().logger.loge("$tag::createUser() failure: ${task.exception}")
                         continuation.resume(AuthResult.registrationFailed(email)) { _, _, _ ->
                             // no-op if coroutine is canceled
                         }
@@ -58,12 +58,12 @@ class FirebaseAuthService : AbstractAuthService() {
         val result = suspendCancellableCoroutine { continuation ->
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    logger.logi("$tag::login() success")
+                    Platform().logger.logi("$tag::login() success")
                     continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
                         // no-op if coroutine is canceled
                     }
                 } else {
-                    logger.loge("$tag::login() failure: ${task.exception}")
+                    Platform().logger.loge("$tag::login() failure: ${task.exception}")
                     continuation.resume(AuthResult.loginFailed()) { _, _, _ ->
                         // no-op if coroutine is canceled
                     }
@@ -81,7 +81,7 @@ class FirebaseAuthService : AbstractAuthService() {
     }
 
     override suspend fun login(tokenId: String, activityContext: Any?): AuthResult {
-        logger.logi("$tag::login() requesting sign with Google creds")
+        Platform().logger.logi("$tag::login() requesting sign with Google creds")
 
         val credential = GoogleAuthProvider.getCredential(tokenId, null)
 
@@ -89,13 +89,13 @@ class FirebaseAuthService : AbstractAuthService() {
             auth.signInWithCredential(credential)
                 .addOnCompleteListener(activityContext as Activity) { task ->
                     if (task.isSuccessful) {
-                        logger.logi("$tag::login() logged in with Google token")
+                        Platform().logger.logi("$tag::login() logged in with Google token")
                         val email = task.result.user?.email ?: ""
                         continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
                             // no-op if coroutine is canceled
                         }
                     } else {
-                        logger.loge("$tag::login() failed to sign in with credential")
+                        Platform().logger.loge("$tag::login() failed to sign in with credential")
                         continuation.resume(AuthResult.loginFailed()) { _, _, _ ->
                             // no-op if coroutine is canceled
                         }
@@ -107,26 +107,44 @@ class FirebaseAuthService : AbstractAuthService() {
     }
 
     override suspend fun sendEmailVerify(): AuthResult {
-        logger.logi("$tag::sendVerification()")
+        Platform().logger.logi("$tag::sendVerification()")
         return sendEmailVerify(null)
+    }
+
+    override suspend fun verifyCode(code: String): Boolean {
+        return suspendCancellableCoroutine { continuation ->
+            auth.applyActionCode(code)
+                .addOnSuccessListener {
+                    Platform().logger.logi("$tag::verifyCode() success")
+                    continuation.resume(true) { _, _, _ ->
+                        // On cancellation do nothing
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Platform().logger.loge("$tag::verifyCode() failed: ${e.message}")
+                    continuation.resume(false) { _, _, _ ->
+                        // On cancellation do nothing
+                    }
+                }
+        }
     }
 
     override suspend fun isEmailVerified(): Boolean {
         val user: FirebaseUser? = auth.currentUser
         if (user == null) {
-            logger.logi("$tag::isEmailVerified() user is null")
+            Platform().logger.logi("$tag::isEmailVerified() user is null")
             return false
         }
         suspendCancellableCoroutine { continuation ->
             // TODO: Check how callback gets called
             user.reload().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    logger.logi("$tag::isEmailVerified() reloaded data")
+                    Platform().logger.logi("$tag::isEmailVerified() reloaded data")
                     continuation.resume(true) { _, _, _ ->
                         // On cancellation do nothing
                     }
                 } else {
-                    logger.loge("$tag::isEmailVerified() reload is failed: ${task.exception}")
+                    Platform().logger.loge("$tag::isEmailVerified() reload is failed: ${task.exception}")
                     continuation.resume(false) { _, _, _ ->
                         // On cancellation do nothing
                     }
@@ -153,20 +171,20 @@ class FirebaseAuthService : AbstractAuthService() {
     }
 
     private suspend fun sendEmailVerify(fireBaseUser: FirebaseUser?): AuthResult {
-        logger.logi("$tag::sendVerification()")
+        Platform().logger.logi("$tag::sendVerification()")
         val user: FirebaseUser? = fireBaseUser ?: auth.currentUser
         return suspendCancellableCoroutine { continuation ->
             user?.sendEmailVerification()?.addOnCompleteListener { task ->
-                logger.logi("$tag::sendVerification() completed")
+                Platform().logger.logi("$tag::sendVerification() completed")
                 if (task.isSuccessful) {
-                    logger.logi("$tag::sendVerification() verification code is sent")
+                    Platform().logger.logi("$tag::sendVerification() verification code is sent")
                     continuation.resume(
                         AuthResult.verificationSentSuccess(user.email!!),
                     ) { _, _, _ ->
                         // no-op if coroutine is cancelled
                     }
                 } else {
-                    logger.loge("$tag::sendVerification() failure: ${task.exception}")
+                    Platform().logger.loge("$tag::sendVerification() failure: ${task.exception}")
                     continuation.resume(
                         AuthResult.verificationSentFailed(user.email!!),
                     ) { _, _, _ ->
@@ -183,7 +201,7 @@ class FirebaseAuthService : AbstractAuthService() {
 
     private suspend fun signInUsingGoogleSilent(activityContext: Any?) {
         if (activityContext != null) {
-            logger.logi("$tag::signInUsingGoogleSilent() try to perform silent login")
+            Platform().logger.logi("$tag::signInUsingGoogleSilent() try to perform silent login")
 
             // Try to perform silent Google Sing In to get auth token
             // and then to finish firebase authentication
@@ -197,12 +215,12 @@ class FirebaseAuthService : AbstractAuthService() {
             val result = googleSignInService.login("", "", activityContext)
 
             if (result.isSuccess()) {
-                logger.logi("$tag::signInUsingGoogleSilent() done silent login with Google service")
+                Platform().logger.logi("$tag::signInUsingGoogleSilent() done silent login with Google service")
             } else {
-                logger.loge("$tag::signInUsingGoogleSilent() silent login has failed")
+                Platform().logger.loge("$tag::signInUsingGoogleSilent() silent login has failed")
             }
         } else {
-            logger.logi("$tag::signInUsingGoogleSilent() can't perform silent login")
+            Platform().logger.logi("$tag::signInUsingGoogleSilent() can't perform silent login")
         }
     }
 }

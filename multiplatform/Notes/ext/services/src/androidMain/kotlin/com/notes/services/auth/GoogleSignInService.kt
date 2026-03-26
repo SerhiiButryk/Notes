@@ -8,7 +8,7 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import api.AppServices
-import api.PlatformAPIs.logger
+import api.Platform
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -51,7 +51,7 @@ class GoogleSignInService : AbstractAuthService() {
     }
 
     override suspend fun login(pass: String, email: String, activityContext: Any?): AuthResult {
-        logger.logi("GoogleSignInService::login()")
+        Platform().logger.logi("GoogleSignInService::login()")
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setServerClientId(AppServices.serverClientId)
@@ -73,7 +73,7 @@ class GoogleSignInService : AbstractAuthService() {
                 context = activityContext as Context,
             )
         } catch (e: NoCredentialException) {
-            logger.loge("GoogleSignInService::login() error: $e")
+            Platform().logger.loge("GoogleSignInService::login() error: $e")
             return AuthResult.loginFailed()
         }
 
@@ -82,7 +82,7 @@ class GoogleSignInService : AbstractAuthService() {
 
     @OptIn(ExperimentalAtomicApi::class)
     private suspend fun handleResponse(credential: Credential, activityContext: Any?): AuthResult {
-        logger.logi("GoogleSignInService::handleResponse()")
+        Platform().logger.logi("GoogleSignInService::handleResponse()")
         // Check if credential is of type Google ID
         if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             // Create Google ID Token
@@ -106,7 +106,7 @@ class GoogleSignInService : AbstractAuthService() {
                 return AuthResult.loginSuccess(email)
             }
         } else {
-            logger.loge("GoogleSignInService::handleResponse() wrong credentials")
+            Platform().logger.loge("GoogleSignInService::handleResponse() wrong credentials")
         }
         return AuthResult.loginFailed()
     }
@@ -118,7 +118,7 @@ class GoogleSignInService : AbstractAuthService() {
 
     @OptIn(ExperimentalAtomicApi::class)
     override suspend fun signOut(): Boolean {
-        logger.logi("GoogleSignInService::signOut()")
+        Platform().logger.logi("GoogleSignInService::signOut()")
         // Firebase sign out
         AppServices
             .getDefaultAuthService()!!
@@ -129,7 +129,7 @@ class GoogleSignInService : AbstractAuthService() {
             credentialManager?.clearCredentialState(clearRequest)
             return true
         } catch (e: ClearCredentialException) {
-            logger.loge("GoogleSignInService::signOut() Couldn't clear user credentials: ${e.localizedMessage}")
+            Platform().logger.loge("GoogleSignInService::signOut() Couldn't clear user credentials: ${e.localizedMessage}")
         }
 
         return false

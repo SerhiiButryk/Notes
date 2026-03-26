@@ -1,6 +1,6 @@
 package com.notes.data
 
-import api.PlatformAPIs
+import api.Platform
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -29,12 +29,12 @@ class EncryptedNoteDao(
     }
 
     private fun decrypt(noteEntity: NoteEntity): NoteEntity {
-        val plaintext = PlatformAPIs.crypto.decrypt(noteEntity.content)
+        val plaintext = Platform().crypto.decrypt(noteEntity.content)
         return noteEntity.copy(content = plaintext)
     }
 
     private fun encrypt(noteEntity: NoteEntity): NoteEntity {
-        val ciphertext = PlatformAPIs.crypto.encrypt(noteEntity.content)
+        val ciphertext = Platform().crypto.encrypt(noteEntity.content)
         return noteEntity.copy(content = ciphertext)
     }
 }

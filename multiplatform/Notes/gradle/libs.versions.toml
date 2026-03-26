@@ -1,49 +1,48 @@
 [versions]
-agp = "8.12.0" # When updating check IOS & Android build. It could create build issues.
-composeMultiplatform = "1.10.0"
+agp = "8.13.2" # When updating check IOS & Android build. It could create build issues.
+composeMultiplatform = "1.10.3"
 composeHotReload = "1.0.0"
 
-googleAuthLibraryOauth2Http = "1.42.1"
 kotlin = "2.3.0"
 
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
 
-androidx-activity = "1.12.2"
+androidx-activity = "1.13.0"
 androidx-appcompat = "1.7.1"
-androidx-core = "1.17.0"
+androidx-core = "1.18.0"
 androidx-espresso = "3.7.0"
-androidx-lifecycle = "2.9.6"
+androidx-lifecycle = "2.10.0"
 kotlinx-coroutines = "1.10.2"
 adaptiveLayout = "1.2.0"
 material3 = "1.9.0"
 materialIconsExtendedVersion = "1.7.3"
-media3 = "1.9.0"
-datastorePreferences = "1.2.0"
-firebaseBom = "34.8.0"
+media3 = "1.9.3"
+datastorePreferences = "1.2.1"
+firebaseBom = "34.11.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 ksoupHtml = "0.6.0"
 lifecycleRuntimeKtx = "2.10.0"
-composeBom = "2026.01.00"
-materialIconsExtended = "1.7.8"
+composeBom = "2026.03.00"
 okhttp = "5.3.2"
 playServicesAuth = "21.5.0"
 roomRuntime = "2.8.4"
 jsonserialization = "1.9.0"
-navigation = "2.9.6"
-runtime = "1.10.0"
-serialization = "2.3.0"
+navigation = "2.9.7"
+runtime = "1.10.3"
+serialization = "2.3.20"
+startupRuntime = "1.2.0"
 truth = "1.4.5"
 jetbrainsMarkdown = "0.7.3"
-klint = "14.0.1"
+klint = "14.2.0"
 detekt = "1.23.8"
-androidx-compose-ui = "1.10.1"
+androidx-compose-ui = "1.10.5"
 kotlinxCoroutinesCore = "1.10.2"
-ui = "1.10.0"
-uiToolingPreview = "1.10.0"
-componentsResources = "1.10.0"
-foundation = "1.10.0"
+ui = "1.10.3"
+uiToolingPreview = "1.10.3"
+componentsResources = "1.10.3"
+foundation = "1.10.3"
 credentials = "1.5.0"
 googleid = "1.2.0"
 googleApiClientAndroid = "2.8.1"
@@ -52,11 +51,13 @@ googleHttpClientAndroid = "1.44.1"
 googleHttpClientJackson2 = "2.1.0"
 grpc = "1.79.0"
 documentfile = "1.1.0"
+googleAuthLibraryOauth2Http = "1.43.0"
 
 [libraries]
 androidx-compose-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
@@ -101,7 +102,6 @@ androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 serializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "jsonserialization" }
 navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }

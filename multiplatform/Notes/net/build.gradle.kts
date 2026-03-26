@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -32,9 +31,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-
-            implementation(projects.api)
-
             // OkHttp
             implementation(libs.okhttp)
             // Coroutines
@@ -42,7 +38,7 @@ kotlin {
         }
 
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(projects.api)
         }
 
         commonTest.dependencies {

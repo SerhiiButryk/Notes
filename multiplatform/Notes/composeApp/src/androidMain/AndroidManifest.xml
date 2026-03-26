@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <!--  Allows an app to prevent non-system-overlay windows from being drawn on top of it  -->
@@ -14,6 +15,21 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!--
+             Helper class to perform component initialization
+                More:
+                https://developer.android.com/topic/libraries/app-startup
+            . -->
+            <meta-data  android:name="com.notes.os.AndroidInitProvider"
+                android:value="androidx.startup" />
+        </provider>
+
         <activity
                 android:exported="true"
                 android:name=".MainActivity">
@@ -26,8 +42,11 @@
 
             <!--
                 To support automatic redirection to the app during email verification flow
-                TODO: Auto verify doesn't work because assetlinks.json is not created
+                the assetlinks.json file should be located at this link:
                 https://fancynotesdevtest.firebaseapp.com/.well-known/assetlinks.json
+                In oder to use deep links for Android app a assetlinks.json should be created
+                and hosted on your site. We use Firebase to do this job.
+                To generate it add this '"appAssociation": "AUTO"' config to 'firebase.json'
             -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>

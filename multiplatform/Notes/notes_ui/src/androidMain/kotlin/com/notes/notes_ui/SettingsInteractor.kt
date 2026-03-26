@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.result.IntentSenderRequest
 import api.AppServices
-import api.PlatformAPIs.logger
 import api.auth.AuthCallback
 import com.notes.data.LocalNoteDatabase
 import com.notes.data.isAllInSyncWithRemote

@@ -30,10 +30,6 @@ kotlin {
 
         androidMain.dependencies {
 
-            implementation(projects.ext.services)
-            implementation(projects.net)
-            implementation(projects.data)
-
             // Compose UI
             implementation(project.dependencies.platform(libs.androidx.compose.bom))
             implementation(libs.androidx.activity.compose)
@@ -42,8 +38,7 @@ kotlin {
             implementation(libs.navigation)
             implementation(libs.serializationJson)
 
-            // DataStore APIs
-            implementation(libs.androidx.datastore.preferences)
+            implementation("androidx.startup:startup-runtime:1.2.0")
         }
 
         commonMain.dependencies {
@@ -52,7 +47,9 @@ kotlin {
             implementation(projects.ui)
             implementation(projects.notesUi)
             implementation(projects.authUi)
+            implementation(projects.os)
 
+            // Compose
             implementation(libs.runtime)
             implementation(libs.foundation)
             implementation(libs.material3)

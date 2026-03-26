@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -33,8 +32,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
-            implementation(projects.api)
-
             // Firebase SDK
             implementation(project.dependencies.platform(libs.firebase.bom))
             // Firebase AI Logic
@@ -62,7 +59,7 @@ kotlin {
             implementation(libs.grpc.protobuf.lite)
         }
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(projects.api)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

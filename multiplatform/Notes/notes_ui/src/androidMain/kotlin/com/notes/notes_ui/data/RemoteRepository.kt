@@ -1,6 +1,6 @@
 package com.notes.notes_ui.data
 
-import api.PlatformAPIs.logger
+import api.Platform
 import api.data.AbstractStorageService
 import api.data.Document
 import api.data.Notes
@@ -31,7 +31,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
             if (service.canUse)
                 services.add(service)
         }
-        logger.logi("RemoteRepository::getServices() available services = '$services'")
+        Platform().logger.logi("RemoteRepository::getServices() available services = '$services'")
         return services
     }
 
@@ -43,7 +43,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
 
             for (dataStore in getServices()) {
 
-                logger.logi("RemoteRepository::saveNote() to '${dataStore.name}'...")
+                Platform().logger.logi("RemoteRepository::saveNote() to '${dataStore.name}'...")
 
                 updateMetadata(dataStore = dataStore, note = note, pendingUpdate = true)
 
@@ -53,7 +53,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
                 if (result) {
                     updateMetadata(dataStore = dataStore, note = note, pendingUpdate = false)
                 } else {
-                    logger.loge("RemoteRepository::saveNote() failed for '${dataStore.name}'")
+                    Platform().logger.loge("RemoteRepository::saveNote() failed for '${dataStore.name}'")
                 }
             }
 
@@ -61,7 +61,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
     }
 
     fun fetchNotes(scope: CoroutineScope) {
-        logger.logi("RemoteRepository::fetchNotes()")
+        Platform().logger.logi("RemoteRepository::fetchNotes()")
         scope.launch {
             val notesFound = mutableListOf<Notes>()
             // Merge results from several sources
@@ -76,7 +76,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
                     }
                 }
             }
-            logger.logi("RemoteRepository::fetchNotes() got ${notesFound.size}")
+            Platform().logger.logi("RemoteRepository::fetchNotes() got ${notesFound.size}")
             processNotes(notesFound)
         }
     }
@@ -119,7 +119,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
         note: Notes,
     ) {
 
-        logger.logi("RemoteRepository::delete() note = '${note.id}'")
+        Platform().logger.logi("RemoteRepository::delete() note = '${note.id}'")
 
         scope.launch {
 
@@ -130,16 +130,16 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
                 val result = dataStore.delete(note.id.toString())
                 if (result) {
                     updateMetadata(dataStore = dataStore, note = note, pendingDelete = false)
-                    logger.logi("RemoteRepository::delete() deleted = '${note.id}' for '${dataStore.name}'")
+                    Platform().logger.logi("RemoteRepository::delete() deleted = '${note.id}' for '${dataStore.name}'")
                 } else {
-                    logger.loge("RemoteRepository::delete() failed for '${dataStore.name}'")
+                    Platform().logger.loge("RemoteRepository::delete() failed for '${dataStore.name}'")
                 }
 
             }
 
             checkIfNeedDeleteNoteLocally(note)
 
-            logger.logi("RemoteRepository::delete() done")
+            Platform().logger.logi("RemoteRepository::delete() done")
         }
     }
 
@@ -162,7 +162,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
                 // as it is used to select the record
                 val noteEntity = NoteEntity(uid = note.id)
                 LocalNoteDatabase.access().deleteNote(noteEntity)
-                logger.logi("RemoteRepository::checkIfNeedDeleteNoteLocally() deleted locally = ${note.id}")
+                Platform().logger.logi("RemoteRepository::checkIfNeedDeleteNoteLocally() deleted locally = ${note.id}")
             }
         }
     }
@@ -171,7 +171,7 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
     // Application reads from local db to get the most recent data.
     private suspend fun processNotes(notes: List<Notes>) = coroutineScope {
 
-        logger.logi("RemoteRepository::processNotes()")
+        Platform().logger.logi("RemoteRepository::processNotes()")
 
         for (note in notes) {
 
@@ -198,12 +198,12 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
 
                     val metaId = metadataDb.insertMetadata(metadata.copy(metadata = newMetadata))
 
-                    logger.logi(
+                    Platform().logger.logi(
                         "RemoteRepository::processNotes() " +
                                 "added to local store note = $id, meta id = $metaId"
                     )
                 } else {
-                    logger.logi("RemoteRepository::processNotes() already have note = ${data.uid}")
+                    Platform().logger.logi("RemoteRepository::processNotes() already have note = ${data.uid}")
                 }
             }
         }
@@ -238,11 +238,11 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
 
                 metaDb.updateMetadata(currMetadata.copy(metadata = newMetadata))
 
-                logger.logi(
+                Platform().logger.logi(
                     "RemoteRepository::updateMetadata() updated = '${currMetadata.uid}' for '${dataStore.name}'"
                 )
             } else {
-                logger.loge(
+                Platform().logger.loge(
                     "RemoteRepository::updateMetadata() absent for '${dataStore.name}'"
                 )
             }
@@ -264,9 +264,8 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
 
             val id = metaDb.insertMetadata(newMetadata.copy(metadata = updated))
 
-            logger.logi(
-                "RemoteRepository::updateMetadata() added new metadata = '$id' for ${dataStore.name}"
-            )
+            Platform().logger
+                .logi("RemoteRepository::updateMetadata() added new metadata = '$id' for ${dataStore.name}")
 
         }
     }

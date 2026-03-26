@@ -1,6 +1,6 @@
 package com.notes.data.json
 
-import api.PlatformAPIs.logger
+import api.Platform
 import api.data.AbstractStorageService
 import com.notes.data.NotesMetadataEntity
 import kotlinx.serialization.json.Json
@@ -23,7 +23,7 @@ fun NotesMetadataEntity.isPendingDeletionOnRemote(): Boolean {
             jsonElement.jsonObject["pending_delete_on_googledrive"]?.jsonPrimitive?.content ?: ""
         return pendingFirebase.toBoolean() || pendingGoogle.toBoolean()
     } catch (e: IllegalArgumentException) {
-        logger.loge("NotesMetadataEntity.isPendingDeletionOnRemote(): error = $e")
+        Platform().logger.loge("NotesMetadataEntity.isPendingDeletionOnRemote(): error = $e")
         return false
     }
 }
@@ -37,7 +37,7 @@ fun NotesMetadataEntity.isPendingUpdateOnRemote(): Boolean {
             jsonElement.jsonObject["pending_update_on_googledrive"]?.jsonPrimitive?.content ?: ""
         return pendingFirebase.toBoolean() || pendingGoogle.toBoolean()
     } catch (e: IllegalArgumentException) {
-        logger.loge("NotesMetadataEntity.isPendingUpdateOnRemote(): error = $e")
+        Platform().logger.loge("NotesMetadataEntity.isPendingUpdateOnRemote(): error = $e")
         return false
     }
 }
@@ -115,7 +115,7 @@ fun NotesMetadataEntity.update(
             pendingUpdateGoogleValue = str.toBoolean()
         }
     } catch (e: Exception) {
-        logger.loge("NotesMetadataEntity.update(): error = $e")
+        Platform().logger.loge("NotesMetadataEntity.update(): error = $e")
     }
 
     return toJson(
@@ -147,7 +147,7 @@ private fun parseJson(metadata: String): JsonElement? {
     val deserializedElement: JsonElement = try {
         json.parseToJsonElement(metadata)
     } catch (e: Exception) {
-        logger.loge("NotesMetadataEntity.parseJson(): error = $e")
+        Platform().logger.loge("NotesMetadataEntity.parseJson(): error = $e")
         return null
     }
     return deserializedElement

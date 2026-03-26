@@ -1,43 +1,29 @@
 package com.notes.app
 
 import android.app.Application
-import android.net.ConnectivityManager
 import api.AppServices
-import api.PlatformAPIs
-import com.notes.app.data.StorageProvider
-import com.notes.app.log.AppLogger
-import com.notes.app.security.Base64Provider
-import com.notes.app.security.CryptoProvider
-import com.notes.app.security.DerivedKeyProvider
-import com.notes.data.LocalNoteDatabase
-import com.notes.net.NetStateManager
-import com.notes.services.auth.FirebaseAuthService
-import com.notes.services.auth.GoogleSignInService
-import com.notes.services.storage.FirebaseFirestore
-import com.notes.services.storage.GoogleDriveService
-import com.notes.ui.*
+import com.notes.ui.CommonIcon
+import com.notes.ui.cloudSyncIcon
+import com.notes.ui.firebaseIcon
+import com.notes.ui.googleDriveIcon
+import com.notes.ui.googleIcon
+import com.notes.ui.h1FormatIcon
+import com.notes.ui.h2FormatIcon
+import com.notes.ui.h3FormatIcon
+import com.notes.ui.h4FormatIcon
+import com.notes.ui.h5FormatIcon
+import com.notes.ui.h6FormatIcon
+import com.notes.ui.iconsCollection
+import com.notes.ui.previewIcon
 
 class Notes : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initComponents()
+        initRes()
     }
 
-    private fun initComponents() {
-        // Inject dependencies.
-
-        // Logger is initialized first as some of the below classes
-        // could call it during instance creation
-        PlatformAPIs.logger = AppLogger()
-        PlatformAPIs.base64 = Base64Provider()
-        PlatformAPIs.storage = StorageProvider(applicationContext)
-        PlatformAPIs.derivedKey = DerivedKeyProvider()
-        val cryptoProvider = CryptoProvider()
-        PlatformAPIs.crypto = cryptoProvider
-
-        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        PlatformAPIs.netStateManager = NetStateManager(connectivityManager)
+    private fun initRes() {
 
         // Icons: https://icons8.com/icons/set/cloud
         iconsCollection[h1FormatIcon] = CommonIcon(R.drawable.format_h1)
@@ -53,18 +39,5 @@ class Notes : Application() {
         iconsCollection[previewIcon] = CommonIcon(R.drawable.image_preview)
 
         AppServices.serverClientId = getString(R.string.server_client_id)
-
-        // Set services
-        AppServices.addService(FirebaseFirestore())
-        AppServices.addService(FirebaseAuthService())
-        AppServices.addService(GoogleDriveService())
-
-        val googleSignInService = GoogleSignInService()
-        googleSignInService.init(applicationContext)
-        AppServices.addService(googleSignInService)
-
-        // Could be slow check if we can use coroutine or something else
-        // DB init
-        LocalNoteDatabase.initialize(applicationContext)
     }
 }

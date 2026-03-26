@@ -38,12 +38,12 @@ object AppServices {
      */
     fun __delicateCall_getOriginalStoreService(name: String): AbstractStorageService? {
         if (dataStoreService.isEmpty()) return null
-        for (item in dataStoreService) {
-            if (item.name == name) {
-                if (item is EncryptedStore) {
-                    return item.delegate
+        for (service in dataStoreService) {
+            if (service.name == name) {
+                if (service is EncryptedStore) {
+                    return service.delegate
                 } else {
-                    return item
+                    return service
                 }
             }
         }

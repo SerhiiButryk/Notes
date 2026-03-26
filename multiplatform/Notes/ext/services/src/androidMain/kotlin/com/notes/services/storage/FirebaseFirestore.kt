@@ -1,7 +1,7 @@
 package com.notes.services.storage
 
 import api.AppServices
-import api.PlatformAPIs.logger
+import api.Platform
 import api.data.AbstractStorageService
 import api.data.Document
 import api.data.toDocument
@@ -38,7 +38,7 @@ class FirebaseFirestore : AbstractStorageService() {
     override suspend fun load(name: String): Document? = loadImpl(name)
 
     override suspend fun fetchAll(): List<Document> {
-        logger.logi("$tag::fetchAll()")
+        Platform().logger.logi("$tag::fetchAll()")
 
         if (!isAuthenticated()) return emptyList()
 
@@ -50,10 +50,10 @@ class FirebaseFirestore : AbstractStorageService() {
                 .collection("users/$uid/user_notes")
                 .get()
                 .addOnSuccessListener { snapshots ->
-                    logger.logi("$tag::fetchAll() sz = ${snapshots.size()}")
+                    Platform().logger.logi("$tag::fetchAll() sz = ${snapshots.size()}")
                     val list = mutableListOf<Document>()
                     for (snapshot in snapshots) {
-                        logger.logi("$tag::fetchAll() <= ${snapshot.id}")
+                        Platform().logger.logi("$tag::fetchAll() <= ${snapshot.id}")
                         val json = snapshot.data["content"] as? String ?: ""
                         val doc = json.toDocument()
                         if (!doc.isEmpty()) {
@@ -62,14 +62,14 @@ class FirebaseFirestore : AbstractStorageService() {
                     }
                     continuation.resume(list)
                 }.addOnFailureListener { e ->
-                    logger.loge("$tag::fetchAll() error: $e")
+                    Platform().logger.loge("$tag::fetchAll() error: $e")
                     continuation.resume(emptyList())
                 }
         }
     }
 
     override suspend fun delete(name: String): Boolean {
-        logger.logi("$tag::delete()")
+        Platform().logger.logi("$tag::delete()")
 
         if (!paramsCheck(name)) {
             return false
@@ -83,10 +83,10 @@ class FirebaseFirestore : AbstractStorageService() {
                 .document("users/$uid/user_notes/$name")
                 .delete()
                 .addOnSuccessListener {
-                    logger.logi("$tag::delete() success, deleted name = $name")
+                    Platform().logger.logi("$tag::delete() success, deleted name = $name")
                     continuation.resume(true)
                 }.addOnFailureListener { e ->
-                    logger.loge("$tag::delete() failed to delete name = $name")
+                    Platform().logger.loge("$tag::delete() failed to delete name = $name")
                     continuation.resume(false)
                 }
         }
@@ -118,10 +118,10 @@ class FirebaseFirestore : AbstractStorageService() {
             userNoteDocument
                 .set(payload)
                 .addOnSuccessListener {
-                    logger.logi("$tag::storeImpl() => '${document.name}'")
+                    Platform().logger.logi("$tag::storeImpl() => '${document.name}'")
                     continuation.resume(true)
                 }.addOnFailureListener { e ->
-                    logger.loge("$tag::storeImpl() failed, error: $e")
+                    Platform().logger.loge("$tag::storeImpl() failed, error: $e")
                     continuation.resume(false)
                 }
         }
@@ -148,13 +148,13 @@ class FirebaseFirestore : AbstractStorageService() {
                 .addOnSuccessListener { snapshot ->
                     if (snapshot != null && snapshot.exists()) {
                         val document = snapshot.toString().toDocument()
-                        logger.loge("$tag::loadImpl() <= ${document.name}")
+                        Platform().logger.loge("$tag::loadImpl() <= ${document.name}")
                         continuation.resume(document)
                     } else {
                         continuation.resume(null)
                     }
                 }.addOnFailureListener { e ->
-                    logger.loge("$tag::loadImpl() failed, error: $e")
+                    Platform().logger.loge("$tag::loadImpl() failed, error: $e")
                     continuation.resume(null)
                 }
         }

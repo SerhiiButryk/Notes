@@ -1,33 +1,34 @@
 package api.data
 
-import api.PlatformAPIs
-import api.PlatformAPIs.logger
+import api.Platform
 import kotlinx.coroutines.flow.MutableStateFlow
 
-private data class UserInfo(val email: String = "")
+data class UserInfo(
+    val email: String = "",
+    val code: String = ""
+)
 
-private val userDataState = MutableStateFlow(UserInfo())
+val userDataState = MutableStateFlow(UserInfo())
 
 private const val REGISTERED_USER_EMAIL = "REGISTERED_USER_EMAIL"
 
 suspend fun saveUserEmail(email: String) {
-    PlatformAPIs.storage.save(email, REGISTERED_USER_EMAIL)
+    Platform().storage.save(email, REGISTERED_USER_EMAIL)
 }
 
-suspend fun getUserEmail(): String = PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
+suspend fun getUserEmail(): String = Platform().storage.get(REGISTERED_USER_EMAIL)
 
 suspend fun loadUserData() {
-    val userEmail = PlatformAPIs.storage.get(REGISTERED_USER_EMAIL)
-    userDataState.value = UserInfo(email = userEmail)
-    logger.logi("loadUserData() done")
+    val email = Platform().storage.get(REGISTERED_USER_EMAIL)
+    userDataState.value = userDataState.value.copy(email = email)
+    Platform().logger.logi("loadUserData() done")
 }
 
+// TODO: Might not get correct result but it's just a hint
 fun isFirstLaunch(): Boolean {
-    // TODO: Might not get correct result but works
     return userDataState.value.email.isEmpty()
 }
 
-fun isUserRegistered(): Boolean {
-    // If we have saved an email then it's more likely user has already passed registration
-    return userDataState.value.email.isNotEmpty()
+fun verifyReceived(code: String) {
+    userDataState.value = userDataState.value.copy(code = code)
 }

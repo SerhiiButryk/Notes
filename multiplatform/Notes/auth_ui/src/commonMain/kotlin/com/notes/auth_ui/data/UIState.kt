@@ -1,7 +1,7 @@
 package com.notes.auth_ui.ui
 
 import androidx.compose.runtime.Stable
-import api.getVerifyTitleAndMessage
+import api.utils.getVerifyTitleAndMessage
 
 open class UIState
 

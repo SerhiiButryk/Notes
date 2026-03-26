@@ -4,9 +4,9 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
-import api.NetStateInfo
-import api.NetStateManager
-import api.PlatformAPIs.logger
+import api.net.NetStateInfo
+import api.net.NetStateManager
+import api.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,12 +35,12 @@ class NetStateManager(private val connectivityManager: ConnectivityManager) : Ne
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
 
             override fun onAvailable(network: Network) {
-                logger.logi("$tag::onAvailable")
+                Platform().logger.logi("$tag::onAvailable")
                 updateNetworkState(network)
             }
 
             override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-                logger.logi("$tag::onBlockedStatusChanged")
+                Platform().logger.logi("$tag::onBlockedStatusChanged")
                 updateNetworkState(network)
             }
 
@@ -48,7 +48,7 @@ class NetStateManager(private val connectivityManager: ConnectivityManager) : Ne
                 network: Network,
                 networkCapabilities: NetworkCapabilities
             ) {
-                logger.logi("$tag::onCapabilitiesChanged")
+                Platform().logger.logi("$tag::onCapabilitiesChanged")
                 updateNetworkState(network)
             }
 
@@ -56,28 +56,28 @@ class NetStateManager(private val connectivityManager: ConnectivityManager) : Ne
                 network: Network,
                 linkProperties: LinkProperties
             ) {
-                logger.logi("$tag::onLinkPropertiesChanged")
+                Platform().logger.logi("$tag::onLinkPropertiesChanged")
                 updateNetworkState(network)
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
-                logger.logi("$tag::onLosing")
+                Platform().logger.logi("$tag::onLosing")
                 updateNetworkState(network)
             }
 
             override fun onLost(network: Network) {
-                logger.logi("$tag::onLost")
+                Platform().logger.logi("$tag::onLost")
                 scope.launch {
                     newtStateInfoChannel.send(NetStateInfo(networkIsAvailable = false))
                 }
             }
 
             override fun onReserved(networkCapabilities: NetworkCapabilities) {
-                logger.logi("$tag::onReserved")
+                Platform().logger.logi("$tag::onReserved")
             }
 
             override fun onUnavailable() {
-                logger.logi("$tag::onUnavailable")
+                Platform().logger.logi("$tag::onUnavailable")
                 scope.launch {
                     newtStateInfoChannel.send(NetStateInfo(networkIsAvailable = false))
                 }

@@ -23,7 +23,7 @@ interface AuthService {
     ): AuthResult = AuthResult.loginFailed()
 
     suspend fun sendEmailVerify(): AuthResult = AuthResult.verificationSentFailed("")
-
+    suspend fun verifyCode(code: String): Boolean = false
     suspend fun isEmailVerified(): Boolean = false
 
     fun getUserEmail(): String = ""
@@ -45,11 +45,10 @@ abstract class AbstractAuthService : AuthService {
 
     private var _callback: WeakReference<AuthCallback>? = null
 
-    protected var callback: AuthCallback?
+    protected val callback: AuthCallback?
         get() {
             return _callback?.get()
         }
-        private set(value) {}
 
     override fun setAuthCallback(callback: AuthCallback?) {
         this._callback = WeakReference(callback)

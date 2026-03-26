@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -33,15 +32,12 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-
-            implementation(projects.api)
-
             // Room
             implementation(libs.androidx.room.runtime)
             implementation(libs.serializationJson)
         }
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(projects.api)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -51,5 +47,5 @@ kotlin {
 
 dependencies {
     // Apply to an Android-specific source set if needed
-    add("kspAndroid", "androidx.room:room-compiler:2.8.3")
+    add("kspAndroid", libs.androidx.room.compiler)
 }

@@ -1,6 +1,6 @@
 package com.notes.net
 
-import api.PlatformAPIs.logger
+import api.Platform
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -9,7 +9,7 @@ private val tag = "NetUtils"
 
 fun inputStreamAsString(inputStream: InputStream?): String {
     if (inputStream == null) {
-        logger.loge("$tag inputStreamAsString: input stream is null")
+        Platform().logger.loge("$tag inputStreamAsString: input stream is null")
         return ""
     }
 
@@ -22,7 +22,7 @@ fun inputStreamAsString(inputStream: InputStream?): String {
             stringBuilder.append(line)
         }
     } catch (e: Exception) {
-        logger.loge("$tag inputStreamAsString: error: $e")
+        Platform().logger.loge("$tag inputStreamAsString: error: $e")
     } finally {
         inputStream.close()
     }

@@ -3,7 +3,7 @@ package com.notes.app
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import api.PlatformAPIs
+import api.Platform
 import api.data.AbstractStorageService
 import api.data.Document
 import api.data.toDocument
@@ -71,12 +71,12 @@ class BasicTests {
 
         val crypto = CryptoProvider()
 
-        val key = PlatformAPIs.storage.get("derived_key_pass")
+        val key = Platform.storage.get("derived_key_pass")
         assertThat(key.isEmpty()).isTrue()
 
         crypto.onLoginCompleted("hellohellohello", "reitueoirrngeorg490904r3094rjr209jowmf.a,c2")
 
-        val key2 = PlatformAPIs.storage.get("derived_key_pass")
+        val key2 = Platform.storage.get("derived_key_pass")
         assertThat(key2.isEmpty()).isFalse()
 
         val message = "hello world"
@@ -89,13 +89,13 @@ class BasicTests {
         assertThat(plaintext).isEqualTo(message)
 
         // Clear derived key
-        PlatformAPIs.storage.clearAll()
+        Platform.storage.clearAll()
     }
 
     @Test
     fun test02_encryptedStore() = runTest {
 
-        PlatformAPIs.crypto.onLoginCompleted("test", "test") // Gen derived key
+        Platform.crypto.onLoginCompleted("test", "test") // Gen derived key
 
         val doc1 = Document("doc1", "data 1")
 
@@ -126,7 +126,7 @@ class BasicTests {
         assertThat(docListRet).isEqualTo(docList)
 
         // Clear derived key
-        PlatformAPIs.storage.clearAll()
+        Platform.storage.clearAll()
 
     }
 

@@ -1,6 +1,6 @@
 package api.data
 
-import api.PlatformAPIs.logger
+import api.Platform
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -25,7 +25,7 @@ fun String.toDocument(): Document {
     val deserializedElement: JsonElement = try {
         json.parseToJsonElement(this)
     } catch (e: Exception) {
-        logger.loge("toDocument(): error = $e")
+        Platform().logger.loge("toDocument(): error = $e")
         return Document("", "")
     }
     try {
@@ -33,7 +33,7 @@ fun String.toDocument(): Document {
         val data = deserializedElement.jsonObject["content"]?.jsonPrimitive?.content ?: ""
         return Document(name, data)
     } catch (e: IllegalArgumentException) {
-        logger.loge("toDocument(): error = $e")
+        Platform().logger.loge("toDocument(): error = $e")
         return Document("", "")
     }
 }

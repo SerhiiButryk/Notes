@@ -1,7 +1,7 @@
 package com.notes.net
 
-import api.HttpClient
-import api.PlatformAPIs.logger
+import api.Platform
+import api.net.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -23,7 +23,7 @@ class NetHttpClient : HttpClient {
         callback: (statusCode: Int, body: InputStream?) -> Unit,
     ) {
         withContext(Dispatchers.IO) {
-            logger.logi("$tag: post: started")
+            Platform().logger.logi("$tag: post: started")
 
             try {
                 val request =
@@ -35,12 +35,12 @@ class NetHttpClient : HttpClient {
 
                 client.newCall(request).execute().use { response ->
                     val result = if (response.isSuccessful) "successful" else "failed"
-                    logger.logi("$tag: post: $result, status code = ${response.code}")
+                    Platform().logger.logi("$tag: post: $result, status code = ${response.code}")
                     callback(response.code, response.body?.byteStream())
                 }
             } catch (e: ConnectException) {
                 // TODO: Improve error handling
-                logger.loge("$tag: error: $e")
+                Platform().logger.loge("$tag: error: $e")
                 callback(-1, null)
             }
         }

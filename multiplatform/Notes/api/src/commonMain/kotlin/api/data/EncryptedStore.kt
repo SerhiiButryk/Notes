@@ -1,6 +1,6 @@
 package api.data
 
-import api.PlatformAPIs
+import api.Platform
 
 /**
  * Service which adds a layer of encryption on storage service
@@ -13,14 +13,14 @@ class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageServ
         get() = delegate.canUse
 
     override suspend fun store(document: Document): Boolean {
-        val encrypted = PlatformAPIs.crypto.encryptWithDerivedKey(document.data)
+        val encrypted = Platform().crypto.encryptWithDerivedKey(document.data)
         return delegate.store(Document(document.name, encrypted))
     }
 
     override suspend fun load(name: String): Document? {
         val data = delegate.load(name)
         if (data != null) {
-            val decrypted = PlatformAPIs.crypto.decryptWithDerivedKey(data.data)
+            val decrypted = Platform().crypto.decryptWithDerivedKey(data.data)
             return Document(data = decrypted, name = name)
         }
         return null
@@ -33,7 +33,7 @@ class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageServ
     override suspend fun fetchAll(): List<Document> {
         val documents = delegate.fetchAll()
         return documents.map { doc ->
-            val decrypted = PlatformAPIs.crypto.decryptWithDerivedKey(doc.data)
+            val decrypted = Platform().crypto.decryptWithDerivedKey(doc.data)
             Document(name = doc.name, data = decrypted)
         }
     }

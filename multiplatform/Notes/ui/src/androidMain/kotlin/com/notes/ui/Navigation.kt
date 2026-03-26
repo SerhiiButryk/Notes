@@ -6,8 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
-import api.PlatformAPIs.logger
-import kotlinx.serialization.Serializable
+import api.Platform
 
 /**
  * Define new screen using this base class.
@@ -35,9 +34,9 @@ fun NavControllerStateDebug(navController: NavController) {
     val backStack by navController.currentBackStack.collectAsState()
     LaunchedEffect(backStack) {
         navController.graph.forEach { destination ->
-            logger.logi("Destination: ${destination.label} - ${destination.route}")
+            Platform().logger.logi("Destination: ${destination.label} - ${destination.route}")
         }
         val stackRoutes = backStack.map { entry -> entry.destination.route }
-        logger.logi("NavigationBackStack BackStack: '$stackRoutes'")
+        Platform().logger.logi("NavigationBackStack BackStack: '$stackRoutes'")
     }
 }

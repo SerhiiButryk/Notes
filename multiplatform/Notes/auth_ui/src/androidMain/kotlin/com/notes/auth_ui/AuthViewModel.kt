@@ -3,9 +3,10 @@ package com.notes.auth_ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import api.PlatformAPIs.logger
+import api.Platform
 import api.auth.AuthResult
-import api.getErrorTitleAndMessage
+import api.data.userDataState
+import api.utils.getErrorTitleAndMessage
 import com.notes.auth_ui.ui.DialogState
 import com.notes.auth_ui.ui.LoginUIState
 import com.notes.auth_ui.ui.RegisterUIState
@@ -37,7 +38,7 @@ class AuthViewModel : ViewModel() {
         onSuccess: () -> Unit,
         context: Any?
     ) {
-        logger.logi("$TAG::login()")
+        Platform().logger.logi("$TAG::login()")
         viewModelScope.launch {
             // Show progress
             val newState = _uiState.copyLoginUIState(showProgress = true)
@@ -61,7 +62,7 @@ class AuthViewModel : ViewModel() {
         state: RegisterUIState,
         onSuccess: suspend () -> Unit,
     ) {
-        logger.logi("$TAG::register()")
+        Platform().logger.logi("$TAG::register()")
         viewModelScope.launch {
             val result = interactor.register(state.confirmPassword, state.password, state.email)
             if (result.isSuccess()) {
@@ -79,25 +80,25 @@ class AuthViewModel : ViewModel() {
         shouldResendVerification: Boolean = false,
         navController: NavController,
     ) {
-        logger.logi("$TAG::runConfirmationCheck()")
+        Platform().logger.logi("$TAG::runConfirmationCheck()")
         viewModelScope.launch {
             val isEmailVerified = interactor.isEmailVerified()
             if (isEmailVerified) {
-                logger.logi("$TAG::runConfirmationCheck() passed")
+                Platform().logger.logi("$TAG::runConfirmationCheck() passed")
                 onShowLoginUI()
                 // Open login screen
                 navController.navigate(Access)
             } else if (shouldResendVerification) {
-                logger.logi("$TAG::runConfirmationCheck() resending verification")
+                Platform().logger.logi("$TAG::runConfirmationCheck() resending verification")
                 val result = interactor.sendEmailVerification()
                 handleResult(result)
             } else {
-                logger.logi("$TAG::runConfirmationCheck() failed, no-op")
+                Platform().logger.logi("$TAG::runConfirmationCheck() failed, no-op")
             }
         }
     }
 
-    fun onShowAuthUI(uiForced: Boolean = false) {
+    fun onShowAccessUI(uiForced: Boolean = false) {
         viewModelScope.launch {
             if (uiForced) {
                 onShowLoginUI(uiForced)
@@ -114,6 +115,17 @@ class AuthViewModel : ViewModel() {
                 onShowRegisterUI()
             } else {
                 onShowLoginUI()
+            }
+        }
+    }
+
+    fun onShowOnBoardingUI(navController: NavController) {
+        viewModelScope.launch {
+            if (userDataState.value.code.isNotEmpty()) {
+                if (interactor.verifyCode(userDataState.value.code)) {
+                    // Check if can proceed
+                    runConfirmationCheck(navController = navController)
+                }
             }
         }
     }
@@ -135,19 +147,19 @@ class AuthViewModel : ViewModel() {
     }
 
     fun dismissDialog() {
-        logger.logi("$TAG::dismissDialog()")
+        Platform().logger.logi("$TAG::dismissDialog()")
         viewModelScope.launch {
             _dialogState.emit(null)
         }
     }
 
     override fun onCleared() {
-        logger.logi("$TAG::onCleared()")
+        Platform().logger.logi("$TAG::onCleared()")
         interactor.onClear()
     }
 
     private suspend fun handleResult(result: AuthResult) {
-        logger.logi("$TAG::handleResult()")
+        Platform().logger.logi("$TAG::handleResult()")
 
         if (result.isEmailVerificationPassed()) {
             _uiState.emit(

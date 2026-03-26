@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.concurrent.AtomicBoolean
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.db.SupportSQLiteDatabase
-import api.PlatformAPIs.logger
+import api.Platform
 import kotlinx.coroutines.delay
 
 @Database(entities = [NoteEntity::class, NotesMetadataEntity::class], version = 1)
@@ -43,19 +43,19 @@ class LocalCallback(private val callbackList: Set<DBLifecycleCallback>) : DBLife
     private val created = AtomicBoolean(false)
 
     override fun onCreate() {
-        logger.logi("DBLifecycleCallback: onCreate()")
+        Platform().logger.logi("DBLifecycleCallback: onCreate()")
         callbackList.forEach { it.onCreate() }
         created.set(true)
     }
 
     override fun onClose() {
-        logger.logi("DBLifecycleCallback: onClose()")
+        Platform().logger.logi("DBLifecycleCallback: onClose()")
         callbackList.forEach { it.onClose() }
         closed.set(true)
     }
 
     override fun onOpen() {
-        logger.logi("DBLifecycleCallback: onOpen()")
+        Platform().logger.logi("DBLifecycleCallback: onOpen()")
         callbackList.forEach { it.onOpen() }
         opened.set(true)
     }
@@ -87,7 +87,7 @@ abstract class LocalNoteDatabaseImpl {
         context: Context? = null,
         callback: DBLifecycleCallback? = null,
     ): NoteDatabase? {
-        logger.logi("LocalDatabase: initialize()")
+        Platform().logger.logi("LocalDatabase: initialize()")
         if (initNotStarted.compareAndSet(false, true)) {
             if (callback != null) callbackList.add(callback)
             val builder = Room.databaseBuilder<NoteDatabase>(context!!, "note_local_database")
@@ -95,7 +95,7 @@ abstract class LocalNoteDatabaseImpl {
                 object : RoomDatabase.Callback() {
 
                     override fun onCreate(db: SupportSQLiteDatabase) {
-                        logger.logi("LocalDatabase: Callback.onCreate()")
+                        Platform().logger.logi("LocalDatabase: Callback.onCreate()")
                         super.onCreate(db)
                         localCallback.onCreate()
                     }
@@ -106,28 +106,28 @@ abstract class LocalNoteDatabaseImpl {
                     }
 
                     override fun onOpen(db: SupportSQLiteDatabase) {
-                        logger.logi("LocalDatabase: Callback.onOpen()")
+                        Platform().logger.logi("LocalDatabase: Callback.onOpen()")
                         super.onOpen(db)
                         localCallback.onOpen()
                     }
                 },
             )
             noteDb = builder.build()
-            logger.logi("LocalDatabase: initialize(): done")
+            Platform().logger.logi("LocalDatabase: initialize(): done")
             return noteDb
         } else {
             if (callback != null) {
                 callbackList.add(callback)
                 localCallback.invokeCallbacksIfNeeded(callback)
             }
-            logger.logi("LocalDatabase: initialize(): no-op")
+            Platform().logger.logi("LocalDatabase: initialize(): no-op")
             return noteDb
         }
     }
 
     suspend fun accessInternal(): NoteDatabase {
         while (noteDb == null) {
-            logger.logi("LocalDatabase: accessInternal() not initialized, waiting...")
+            Platform().logger.logi("LocalDatabase: accessInternal() not initialized, waiting...")
             delay(100)
         }
         return noteDb!!
@@ -137,9 +137,9 @@ abstract class LocalNoteDatabaseImpl {
         if (noteConnection != null) {
             noteConnection?.close()
             noteConnection = null
-            logger.logi("LocalDatabase: close(): connection is closed")
+            Platform().logger.logi("LocalDatabase: close(): connection is closed")
         } else {
-            logger.logi("LocalDatabase: close(): connection is invalid")
+            Platform().logger.logi("LocalDatabase: close(): connection is invalid")
         }
 
         noteDb?.close()
@@ -149,6 +149,6 @@ abstract class LocalNoteDatabaseImpl {
         localCallback.onClose()
         clientCallback = null
 
-        logger.logi("LocalDatabase: close(): done")
+        Platform().logger.logi("LocalDatabase: close(): done")
     }
 }

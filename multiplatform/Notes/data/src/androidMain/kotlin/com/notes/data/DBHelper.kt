@@ -1,6 +1,6 @@
 package com.notes.data
 
-import api.PlatformAPIs.logger
+import api.Platform
 import api.data.Notes
 import com.notes.data.json.isPendingDeletionOnRemote
 import com.notes.data.json.isPendingUpdateOnRemote
@@ -23,7 +23,7 @@ suspend fun updateMetadataForNote(
         val currEntity = metaDb.getMetadata(noteInfo.metadataId).first()
         val newMetadata = currEntity!!.update(pendingDelete = pendingDelete, pendingUpdate = pendingUpdate)
         metaDb.updateMetadata(currEntity.copy(metadata = newMetadata, pendingDelete = true))
-        logger.logi("updateMetadataForNote() updated for = ${note.id}")
+        Platform().logger.logi("updateMetadataForNote() updated for = ${note.id}")
     }
 }
 
@@ -32,7 +32,7 @@ suspend fun isAllInSyncWithRemote(): Boolean {
     val metadataList = db.getAllMetadata().first()
     for (metadata in metadataList) {
         if (metadata.isPendingDeletionOnRemote() || metadata.isPendingUpdateOnRemote()) {
-            logger.loge("isAllInSyncWithRemote() not in sync, " +
+            Platform().logger.loge("isAllInSyncWithRemote() not in sync, " +
                     "pending delete = ${metadata.isPendingDeletionOnRemote()}, " +
                     "pending update = ${metadata.isPendingUpdateOnRemote()}\n" +
                     "meta data = $metadata")

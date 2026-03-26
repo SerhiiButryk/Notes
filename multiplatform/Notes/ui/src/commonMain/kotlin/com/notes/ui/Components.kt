@@ -38,8 +38,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import api.PlatformAPIs
-import api.PlatformAPIs.logger
+import api.Platform
 import kotlinx.coroutines.delay
 
 /**
@@ -234,10 +233,11 @@ fun SearchBarField(
             .fillMaxWidth()
             .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
             .onFocusEvent {
-                if (it.hasFocus && shouldClear) {
-                    focusManager.clearFocus()
-                    shouldClear = false
-                }
+                // TODO: Can cause crashes
+//                if (it.hasFocus && shouldClear) {
+//                    focusManager.clearFocus()
+//                    shouldClear = false
+//                }
             },
     ) {}
 }
@@ -290,13 +290,13 @@ fun NetworkStateMessage() {
     var show by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(false) {
-        if (!PlatformAPIs.netStateManager.isNetworkAvailable()) {
+        if (!Platform().netStateManager.isNetworkAvailable()) {
             // Network is NOT available show it permanently
             networkIsAvailable = false
             show = true
         }
-        PlatformAPIs.netStateManager.observerChanges().collect { netState ->
-            logger.logi("NetworkStateMessage() netState = $netState, currState = $networkIsAvailable")
+        Platform().netStateManager.observerChanges().collect { netState ->
+            Platform().logger.logi("NetworkStateMessage() netState = $netState, currState = $networkIsAvailable")
             if (netState.networkIsAvailable && !networkIsAvailable) {
                 // Network is now available show it
                 networkIsAvailable = true

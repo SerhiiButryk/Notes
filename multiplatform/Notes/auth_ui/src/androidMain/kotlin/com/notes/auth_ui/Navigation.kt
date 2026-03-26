@@ -6,26 +6,24 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.notes.auth_ui.ui.LoginUI
+import com.notes.auth_ui.ui.LoginUIState
+import com.notes.auth_ui.ui.OnboardingScreen
+import com.notes.auth_ui.ui.RegisterUI
+import com.notes.auth_ui.ui.RegisterUIState
+import com.notes.auth_ui.ui.VerificationEmailUI
+import com.notes.auth_ui.ui.VerificationUIState
 import com.notes.ui.Access
+import com.notes.ui.AlertDialogUI
 import com.notes.ui.Auth
 import com.notes.ui.EmailVerification
 import com.notes.ui.OnBoardingScreen
 import com.notes.ui.getStartDestination
-import com.notes.auth_ui.ui.LoginUI
-import com.notes.auth_ui.ui.OnboardingScreen
-import com.notes.auth_ui.ui.RegisterUI
-import com.notes.auth_ui.ui.VerificationEmailUI
-import com.notes.auth_ui.ui.LoginUIState
-import com.notes.auth_ui.ui.RegisterUIState
-import com.notes.auth_ui.ui.VerificationUIState
-import com.notes.ui.AlertDialogUI
 import com.notes.ui.getViewModel
 import com.notes.ui.navAndPopUpCurrent
 
@@ -40,7 +38,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
             val state = viewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(false) {
-                viewModel.onShowAuthUI()
+                viewModel.onShowAccessUI()
             }
 
             if (state.value is LoginUIState) {
@@ -78,7 +76,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                         )
                     },
                     onLogin = {
-                        viewModel.onShowAuthUI(uiForced = true)
+                        viewModel.onShowAccessUI(uiForced = true)
                         // Go to login screen
                         navController.navigate(Access)
                     }
@@ -94,11 +92,6 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
             val state = viewModel.uiState.collectAsStateWithLifecycle()
 
             val uiState = state.value as VerificationUIState
-
-            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-                // Run a check to see if we got confirmation of user email
-                viewModel.runConfirmationCheck(navController = navController)
-            }
 
             VerificationEmailUI(
                 onRetry = {
@@ -136,6 +129,13 @@ private fun Dialog(viewModel: AuthViewModel) {
 
 fun NavGraphBuilder.onboardingDestination(navController: NavController) {
     composable<OnBoardingScreen> { backStackEntry ->
+
+        val viewModel = backStackEntry.getViewModel<AuthViewModel>(navController)
+
+        LaunchedEffect(false) {
+            viewModel.onShowOnBoardingUI(navController)
+        }
+
         OnboardingScreen {
             navController.navigate(route = Auth)
         }

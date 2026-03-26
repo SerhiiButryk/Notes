@@ -1,6 +1,6 @@
 package com.notes.notes_ui.data
 
-import api.PlatformAPIs.logger
+import api.Platform
 import api.data.Notes
 import com.notes.data.LocalNoteDatabase
 import com.notes.data.json.isPendingDeletionOnRemote
@@ -26,7 +26,7 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
 
     override fun getNotes(): Flow<List<Notes>> =
         flow {
-            logger.logi("OfflineRepository::getNotes()")
+            Platform().logger.logi("OfflineRepository::getNotes()")
 
             // TODO: Might do this periodically
             // in Work manager or something else
@@ -62,7 +62,7 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
 
     override fun getNotes(id: Long): Flow<Notes?> =
         flow {
-            logger.logi("OfflineRepository::getNotes(id=$id)")
+            Platform().logger.logi("OfflineRepository::getNotes(id=$id)")
 
             val db = LocalNoteDatabase.access()
 
@@ -90,11 +90,11 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
             if (newNote) {
                 val id = db.insertNote(note.toEntity(setId = false /* Use auto-increment */))
                 onNewAdded(id)
-                logger.logi("OfflineRepository::saveNote($id) new record is added locally")
+                Platform().logger.logi("OfflineRepository::saveNote($id) new record is added locally")
                 remoteRepository.saveNote(scope, note.copy(id = id))
             } else {
                 db.updateNote(note.toEntity())
-                logger.logi("OfflineRepository::saveNote(${note.id}) is updated locally")
+                Platform().logger.logi("OfflineRepository::saveNote(${note.id}) is updated locally")
                 remoteRepository.saveNote(scope, note)
             }
         }
@@ -111,7 +111,7 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
         callback: (Long) -> Unit,
     ) {
         scope.launch {
-            logger.logi("OfflineRepository::deleteNote(${note.id})")
+            Platform().logger.logi("OfflineRepository::deleteNote(${note.id})")
 
             // 1. Update metadata
             // 2. Delete note on remote. Will update metadata on success
@@ -129,7 +129,7 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
     }
 
     override fun clear() {
-        logger.logi("OfflineRepository::clear()")
+        Platform().logger.logi("OfflineRepository::clear()")
         scope.cancel()
     }
 
