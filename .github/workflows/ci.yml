@@ -59,8 +59,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: Android_Artifact
-          # NOTE: Verify if your output is actually in /Notes-App or in /app/build/outputs/apk/
-          path: "**/build/outputs/apk/**/*.apk" 
+          path: "./Notes-App/**" 
           if-no-files-found: warn
 
   # Job 2: Build JVM Desktop target
