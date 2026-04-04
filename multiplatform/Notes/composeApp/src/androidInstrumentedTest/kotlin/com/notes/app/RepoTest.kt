@@ -37,6 +37,10 @@ class RepoTest : AppTest() {
 
         override val name: String = "firebase"
 
+        init {
+            canUse = true
+        }
+
         override suspend fun store(document: Document): Boolean {
             return mockedStoreServiceStoreResult
         }
@@ -58,6 +62,10 @@ class RepoTest : AppTest() {
     private val mockedStoreServiceGoogle = object : AbstractStorageService() {
 
         override val name: String = "googledrive"
+
+        init {
+            canUse = true
+        }
 
         override suspend fun store(document: Document): Boolean {
             return mockedStoreServiceStoreResult

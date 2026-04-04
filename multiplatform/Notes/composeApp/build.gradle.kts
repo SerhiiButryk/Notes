@@ -38,7 +38,8 @@ kotlin {
             implementation(libs.navigation)
             implementation(libs.serializationJson)
 
-            implementation("androidx.startup:startup-runtime:1.2.0")
+            // Initialization during app launch
+            implementation(libs.androidx.startup.runtime)
         }
 
         commonMain.dependencies {

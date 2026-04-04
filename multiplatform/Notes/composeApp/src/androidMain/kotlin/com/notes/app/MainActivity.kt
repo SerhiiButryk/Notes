@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import api.Platform
 import com.notes.app.ui.EntryScreen
 import api.data.loadUserData
-import api.data.verifyReceived
+import api.data.cacheCode
 import com.notes.ui.AppTheme
 import kotlinx.coroutines.launch
 
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
             if (oobCode != null) {
                 Platform().logger.logi("MainActivity::handleIntent() " +
                         "looks like we got email verification response")
-                verifyReceived(oobCode)
+                cacheCode(oobCode)
             }
         }
     }

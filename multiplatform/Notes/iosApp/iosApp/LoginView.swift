@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct LoginUI: View {
+struct LoginView: View {
     
     private let titleStr = "Login"
     private let fieldUsernameStr = "Username"
     private let fieldPasswordStr = "Password"
-    private let buttonStr = "Sing in"
+    private let signInbuttonStr = "Sing in"
     
     @State private var username = ""
     @State private var password = ""
@@ -24,8 +24,7 @@ struct LoginUI: View {
                 VStack {
                     
                     Text(titleStr)
-                        .font(.largeTitle)
-                        .bold()
+                        .font(.largeTitle.bold())
                         .padding()
                     
                     TextField(fieldUsernameStr, text: $username)
@@ -35,7 +34,7 @@ struct LoginUI: View {
                         .modifier(CommonFieldStyle(backgroundColor: Color.black.opacity(0.05)))
                     
                         
-                    Button(buttonStr) {
+                    Button(signInbuttonStr) {
                         authenticated = appViewModel.login(username, password)
                         
                     }
@@ -71,6 +70,6 @@ struct CommonFieldStyle : ViewModifier {
 
 struct LoginUI_Previews: PreviewProvider {
     static var previews: some View {
-        LoginUI()
+        LoginView()
     }
 }

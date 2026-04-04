@@ -41,19 +41,20 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
     ) {
         scope.launch {
 
-            for (dataStore in getServices()) {
+            val services = getServices()
+            for (service in services) {
 
-                Platform().logger.logi("RemoteRepository::saveNote() to '${dataStore.name}'...")
+                Platform().logger.logi("RemoteRepository::saveNote() to '${service.name}'...")
 
-                updateMetadata(dataStore = dataStore, note = note, pendingUpdate = true)
+                updateMetadata(dataStore = service, note = note, pendingUpdate = true)
 
                 val result =
-                    dataStore.store(Document(data = note.content, name = note.id.toString()))
+                    service.store(Document(data = note.content, name = note.id.toString()))
 
                 if (result) {
-                    updateMetadata(dataStore = dataStore, note = note, pendingUpdate = false)
+                    updateMetadata(dataStore = service, note = note, pendingUpdate = false)
                 } else {
-                    Platform().logger.loge("RemoteRepository::saveNote() failed for '${dataStore.name}'")
+                    Platform().logger.loge("RemoteRepository::saveNote() failed for '${service.name}'")
                 }
             }
 
@@ -66,8 +67,9 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
             val notesFound = mutableListOf<Notes>()
             // Merge results from several sources
             // Ideally it should have exact list but do check a merge for safety
-            for (dataStore in getServices()) {
-                val result = dataStore.fetchAll().map { document ->
+            val services = getServices()
+            for (service in services) {
+                val result = service.fetchAll().map { document ->
                     Notes(id = document.name.toLong(), content = document.data)
                 }
                 for (item in result) {
@@ -123,16 +125,17 @@ class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
 
         scope.launch {
 
-            for (dataStore in getServices()) {
+            val services = getServices()
+            for (service in services) {
 
-                updateMetadata(dataStore = dataStore, note = note, pendingDelete = true)
+                updateMetadata(dataStore = service, note = note, pendingDelete = true)
 
-                val result = dataStore.delete(note.id.toString())
+                val result = service.delete(note.id.toString())
                 if (result) {
-                    updateMetadata(dataStore = dataStore, note = note, pendingDelete = false)
-                    Platform().logger.logi("RemoteRepository::delete() deleted = '${note.id}' for '${dataStore.name}'")
+                    updateMetadata(dataStore = service, note = note, pendingDelete = false)
+                    Platform().logger.logi("RemoteRepository::delete() deleted = '${note.id}' for '${service.name}'")
                 } else {
-                    Platform().logger.loge("RemoteRepository::delete() failed for '${dataStore.name}'")
+                    Platform().logger.loge("RemoteRepository::delete() failed for '${service.name}'")
                 }
 
             }

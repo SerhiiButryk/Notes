@@ -266,11 +266,15 @@ class ViewModelNotesTest {
 
             override val name: String = "firebase"
 
+            init {
+                canUse = true
+            }
+
             override suspend fun store(document: Document): Boolean {
                 return true
             }
 
-            override suspend fun load(name: String): Document? {
+            override suspend fun load(name: String): Document {
                 return Document("", "")
             }
 

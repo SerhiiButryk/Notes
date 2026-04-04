@@ -135,7 +135,7 @@ class GoogleSignInService : AbstractAuthService() {
         return false
     }
 
-    // This should show a dialog for a user to confirm permissions
+    // This should show a dialog for a user to get permissions
     private suspend fun requestGoogleDriveAccess(activityContext: Any?) {
         val googleDriveService = AppServices
             .__delicateCall_getOriginalStoreService("googledrive") as GoogleDriveService

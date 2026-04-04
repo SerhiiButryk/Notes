@@ -14,7 +14,7 @@ internal class AndroidInitProvider : Initializer<Platform> {
 
     override fun create(context: Context): Platform {
 
-        // Perform important initialization
+        // Perform initialization during the app launch
 
         val factory = PlatformFactory(context)
         val osPlatform = Platform(factory)

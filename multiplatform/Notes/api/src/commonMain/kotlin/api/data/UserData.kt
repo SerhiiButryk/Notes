@@ -29,6 +29,6 @@ fun isFirstLaunch(): Boolean {
     return userDataState.value.email.isEmpty()
 }
 
-fun verifyReceived(code: String) {
+fun cacheCode(code: String) {
     userDataState.value = userDataState.value.copy(code = code)
 }

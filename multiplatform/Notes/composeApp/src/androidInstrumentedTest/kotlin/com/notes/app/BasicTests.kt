@@ -9,8 +9,8 @@ import api.data.Document
 import api.data.toDocument
 import api.data.toJson
 import com.google.common.truth.Truth.assertThat
-import com.notes.app.security.CryptoProvider
 import api.data.EncryptedStore
+import com.notes.os.impl.CryptoProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -71,12 +71,12 @@ class BasicTests {
 
         val crypto = CryptoProvider()
 
-        val key = Platform.storage.get("derived_key_pass")
+        val key = Platform().storage.get("derived_key_pass")
         assertThat(key.isEmpty()).isTrue()
 
         crypto.onLoginCompleted("hellohellohello", "reitueoirrngeorg490904r3094rjr209jowmf.a,c2")
 
-        val key2 = Platform.storage.get("derived_key_pass")
+        val key2 = Platform().storage.get("derived_key_pass")
         assertThat(key2.isEmpty()).isFalse()
 
         val message = "hello world"
@@ -89,13 +89,13 @@ class BasicTests {
         assertThat(plaintext).isEqualTo(message)
 
         // Clear derived key
-        Platform.storage.clearAll()
+        Platform().storage.clearAll()
     }
 
     @Test
     fun test02_encryptedStore() = runTest {
 
-        Platform.crypto.onLoginCompleted("test", "test") // Gen derived key
+        Platform().crypto.onLoginCompleted("test", "test") // Gen derived key
 
         val doc1 = Document("doc1", "data 1")
 
@@ -126,7 +126,7 @@ class BasicTests {
         assertThat(docListRet).isEqualTo(docList)
 
         // Clear derived key
-        Platform.storage.clearAll()
+        Platform().storage.clearAll()
 
     }
 
