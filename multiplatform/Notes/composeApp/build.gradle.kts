@@ -36,7 +36,6 @@ kotlin {
 
             // Compose navigation
             implementation(libs.navigation)
-            implementation(libs.serializationJson)
 
             // Initialization during app launch
             implementation(libs.androidx.startup.runtime)
@@ -59,6 +58,12 @@ kotlin {
             implementation(libs.jetbrains.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // Serialization
+            implementation(libs.serializationJson)
+
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
         }
 
         commonTest.dependencies {
@@ -68,9 +73,6 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
-
-            // Resources
-            implementation(compose.components.resources)
         }
 
         androidInstrumentedTest.dependencies {

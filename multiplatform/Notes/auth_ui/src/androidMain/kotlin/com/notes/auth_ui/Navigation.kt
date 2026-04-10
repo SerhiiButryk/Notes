@@ -22,7 +22,7 @@ import com.notes.ui.Access
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.Auth
 import com.notes.ui.EmailVerification
-import com.notes.ui.OnBoardingScreen
+import com.notes.ui.OnBoardingNoteScreen
 import com.notes.ui.getStartDestination
 import com.notes.ui.getViewModel
 import com.notes.ui.navAndPopUpCurrent
@@ -128,7 +128,7 @@ private fun Dialog(viewModel: AuthViewModel) {
 }
 
 fun NavGraphBuilder.onboardingDestination(navController: NavController) {
-    composable<OnBoardingScreen> { backStackEntry ->
+    composable<OnBoardingNoteScreen> { backStackEntry ->
 
         val viewModel = backStackEntry.getViewModel<AuthViewModel>(navController)
 

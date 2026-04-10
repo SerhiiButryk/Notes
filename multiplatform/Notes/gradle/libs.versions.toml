@@ -29,6 +29,7 @@ okhttp = "5.3.2"
 playServicesAuth = "21.5.0"
 roomRuntime = "2.8.4"
 jsonserialization = "1.9.0"
+serializationCore = "1.10.0"
 navigation = "2.9.7"
 runtime = "1.10.3"
 serialization = "2.3.20"
@@ -52,8 +53,10 @@ googleHttpClientJackson2 = "2.1.0"
 grpc = "1.79.0"
 documentfile = "1.1.0"
 googleAuthLibraryOauth2Http = "1.43.0"
+multiplatform-nav3-ui = "1.0.0-alpha05"
 
 [libraries]
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
 androidx-compose-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
@@ -104,6 +107,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 serializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "jsonserialization" }
+serializationCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serializationCore" }
 navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 jetbrains-markdown = { module = "org.jetbrains:markdown", version.ref = "jetbrainsMarkdown" }
 androidx-compose-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "androidx-compose-ui" }

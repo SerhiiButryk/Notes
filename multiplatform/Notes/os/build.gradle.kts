@@ -30,6 +30,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.api)
+                implementation(projects.ui)
+                // Kotlin coroutines
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 
@@ -51,6 +54,9 @@ kotlin {
                 // DataStore APIs
                 implementation(libs.androidx.datastore.preferences)
             }
+        }
+
+        jvmMain.dependencies {
         }
 
         getByName("androidDeviceTest") {
