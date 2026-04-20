@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LoginView: View {
     
-    private let titleStr = "Login"
+    private let titleStr = "Sign in"
     private let fieldUsernameStr = "Username"
     private let fieldPasswordStr = "Password"
     private let signInbuttonStr = "Sing in"
@@ -11,43 +11,42 @@ struct LoginView: View {
     @State private var password = ""
     @State private var authenticated = false
     
-    private let appViewModel = AppViewModel()
+    private let dataModel = AppViewModel()
+    
+    private let onNavLogin: () -> Void
+    
+    init(onNavLogin: @escaping () -> Void) {
+        self.onNavLogin = onNavLogin
+    }
     
     var body: some View {
         
-        NavigationView {
+        ZStack {
             
-            ZStack {
+            // Can set background at this point
+            
+            VStack {
                 
-                // Can set background at this point
+                Text(titleStr)
+                    .font(.largeTitle.bold())
+                    .padding()
                 
-                VStack {
-                    
-                    Text(titleStr)
-                        .font(.largeTitle.bold())
-                        .padding()
-                    
-                    TextField(fieldUsernameStr, text: $username)
-                        .modifier(CommonFieldStyle(backgroundColor: Color.black.opacity(0.05)))
-                    
-                    SecureField(fieldPasswordStr, text: $password)
-                        .modifier(CommonFieldStyle(backgroundColor: Color.black.opacity(0.05)))
-                    
-                        
-                    Button(signInbuttonStr) {
-                        authenticated = appViewModel.login(username, password)
-                        
-                    }
-                    .foregroundColor(.white)
-                    .modifier(CommonFieldStyle(backgroundColor: Color.blue))
-                    
-                    
-                    NavigationLink(destination: Text("Some text"), isActive: $authenticated) {
-                        EmptyView()
+                TextField(fieldUsernameStr, text: $username)
+                    .modifier(CommonFieldStyle(backgroundColor: Color.black.opacity(0.05)))
+                
+                SecureField(fieldPasswordStr, text: $password)
+                    .modifier(CommonFieldStyle(backgroundColor: Color.black.opacity(0.05)))
+                
+                
+                Button(signInbuttonStr) {
+                    authenticated = dataModel.login(username, password)
+                    if (authenticated) {
+                        onNavLogin()
                     }
                 }
-                
-            }.navigationBarHidden(true)
+                .foregroundColor(.white)
+                .modifier(CommonFieldStyle(backgroundColor: Color.blue))
+            }
             
         }
         
@@ -60,16 +59,16 @@ struct CommonFieldStyle : ViewModifier {
     
     func body(content: Content) -> some View {
         content.padding()
-        .frame(maxWidth: .infinity)
-        .background(backgroundColor)
-        .cornerRadius(10)
-        .padding([.leading, .trailing], 20)
+            .frame(maxWidth: .infinity)
+            .background(backgroundColor)
+            .cornerRadius(10)
+            .padding([.leading, .trailing], 20)
     }
     
 }
 
-struct LoginUI_Previews: PreviewProvider {
+struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView{}
     }
 }

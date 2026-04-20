@@ -9,6 +9,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import com.notes.auth_ui.data.LoginUIState
 import com.notes.ui.AnimatedBackground
 import com.notes.ui.NetworkStateMessage
 
@@ -17,8 +18,6 @@ fun LoginUIImpl(
     state: LoginUIState,
     onLogin: (LoginUIState) -> Unit,
     content: @Composable (
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
@@ -41,8 +40,6 @@ fun LoginUIImpl(
                 val password = rememberSaveable { mutableStateOf("") }
 
                 content(
-                    "Welcome again !",
-                    "Sign in using your email and password",
                     email,
                     password,
                     { passwordValue, _, emailValue ->

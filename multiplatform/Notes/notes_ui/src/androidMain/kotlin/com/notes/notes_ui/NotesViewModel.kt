@@ -31,10 +31,10 @@ class NotesViewModel(
 
     private val scope: CoroutineScope = scopeOverride ?: viewModelScope
 
-    private val interaction: Interactor = Interactor(appRepository, this)
+    private val interactor: Interactor = Interactor(appRepository, this)
 
     // A state to hold all the notes
-    val notesState: StateFlow<List<Notes>> = interaction
+    val notesState: StateFlow<List<Notes>> = interactor
         .getNotes()
         .stateIn(
             scope = scope,
@@ -46,31 +46,31 @@ class NotesViewModel(
     private val _noteState = MutableStateFlow(Notes.AbsentNote())
     val noteState = _noteState.asStateFlow()
 
-    val richTools = getToolsList(interaction)
+    val richTools = getToolsList(interactor)
 
     private val uiEvents = Channel<UiEvent>(capacity = Channel.BUFFERED)
     val events = uiEvents.receiveAsFlow()
 
     override fun onCleared() {
-        interaction.onClear()
+        interactor.onClear()
     }
 
     // User selected a note from list ui
     suspend fun onSelectAction(note: Notes) {
         val found = notesState.value.firstOrNull { note.id == it.id }
         if (found == null) {
-            val note = interaction.getNotes(note.id).first()!!
+            val note = interactor.getNotes(note.id).first()!!
             _noteState.emit(note)
         } else {
             _noteState.emit(found)
         }
-        interaction.onNoteOpened()
+        interactor.onNoteOpened()
     }
 
     // User clicked on '+' button in ui to create an empty note
     suspend fun onAddAction() {
         _noteState.emit(Notes.NewNote())
-        interaction.onNoteOpened()
+        interactor.onNoteOpened()
     }
 
     override fun onNoteAdded(id: Long) { // Note has been updated in repository
@@ -100,6 +100,6 @@ class NotesViewModel(
     }
 
     fun sendEditorCommand(command: EditorCommand) {
-        interaction.sendEditorCommand(command)
+        interactor.sendEditorCommand(command)
     }
 }

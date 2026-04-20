@@ -7,15 +7,16 @@ import api.Platform
 import api.auth.AuthResult
 import api.data.userDataState
 import api.utils.getErrorTitleAndMessage
-import com.notes.auth_ui.ui.DialogState
-import com.notes.auth_ui.ui.LoginUIState
-import com.notes.auth_ui.ui.RegisterUIState
-import com.notes.auth_ui.ui.UIState
-import com.notes.auth_ui.ui.VerificationUIState
+import com.notes.auth_ui.data.DialogState
+import com.notes.auth_ui.data.LoginUIState
+import com.notes.auth_ui.data.RegisterUIState
+import com.notes.auth_ui.data.UIState
+import com.notes.auth_ui.data.VerificationUIState
+import com.notes.auth_ui.data.copyLoginUIState
+import com.notes.ui.Access
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.notes.ui.Access
 
 private const val TAG = "AuthViewModel"
 
@@ -29,14 +30,11 @@ class AuthViewModel : ViewModel() {
 
     private val interactor = Interactor()
 
-    fun <T> MutableStateFlow<T>.copyLoginUIState(showProgress: Boolean): UIState? {
-        return (value as? LoginUIState)?.copy(showProgress = showProgress)
-    }
-
     fun login(
         state: LoginUIState,
         onSuccess: () -> Unit,
-        context: Any?
+        context: Any?,
+        args: Access
     ) {
         Platform().logger.logi("$TAG::login()")
         viewModelScope.launch {
@@ -46,8 +44,18 @@ class AuthViewModel : ViewModel() {
 
             val result = interactor.login(state.password, state.email, context)
             if (result.isSuccess()) {
-                onSuccess()
+                Platform().logger.logi("$TAG::login() reauth success")
+                if (args.showChangePasswordUI) {
+                    Platform().logger.logi("$TAG::login() showing change password screen")
+                    // User password is confirmed. Show change password screen
+                    onShowRegisterUI(args)
+                } else {
+                    onSuccess()
+                }
             } else {
+                if (state.authToConfirm) {
+                    Platform().logger.loge("$TAG::login() reauth failed")
+                }
                 handleResult(result)
             }
 
@@ -60,7 +68,7 @@ class AuthViewModel : ViewModel() {
 
     fun register(
         state: RegisterUIState,
-        onSuccess: suspend () -> Unit,
+        onSuccess: suspend () -> Unit
     ) {
         Platform().logger.logi("$TAG::register()")
         viewModelScope.launch {
@@ -76,6 +84,23 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun changePassword(
+        state: RegisterUIState,
+        onSuccess: () -> Unit
+    ) {
+        Platform().logger.logi("$TAG::changePassword()")
+
+        viewModelScope.launch {
+            showDialog(
+                title = "Success",
+                subtitle = "Password has changed successfully!",
+                onConfirm = {
+                    onSuccess()
+                }
+            )
+        }
+    }
+
     fun runConfirmationCheck(
         shouldResendVerification: Boolean = false,
         navController: NavController,
@@ -85,7 +110,7 @@ class AuthViewModel : ViewModel() {
             val isEmailVerified = interactor.isEmailVerified()
             if (isEmailVerified) {
                 Platform().logger.logi("$TAG::runConfirmationCheck() passed")
-                onShowLoginUI()
+                onShowLoginUI(args = Access())
                 // Open login screen
                 navController.navigate(Access)
             } else if (shouldResendVerification) {
@@ -98,23 +123,21 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun onShowAccessUI(uiForced: Boolean = false) {
+    fun onShowAccessUI(args: Access) {
         viewModelScope.launch {
-            if (uiForced) {
-                onShowLoginUI(uiForced)
-                return@launch
-            }
             // Special case to handle if user don't want to register
             // and to allow he/she to go to sing in ui from register ui
-            if (_uiState.value is LoginUIState) {
-                if ((_uiState.value as LoginUIState).uiForced) {
-                    return@launch
-                }
-            }
-            if (interactor.getEmail().isEmpty()) {
-                onShowRegisterUI()
+            // also in some cases we should auth user again
+            val loginUIForced = args.forceLoginUI ||
+                    (_uiState.value is LoginUIState && (_uiState.value as LoginUIState).uiForced) ||
+                    args.showChangePasswordUI
+
+            if (loginUIForced) {
+                onShowLoginUI(args)
+            } else if (interactor.getEmail().isEmpty()) {
+                onShowRegisterUI(args)
             } else {
-                onShowLoginUI()
+                onShowLoginUI(args)
             }
         }
     }
@@ -130,9 +153,14 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    private suspend fun onShowLoginUI(uiForced: Boolean = false) {
+    private suspend fun onShowLoginUI(args: Access) {
         // Initially we are going to show a keyboard if ui is open
-        val newState = LoginUIState(hasFocus = true, email = interactor.getEmail(), uiForced = uiForced)
+        val newState = LoginUIState(
+            hasFocus = true,
+            email = interactor.getEmail(),
+            uiForced = args.forceLoginUI,
+            authToConfirm = args.showChangePasswordUI
+        )
         _uiState.emit(newState)
     }
 
@@ -141,9 +169,14 @@ class AuthViewModel : ViewModel() {
         _uiState.emit(VerificationUIState(email = email))
     }
 
-    private suspend fun onShowRegisterUI() {
+    private suspend fun onShowRegisterUI(args: Access) {
         // Initially we are going to show a keyboard if ui is open
-        _uiState.emit(RegisterUIState(hasFocus = true))
+        _uiState.emit(
+            RegisterUIState(
+                hasFocus = true,
+                showChangePassword = args.showChangePasswordUI
+            )
+        )
     }
 
     fun dismissDialog() {
@@ -151,6 +184,14 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _dialogState.emit(null)
         }
+    }
+
+    private suspend fun showDialog(
+        title: String,
+        subtitle: String,
+        onConfirm: (() -> Unit)? = null
+    ) {
+        _dialogState.emit(DialogState(title = title, subtitle = subtitle, onConfirm = onConfirm))
     }
 
     override fun onCleared() {
@@ -162,17 +203,23 @@ class AuthViewModel : ViewModel() {
         Platform().logger.logi("$TAG::handleResult()")
 
         if (result.isEmailVerificationPassed()) {
+            val old = _uiState.value as VerificationUIState
             _uiState.emit(
-                (_uiState.value as VerificationUIState)
-                    .copy(emailVerificationSent = true)
+                VerificationUIState(
+                    emailVerificationSent = true,
+                    email = old.email,
+                )
             )
             return
         }
 
         if (result.isEmailVerificationFailed()) {
+            val old = _uiState.value as VerificationUIState
             _uiState.emit(
-                (_uiState.value as VerificationUIState)
-                    .copy(emailVerificationSent = false)
+                VerificationUIState(
+                    emailVerificationSent = false,
+                    email = old.email,
+                )
             )
             return
         }
@@ -182,6 +229,6 @@ class AuthViewModel : ViewModel() {
         val title = strings.first
         val subtitle = strings.second
 
-        _dialogState.emit(DialogState(title = title, subtitle = subtitle))
+        showDialog(title = title, subtitle = subtitle)
     }
 }

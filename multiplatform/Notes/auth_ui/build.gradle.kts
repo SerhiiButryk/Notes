@@ -51,7 +51,6 @@ kotlin {
 
             // Compose navigation
             implementation(libs.navigation)
-            implementation(libs.serializationJson)
 
             // Adaptive layout
             implementation(libs.androidx.adaptive)
@@ -73,6 +72,13 @@ kotlin {
             implementation(libs.jetbrains.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // Serialization
+            implementation(libs.serializationJson)
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
+            // View Model
+            implementation(libs.androidx.lifecycle.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

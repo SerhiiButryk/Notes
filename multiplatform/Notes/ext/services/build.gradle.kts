@@ -29,6 +29,8 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         androidMain.dependencies {
 
@@ -60,9 +62,23 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.api)
+            // Firebase SDK
+            // The unofficial Firebase Kotlin SDK for KMP
+            implementation(libs.firebase.common)
+            // Firebase auth
+            implementation(libs.gitlive.firebase.auth)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+
+        jvmMain.dependencies {
+            // https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master
+            // Firebase SDK
+            // The unofficial Firebase Kotlin SDK for KMP
+//            implementation(libs.firebase.common)
+            // Firebase auth
+//            implementation(libs.gitlive.firebase.auth)
         }
     }
 }

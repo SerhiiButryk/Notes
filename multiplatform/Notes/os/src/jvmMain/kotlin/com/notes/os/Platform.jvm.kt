@@ -43,19 +43,19 @@ internal actual class PlatformFactory {
     actual fun provideCryptoOperations(): CryptoOperations {
         return object : CryptoOperations {
             override fun encrypt(message: String): String {
-                return ""
+                return message
             }
 
             override fun decrypt(message: String): String {
-                return ""
+                return message
             }
 
             override suspend fun encryptWithDerivedKey(message: String): String {
-                return ""
+                return message
             }
 
             override suspend fun decryptWithDerivedKey(message: String): String {
-                return ""
+                return message
             }
         }
     }
@@ -79,11 +79,11 @@ internal actual class PlatformFactory {
         return object : Log {
 
             override fun logi(message: String) {
-
+                println("NOTES [INFO] $message")
             }
 
             override fun loge(message: String) {
-
+                println("NOTES [ERROR] $message")
             }
         }
     }

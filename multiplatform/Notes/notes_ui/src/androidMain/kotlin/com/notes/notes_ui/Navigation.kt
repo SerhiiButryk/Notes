@@ -25,14 +25,14 @@ import com.notes.ui.NotesSettings
 import api.data.Notes
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
+import com.notes.ui.Access
 import com.notes.ui.getViewModel
 import com.notes.ui.isTabletOrFoldableExpanded
-import com.notes.ui.navAndPopUpCurrent
 import kotlinx.coroutines.flow.Flow
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
     // Main app content graph
-    navigation<MainContent>(startDestination = NotesPreview) {
+    navigation<MainContent>(startDestination = NotesPreview()) {
         composable<NotesPreview> { backStackEntry ->
 
             val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController)
@@ -53,7 +53,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val getEvents: suspend () -> Flow<UiEvent> = { viewModel.events }
 
-            val onSettingsClicked = { navController.navigate(NotesSettings) }
+            val onSettingsClicked = { navController.navigate(NotesSettings()) }
 
             val toolsPaneItems = viewModel.richTools
 
@@ -92,11 +92,15 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val onBackClicked: () -> Unit = { navController.navAndPopUpCurrent(NotesPreview) }
+            val onBackClicked: () -> Unit = { navController.popBackStack() }
 
-            val onAccountSelected = { navController.navigate(NotesAccount) }
+            val onAccountSelected = { navController.navigate(NotesAccount()) }
             val onExport: (uri: Uri?, context: Context) -> Unit = { uri, context ->
                 viewModel.onExport(uri, context)
+            }
+
+            val onPasswordUpdateClick = {
+                navController.navigate(Access(showChangePasswordUI = true))
             }
 
             val launcher = rememberLauncherForActivityResult(
@@ -111,7 +115,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onExportClick = {
                     // Ask User to select a folder for notes export
                     launcher.launch(null)
-                }
+                },
+                onPasswordUpdateClick = onPasswordUpdateClick
             )
         }
 
@@ -119,11 +124,11 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val onBackClick: () -> Unit = { navController.navAndPopUpCurrent(NotesSettings) }
+            val onBackClick: () -> Unit = { navController.popBackStack() }
 
             val onSignOut = {
                 viewModel.singOut {
-                    navController.navigate(Auth)
+                    navController.navigate(Auth())
                 }
             }
 

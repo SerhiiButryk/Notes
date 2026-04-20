@@ -9,14 +9,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import com.notes.auth_ui.data.RegisterUIState
 import com.notes.ui.NetworkStateMessage
 
 @Composable
 fun RegisterUIImpl(
     onRegister: (RegisterUIState) -> Unit,
     content: @Composable (
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,
@@ -40,9 +39,6 @@ fun RegisterUIImpl(
             NetworkStateMessage()
 
             content(
-                "Register",
-                "Enter your user email and create a password " +
-                        "to access this application",
                 email,
                 password,
                 confirmPassword,

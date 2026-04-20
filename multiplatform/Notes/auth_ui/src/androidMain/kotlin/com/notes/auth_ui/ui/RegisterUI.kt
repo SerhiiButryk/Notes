@@ -3,20 +3,20 @@ package com.notes.auth_ui.ui
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import com.notes.auth_ui.data.RegisterUIState
 
 @Composable
 internal fun RegisterUI(
     state: RegisterUIState,
     onRegister: (RegisterUIState) -> Unit,
-    onLogin: (() -> Unit)
+    onLogin: (() -> Unit)? = null,
+    title: String,
+    subTitle: String,
 ) {
 
     RegisterUIImpl(
         onRegister = onRegister,
     ) {
-
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,

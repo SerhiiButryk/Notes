@@ -2,7 +2,9 @@ package com.notes.notes_ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +24,8 @@ import com.notes.ui.SimpleTopBar
 fun SettingsUI(
     onBackClick: () -> Unit,
     onAccountClick: () -> Unit,
-    onExportClick: () -> Unit
+    onExportClick: () -> Unit,
+    onPasswordUpdateClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -46,10 +49,19 @@ fun SettingsUI(
             SettingsListItem(
                 title = "Export to a PDF file",
                 subtitle = "Save your notes to a pdf file",
-                icon = Icons.Default.Person,
+                icon = Icons.Default.Backup,
                 onClick = onExportClick,
                 showRightSign = false
             )
+
+            SettingsListItem(
+                title = "Change a password",
+                subtitle = "Update your password",
+                icon = Icons.Default.Key,
+                onClick = onPasswordUpdateClick,
+                showRightSign = false
+            )
+
         }
     }
 }

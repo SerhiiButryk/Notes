@@ -1,4 +1,5 @@
 import SwiftUI
+import OSLog
 
 @main
 struct iOSApp: App {
@@ -7,4 +8,12 @@ struct iOSApp: App {
             ContentView()
         }
     }
+}
+
+func createLogger(withTag tag: String) -> Logger {
+    var subsystem = ""
+    if let bundleIdentifier = Bundle.main.bundleIdentifier {
+        subsystem = bundleIdentifier
+    }
+    return Logger(subsystem: subsystem, category: tag)
 }

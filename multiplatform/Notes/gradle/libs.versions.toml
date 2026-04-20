@@ -2,7 +2,6 @@
 agp = "8.13.2" # When updating check IOS & Android build. It could create build issues.
 composeMultiplatform = "1.10.3"
 composeHotReload = "1.0.0"
-
 kotlin = "2.3.0"
 
 android-compileSdk = "36"
@@ -16,6 +15,7 @@ androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.10.0"
 kotlinx-coroutines = "1.10.2"
 adaptiveLayout = "1.2.0"
+lifecycleViewmodel = "2.10.0"
 material3 = "1.9.0"
 materialIconsExtendedVersion = "1.7.3"
 media3 = "1.9.3"
@@ -54,8 +54,16 @@ grpc = "1.79.0"
 documentfile = "1.1.0"
 googleAuthLibraryOauth2Http = "1.43.0"
 multiplatform-nav3-ui = "1.0.0-alpha05"
+compose = "1.7.0"
+firebaseCommon = "2.4.0"
+firebaseAuth = "2.4.0"
+componentsSplitpane = "1.10.3"
 
 [libraries]
+androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
+components-splitpane = { module = "org.jetbrains.compose.components:components-splitpane", version.ref = "componentsSplitpane" }
+gitlive-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
 androidx-compose-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }

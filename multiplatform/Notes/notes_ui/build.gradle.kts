@@ -49,13 +49,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.androidx.compose.bom))
             implementation(libs.bundles.composeui)
 
-            // Compose preview
-            implementation(libs.ui.tooling)
-            implementation(libs.ui.tooling.preview)
-
             // Compose navigation
             implementation(libs.navigation)
-            implementation(libs.serializationJson)
 
             // For currentWindowAdaptiveInfo() & List Detail composable
             implementation(libs.androidx.adaptive)
@@ -90,6 +85,15 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.jetbrains.material.icons.extended)
+            implementation(libs.components.splitpane)
+            implementation(libs.jetbrains.ui.tooling.preview)
+
+            // Serialization
+            implementation(libs.serializationJson)
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
+            // View Model
+            implementation(libs.androidx.lifecycle.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -3,13 +3,13 @@ package com.notes.ui
 import api.data.isFirstLaunch
 import kotlinx.serialization.Serializable
 
-fun getStartDestination(): Screen = MainContent
+fun getStartDestination(): Screen = MainContent()
 
 fun getStartRoute(): Screen {
     if (isFirstLaunch()) {
-        return OnBoardingScreen
+        return OnBoardingScreen()
     }
-    return Auth
+    return Auth()
 }
 
 // Object: Use an object for routes without arguments.
@@ -19,25 +19,28 @@ fun getStartRoute(): Screen {
 open class Screen
 
 @Serializable
-object Auth : Screen()
+class Auth : Screen()
 
 @Serializable
-object Access : Screen()
+class Access(
+    val showChangePasswordUI: Boolean = false,
+    val forceLoginUI: Boolean = false
+) : Screen()
 
 @Serializable
-object OnBoardingScreen : Screen()
+class OnBoardingScreen : Screen()
 
 @Serializable
-object EmailVerification : Screen()
+class EmailVerification : Screen()
 
 @Serializable
-object NotesPreview : Screen()
+class NotesPreview : Screen()
 
 @Serializable
-object MainContent : Screen()
+class MainContent : Screen()
 
 @Serializable
-object NotesSettings : Screen()
+class NotesSettings : Screen()
 
 @Serializable
-object NotesAccount : Screen()
+class NotesAccount : Screen()

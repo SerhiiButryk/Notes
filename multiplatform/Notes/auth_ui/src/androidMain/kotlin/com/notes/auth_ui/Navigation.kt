@@ -11,25 +11,28 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
+import com.notes.auth_ui.data.LoginUIState
+import com.notes.auth_ui.data.RegisterUIState
+import com.notes.auth_ui.data.VerificationUIState
 import com.notes.auth_ui.ui.LoginUI
-import com.notes.auth_ui.ui.LoginUIState
 import com.notes.auth_ui.ui.OnboardingScreen
 import com.notes.auth_ui.ui.RegisterUI
-import com.notes.auth_ui.ui.RegisterUIState
 import com.notes.auth_ui.ui.VerificationEmailUI
-import com.notes.auth_ui.ui.VerificationUIState
 import com.notes.ui.Access
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.Auth
 import com.notes.ui.EmailVerification
-import com.notes.ui.OnBoardingNoteScreen
+import com.notes.ui.NotesSettings
+import com.notes.ui.OnBoardingScreen
+import com.notes.ui.SettingsScreen
 import com.notes.ui.getStartDestination
 import com.notes.ui.getViewModel
 import com.notes.ui.navAndPopUpCurrent
 
 fun NavGraphBuilder.authDestination(navController: NavController) {
     // Authentication graph
-    navigation<Auth>(startDestination = Access) {
+    navigation<Auth>(startDestination = Access()) {
         composable<Access> { backStackEntry ->
 
             // Show login or register depending on UI state
@@ -37,8 +40,14 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
             val viewModel = backStackEntry.getViewModel<AuthViewModel>(navController)
             val state = viewModel.uiState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(false) {
-                viewModel.onShowAccessUI()
+            // Arguments
+            val args: Access = backStackEntry.toRoute()
+
+            val title = state.value.title
+            val subTitle = state.value.subtitle
+
+            LaunchedEffect(args.forceLoginUI) {
+                viewModel.onShowAccessUI(args)
             }
 
             if (state.value is LoginUIState) {
@@ -52,34 +61,58 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
                 LoginUI(
                     state = loginUIState,
-                    onLogin = { viewModel.login(state = it, onSuccess = onSuccess, context = activityContext) },
+                    onLogin = {
+                        viewModel.login(state = it, onSuccess = onSuccess, context = activityContext, args = args)
+                    },
+                    title = title,
+                    subTitle = subTitle
                 )
 
                 val context = LocalContext.current
-                BackHandler(enabled = true) {
-                    val activity = context as? Activity
-                    activity?.moveTaskToBack(true)
+                if (!args.showChangePasswordUI) {
+                    BackHandler(enabled = true) {
+                        val activity = context as? Activity
+                        activity?.moveTaskToBack(true)
+                    }
                 }
             }
 
             if (state.value is RegisterUIState) {
-                val onSuccess = {
-                    navController.navigate(EmailVerification)
+
+
+                val onLogin = {
+                    // Go to login screen
+                    navController.navigate(Access(forceLoginUI = true))
                 }
 
-                RegisterUI(
-                    state = state.value as RegisterUIState,
-                    onRegister = {
+                val onRegister: (RegisterUIState) -> Unit = {
+                    if (args.showChangePasswordUI) {
+
+                        val onSuccess = {
+                            navController.popBackStack()
+                            Unit
+                        }
+
+                        viewModel.changePassword(state = it, onSuccess = onSuccess)
+                    } else {
+
+                        val onSuccess = {
+                            navController.navigate(EmailVerification())
+                        }
+
                         viewModel.register(
                             state = it,
                             onSuccess = onSuccess,
                         )
-                    },
-                    onLogin = {
-                        viewModel.onShowAccessUI(uiForced = true)
-                        // Go to login screen
-                        navController.navigate(Access)
                     }
+                }
+
+                RegisterUI(
+                    state = state.value as RegisterUIState,
+                    onRegister = onRegister,
+                    onLogin = if (args.showChangePasswordUI) null else onLogin,
+                    title = title,
+                    subTitle = subTitle
                 )
             }
 
@@ -116,19 +149,22 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 @Composable
 private fun Dialog(viewModel: AuthViewModel) {
     val dialogState = viewModel.dialogState.collectAsStateWithLifecycle()
-
-    if (dialogState.value != null) {
+    val dialogValue = dialogState.value
+    if (dialogValue != null) {
         AlertDialogUI(
             onDismissRequest = { viewModel.dismissDialog() },
-            onConfirmation = { viewModel.dismissDialog() },
-            dialogTitle = dialogState.value!!.title,
-            dialogText = dialogState.value!!.subtitle,
+            onConfirmation = {
+                viewModel.dismissDialog()
+                dialogValue.onConfirm?.invoke()
+            },
+            dialogTitle = dialogValue.title,
+            dialogText = dialogValue.subtitle,
         )
     }
 }
 
 fun NavGraphBuilder.onboardingDestination(navController: NavController) {
-    composable<OnBoardingNoteScreen> { backStackEntry ->
+    composable<OnBoardingScreen> { backStackEntry ->
 
         val viewModel = backStackEntry.getViewModel<AuthViewModel>(navController)
 
@@ -137,7 +173,7 @@ fun NavGraphBuilder.onboardingDestination(navController: NavController) {
         }
 
         OnboardingScreen {
-            navController.navigate(route = Auth)
+            navController.navigate(Auth())
         }
     }
 }
