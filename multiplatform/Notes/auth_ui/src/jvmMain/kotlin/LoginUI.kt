@@ -13,16 +13,15 @@ import kotlin.String
 @Composable
 fun LoginScreenImpl(
     state: LoginUIState,
-    onLogin: (LoginUIState) -> Unit
+    onLogin: (LoginUIState) -> Unit,
+    title: String,
+    subTitle: String,
 ) {
 
     LoginUIImpl(
         state = state,
         onLogin = onLogin
     ) {
-
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,

@@ -1,14 +1,17 @@
 package com.notes.os
 
+import api.data.Notes
 import api.data.StorageOperations
 import api.net.NetStateInfo
 import api.net.NetStateManager
+import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
 import api.security.DerivedKeyOperations
 import api.utils.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 
 internal actual class PlatformFactory {
 
@@ -99,4 +102,47 @@ internal actual class PlatformFactory {
             }
         }
     }
+
+    actual fun provideAppRepository(): Repository {
+        return object : Repository {
+
+            override fun getNotes(): Flow<List<Notes>> {
+                return flow {
+                    emit(listOf(Notes("content1", id = 1), Notes("content2", id = 2)))
+                }
+            }
+
+            override fun getNotes(id: Long): Flow<Notes?> {
+                return flow {
+                    emit(Notes("content1", id = 1))
+                }
+            }
+
+            override fun saveNote(note: Notes, onNewAdded: suspend (Long) -> Unit) {
+
+            }
+
+            override fun deleteNote(note: Notes, callback: (Long) -> Unit) {
+
+            }
+
+            override fun clear() {
+
+            }
+
+            override suspend fun triggerSyncWithRemote() {
+
+            }
+
+            override suspend fun clearLocalNotesStorage() {
+
+            }
+
+            override suspend fun isDataInSync(): Boolean {
+                return true
+            }
+        }
+    }
+
+
 }

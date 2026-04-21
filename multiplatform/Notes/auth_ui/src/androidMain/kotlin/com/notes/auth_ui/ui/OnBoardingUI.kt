@@ -11,14 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.notes.ui.getIconByKey
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.previewIcon
-
 @Composable
-internal fun OnboardingScreen(onContinue: () -> Unit = {}) {
-    OnboardingScreenImpl(onContinue = onContinue)
-}
-
-@Composable
-private fun OnboardingScreenImpl(onContinue: () -> Unit = {}) {
+fun OnboardingScreen(onContinue: () -> Unit) {
 
     val sc = currentWindowAdaptiveInfo().windowSizeClass
 

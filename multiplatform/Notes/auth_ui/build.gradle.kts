@@ -39,6 +39,8 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
+            implementation(projects.repo)
+
             implementation(libs.bundles.android.core)
 
             // Compose UI

@@ -2,6 +2,7 @@ package api
 
 import api.data.StorageOperations
 import api.net.NetStateManager
+import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
 import api.security.DerivedKeyOperations
@@ -20,6 +21,8 @@ interface OSPlatform {
     val crypto: CryptoOperations
 
     val netStateManager: NetStateManager
+
+    val appRepo: Repository
 }
 
 var platform: OSPlatform? = null

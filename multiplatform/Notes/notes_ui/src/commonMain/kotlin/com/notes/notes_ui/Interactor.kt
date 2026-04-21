@@ -1,35 +1,12 @@
 package com.notes.notes_ui
 
 import api.data.Notes
+import api.repo.RepoCallback
+import api.repo.Repository
 import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.editor.EditorState
 import com.notes.notes_ui.features.RedoUndoAction
 import kotlinx.coroutines.flow.Flow
-
-interface RepoCallback {
-    fun onNoteAdded(id: Long)
-
-    fun onNoteDeleted(id: Long)
-    fun onNoteNavigateBack()
-}
-
-interface Repository {
-    fun getNotes(): Flow<List<Notes>>
-
-    fun getNotes(id: Long): Flow<Notes?>
-
-    fun saveNote(
-        note: Notes,
-        onNewAdded: suspend (Long) -> Unit,
-    )
-
-    fun deleteNote(
-        note: Notes,
-        callback: (Long) -> Unit,
-    )
-
-    fun clear()
-}
 
 class Interactor(
     private val repository: Repository,

@@ -1,8 +1,8 @@
-package com.notes.data.json
+package com.notes.db.json
 
 import api.Platform
 import api.data.AbstractStorageService
-import com.notes.data.NotesMetadataEntity
+import com.notes.db.NotesMetadataEntity
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive

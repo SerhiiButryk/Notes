@@ -1,11 +1,11 @@
-package com.notes.data
+package com.notes.db
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.notes.data.models.NoteInfo
+import com.notes.db.models.NoteInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao

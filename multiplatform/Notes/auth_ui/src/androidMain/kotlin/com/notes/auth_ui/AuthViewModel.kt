@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import api.Platform
 import api.auth.AuthResult
+import api.data.getUserEmail
 import api.data.userDataState
 import api.utils.getErrorTitleAndMessage
 import com.notes.auth_ui.data.DialogState
@@ -14,14 +15,19 @@ import com.notes.auth_ui.data.UIState
 import com.notes.auth_ui.data.VerificationUIState
 import com.notes.auth_ui.data.copyLoginUIState
 import com.notes.ui.Access
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 private const val TAG = "AuthViewModel"
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    // For test support
+    scopeOverride: CoroutineScope? = null
+) : ViewModel() {
 
+    private val scope: CoroutineScope = scopeOverride ?: viewModelScope
     private val _uiState = MutableStateFlow(UIState())
     val uiState = _uiState.asStateFlow()
 
@@ -37,7 +43,7 @@ class AuthViewModel : ViewModel() {
         args: Access
     ) {
         Platform().logger.logi("$TAG::login()")
-        viewModelScope.launch {
+        scope.launch {
             // Show progress
             val newState = _uiState.copyLoginUIState(showProgress = true)
             _uiState.emit(newState!!)
@@ -71,7 +77,7 @@ class AuthViewModel : ViewModel() {
         onSuccess: suspend () -> Unit
     ) {
         Platform().logger.logi("$TAG::register()")
-        viewModelScope.launch {
+        scope.launch {
             val result = interactor.register(state.confirmPassword, state.password, state.email)
             if (result.isSuccess()) {
                 onShowVerificationUI()
@@ -89,15 +95,53 @@ class AuthViewModel : ViewModel() {
         onSuccess: () -> Unit
     ) {
         Platform().logger.logi("$TAG::changePassword()")
+        scope.launch {
 
-        viewModelScope.launch {
-            showDialog(
-                title = "Success",
-                subtitle = "Password has changed successfully!",
-                onConfirm = {
-                    onSuccess()
-                }
-            )
+            if (state.email != interactor.getEmail()) {
+                // Show error
+                showDialog(
+                    title = "Error",
+                    subtitle = "Entered email is not correct",
+                    onConfirm = {
+                        dismissDialog()
+                    }
+                )
+                return@launch
+            }
+
+            if (state.confirmPassword != state.password) {
+                // Show error
+                showDialog(
+                    title = "Error",
+                    subtitle = "Passwords do not match",
+                    onConfirm = {
+                        dismissDialog()
+                    }
+                )
+                return@launch
+            }
+
+            val result = interactor.changePassword(state.password)
+
+            if (result) {
+
+                showDialog(
+                    title = "Success",
+                    subtitle = "Password has changed successfully!",
+                    onConfirm = {
+                        onSuccess()
+                    }
+                )
+            } else {
+                showDialog(
+                    title = "Error",
+                    subtitle = "Failed to change password. Please, try again!",
+                    onConfirm = {
+                        dismissDialog()
+                    }
+                )
+            }
+
         }
     }
 
@@ -106,27 +150,32 @@ class AuthViewModel : ViewModel() {
         navController: NavController,
     ) {
         Platform().logger.logi("$TAG::runConfirmationCheck()")
-        viewModelScope.launch {
+        scope.launch {
+
+            if (userDataState.value.code.isNotEmpty()) {
+                interactor.verifyCode(userDataState.value.code)
+            }
+
             val isEmailVerified = interactor.isEmailVerified()
             if (isEmailVerified) {
                 Platform().logger.logi("$TAG::runConfirmationCheck() passed")
                 onShowLoginUI(args = Access())
                 // Open login screen
-                navController.navigate(Access)
+                navController.navigate(Access())
             } else if (shouldResendVerification) {
                 Platform().logger.logi("$TAG::runConfirmationCheck() resending verification")
                 val result = interactor.sendEmailVerification()
                 handleResult(result)
             } else {
-                Platform().logger.logi("$TAG::runConfirmationCheck() failed, no-op")
+                Platform().logger.logi("$TAG::runConfirmationCheck() no-op")
             }
         }
     }
 
     fun onShowAccessUI(args: Access) {
-        viewModelScope.launch {
+        scope.launch {
             // Special case to handle if user don't want to register
-            // and to allow he/she to go to sing in ui from register ui
+            // and to allow he/she to go strait to login ui
             // also in some cases we should auth user again
             val loginUIForced = args.forceLoginUI ||
                     (_uiState.value is LoginUIState && (_uiState.value as LoginUIState).uiForced) ||
@@ -134,7 +183,7 @@ class AuthViewModel : ViewModel() {
 
             if (loginUIForced) {
                 onShowLoginUI(args)
-            } else if (interactor.getEmail().isEmpty()) {
+            } else if (getUserEmail().isEmpty()) {
                 onShowRegisterUI(args)
             } else {
                 onShowLoginUI(args)
@@ -143,14 +192,8 @@ class AuthViewModel : ViewModel() {
     }
 
     fun onShowOnBoardingUI(navController: NavController) {
-        viewModelScope.launch {
-            if (userDataState.value.code.isNotEmpty()) {
-                if (interactor.verifyCode(userDataState.value.code)) {
-                    // Check if can proceed
-                    runConfirmationCheck(navController = navController)
-                }
-            }
-        }
+        // Check if can proceed
+        runConfirmationCheck(navController = navController)
     }
 
     private suspend fun onShowLoginUI(args: Access) {
@@ -165,8 +208,7 @@ class AuthViewModel : ViewModel() {
     }
 
     private suspend fun onShowVerificationUI() {
-        val email = interactor.getEmail()
-        _uiState.emit(VerificationUIState(email = email))
+        updateVerificationUIState(email = interactor.getEmail(), force = true)
     }
 
     private suspend fun onShowRegisterUI(args: Access) {
@@ -181,7 +223,7 @@ class AuthViewModel : ViewModel() {
 
     fun dismissDialog() {
         Platform().logger.logi("$TAG::dismissDialog()")
-        viewModelScope.launch {
+        scope.launch {
             _dialogState.emit(null)
         }
     }
@@ -199,28 +241,30 @@ class AuthViewModel : ViewModel() {
         interactor.onClear()
     }
 
+    private suspend fun updateVerificationUIState(
+        emailVerificationSent: Boolean? = null,
+        email: String? = null,
+        force: Boolean = false
+    ) {
+        val copy = if (force) VerificationUIState() else _uiState.value as? VerificationUIState ?: return
+        _uiState.emit(
+            VerificationUIState(
+                emailVerificationSent = emailVerificationSent ?: copy.emailVerificationSent,
+                email = email ?: copy.email,
+            )
+        )
+    }
+
     private suspend fun handleResult(result: AuthResult) {
         Platform().logger.logi("$TAG::handleResult()")
 
         if (result.isEmailVerificationPassed()) {
-            val old = _uiState.value as VerificationUIState
-            _uiState.emit(
-                VerificationUIState(
-                    emailVerificationSent = true,
-                    email = old.email,
-                )
-            )
+            updateVerificationUIState(emailVerificationSent = true)
             return
         }
 
         if (result.isEmailVerificationFailed()) {
-            val old = _uiState.value as VerificationUIState
-            _uiState.emit(
-                VerificationUIState(
-                    emailVerificationSent = false,
-                    email = old.email,
-                )
-            )
+            updateVerificationUIState(emailVerificationSent = false)
             return
         }
 

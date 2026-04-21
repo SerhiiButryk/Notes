@@ -1,13 +1,15 @@
-package com.notes.notes_ui.data
+package com.notes.repo
 
+import api.AppServices
 import api.Platform
 import api.data.Notes
-import com.notes.data.LocalNoteDatabase
-import com.notes.data.json.isPendingDeletionOnRemote
-import com.notes.data.toEntity
-import com.notes.data.toNote
-import com.notes.data.updateMetadataForNote
-import com.notes.notes_ui.Repository
+import api.repo.Repository
+import com.notes.db.LocalNoteDatabase
+import com.notes.db.isAllInSyncWithRemote
+import com.notes.db.json.isPendingDeletionOnRemote
+import com.notes.db.toEntity
+import com.notes.db.toNote
+import com.notes.db.updateMetadataForNote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,10 +21,23 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class AppRepository(private val remoteRepository: RemoteRepository) : Repository {
+class AppRepository private constructor(
+    private val remoteRepository: RemoteRepository
+) : Repository {
+
+    companion object {
+        // Factory to create this repository
+        fun create(): AppRepository {
+            return AppRepository(
+                RemoteRepository(AppServices.dataStoreService)
+            )
+        }
+    }
 
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)
+
+    private var cachedLocalNotes: List<Notes> = emptyList()
 
     override fun getNotes(): Flow<List<Notes>> =
         flow {
@@ -55,6 +70,8 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
 
                 }
 
+                cachedLocalNotes = list
+
                 emit(list)
             }
 
@@ -64,14 +81,14 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
         flow {
             Platform().logger.logi("OfflineRepository::getNotes(id=$id)")
 
-            val db = LocalNoteDatabase.access()
-
-            db
+            LocalNoteDatabase
+                .access()
                 .getNote(id)
                 .map { it?.toNote() }
                 .collect {
                     emit(it)
                 }
+
         }.flowOn(Dispatchers.IO)
 
     override fun saveNote(
@@ -127,6 +144,30 @@ class AppRepository(private val remoteRepository: RemoteRepository) : Repository
             remoteRepository.delete(scope, note)
         }
     }
+
+    override suspend fun triggerSyncWithRemote() {
+        val job = scope.launch {
+            Platform().logger.logi("OfflineRepository::triggerFullDataSync() started")
+
+            // Update remote datastore using new key
+
+            //TODO 'cachedLocalNotes' must be the source of truth
+            for (note in cachedLocalNotes) {
+                remoteRepository.saveNote(this, note)
+            }
+
+            Platform().logger.logi("OfflineRepository::triggerFullDataSync() finished")
+        }
+        // Wait completion
+        job.join()
+    }
+
+    override suspend fun clearLocalNotesStorage() {
+        // Will be clearing database completely
+        LocalNoteDatabase.access().delete()
+    }
+
+    override suspend fun isDataInSync() = isAllInSyncWithRemote()
 
     override fun clear() {
         Platform().logger.logi("OfflineRepository::clear()")

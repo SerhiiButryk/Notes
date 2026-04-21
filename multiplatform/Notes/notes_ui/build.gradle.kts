@@ -39,8 +39,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
-            implementation(projects.data)
-
             implementation(libs.bundles.android.core)
             // For style attributes like attr/colorControlNormal
             implementation(libs.androidx.appcompat)

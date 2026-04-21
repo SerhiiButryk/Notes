@@ -25,9 +25,9 @@ class CryptoProvider : CryptoOperations {
         return provider.decryptSymmetricWithKey(message = message, key = getKey())
     }
 
-    override suspend fun onLoginCompleted(password: String, uid: String) {
+    override suspend fun onLoginCompleted(password: String, uid: String, force: Boolean) {
         val key = Platform().storage.get(DERIVED_PASS_KEY)
-        if (key.isEmpty()) {
+        if (key.isEmpty() || force) {
             genDerivedKey(password, uid)
             Platform().logger.logi("onLoginCompleted() key is stored")
         } else {
@@ -59,7 +59,8 @@ class CryptoProvider : CryptoOperations {
         val encKey = provider.encrypt(String(key)).message
         val key2 = Base64.encode(encKey.toByteArray(), Base64.NO_WRAP)
 
-        Platform().storage.save(String(key2), DERIVED_PASS_KEY)
+        val result = Platform().storage.save(String(key2), DERIVED_PASS_KEY)
+        Platform().logger.logi("genDerivedKey() saved = $result")
     }
 
     private suspend fun getKey(): ByteArray {

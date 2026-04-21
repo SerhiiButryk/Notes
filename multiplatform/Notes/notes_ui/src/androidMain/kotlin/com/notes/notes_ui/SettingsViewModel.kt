@@ -6,6 +6,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.Platform
+import api.repo.Repository
 import com.notes.notes_ui.data.AccountInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
+    appRepository: Repository = Platform().appRepo,
     // For test support
     scopeOverride: CoroutineScope? = null
 ) : ViewModel() {
@@ -24,7 +26,7 @@ class SettingsViewModel(
 
     private val scope: CoroutineScope = scopeOverride ?: viewModelScope
 
-    private val interactor = SettingsInteractor()
+    private val interactor = SettingsInteractor(appRepository)
 
     init {
         updateAccountInfo()

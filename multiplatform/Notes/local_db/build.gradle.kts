@@ -9,7 +9,7 @@ plugins {
 kotlin {
 
     androidLibrary {
-        namespace = "com.notes.data"
+        namespace = "com.notes.db"
 
         compileSdk =
             libs.versions.android.compileSdk

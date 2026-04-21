@@ -3,9 +3,9 @@ package com.notes.os
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
-import androidx.startup.AppInitializer
 import api.data.StorageOperations
 import api.net.NetStateManager
+import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
 import api.security.DerivedKeyOperations
@@ -15,6 +15,7 @@ import com.notes.os.impl.Base64Provider
 import com.notes.os.impl.CryptoProvider
 import com.notes.os.impl.DerivedKeyProvider
 import com.notes.os.impl.StorageProvider
+import com.notes.repo.AppRepository
 import java.lang.ref.WeakReference
 
 internal actual class PlatformFactory(context: Context) {
@@ -49,5 +50,10 @@ internal actual class PlatformFactory(context: Context) {
         val connectivityManager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         return com.notes.net.NetStateManager(connectivityManager)
     }
+
+    actual fun provideAppRepository(): Repository {
+        return AppRepository.create()
+    }
+
 }
 

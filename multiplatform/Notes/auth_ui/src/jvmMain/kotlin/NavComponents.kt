@@ -30,7 +30,9 @@ fun EntryProviderScope<NavKey>.authDestination(
             onLogin = {
                 viewModel.login(state = it, onSuccess = onNavLogin)
             },
-            state = uiState
+            state = uiState,
+            title = "",
+            subTitle = "",
         )
     }
 
@@ -45,7 +47,9 @@ fun EntryProviderScope<NavKey>.authDestination(
             onRegister = {
                 viewModel.register(state = it, onSuccess = onNavRegister)
             },
-            state = uiState
+            state = uiState,
+            title = "",
+            subTitle = "",
         )
     }
 

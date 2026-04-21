@@ -2,13 +2,13 @@ package com.notes.notes_ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import api.AppServices
+import api.Platform
 import api.data.Notes
-import com.notes.notes_ui.data.AppRepository
-import com.notes.notes_ui.data.RemoteRepository
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.data.getToolsList
 import com.notes.notes_ui.editor.EditorCommand
+import api.repo.RepoCallback
+import api.repo.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,10 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class NotesViewModel(
-    // TODO: This may be simplified
-    appRepository: Repository = AppRepository(
-        RemoteRepository(AppServices.dataStoreService)
-    ),
+    appRepository: Repository = Platform().appRepo,
     // For test support
     scopeOverride: CoroutineScope? = null
 ) : ViewModel(), RepoCallback {

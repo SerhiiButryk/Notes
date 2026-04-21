@@ -5,22 +5,17 @@ import android.net.Uri
 import androidx.activity.result.IntentSenderRequest
 import api.AppServices
 import api.auth.AuthCallback
-import com.notes.data.LocalNoteDatabase
-import com.notes.data.isAllInSyncWithRemote
+import api.repo.Repository
 import com.notes.notes_ui.data.AccountInfo
-import com.notes.notes_ui.data.AppRepository
-import com.notes.notes_ui.data.RemoteRepository
 import com.notes.notes_ui.features.PdfConverter
 import com.notes.notes_ui.features.toHtml
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-class SettingsInteractor {
+class SettingsInteractor(private val repo: Repository) {
 
     suspend fun onExport(uri: Uri, context: Context) {
-
-        val repo = AppRepository(RemoteRepository(AppServices.dataStoreService))
 
         val notesHtml = repo
             .getNotes()
@@ -39,8 +34,7 @@ class SettingsInteractor {
             .signOut()
         callback(result)
         if (result) {
-            // Will be clearing database completely
-            LocalNoteDatabase.access().delete()
+            repo.clearLocalNotesStorage()
         }
     }
 
@@ -64,8 +58,6 @@ class SettingsInteractor {
 
         val grantPermission = !googleDriveIsActive
 
-        val syncCompleted = isAllInSyncWithRemote()
-
         return AccountInfo(
             email = email,
             googleIsActive = googleIsActive,
@@ -73,7 +65,7 @@ class SettingsInteractor {
             googleDriveIsActive = googleDriveIsActive,
             showGrantPermissions = grantPermission,
             pending = pending,
-            syncCompleted = syncCompleted
+            syncCompleted = repo.isDataInSync()
         )
     }
 

@@ -1,4 +1,4 @@
-package com.notes.data
+package com.notes.db
 
 import api.Platform
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,7 @@
 package com.notes.app
 
 import com.google.common.truth.Truth.assertThat
-import com.notes.data.LocalNoteDatabase
+import com.notes.db.LocalNoteDatabase
 import kotlinx.coroutines.flow.first
 
 open class AppTest {

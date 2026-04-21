@@ -85,6 +85,35 @@ internal class Interactor(
         return email.ifEmpty { authService.getUserEmail() }
     }
 
+        suspend fun changePassword(newPass: String): Boolean {
+        val job = scope.async {
+
+            // When the password change is successful we must update derived key.
+            // Derived key we use to encrypt user notes before they are sent to datastore.
+            // This will update derived key, However, there are coner case which can corrupt user data:
+
+            // 1. What happens if local notes are not up-to-date with remote datastore services ?
+            // 2. What happens if local notes are up-to-date with one datastore, but out of sync with others ?
+
+            //TODO Should change password if only we absolutely sure that user local
+            // data is up-to-data with remote
+            // datastore's so we can encrypt and override them using new key
+
+            // We should create a backup before changing a password
+
+            val result = authService.changePassword(newPass)
+            if (result) {
+                // Update derived key
+                Platform().crypto.onLoginCompleted(newPass, getEmail(), true)
+                // Update data and resave it using a new key
+                Platform().appRepo.triggerSyncWithRemote()
+            }
+
+            result
+        }
+        return job.await()
+    }
+
     fun onClear() {
         scope.cancel()
     }

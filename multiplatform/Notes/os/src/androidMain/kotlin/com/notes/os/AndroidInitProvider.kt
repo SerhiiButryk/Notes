@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.startup.Initializer
 import api.AppServices
 import api.platform
-import com.notes.data.LocalNoteDatabase
+import com.notes.db.LocalNoteDatabase
 import com.notes.services.auth.FirebaseAuthService
 import com.notes.services.auth.GoogleSignInService
 import com.notes.services.storage.FirebaseFirestore

@@ -77,7 +77,7 @@ kotlin {
 
         androidInstrumentedTest.dependencies {
             // Test modules
-            implementation(projects.data)
+            implementation(projects.localDb)
             // Test deps
             implementation(libs.androidx.espresso.core)
             implementation(libs.truth)

@@ -1,10 +1,10 @@
-package com.notes.data
+package com.notes.db
 
 import api.Platform
 import api.data.Notes
-import com.notes.data.json.isPendingDeletionOnRemote
-import com.notes.data.json.isPendingUpdateOnRemote
-import com.notes.data.json.update
+import com.notes.db.json.isPendingDeletionOnRemote
+import com.notes.db.json.isPendingUpdateOnRemote
+import com.notes.db.json.update
 import kotlinx.coroutines.flow.first
 
 /**

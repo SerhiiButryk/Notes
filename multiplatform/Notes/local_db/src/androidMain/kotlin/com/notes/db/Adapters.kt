@@ -1,4 +1,4 @@
-package com.notes.data
+package com.notes.db
 
 import android.os.Build
 import api.data.Notes

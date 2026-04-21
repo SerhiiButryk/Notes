@@ -20,6 +20,6 @@ fun EntryProviderScope<NavKey>.notesMainDestination(
     }
 
     entry(SettingsScreen) {
-        SettingsUI({}, onAccountClick, {})
+        SettingsUI({}, onAccountClick, {}, {})
     }
 }

@@ -6,7 +6,7 @@ plugins {
 kotlin {
 
     androidLibrary {
-        namespace = "com.notes.os"
+        namespace = "com.notes.repo"
         compileSdk = libs.versions.android.targetSdk
             .get()
             .toInt()
@@ -24,13 +24,10 @@ kotlin {
         }
     }
 
-    jvm()
-
     sourceSets {
         commonMain {
             dependencies {
                 implementation(projects.api)
-                implementation(projects.ui)
                 // Kotlin coroutines
                 implementation(libs.kotlinx.coroutines.core)
             }
@@ -44,20 +41,8 @@ kotlin {
 
         androidMain {
             dependencies {
-                implementation(projects.net)
-                implementation(projects.ext.services)
                 implementation(projects.localDb)
-                implementation(projects.repo)
-
-                // API to initialize components
-                implementation(libs.androidx.startup.runtime)
-
-                // DataStore APIs
-                implementation(libs.androidx.datastore.preferences)
             }
-        }
-
-        jvmMain.dependencies {
         }
 
         getByName("androidDeviceTest") {

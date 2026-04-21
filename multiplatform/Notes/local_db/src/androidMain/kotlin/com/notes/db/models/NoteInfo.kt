@@ -1,4 +1,4 @@
-package com.notes.data.models
+package com.notes.db.models
 
 /**
  * Additional note data

@@ -24,6 +24,7 @@ interface AuthService {
 
     suspend fun sendEmailVerify(): AuthResult = AuthResult.verificationSentFailed("")
     suspend fun verifyCode(code: String): Boolean = false
+    suspend fun changePassword(newPass: String): Boolean = false
     suspend fun isEmailVerified(): Boolean = false
 
     fun getUserEmail(): String = ""

@@ -8,7 +8,7 @@ import api.data.AbstractStorageService
 import com.google.common.truth.Truth.assertThat
 import api.data.Document
 import api.data.Notes
-import com.notes.data.LocalNoteDatabase
+import com.notes.db.LocalNoteDatabase
 import com.notes.notes_ui.NotesViewModel
 import com.notes.notes_ui.Repository
 import com.notes.notes_ui.data.AppRepository

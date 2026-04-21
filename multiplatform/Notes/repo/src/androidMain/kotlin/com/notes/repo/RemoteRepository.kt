@@ -1,18 +1,18 @@
-package com.notes.notes_ui.data
+package com.notes.repo
 
 import api.Platform
 import api.data.AbstractStorageService
 import api.data.Document
 import api.data.Notes
-import com.notes.data.LocalNoteDatabase
-import com.notes.data.NoteEntity
-import com.notes.data.NotesMetadataEntity
-import com.notes.data.json.isPendingDeletionOnRemote
-import com.notes.data.json.isPendingUpdateOnRemote
-import com.notes.data.json.update
-import com.notes.data.json.updateForDatastore
-import com.notes.data.toEntity
-import com.notes.data.toNote
+import com.notes.db.LocalNoteDatabase
+import com.notes.db.NoteEntity
+import com.notes.db.NotesMetadataEntity
+import com.notes.db.json.isPendingDeletionOnRemote
+import com.notes.db.json.isPendingUpdateOnRemote
+import com.notes.db.json.update
+import com.notes.db.json.updateForDatastore
+import com.notes.db.toEntity
+import com.notes.db.toNote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
@@ -21,17 +21,15 @@ import kotlinx.coroutines.launch
 /**
  * Class which handles data synchronization between remote and local datastore
  */
-class RemoteRepository(remoteDataStore: List<AbstractStorageService>) {
-
-    private val _allServicesList: List<AbstractStorageService> = remoteDataStore
+internal class RemoteRepository(private val allServicesList: List<AbstractStorageService>) {
 
     private fun getServices(): List<AbstractStorageService> {
         val services = mutableListOf<AbstractStorageService>()
-        for (service in _allServicesList) {
+        for (service in allServicesList) {
             if (service.canUse)
                 services.add(service)
         }
-        Platform().logger.logi("RemoteRepository::getServices() available services = '$services'")
+        Platform().logger.logi("RemoteRepository::getServices() available services = '${services.size}'")
         return services
     }
 

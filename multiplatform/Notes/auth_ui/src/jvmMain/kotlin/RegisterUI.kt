@@ -15,14 +15,13 @@ fun RegisterScreenImpl(
     state: RegisterUIState,
     onRegister: (RegisterUIState) -> Unit,
     onLogin: () -> Unit,
+    title: String,
+    subTitle: String,
 ) {
 
     RegisterUIImpl(
         onRegister = { onRegister(it) },
     ) {
-
-        title: String,
-        subTitle: String,
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,

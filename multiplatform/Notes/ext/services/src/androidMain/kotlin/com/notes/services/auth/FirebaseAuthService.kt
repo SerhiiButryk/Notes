@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
@@ -75,7 +76,7 @@ class FirebaseAuthService : AbstractAuthService() {
             // Now we can try sign in silently with Google account to get access to Google APIs
             signInUsingGoogleSilent(activityContext)
             // Done
-            callback?.onLoginCompleted(pass, getUserId())
+            callback?.onLoginCompleted(pass, getUserId(), false)
         }
         return result
     }
@@ -135,6 +136,9 @@ class FirebaseAuthService : AbstractAuthService() {
             Platform().logger.logi("$tag::isEmailVerified() user is null")
             return false
         }
+        // Sometimes we don't get a precise response from the google
+        // Trying to mitigate this by using a delay
+        delay(3000)
         suspendCancellableCoroutine { continuation ->
             // TODO: Check how callback gets called
             user.reload().addOnCompleteListener { task ->
@@ -181,14 +185,14 @@ class FirebaseAuthService : AbstractAuthService() {
                     continuation.resume(
                         AuthResult.verificationSentSuccess(user.email!!),
                     ) { _, _, _ ->
-                        // no-op if coroutine is cancelled
+                        // no-op if coroutine is canceled
                     }
                 } else {
                     Platform().logger.loge("$tag::sendVerification() failure: ${task.exception}")
                     continuation.resume(
                         AuthResult.verificationSentFailed(user.email!!),
                     ) { _, _, _ ->
-                        // no-op if coroutine is cancelled
+                        // no-op if coroutine is canceled
                     }
                 }
             } ?: continuation.resume(
@@ -221,6 +225,33 @@ class FirebaseAuthService : AbstractAuthService() {
             }
         } else {
             Platform().logger.logi("$tag::signInUsingGoogleSilent() can't perform silent login")
+        }
+    }
+
+    override suspend fun changePassword(newPass: String): Boolean {
+        Platform().logger.logi("$tag::changePassword()")
+
+        val user = auth.currentUser
+        if (user == null) {
+            Platform().logger.loge("$tag::changePassword() user is null")
+            return false
+        }
+
+        return suspendCancellableCoroutine { continuation ->
+            user.updatePassword(newPass)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Platform().logger.logi("$tag::changePassword() done")
+                        continuation.resume(true) { _, _, _ ->
+                            // no-op if coroutine is canceled
+                        }
+                    } else {
+                        Platform().logger.loge("$tag::changePassword() failed, may need to reauth user")
+                        continuation.resume(false) { _, _, _ ->
+                            // no-op if coroutine is canceled
+                        }
+                    }
+                }
         }
     }
 }
