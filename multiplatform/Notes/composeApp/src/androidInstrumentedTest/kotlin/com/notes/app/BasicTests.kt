@@ -1,6 +1,8 @@
 package com.notes.app
 
 import android.content.Context
+import android.util.Base64
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import api.Platform
@@ -10,12 +12,15 @@ import api.data.toDocument
 import api.data.toJson
 import com.google.common.truth.Truth.assertThat
 import api.data.EncryptedStore
+import api.data.Notes
 import com.notes.os.impl.CryptoProvider
+import com.notes.repo.FilesManager
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class BasicTests {
@@ -169,6 +174,146 @@ class BasicTests {
         assertThat(doc5).isEqualTo(Document("", ""))
         val doc6 = json5.toDocument()
         assertThat(doc6).isEqualTo(Document("", ""))
+    }
+
+    @Test
+    fun test04_backup_files() = runTest {
+
+        val filesManager = FilesManager()
+
+        val notes = listOf(Notes(content = "note 1", id = 1), Notes(content = "note 2", id = 2),
+            Notes(content = "note 3", id = 3))
+
+        filesManager.saveToDisk(notes)
+
+        val cacheDir = Platform().storage.getCacheDir()
+        val file = File(cacheDir)
+
+        val files = file.list()
+        assertThat(files).isNotNull()
+        assertThat(files!!.size).isEqualTo(notes.size)
+
+        for ((i, f) in files.withIndex()) {
+
+            val file = File(cacheDir, f)
+            Log.i("BasicTests", "test04_backup_files: file = ${file.name}")
+
+            assertThat(file.name).isEqualTo(notes[i].id.toString())
+        }
+
+        val restoredNotes = filesManager.readFromDisk()
+
+        assertThat(restoredNotes).isNotNull()
+        assertThat(restoredNotes.size).isEqualTo(notes.size)
+
+        for ((i, n) in restoredNotes.withIndex()) {
+            assertThat(n.id.toString()).isEqualTo(notes[i].id.toString())
+            assertThat(n.content).isEqualTo(notes[i].content)
+            assertThat(n.time).isEqualTo(notes[i].time)
+            assertThat(n.userId).isEqualTo(notes[i].userId)
+        }
+
+        val notes2 = filesManager.readFromDisk()
+        assertThat(notes2.isEmpty()).isFalse()
+
+        // Remove created files
+        filesManager.clearCache()
+
+        val notes3 = filesManager.readFromDisk()
+        assertThat(notes3.isEmpty()).isTrue()
+    }
+
+    @Test
+    fun test05_backup_no_files() = runTest {
+        val filesManager = FilesManager()
+        val notes = filesManager.readFromDisk()
+        assertThat(notes.isEmpty()).isTrue()
+    }
+
+    @Test
+    fun test06_override_files() = runTest {
+
+        val filesManager = FilesManager()
+
+        // Create files
+
+        val notes = listOf(Notes(content = "note 1", id = 1), Notes(content = "note 2", id = 2),
+            Notes(content = "note 3", id = 3))
+
+        filesManager.saveToDisk(notes)
+
+        val cacheDir = Platform().storage.getCacheDir()
+        val file = File(cacheDir)
+
+        val files = file.list()
+        assertThat(files).isNotNull()
+        assertThat(files!!.size).isEqualTo(notes.size)
+
+        for ((i, f) in files.withIndex()) {
+
+            val file = File(cacheDir, f)
+            Log.i("BasicTests", "test04_backup_files: file = ${file.name}")
+
+            assertThat(file.name).isEqualTo(notes[i].id.toString())
+        }
+
+        val restoredNotes = filesManager.readFromDisk()
+
+        assertThat(restoredNotes).isNotNull()
+        assertThat(restoredNotes.size).isEqualTo(notes.size)
+
+        for ((i, n) in restoredNotes.withIndex()) {
+            assertThat(n.id.toString()).isEqualTo(notes[i].id.toString())
+            assertThat(n.content).isEqualTo(notes[i].content)
+            assertThat(n.time).isEqualTo(notes[i].time)
+            assertThat(n.userId).isEqualTo(notes[i].userId)
+        }
+
+        // Override
+
+        val notesOverrideList = listOf(Notes(content = "note 1 Override", id = 1),
+            Notes(content = "note 2 Override", id = 2),
+            Notes(content = "note 3 Override", id = 3))
+
+        filesManager.saveToDisk(notesOverrideList)
+
+        val restoredNotesAfterOverride = filesManager.readFromDisk()
+
+        assertThat(restoredNotesAfterOverride).isNotNull()
+        assertThat(restoredNotesAfterOverride.size).isEqualTo(notesOverrideList.size)
+
+        for ((i, n) in restoredNotesAfterOverride.withIndex()) {
+            assertThat(n.id.toString()).isEqualTo(notesOverrideList[i].id.toString())
+            assertThat(n.content).isEqualTo(notesOverrideList[i].content)
+            assertThat(n.time).isEqualTo(notesOverrideList[i].time)
+            assertThat(n.userId).isEqualTo(notesOverrideList[i].userId)
+        }
+
+        // Remove created files
+        filesManager.clearCache()
+
+        val notesList = filesManager.readFromDisk()
+        assertThat(notesList.isEmpty()).isTrue()
+
+    }
+
+    @Test
+    fun test07_if_derived_key_generates_stable_value() = runTest {
+
+        val crypto = CryptoProvider()
+
+        val key = Platform().storage.get("derived_key_pass")
+        assertThat(key.isEmpty()).isTrue()
+
+        crypto.testOnly_genDerivedKey("Th@092Lf", "example@iduser")
+
+        val key2 = String(Base64.encode(crypto.testOnly_getKey(), Base64.NO_WRAP))
+
+        assertThat(key2.isNotEmpty()).isTrue()
+
+        // Same input should always generate the same key
+        val expected = "o8EEKagakb/WFhqhAT2HwFocLNHcuzLPIOxHFWCrTRI="
+        assertThat(key2 == expected).isTrue()
     }
 
 }

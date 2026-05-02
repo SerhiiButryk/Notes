@@ -2,6 +2,7 @@ package com.notes.app
 
 import android.app.Application
 import api.AppServices
+import api.Platform
 import com.notes.ui.CommonIcon
 import com.notes.ui.cloudSyncIcon
 import com.notes.ui.firebaseIcon
@@ -39,5 +40,10 @@ class Notes : Application() {
         iconsCollection[previewIcon] = CommonIcon(R.drawable.image_preview)
 
         AppServices.serverClientId = getString(R.string.server_client_id)
+
+        // TODO This should be moved to some lifecycle aware component
+        Platform().netStateManager.startObserver()
+
+        Platform().logger.setDebug(BuildConfig.DEBUG)
     }
 }

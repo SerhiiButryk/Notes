@@ -76,7 +76,7 @@ class FirebaseAuthService : AbstractAuthService() {
             // Now we can try sign in silently with Google account to get access to Google APIs
             signInUsingGoogleSilent(activityContext)
             // Done
-            callback?.onLoginCompleted(pass, getUserId(), false)
+            callback?.onLoginCompleted(pass, getUserEmail())
         }
         return result
     }

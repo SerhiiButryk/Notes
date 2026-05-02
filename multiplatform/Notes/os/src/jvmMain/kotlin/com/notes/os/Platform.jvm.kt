@@ -2,6 +2,7 @@ package com.notes.os
 
 import api.data.Notes
 import api.data.StorageOperations
+import api.net.HttpClient
 import api.net.NetStateInfo
 import api.net.NetStateManager
 import api.repo.Repository
@@ -75,6 +76,10 @@ internal actual class PlatformFactory {
 
             override suspend fun clearAll() {
             }
+
+            override fun getCacheDir(): String {
+                return ""
+            }
         }
     }
 
@@ -99,6 +104,10 @@ internal actual class PlatformFactory {
 
             override fun observerChanges(): Flow<NetStateInfo> {
                 return emptyFlow()
+            }
+
+            override fun startObserver() {
+
             }
         }
     }
@@ -130,19 +139,39 @@ internal actual class PlatformFactory {
 
             }
 
-            override suspend fun triggerSyncWithRemote() {
+            override suspend fun onPasswordChanged() {
 
             }
 
-            override suspend fun clearLocalNotesStorage() {
+            override suspend fun clearLocalAppStorage() {
 
             }
 
             override suspend fun isDataInSync(): Boolean {
                 return true
             }
+
+            override suspend fun canChangePassword(): Boolean {
+                return false
+            }
         }
     }
 
+    actual fun provideHttpClient(): HttpClient {
+        return object : HttpClient {
+            override suspend fun post(
+                url: String,
+                formArgs: Map<String, String>
+            ): String? {
+                return null
+            }
 
+            override fun postSync(
+                url: String,
+                formArgs: Map<String, String>
+            ): String? {
+                return null
+            }
+        }
+    }
 }

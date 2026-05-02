@@ -124,7 +124,6 @@ class AuthViewModel(
             val result = interactor.changePassword(state.password)
 
             if (result) {
-
                 showDialog(
                     title = "Success",
                     subtitle = "Password has changed successfully!",
@@ -135,7 +134,7 @@ class AuthViewModel(
             } else {
                 showDialog(
                     title = "Error",
-                    subtitle = "Failed to change password. Please, try again!",
+                    subtitle = "Failed to change password. Please, try later.",
                     onConfirm = {
                         dismissDialog()
                     }

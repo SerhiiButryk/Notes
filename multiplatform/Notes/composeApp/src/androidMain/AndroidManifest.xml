@@ -2,42 +2,43 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <!--  Allows an app to prevent non-system-overlay windows from being drawn on top of it  -->
-    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS"/>
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
 
     <application
-            android:name="com.notes.app.Notes"
-            android:networkSecurityConfig="@xml/net_configs"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        android:name="com.notes.app.Notes"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/net_configs"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
+        <!--
+            Helper class to perform component initialization
+            More:
+            https://developer.android.com/topic/libraries/app-startup
+        -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
             tools:node="merge">
-            <!--
-             Helper class to perform component initialization
-                More:
-                https://developer.android.com/topic/libraries/app-startup
-            . -->
-            <meta-data  android:name="com.notes.os.AndroidInitProvider"
+            <meta-data
+                android:name="com.notes.os.AndroidInitProvider"
                 android:value="androidx.startup" />
         </provider>
 
         <activity
-                android:exported="true"
-                android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:exported="true">
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <!--
@@ -46,16 +47,18 @@
                 https://fancynotesdevtest.firebaseapp.com/.well-known/assetlinks.json
                 In oder to use deep links for Android app a assetlinks.json should be created
                 and hosted on your site. We use Firebase to do this job.
-                To generate it add this '"appAssociation": "AUTO"' config to 'firebase.json'
+                To generate it add '"appAssociation": "AUTO"' config to 'firebase.json'
             -->
             <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="@string/verification_server_domain"
-                    android:pathPrefix="@string/verification_path"/>
+                    android:pathPrefix="@string/verification_path"
+                    android:scheme="https" />
             </intent-filter>
 
         </activity>

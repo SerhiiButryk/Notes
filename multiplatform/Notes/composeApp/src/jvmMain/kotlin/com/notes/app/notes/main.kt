@@ -12,8 +12,11 @@ const val APP_TITLE = "Notes"
 
 fun main() {
 
-    // Set application title
-    System.setProperty("apple.awt.application.name", APP_TITLE)
+    val osType = System.getProperty("os.name").lowercase()
+    if (osType.contains("mac")) {
+        // Set application title
+        System.setProperty("apple.awt.application.name", APP_TITLE)
+    }
 
     JVMInitProvider.create()
 

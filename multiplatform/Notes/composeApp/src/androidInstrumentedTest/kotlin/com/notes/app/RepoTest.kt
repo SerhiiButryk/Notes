@@ -5,12 +5,11 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import api.data.AbstractStorageService
-import com.google.common.truth.Truth.assertThat
 import api.data.Document
 import api.data.Notes
+import com.google.common.truth.Truth.assertThat
 import com.notes.db.LocalNoteDatabase
-import com.notes.notes_ui.data.AppRepository
-import com.notes.notes_ui.data.RemoteRepository
+import com.notes.repo.AppRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -85,7 +84,7 @@ class RepoTest : AppTest() {
 
     }
 
-    private val remoteRepo = RemoteRepository(
+    private val appRepo = AppRepository.create(
         listOf(mockedStoreServiceGoogle, mockedStoreServiceFirebase)
     )
 
@@ -104,7 +103,7 @@ class RepoTest : AppTest() {
 
         preConditionCheck()
 
-        val repo = AppRepository(remoteRepository = remoteRepo)
+        val repo = appRepo
 
         // Check that no data
         verifyDBIsEmpty(repo)
@@ -153,7 +152,7 @@ class RepoTest : AppTest() {
 
         preConditionCheck()
 
-        val repo = AppRepository(remoteRepository = remoteRepo)
+        val repo = appRepo
 
         // Check that no data
         verifyDBIsEmpty(repo)
@@ -224,7 +223,7 @@ class RepoTest : AppTest() {
 
         preConditionCheck()
 
-        val repo = AppRepository(remoteRepository = remoteRepo)
+        val repo = appRepo
 
         // Check that no data
         verifyDBIsEmpty(repo)
@@ -280,7 +279,7 @@ class RepoTest : AppTest() {
 
         preConditionCheck()
 
-        val repo = AppRepository(remoteRepository = remoteRepo)
+        val repo = appRepo
 
         // Check that no data
         verifyDBIsEmpty(repo)
@@ -319,7 +318,7 @@ class RepoTest : AppTest() {
 
         // Try retriggering delete from remote
         coroutineScope {
-            remoteRepo.updateIfNeeded(this)
+            appRepo.syncData(this)
         }
 
         // Still should have pendingDelete set to true

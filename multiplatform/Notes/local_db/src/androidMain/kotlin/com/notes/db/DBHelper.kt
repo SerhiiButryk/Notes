@@ -1,31 +1,9 @@
 package com.notes.db
 
 import api.Platform
-import api.data.Notes
 import com.notes.db.json.isPendingDeletionOnRemote
 import com.notes.db.json.isPendingUpdateOnRemote
-import com.notes.db.json.update
 import kotlinx.coroutines.flow.first
-
-/**
- * Helper function for convenience
- */
-
-suspend fun updateMetadataForNote(
-    note: Notes,
-    pendingDelete: Boolean? = null,
-    pendingUpdate: Boolean? = null
-) {
-    val db = LocalNoteDatabase.access()
-    val noteInfo = db.getNoteWithMetadata(note.id).first()
-    if (noteInfo != null && noteInfo.metadataId != null) {
-        val metaDb = LocalNoteDatabase.accessNoteMetadata()
-        val currEntity = metaDb.getMetadata(noteInfo.metadataId).first()
-        val newMetadata = currEntity!!.update(pendingDelete = pendingDelete, pendingUpdate = pendingUpdate)
-        metaDb.updateMetadata(currEntity.copy(metadata = newMetadata, pendingDelete = true))
-        Platform().logger.logi("updateMetadataForNote() updated for = ${note.id}")
-    }
-}
 
 suspend fun isAllInSyncWithRemote(): Boolean {
     val db = LocalNoteDatabase.accessNoteMetadata()

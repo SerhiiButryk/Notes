@@ -132,18 +132,25 @@ class CryptoKeystore {
         if (message.isEmpty()) return ""
         if (key.isEmpty()) return ""
 
-        val decoded = Base64.decode(message, Base64.NO_WRAP)
+        try {
 
-        val secretKey = SecretKeySpec(key, "AES")
-        val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
+            val decoded = Base64.decode(message, Base64.NO_WRAP)
 
-        val iv = decoded.take(12)
-        val spec = GCMParameterSpec(128, iv.toByteArray())
+            val secretKey = SecretKeySpec(key, "AES")
+            val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
 
-        val messageBytes = decoded.slice(12 until decoded.size)
+            val iv = decoded.take(12)
+            val spec = GCMParameterSpec(128, iv.toByteArray())
 
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-        return String(cipher.doFinal(messageBytes.toByteArray()))
+            val messageBytes = decoded.slice(12 until decoded.size)
+
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+            return String(cipher.doFinal(messageBytes.toByteArray()))
+
+        } catch (e: Exception) {
+            logger.loge("$TAG: failed to decrypt: " + e.message)
+            return ""
+        }
     }
 
     private fun init(

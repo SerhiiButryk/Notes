@@ -29,7 +29,7 @@ internal class AndroidInitProvider : Initializer<Platform> {
         googleSignInService.init(context.applicationContext)
         AppServices.addService(googleSignInService)
 
-        // Need to check if it's slow or not
+        // TODO: Need to check if it's slow or not
         LocalNoteDatabase.initialize(context.applicationContext)
 
         return osPlatform

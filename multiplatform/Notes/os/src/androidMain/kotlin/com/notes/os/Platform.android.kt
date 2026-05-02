@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
 import api.data.StorageOperations
+import api.net.HttpClient
 import api.net.NetStateManager
 import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
 import api.security.DerivedKeyOperations
 import api.utils.Log
+import com.notes.net.NetHttpClient
 import com.notes.os.impl.AppLogger
 import com.notes.os.impl.Base64Provider
 import com.notes.os.impl.CryptoProvider
@@ -53,6 +55,10 @@ internal actual class PlatformFactory(context: Context) {
 
     actual fun provideAppRepository(): Repository {
         return AppRepository.create()
+    }
+
+    actual fun provideHttpClient(): HttpClient {
+        return NetHttpClient()
     }
 
 }

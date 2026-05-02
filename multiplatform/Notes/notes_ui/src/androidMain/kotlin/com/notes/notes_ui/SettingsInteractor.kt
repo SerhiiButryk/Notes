@@ -34,7 +34,7 @@ class SettingsInteractor(private val repo: Repository) {
             .signOut()
         callback(result)
         if (result) {
-            repo.clearLocalNotesStorage()
+            repo.clearLocalAppStorage()
         }
     }
 

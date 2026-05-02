@@ -2,47 +2,77 @@ package com.notes.net
 
 import api.Platform
 import api.net.HttpClient
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
+import kotlinx.coroutines.suspendCancellableCoroutine
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.InputStream
-import java.net.ConnectException
 
 class NetHttpClient : HttpClient {
-    private val client = OkHttpClient()
 
     private val tag = "HttpClient"
 
+    private val client = OkHttpClient()
+
     override suspend fun post(
         url: String,
-        body: String,
-        mimeType: String,
-        callback: (statusCode: Int, body: InputStream?) -> Unit,
-    ) {
-        withContext(Dispatchers.IO) {
-            Platform().logger.logi("$tag: post: started")
+        formArgs: Map<String, String>,
+    ): String? {
+        return suspendCancellableCoroutine { continuation ->
+            postInternal(url = url, formArgs = formArgs, callback = { body, result ->
+                if (result) {
+                    continuation.resume(body) { _, _, _ ->
+                        // no-op if coroutine is canceled
+                    }
+                } else {
+                    continuation.resume(null) { _, _, _ ->
+                        // no-op if coroutine is canceled
+                    }
+                }
+            })
+        }
+    }
 
-            try {
-                val request =
-                    Request
-                        .Builder()
-                        .url(url)
-                        .post(body.toRequestBody(mimeType.toMediaType()))
-                        .build()
+    override fun postSync(
+        url: String,
+        formArgs: Map<String, String>
+    ): String? = postInternal(url = url, formArgs = formArgs, sync = true)
 
+    private fun postInternal(
+        url: String,
+        formArgs: Map<String, String>,
+        callback: ((String?, Boolean) -> Unit)? = null,
+        sync: Boolean = false
+    ): String? {
+        try {
+
+            val builder = FormBody.Builder()
+            for ((key, value) in formArgs) {
+                builder.add(key, value)
+            }
+            val body = builder.build()
+
+            val request = Request.Builder().url(url).post(body).build()
+
+            if (sync) {
+                Platform().logger.logi("$tag: postInternal: sync sending...")
+                val response = client.newCall(request).execute()
+                return response.body.string()
+            } else {
+                Platform().logger.logi("$tag: postInternal: async sending...")
                 client.newCall(request).execute().use { response ->
                     val result = if (response.isSuccessful) "successful" else "failed"
-                    Platform().logger.logi("$tag: post: $result, status code = ${response.code}")
-                    callback(response.code, response.body?.byteStream())
+                    Platform().logger.logi("$tag: postInternal: '$result', status code = ${response.code}")
+                    callback?.invoke(response.body.string(), true)
                 }
-            } catch (e: ConnectException) {
-                // TODO: Improve error handling
-                Platform().logger.loge("$tag: error: $e")
-                callback(-1, null)
             }
+
+        } catch (e: Exception) {
+            // TODO: Improve error handling
+            Platform().logger.loge("$tag: postInternal: error: '$e'")
+            callback?.invoke(null, false)
         }
+
+        Platform().logger.logi("$tag: postInternal: done")
+        return null
     }
 }

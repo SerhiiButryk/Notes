@@ -24,9 +24,11 @@ interface Repository {
         callback: (Long) -> Unit,
     )
 
-    suspend fun triggerSyncWithRemote()
+    suspend fun onPasswordChanged()
 
-    suspend fun clearLocalNotesStorage()
+    suspend fun canChangePassword(): Boolean
+
+    suspend fun clearLocalAppStorage()
 
     suspend fun isDataInSync(): Boolean
 

@@ -20,12 +20,12 @@ inline fun <reified T : ViewModel> NavBackStackEntry.getViewModel(navController:
 
     val route = parentNavGraph.route
     if (route == null) {
-        Platform().logger.logi("$TAG::getViewModel: no route, use default arguments")
+        Platform().logger.logd("$TAG::getViewModel: no route, use default arguments")
         return viewModel<T>()
     }
 
     val parentEntry = remember(this) { navController.getBackStackEntry(route) }
     val vm = viewModel<T>(parentEntry)
-    Platform().logger.logi("$TAG::getViewModel: created = $vm")
+    Platform().logger.logd("$TAG::getViewModel: created = $vm")
     return vm
 }

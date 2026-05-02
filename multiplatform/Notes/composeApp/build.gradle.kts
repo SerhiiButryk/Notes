@@ -78,6 +78,7 @@ kotlin {
         androidInstrumentedTest.dependencies {
             // Test modules
             implementation(projects.localDb)
+            implementation(projects.repo)
             // Test deps
             implementation(libs.androidx.espresso.core)
             implementation(libs.truth)
@@ -132,6 +133,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/INDEX.LIST"
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

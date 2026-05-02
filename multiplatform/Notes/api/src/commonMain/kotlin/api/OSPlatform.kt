@@ -1,6 +1,7 @@
 package api
 
 import api.data.StorageOperations
+import api.net.HttpClient
 import api.net.NetStateManager
 import api.repo.Repository
 import api.security.Base64Operations
@@ -23,12 +24,14 @@ interface OSPlatform {
     val netStateManager: NetStateManager
 
     val appRepo: Repository
+
+    val httpClient: HttpClient
 }
 
 var platform: OSPlatform? = null
 
 fun Platform(): OSPlatform {
     val pl = platform
-    requireNotNull(pl) { "Platform is not set" }
+    requireNotNull(pl) { "Platform hasn't been installed" }
     return pl
 }

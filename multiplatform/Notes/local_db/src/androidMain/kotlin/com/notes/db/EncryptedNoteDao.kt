@@ -28,12 +28,12 @@ class EncryptedNoteDao(
         return original.updateNote(encrypted)
     }
 
-    private fun decrypt(noteEntity: NoteEntity): NoteEntity {
+    private suspend fun decrypt(noteEntity: NoteEntity): NoteEntity {
         val plaintext = Platform().crypto.decrypt(noteEntity.content)
         return noteEntity.copy(content = plaintext)
     }
 
-    private fun encrypt(noteEntity: NoteEntity): NoteEntity {
+    private suspend fun encrypt(noteEntity: NoteEntity): NoteEntity {
         val ciphertext = Platform().crypto.encrypt(noteEntity.content)
         return noteEntity.copy(content = ciphertext)
     }

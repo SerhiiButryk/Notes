@@ -8,6 +8,7 @@ import api.data.AbstractStorageService
 import api.data.Document
 import api.data.toDocument
 import api.data.toJson
+import com.google.android.gms.auth.api.identity.AuthorizationClient
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.Scope
@@ -36,6 +37,7 @@ class GoogleDriveService : AbstractStorageService() {
 
     // Location on the Google Drive. This folder is invisible for user.
     private val appDataFolder = "appDataFolder"
+    private var client: AuthorizationClient? = null
 
     override var canUse: Boolean = false
         get() = drive != null
@@ -46,7 +48,7 @@ class GoogleDriveService : AbstractStorageService() {
 
         if (!canUse) return false
 
-        val fileMetadata = File().apply {
+        val file = File().apply {
             name = getDataFileName(document.name)
             parents = listOf(appDataFolder) // Saves to hidden folder on Google Drive's storage
         }
@@ -55,18 +57,28 @@ class GoogleDriveService : AbstractStorageService() {
 
         val content = ByteArrayContent.fromString("application/json", payload)
 
+        val oldFile = getFile(name)
+
         try {
-            drive!!
-                .files()
-                .create(fileMetadata, content)
-                .execute()
+            if (oldFile == null) {
+                Platform().logger.logi("GoogleDriveService::store() creating... file = '${file.name}'")
+                drive!!
+                    .files()
+                    .create(file, content)
+                    .execute()
+            } else {
+                Platform().logger.logi("GoogleDriveService::store() updating... file = '${file.name}'")
+                drive!!
+                    .files()
+                    .update(oldFile.id, file, content)
+                    .execute()
+            }
         } catch (e: IOException) {
-            Platform().logger.loge("GoogleDriveService::store() error = $e")
+            Platform().logger.loge("GoogleDriveService::store() not created or updated, error = '$e'")
             return false
         }
 
         Platform().logger.logi("GoogleDriveService::store() done")
-
         return true
     }
 
@@ -131,7 +143,7 @@ class GoogleDriveService : AbstractStorageService() {
 
     override suspend fun fetchAll(): List<Document> {
 
-         if (!canUse) return emptyList()
+        if (!canUse) return emptyList()
 
         val list = mutableListOf<Document>()
 
@@ -152,8 +164,8 @@ class GoogleDriveService : AbstractStorageService() {
             try {
                 drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
             } catch (e: IOException) {
-                Platform().logger.loge("GoogleDriveService::fetchAll() failed error = $e")
-                return list
+                Platform().logger.loge("GoogleDriveService::fetchAll() error = '$e' file = '${file.id}'")
+                continue
             }
 
             val responseJson = outputStream.toString()
@@ -180,14 +192,15 @@ class GoogleDriveService : AbstractStorageService() {
             .build()
 
         val token = suspendCancellableCoroutine { continuation ->
-            Identity.getAuthorizationClient(activityContext as Context)
-                .authorize(authorizationRequest)
+            client = Identity.getAuthorizationClient(activityContext as Context)
+            client!!.authorize(authorizationRequest)
                 .addOnSuccessListener { authorizationResult ->
                     if (authorizationResult.hasResolution()) {
                         Platform().logger.logi("GoogleDriveService::askForAccess() Success.")
                         // The user needs to grant permission via a popup
                         val pendingIntent = authorizationResult.pendingIntent
-                        val intentSenderRequest = IntentSenderRequest.Builder(pendingIntent!!).build()
+                        val intentSenderRequest =
+                            IntentSenderRequest.Builder(pendingIntent!!).build()
                         callback?.onUserAction(intentSenderRequest)
                     } else {
                         // Permission already granted
@@ -199,14 +212,14 @@ class GoogleDriveService : AbstractStorageService() {
                 }
                 .addOnFailureListener { e ->
                     Platform().logger.loge("GoogleDriveService::askForAccess() Authorization failed: ${e.message}")
-                    continuation.resume("") { _, _, _ ->
+                    continuation.resume(null) { _, _, _ ->
                         // no-op if coroutine is canceled
                     }
                 }
         }
 
         if (!token.isNullOrEmpty() && drive == null) {
-            drive = getDriveService(token)
+            initGoogleDrive(token)
         }
 
         Platform().logger.logi("GoogleDriveService::askForAccess() ready = $canUse")
@@ -215,14 +228,24 @@ class GoogleDriveService : AbstractStorageService() {
         callback?.onUserAction(null)
     }
 
-    private fun getDriveService(accessToken: String): Drive {
+    private fun initGoogleDrive(token: String) {
 
-        val accessToken = AccessToken(accessToken, null)
+        val accessToken = AccessToken(token, null)
 
-        val credentials = GoogleCredentials.create(accessToken)
-            .createScoped(listOf(DriveScopes.DRIVE_APPDATA))
+        val builder = GoogleCredentials.newBuilder().setAccessToken(accessToken)
 
-        return Drive.Builder(
+        val credentials = object : GoogleCredentials(builder) {
+            // WE DO not support the access token refresh.
+            // Ideally it should be done on backend, but we don't have it
+            // so can't do this safely. User should log in to get new access
+            override fun refreshAccessToken(): AccessToken {
+                return AccessToken("", null)
+            }
+        }
+
+        credentials.createScoped(listOf(DriveScopes.DRIVE_APPDATA))
+
+        drive = Drive.Builder(
             GoogleNetHttpTransport.newTrustedTransport(),
             GsonFactory.getDefaultInstance(),
             HttpCredentialsAdapter(credentials)

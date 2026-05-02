@@ -21,16 +21,13 @@ class NetStateManager(private val connectivityManager: ConnectivityManager) : Ne
     private val newtStateInfoChannel = Channel<NetStateInfo>(capacity = Channel.CONFLATED)
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    init {
-        addCallback()
-    }
-
     override suspend fun isNetworkAvailable(): Boolean {
         val network = connectivityManager.activeNetwork ?: return false
         return hasAvailableNetwork(connectivityManager.getNetworkCapabilities(network))
     }
 
-    private fun addCallback() {
+    override fun startObserver() {
+        Platform().logger.logi("$tag::startObserver")
 
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
 

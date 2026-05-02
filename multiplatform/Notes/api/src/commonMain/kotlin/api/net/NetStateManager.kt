@@ -8,5 +8,7 @@ interface NetStateManager {
 
     suspend fun isNetworkAvailable(): Boolean
 
+    fun startObserver()
+
     fun observerChanges(): Flow<NetStateInfo>
 }

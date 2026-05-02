@@ -8,11 +8,10 @@ import api.data.AbstractStorageService
 import com.google.common.truth.Truth.assertThat
 import api.data.Document
 import api.data.Notes
+import api.repo.Repository
 import com.notes.db.LocalNoteDatabase
 import com.notes.notes_ui.NotesViewModel
-import com.notes.notes_ui.Repository
-import com.notes.notes_ui.data.AppRepository
-import com.notes.notes_ui.data.RemoteRepository
+import com.notes.repo.AppRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -80,6 +79,21 @@ class ViewModelNotesTest {
             override fun clear() {
                 Log.i("ViewModelNotesTests", "clear()")
                 cleared.store(true)
+            }
+
+            override suspend fun onPasswordChanged() {
+
+            }
+
+            override suspend fun canChangePassword(): Boolean {
+                return false
+            }
+
+            override suspend fun clearLocalAppStorage() {
+            }
+
+            override suspend fun isDataInSync(): Boolean {
+                return false
             }
         }
 
@@ -288,7 +302,7 @@ class ViewModelNotesTest {
 
         }
 
-        return AppRepository(RemoteRepository(listOf(mockedStoreService)))
+        return AppRepository.create(listOf(mockedStoreService))
     }
 
 }

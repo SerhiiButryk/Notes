@@ -2,6 +2,7 @@ package com.notes.os
 
 import api.OSPlatform
 import api.data.StorageOperations
+import api.net.HttpClient
 import api.net.NetStateManager
 import api.repo.Repository
 import api.security.Base64Operations
@@ -17,6 +18,7 @@ internal expect class PlatformFactory {
     fun provideLogger(): Log
     fun provideNetStateManager(): NetStateManager
     fun provideAppRepository(): Repository
+    fun provideHttpClient(): HttpClient
 }
 
 internal class Platform(factory: PlatformFactory) : OSPlatform {
@@ -34,5 +36,7 @@ internal class Platform(factory: PlatformFactory) : OSPlatform {
     override val netStateManager: NetStateManager = factory.provideNetStateManager()
 
     override val appRepo: Repository = factory.provideAppRepository()
+
+    override val httpClient: HttpClient = factory.provideHttpClient()
 }
 
