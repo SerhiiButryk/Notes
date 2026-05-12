@@ -19,33 +19,9 @@ Under active development.
 **Cloning the repo with submodules**
 
 ```
-$ git clone /url/to/repo/with/submodules
+$ git clone git@github.com:SerhiiButryk/Notes.git
 $ git submodule init
 $ git submodule update
-
-Add new submodule:
-
-$ git submodule add https://bitbucket.org/jaredw/awesomelibrary
-```
-
-**Dev notes**
-
-```
- 1. Ktlint run:
- ./gradlew ktlintchec
-
- 2. Android lint run:
- ./gradlew lint
-
- 3. Fix style Ktlint issues:
- ./gradlew ktlintFormat
-
-4. Fresh detekt run:
-./gradlew detekt
-
-This may be required:
-./gradlew detektGenerateConfig
-./gradlew detektBaseline
 ```
 
 **The ongoing improvements/features**
@@ -55,3 +31,5 @@ This may be required:
 2. Test with large notes > 1 GB
 
 3. Implement UI improvements (Search, Labels ...)
+
+4. Can add PlayIntgrity check using Firebase. However, it needs Google Play console configuration which is not possible now.
