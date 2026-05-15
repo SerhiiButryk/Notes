@@ -1,6 +1,11 @@
 package com.notes.notes_ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -17,7 +22,7 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import com.notes.notes_ui.components.ToolsBar
-import com.notes.notes_ui.data.ToolsPane
+import com.notes.notes_ui.data.Tools
 import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.editor.TextInputCommand
 import kotlinx.coroutines.launch
@@ -27,8 +32,8 @@ fun NotesEditorUI(
     modifier: Modifier = Modifier,
     notes: Notes,
     state: RichTextState,
-    toolsPaneItems: List<ToolsPane> = emptyList(),
-    onTextChanged: (EditorCommand) -> Unit = {},
+    toolsPaneItems: Tools,
+    onTextChanged: (EditorCommand) -> Unit,
 ) {
     EditorUI(modifier, notes, state, toolsPaneItems, onTextChanged)
 }
@@ -38,7 +43,7 @@ private fun EditorUI(
     modifier: Modifier = Modifier,
     notes: Notes,
     state: RichTextState,
-    toolsPaneItems: List<ToolsPane>,
+    toolsPaneItems: Tools,
     onTextChanged: (EditorCommand) -> Unit,
 ) {
     Scaffold(

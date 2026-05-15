@@ -1,0 +1,9 @@
+1. Firebase JVM desktop investigation:
+
+JVM desktop SDK:
+https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master
+
+Example project:
+https://github.com/KhubaibKhan4/Youtube-Clone-KMP/blob/master/composeApp/src/jvmMain/kotlin/main.kt
+
+Official firebase SDK available only for mobile platform.

@@ -15,10 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.notes.notes_ui.NotesCommonUI
 import com.notes.notes_ui.NotesEditorUI
 import com.notes.notes_ui.NotesListUI
 import com.notes.notes_ui.NotesVM
+import com.notes.notes_ui.data.Tools
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -80,7 +80,7 @@ fun NotesScreenImpl(onSettingsClick: () -> Unit) {
             NotesEditorUI(
                 notes = note,
                 state = state,
-                toolsPaneItems = emptyList(),
+                toolsPaneItems = Tools(emptyList()),
                 onTextChanged = {},
             )
         }

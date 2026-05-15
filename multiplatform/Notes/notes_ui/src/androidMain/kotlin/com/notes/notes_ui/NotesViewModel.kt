@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.Platform
 import api.data.Notes
+import api.data.NotesCollection
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.data.getToolsList
 import com.notes.notes_ui.editor.EditorCommand
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,12 +33,13 @@ class NotesViewModel(
     private val interactor: Interactor = Interactor(appRepository, this)
 
     // A state to hold all the notes
-    val notesState: StateFlow<List<Notes>> = interactor
+    val notesState: StateFlow<NotesCollection> = interactor
         .getNotes()
+        .map { NotesCollection(it) }
         .stateIn(
             scope = scope,
             started = WhileSubscribed(stopTimeoutMillis = 5000),
-            emptyList(),
+            NotesCollection(),
         )
 
     // A state to hold the note which is open in Editor
@@ -54,7 +57,7 @@ class NotesViewModel(
 
     // User selected a note from list ui
     suspend fun onSelectAction(note: Notes) {
-        val found = notesState.value.firstOrNull { note.id == it.id }
+        val found = notesState.value.collection.firstOrNull { note.id == it.id }
         if (found == null) {
             val note = interactor.getNotes(note.id).first()!!
             _noteState.emit(note)

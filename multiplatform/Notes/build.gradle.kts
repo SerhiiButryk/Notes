@@ -15,8 +15,41 @@ plugins {
     alias(libs.plugins.detekt) apply false // Static analysis
 }
 
-// Setup static analysis
 subprojects {
+
+    // Enable compose compiler reports
+    // Run this task to see a report:
+    // '$ ./gradlew clean'
+    // '$ ./gradlew :composeApp:compileDebugKotlinAndroid --rerun-tasks'
+    plugins.withId("org.jetbrains.kotlin.plugin.compose") {
+
+        if (project.name == "compose-rich-editor") { // Separate git submodule , do not enable
+            println("Compose compiler reports are disabled for ${project.name} module")
+        } else {
+
+            extensions.configure<org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension>(
+                "composeCompiler"
+            ) {
+
+                reportsDestination.set(
+                    rootProject.layout.buildDirectory.dir("compose_reports/${project.name}")
+                )
+
+                metricsDestination.set(
+                    rootProject.layout.buildDirectory.dir("compose_compiler/${project.name}/")
+                )
+
+                // TODO Add stability configuration if needed
+//            stabilityConfigurationFiles.add(
+//                rootProject.layout.projectDirectory.file(
+//                    "compose_compiler/stability.conf"
+//                )
+//            )
+            }
+        }
+    }
+
+    // Setup static analysis
     if (project.name == "compose-rich-editor") { // Separate git submodule , do not enable
         println("Ktlint & Detekt are disabled for ${project.name} module")
     } else {

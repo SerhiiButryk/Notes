@@ -15,9 +15,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import api.data.Notes
+import api.data.NotesCollection
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.notes.notes_ui.components.NotesNavRail
-import com.notes.notes_ui.data.ToolsPane
+import com.notes.notes_ui.data.Tools
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
 import kotlinx.coroutines.flow.Flow
@@ -26,8 +27,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotesUI(
     modifier: Modifier = Modifier,
-    notes: List<Notes>,
-    toolsPaneItems: List<ToolsPane>,
+    notes: NotesCollection,
+    toolsPaneItems: Tools,
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
@@ -57,8 +58,8 @@ fun NotesUI(
 
 @Composable
 private fun NotesUIImpl(
-    notes: List<Notes>,
-    toolsPaneItems: List<ToolsPane>,
+    notes: NotesCollection,
+    toolsPaneItems: Tools,
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
@@ -96,8 +97,8 @@ private fun NotesUIImpl(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun ListDetailUI(
-    notes: List<Notes>,
-    toolsPaneItems: List<ToolsPane>,
+    notes: NotesCollection,
+    toolsPaneItems: Tools,
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,

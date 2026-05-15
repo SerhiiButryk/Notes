@@ -7,16 +7,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import api.data.Notes
+import api.data.NotesCollection
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.notes.notes_ui.components.NotesNavRail
-import com.notes.notes_ui.data.ToolsPane
+import com.notes.notes_ui.data.Tools
 import com.notes.notes_ui.editor.EditorCommand
 import kotlinx.coroutines.launch
 
 @Composable
 fun NotesCommonUI(
-    notes: List<Notes>,
-    toolsPaneItems: List<ToolsPane>,
+    notes: NotesCollection,
+    toolsPaneItems: Tools,
     note: Notes,
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,

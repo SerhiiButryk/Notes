@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import api.data.Notes
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.notes.notes_ui.data.Tool
+import com.notes.notes_ui.data.Tools
 import com.notes.notes_ui.data.ToolsPane
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.Arrow_up
@@ -30,7 +31,7 @@ import com.notes.ui.Arrow_up
 @Composable
 fun ToolsBar(
     state: RichTextState,
-    toolsPaneItems: List<ToolsPane>,
+    toolsPaneItems: Tools,
     notes: Notes,
 ) {
     Surface(
@@ -57,7 +58,7 @@ fun ToolsBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
-            for (tools in toolsPaneItems) {
+            for (tools in toolsPaneItems.collection) {
                 // Add one option
                 if (tools.list.size == 1) {
                     val option = tools.list.first()
@@ -85,7 +86,7 @@ fun ToolsBar(
         }
 
         if (savedOption != 0L) {
-            for (tools in toolsPaneItems) {
+            for (tools in toolsPaneItems.collection) {
                 val option = tools.list.first()
                 if (tools.list.size == 1 && option.key == savedOption) {
                     AlertDialogUI(

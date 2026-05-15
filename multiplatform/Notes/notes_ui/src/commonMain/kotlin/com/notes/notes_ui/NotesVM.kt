@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.Platform
 import api.data.Notes
+import api.data.NotesCollection
 import api.repo.RepoCallback
 import com.notes.notes_ui.data.getToolsList
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class NotesVM(
@@ -37,13 +39,14 @@ class NotesVM(
     val richTools = getToolsList(interactor)
 
     // A state to hold all the notes
-    val notesState: StateFlow<List<Notes>> = interactor
+    val notesState: StateFlow<NotesCollection> = interactor
         .getNotes()
+        .map { NotesCollection(it) }
         .stateIn(
             scope = scope,
             // For Desktop app it should be fine
             started = Lazily,
-            emptyList(),
+            NotesCollection(emptyList()),
         )
 
     // A state to hold the note which is open in Editor

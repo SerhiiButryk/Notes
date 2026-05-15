@@ -4,23 +4,15 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import com.notes.os.JVMInitProvider
+import api.Platform
 import com.notes.ui.theme.AppThemeCommon
 
-const val APP_TITLE = "Notes"
+fun main() = run {
 
-fun main() {
+    // Ask whether to provide additional login and trace information
+    Platform().logger.setDebug(true)
 
-    val osType = System.getProperty("os.name").lowercase()
-    if (osType.contains("mac")) {
-        // Set application title
-        System.setProperty("apple.awt.application.name", APP_TITLE)
-    }
-
-    JVMInitProvider.create()
-
-    application {
+    applicationTraced {
 
         Window(
             onCloseRequest = ::exitApplication,

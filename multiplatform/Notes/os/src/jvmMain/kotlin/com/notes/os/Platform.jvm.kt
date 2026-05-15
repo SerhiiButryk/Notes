@@ -10,6 +10,7 @@ import api.security.Base64Operations
 import api.security.CryptoOperations
 import api.security.DerivedKeyOperations
 import api.utils.Log
+import com.notes.os.impl.AppLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
@@ -46,11 +47,11 @@ internal actual class PlatformFactory {
 
     actual fun provideCryptoOperations(): CryptoOperations {
         return object : CryptoOperations {
-            override fun encrypt(message: String): String {
+            override suspend fun encrypt(message: String): String {
                 return message
             }
 
-            override fun decrypt(message: String): String {
+            override suspend fun decrypt(message: String): String {
                 return message
             }
 
@@ -84,16 +85,7 @@ internal actual class PlatformFactory {
     }
 
     actual fun provideLogger(): Log {
-        return object : Log {
-
-            override fun logi(message: String) {
-                println("NOTES [INFO] $message")
-            }
-
-            override fun loge(message: String) {
-                println("NOTES [ERROR] $message")
-            }
-        }
+        return AppLogger()
     }
 
     actual fun provideNetStateManager(): NetStateManager {

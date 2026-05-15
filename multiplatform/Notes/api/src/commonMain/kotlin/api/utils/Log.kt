@@ -1,8 +1,11 @@
 package api.utils
 
-interface Log {
+import java.io.Closeable
+
+interface Log : Closeable {
     fun logi(message: String)
     fun loge(message: String)
     fun logd(message: String)
     fun setDebug(isDebug: Boolean)
+    fun createCustomComposeTracer(): Any
 }

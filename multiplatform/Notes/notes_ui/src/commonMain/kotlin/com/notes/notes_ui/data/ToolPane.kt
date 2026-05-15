@@ -6,6 +6,7 @@ import androidx.compose.material.icons.automirrored.outlined.FormatAlignLeft
 import androidx.compose.material.icons.automirrored.outlined.FormatAlignRight
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,12 +44,17 @@ data class Tool(
     val message: String = "",
 )
 
-@Stable
+@Immutable
 data class ToolsPane(
     val list: List<Tool>,
 )
 
-fun getToolsList(interactor: Interactor): List<ToolsPane> {
+@Immutable
+data class Tools(
+    val collection: List<ToolsPane>,
+)
+
+fun getToolsList(interactor: Interactor): Tools {
 
     // ////////////////////////////////
     // Construct editor tool pane
@@ -327,5 +333,5 @@ fun getToolsList(interactor: Interactor): List<ToolsPane> {
         )
     )
 
-    return builder.build()
+    return Tools(builder.build())
 }

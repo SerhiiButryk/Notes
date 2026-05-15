@@ -1,13 +1,6 @@
 package com.notes.os.impl
 
-import api.utils.Log
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
-
-class AppLogger : Log {
-
-    @OptIn(ExperimentalAtomicApi::class)
-    private var isDebug = AtomicBoolean(false)
+class AppLogger : PlatformLog() {
 
     override fun logi(message: String) {
         android.util.Log.i("Notes", message)
@@ -17,15 +10,8 @@ class AppLogger : Log {
         android.util.Log.e("Notes", message)
     }
 
-    @OptIn(ExperimentalAtomicApi::class)
-    override fun logd(message: String) {
-        if (isDebug.load()) {
-            android.util.Log.d("Notes", message)
-        }
+    override fun logDebug(message: String) {
+        android.util.Log.d("Notes", message)
     }
 
-    @OptIn(ExperimentalAtomicApi::class)
-    override fun setDebug(isDebug: Boolean) {
-        this.isDebug.store(isDebug)
-    }
 }

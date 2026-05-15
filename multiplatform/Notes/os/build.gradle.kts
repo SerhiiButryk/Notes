@@ -33,6 +33,8 @@ kotlin {
                 implementation(projects.ui)
                 // Kotlin coroutines
                 implementation(libs.kotlinx.coroutines.core)
+                // For some Compose APIs
+                implementation(libs.runtime)
             }
         }
 
@@ -58,6 +60,8 @@ kotlin {
         }
 
         jvmMain.dependencies {
+            // Tracing APIs
+            implementation(libs.androidx.tracing.wire)
         }
 
         getByName("androidDeviceTest") {

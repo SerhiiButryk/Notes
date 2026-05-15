@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -32,10 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import api.data.Notes
+import api.data.NotesCollection
 import com.notes.ui.SearchBarField
 
 @Composable
@@ -44,7 +43,7 @@ fun NotesListUI(
     addAction: () -> Unit,
     onSettingsClick: () -> Unit = {},
     onSelected: (Notes) -> Unit,
-    notes: List<Notes>,
+    notes: NotesCollection,
     onBackClick: () -> Unit = {},
     isPhoneSize: Boolean
 ) {
@@ -90,11 +89,11 @@ fun NotesListUI(
 @Composable
 fun NotesList(
     modifier: Modifier = Modifier,
-    notes: List<Notes>,
+    notes: NotesCollection,
     onSelected: (Notes) -> Unit,
     isPhoneSize: Boolean
 ) {
-    if (notes.isEmpty()) {
+    if (notes.collection.isEmpty()) {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,7 +106,7 @@ fun NotesList(
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
             ) {
-                for (note in notes) {
+                for (note in notes.collection) {
                     item(key = note.id) {
                         EditorPreviewStateful(content = note.content) { onSelected(note) }
                     }
@@ -118,7 +117,7 @@ fun NotesList(
                 modifier = modifier,
                 columns = StaggeredGridCells.Adaptive(160.dp),
             ) {
-                for (note in notes) {
+                for (note in notes.collection) {
                     item(key = note.id) {
                         EditorPreviewStateful(content = note.content) { onSelected(note) }
                     }

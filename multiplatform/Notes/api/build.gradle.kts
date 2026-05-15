@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     id("kotlin-parcelize") // For 'kotlinx.parcelize.Parcelize'
+    alias(libs.plugins.composeCompiler) // For 'androidx.compose.runtime.Immutable'
 }
 
 kotlin {
@@ -36,6 +37,11 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.serializationJson)
             implementation(libs.kotlinx.coroutines.core)
+
+            // Compose
+
+            // For 'androidx.compose.runtime.Immutable'
+            implementation(libs.runtime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

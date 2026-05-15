@@ -34,6 +34,7 @@ navigation = "2.9.7"
 runtime = "1.10.3"
 serialization = "2.3.20"
 startupRuntime = "1.2.0"
+tracingWire = "2.0.0-alpha07"
 truth = "1.4.5"
 jetbrainsMarkdown = "0.7.3"
 klint = "14.2.0"
@@ -60,6 +61,7 @@ componentsSplitpane = "1.10.3"
 
 [libraries]
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
+androidx-tracing-wire = { module = "androidx.tracing:tracing-wire", version.ref = "tracingWire" }
 components-splitpane = { module = "org.jetbrains.compose.components:components-splitpane", version.ref = "componentsSplitpane" }
 gitlive-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }

@@ -1,5 +1,8 @@
 package api.data
 
+import androidx.compose.runtime.Immutable
+
+@Immutable // To mark it stable for compose
 data class Notes(
     val content: String = "",
     val id: Long = 0,
@@ -12,6 +15,11 @@ data class Notes(
         fun AbsentNote() = Notes(id = -2)
     }
 }
+
+@Immutable // To mark it stable for compose
+data class NotesCollection(
+    val collection: List<Notes> = emptyList()
+)
 
 fun Notes.getStringRep(): String {
     return content
