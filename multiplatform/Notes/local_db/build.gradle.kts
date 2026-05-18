@@ -8,7 +8,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.db"
 
         compileSdk =
@@ -38,9 +38,6 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.api)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
         }
     }
 }

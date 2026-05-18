@@ -1,4 +1,4 @@
-package com.notes.app.notes
+package com.notes.app
 
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut

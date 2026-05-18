@@ -5,7 +5,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.os"
         compileSdk = libs.versions.android.targetSdk
             .get()
@@ -38,12 +38,6 @@ kotlin {
             }
         }
 
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-
         androidMain {
             dependencies {
                 implementation(projects.net)
@@ -61,12 +55,8 @@ kotlin {
 
         jvmMain.dependencies {
             // Tracing APIs
+            // https://developer.android.com/topic/performance/tracing/in-process-tracing
             implementation(libs.androidx.tracing.wire)
-        }
-
-        getByName("androidDeviceTest") {
-            dependencies {
-            }
         }
     }
 

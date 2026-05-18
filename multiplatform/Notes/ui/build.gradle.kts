@@ -11,7 +11,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.ui"
 
         compileSdk =
@@ -74,27 +74,13 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
             // Resources
-            implementation(compose.components.resources)
+            implementation(libs.components.resources)
 
             // Serialization
             implementation(libs.serializationJson)
 
             // Navigation 3
             implementation(libs.jetbrains.navigation3.ui)
-        }
-
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
-
-        getByName("androidHostTest") {
-            dependencies {
-            }
-        }
-
-        getByName("androidDeviceTest") {
-            dependencies {
-            }
         }
     }
 }

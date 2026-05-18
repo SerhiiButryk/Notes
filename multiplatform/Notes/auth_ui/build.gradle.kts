@@ -5,14 +5,13 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize") // For 'kotlinx.parcelize.Parcelize'
 }
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.auth_ui"
 
         compileSdk =

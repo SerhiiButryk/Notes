@@ -7,7 +7,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.services"
 
         compileSdk =
@@ -68,10 +68,6 @@ kotlin {
             // Firebase auth
             implementation(libs.gitlive.firebase.auth)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
-
         jvmMain.dependencies {
             // https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master
             // Firebase SDK

@@ -5,7 +5,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.repo"
         compileSdk = libs.versions.android.targetSdk
             .get()
@@ -32,21 +32,9 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
-
         androidMain {
             dependencies {
                 implementation(projects.localDb)
-            }
-        }
-
-        getByName("androidDeviceTest") {
-            dependencies {
             }
         }
     }

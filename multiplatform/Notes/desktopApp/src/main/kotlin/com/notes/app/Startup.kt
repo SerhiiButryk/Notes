@@ -1,4 +1,4 @@
-package com.notes.app.notes
+package com.notes.app
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer

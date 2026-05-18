@@ -7,7 +7,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.net"
 
         compileSdk =
@@ -36,23 +36,8 @@ kotlin {
             // Coroutines
             implementation(libs.kotlinx.coroutines.android)
         }
-
         commonMain.dependencies {
             implementation(projects.api)
-        }
-
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
-
-        getByName("androidHostTest") {
-            dependencies {
-            }
-        }
-
-        getByName("androidDeviceTest") {
-            dependencies {
-            }
         }
     }
 }

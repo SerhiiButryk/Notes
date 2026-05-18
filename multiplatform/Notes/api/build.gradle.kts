@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.api"
 
         compileSdk =
@@ -42,9 +42,6 @@ kotlin {
 
             // For 'androidx.compose.runtime.Immutable'
             implementation(libs.runtime)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
         }
     }
 }

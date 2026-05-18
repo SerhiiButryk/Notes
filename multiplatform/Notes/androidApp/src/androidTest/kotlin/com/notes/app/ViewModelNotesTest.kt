@@ -117,22 +117,23 @@ class ViewModelNotesTest {
     fun test01_collect_notesState() = runTest {
 
         val actualList = viewModel?.notesState?.value
-        assertThat(actualList).isEqualTo(emptyList<Notes>())
+        assertThat(actualList?.collection).isEqualTo(emptyList<Notes>())
 
         val notes = Channel<List<Notes>>(capacity = Channel.CONFLATED)
 
         // Trigger 'notesState' sharing
         launch(Dispatchers.IO) {
             viewModel?.notesState?.collect {
-                if (it.isNotEmpty()) {
-                    notes.send(it)
+                if (it.collection.isNotEmpty()) {
+                    notes.send(it.collection)
                     cancel()
                 }
             }
         }
 
-        assertThat(fakeNotes).isEqualTo(notes.receive())
-        assertThat(viewModel?.notesState?.value).isEqualTo(fakeNotes)
+        val actual = notes.receive()
+        assertThat(fakeNotes).isEqualTo(actual)
+        assertThat(viewModel?.notesState?.value?.collection).isEqualTo(fakeNotes)
     }
 
     @Test
@@ -144,7 +145,7 @@ class ViewModelNotesTest {
         // Trigger 'notesState' sharing
         val job = launch(Dispatchers.IO) {
             viewModel?.notesState?.collect {
-                if (it.isNotEmpty()) {
+                if (it.collection.isNotEmpty()) {
                     // Got some valid data. So cancel this coroutine.
                     cancel()
                 }
@@ -179,7 +180,7 @@ class ViewModelNotesTest {
         // Trigger 'notesState' sharing
         val job = launch(Dispatchers.IO) {
             viewModel?.notesState?.collect {
-                if (it.isNotEmpty()) {
+                if (it.collection.isNotEmpty()) {
                     // Got some valid data. So cancel this coroutine.
                     cancel()
                 }
@@ -219,7 +220,7 @@ class ViewModelNotesTest {
             realVM.notesState.collect {
                 Log.i("ViewModelNotesTest",
                     "test04_collect_notesState_and_deletion_in_remote_failed: got = $it")
-                notes.send(it)
+                notes.send(it.collection)
             }
         }
 
@@ -230,9 +231,9 @@ class ViewModelNotesTest {
             realRepo.saveNote(this, note1, {})
             realRepo.saveNote(this, note2, {})
         }
-
-        Thread.sleep(500) // Wait sometime for data, can't use delay()
+        // Wait sometime for data, can't use delay()
         // cos it operates in virtual time
+        Thread.sleep(500)
 
         val list1 = notes.receive()
 

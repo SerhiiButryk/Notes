@@ -12,7 +12,7 @@ plugins {
 
 kotlin {
 
-    androidLibrary {
+    android {
         namespace = "com.notes.notes_ui"
 
         compileSdk =
@@ -92,9 +92,6 @@ kotlin {
             implementation(libs.jetbrains.navigation3.ui)
             // View Model
             implementation(libs.androidx.lifecycle.viewmodel)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
         }
     }
 }

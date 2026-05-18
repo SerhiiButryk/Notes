@@ -1,8 +1,9 @@
 [versions]
-agp = "8.13.2" # When updating check IOS & Android build. It could create build issues.
+agp = "9.1.1" # When updating check IOS & Android build. It could create build issues.
 composeMultiplatform = "1.10.3"
 composeHotReload = "1.0.0"
-kotlin = "2.3.0"
+kotlin = "2.3.2"
+kotlinPlugin = "2.3.20"
 
 android-compileSdk = "36"
 android-minSdk = "24"
@@ -15,6 +16,7 @@ androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.10.0"
 kotlinx-coroutines = "1.10.2"
 adaptiveLayout = "1.2.0"
+kotlinxCoroutinesTest = "1.11.0"
 lifecycleViewmodel = "2.10.0"
 material3 = "1.9.0"
 materialIconsExtendedVersion = "1.7.3"
@@ -29,6 +31,7 @@ okhttp = "5.3.2"
 playServicesAuth = "21.5.0"
 roomRuntime = "2.8.4"
 jsonserialization = "1.9.0"
+runner = "1.7.0"
 serializationCore = "1.10.0"
 navigation = "2.9.7"
 runtime = "1.10.3"
@@ -39,8 +42,8 @@ truth = "1.4.5"
 jetbrainsMarkdown = "0.7.3"
 klint = "14.2.0"
 detekt = "1.23.8"
-androidx-compose-ui = "1.10.5"
-kotlinxCoroutinesCore = "1.10.2"
+androidx-compose-ui = "1.11.1"
+kotlinxCoroutinesCore = "1.11.0"
 ui = "1.10.3"
 uiToolingPreview = "1.10.3"
 componentsResources = "1.10.3"
@@ -58,9 +61,12 @@ multiplatform-nav3-ui = "1.0.0-alpha05"
 firebaseCommon = "2.4.0"
 firebaseAuth = "2.4.0"
 componentsSplitpane = "1.10.3"
+junit = "1.3.0"
 
 [libraries]
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
+androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 androidx-tracing-wire = { module = "androidx.tracing:tracing-wire", version.ref = "tracingWire" }
 components-splitpane = { module = "org.jetbrains.compose.components:components-splitpane", version.ref = "componentsSplitpane" }
 gitlive-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
@@ -81,7 +87,7 @@ google-http-client-jackson2 = { module = "com.google.http-client:google-http-cli
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
 jetbrains-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlinPlugin" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -89,6 +95,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 androidx-media3-ui-compose = { group = "androidx.media3", name = "media3-ui-compose", version.ref = "media3" }
@@ -134,14 +141,15 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinPlugin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinPlugin" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "klint" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
 
 [bundles]
 composeui = [

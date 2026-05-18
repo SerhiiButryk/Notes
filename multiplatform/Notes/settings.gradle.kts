@@ -32,7 +32,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":composeApp")
+include(":shared")
 include(":api")
 include(":ui")
 include(":auth_ui")
@@ -44,3 +44,5 @@ include(":compose-rich-editor")
 project(":compose-rich-editor").projectDir = file("ext/compose-rich-editor/richeditor-compose")
 include(":os")
 include(":repo")
+include(":desktopApp")
+include(":androidApp")
