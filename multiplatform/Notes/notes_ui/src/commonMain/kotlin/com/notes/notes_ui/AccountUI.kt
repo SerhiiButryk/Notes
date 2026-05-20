@@ -86,8 +86,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Google Account",
                 status = status1,
-                icon = getIconByKey(googleIcon),
-                iconTint = Color.Unspecified,
+                painter = toPainter(googleIcon),
                 modifier = modifier,
                 isOnline = accountInfo.googleIsActive,
             )
@@ -97,8 +96,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Firebase Sync",
                 status = status2,
-                icon = getIconByKey(firebaseIcon),
-                iconTint = Color(0xFFFFCA28),
+                painter = toPainter(firebaseIcon),
                 modifier = modifier,
                 isOnline = accountInfo.firebaseIsActive,
             )
@@ -108,8 +106,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Google drive",
                 status = status3,
-                icon = getIconByKey(googleDriveIcon),
-                iconTint = Color.Unspecified,
+                painter = toPainter(googleDriveIcon),
                 showStatusDot = true,
                 isOnline = accountInfo.googleDriveIsActive,
                 modifier = modifier
@@ -120,8 +117,7 @@ fun AccountUI(
             AccountStatusCard(
                 title = "Cloud sync",
                 status = status4,
-                icon = getIconByKey(cloudSyncIcon),
-                iconTint = Color.Unspecified,
+                painter = toPainter(cloudSyncIcon),
                 showStatusDot = true,
                 isOnline = accountInfo.syncCompleted,
                 modifier = modifier
@@ -153,8 +149,8 @@ fun AccountUI(
 fun AccountStatusCard(
     title: String,
     status: String,
-    icon: Painter,
-    iconTint: Color,
+    painter: Painter,
+    iconTint: Color = Color.Unspecified,
     showStatusDot: Boolean = true,
     isOnline: Boolean = true,
     modifier: Modifier
@@ -169,7 +165,7 @@ fun AccountStatusCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = icon,
+                painter = painter,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = iconTint

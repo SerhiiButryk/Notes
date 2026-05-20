@@ -8,9 +8,10 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.notes.ui.getIconByKey
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.previewIcon
+import com.notes.ui.toPainter
+
 @Composable
 fun OnboardingScreen(onContinue: () -> Unit) {
 
@@ -34,7 +35,7 @@ fun OnboardingScreen(onContinue: () -> Unit) {
 
             Image(
                 modifier = Modifier.padding(10.dp, 10.dp, bottom = 30.dp),
-                painter = getIconByKey(previewIcon),
+                painter = toPainter(previewIcon),
                 contentDescription = null,
             )
 

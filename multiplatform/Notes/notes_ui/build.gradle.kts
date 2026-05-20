@@ -86,6 +86,9 @@ kotlin {
             implementation(libs.components.splitpane)
             implementation(libs.jetbrains.ui.tooling.preview)
 
+            // Preview support
+            // implementation(libs.jetbrains.ui.tooling.preview)
+
             // Serialization
             implementation(libs.serializationJson)
             // Navigation 3

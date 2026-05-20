@@ -39,7 +39,7 @@ pushd ${SCRIPT_RELEVANT_PATH}/../
 popd
 
 # Copy final jar file
-cp -rf -v ${PROJECT_FOLDER}/composeApp/build/compose/jars/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/compose/jars/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 # Print folder content
 print_message "******** Log output folder *********"

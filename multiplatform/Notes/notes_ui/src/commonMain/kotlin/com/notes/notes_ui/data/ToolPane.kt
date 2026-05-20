@@ -149,7 +149,7 @@ fun getToolsList(interactor: Interactor): Tools {
 
     builder.addToolList(
         Tool(
-            getIcon = { getIconByKey(h1FormatIcon) },
+            getIcon = { toPainter(h1FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(
                     EditCommand(
@@ -161,7 +161,7 @@ fun getToolsList(interactor: Interactor): Tools {
             text = "size",
         ),
         Tool(
-            getIcon = { getIconByKey(h2FormatIcon) },
+            getIcon = { toPainter(h2FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(
                     EditCommand(
@@ -173,7 +173,7 @@ fun getToolsList(interactor: Interactor): Tools {
             text = "size",
         ),
         Tool(
-            getIcon = { getIconByKey(h3FormatIcon) },
+            getIcon = { toPainter(h3FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(
                     EditCommand(
@@ -185,7 +185,7 @@ fun getToolsList(interactor: Interactor): Tools {
             text = "size",
         ),
         Tool(
-            getIcon = { getIconByKey(h4FormatIcon) },
+            getIcon = { toPainter(h4FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(
                     EditCommand(
@@ -197,7 +197,7 @@ fun getToolsList(interactor: Interactor): Tools {
             text = "size",
         ),
         Tool(
-            getIcon = { getIconByKey(h5FormatIcon) },
+            getIcon = { toPainter(h5FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(
                     EditCommand(
@@ -209,7 +209,7 @@ fun getToolsList(interactor: Interactor): Tools {
             text = "size",
         ),
         Tool(
-            getIcon = { getIconByKey(h6FormatIcon) },
+            getIcon = { toPainter(h6FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(
                     EditCommand(

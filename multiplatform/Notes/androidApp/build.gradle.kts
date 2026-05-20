@@ -38,7 +38,8 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.ui)
     implementation(libs.components.resources)
-    debugImplementation(libs.jetbrains.ui.tooling.preview)
+    // Preview support
+    //debugImplementation(libs.jetbrains.ui.tooling.preview)
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
 
