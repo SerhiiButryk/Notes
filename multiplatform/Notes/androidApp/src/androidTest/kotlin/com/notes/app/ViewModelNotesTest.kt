@@ -5,10 +5,10 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import api.data.AbstractStorageService
-import com.google.common.truth.Truth.assertThat
 import api.data.Document
 import api.data.Notes
 import api.repo.Repository
+import com.google.common.truth.Truth.assertThat
 import com.notes.db.LocalNoteDatabase
 import com.notes.notes_ui.NotesViewModel
 import com.notes.repo.AppRepository
@@ -215,12 +215,14 @@ class ViewModelNotesTest {
         val notes = Channel<List<Notes>>(capacity = Channel.CONFLATED)
 
         // Trigger 'notesState' sharing
-        // backgroundScope is used to not wait for coroutine completion
-        backgroundScope.launch(Dispatchers.IO) {
+        val job = launch(Dispatchers.IO) {
             realVM.notesState.collect {
                 Log.i("ViewModelNotesTest",
                     "test04_collect_notesState_and_deletion_in_remote_failed: got = $it")
-                notes.send(it.collection)
+                if (it.collection.size == 2) {
+                    notes.send(it.collection)
+                    cancel() // Done!
+                }
             }
         }
 
@@ -231,9 +233,8 @@ class ViewModelNotesTest {
             realRepo.saveNote(this, note1, {})
             realRepo.saveNote(this, note2, {})
         }
-        // Wait sometime for data, can't use delay()
-        // cos it operates in virtual time
-        Thread.sleep(500)
+
+        job.join()
 
         val list1 = notes.receive()
 
@@ -249,12 +250,24 @@ class ViewModelNotesTest {
             realRepo.deleteNote(this, noteToDelete, {})
         }
 
+        // Trigger 'notesState' sharing
+        val job2 = launch(Dispatchers.IO) {
+            realVM.notesState.collect {
+                Log.i("ViewModelNotesTest",
+                    "test04_collect_notesState_and_deletion_in_remote_failed: got = $it")
+                if (it.collection.size == 1) {
+                    notes.send(it.collection)
+                    cancel() // Done!
+                }
+            }
+        }
+
+        job2.join()
+
         val list2 = notes.receive() // New data received
 
         assertThat(list2.size == 1).isTrue()
         assertThat(list2[0].id != deletedNoteId).isTrue()
-
-        notes.cancel()
 
         // Clear VM
         val onClear = realVM::class.declaredMemberFunctions.find { it.name == "onCleared" }

@@ -115,16 +115,17 @@ class AppRepository private constructor(
         scope.launch {
             val db = LocalNoteDatabase.access()
             val newNote = db.getNote(note.id).first() == null
-            if (newNote) {
+            val note = if (newNote) {
                 val id = db.insertNote(note.toEntity(setId = false /* Use auto-increment */))
                 onNewAdded(id)
                 Platform().logger.logi("OfflineRepository::saveNote($id) new record is added locally")
-                remoteRepository.saveNote(scope, note.copy(id = id))
+                note.copy(id = id)
             } else {
                 db.updateNote(note.toEntity())
                 Platform().logger.logi("OfflineRepository::saveNote(${note.id}) is updated locally")
-                remoteRepository.saveNote(scope, note)
+                note
             }
+            remoteRepository.saveNote(scope, note)
         }
     }
 
