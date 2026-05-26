@@ -8,4 +8,5 @@ interface Log : Closeable {
     fun logd(message: String)
     fun setDebug(isDebug: Boolean)
     fun createCustomComposeTracer(): Any
+    fun logMemoryUsage(params: Any? = null) {}
 }

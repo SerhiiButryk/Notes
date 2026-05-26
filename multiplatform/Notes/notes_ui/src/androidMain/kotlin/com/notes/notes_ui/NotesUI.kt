@@ -13,6 +13,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import api.data.Notes
 import api.data.NotesCollection
@@ -147,6 +149,9 @@ private fun ListDetailUI(
             AnimatedPane {
                 // Note List screen
                 NotesListUI(
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    },
                     notes = notes,
                     onSelected = { selectedNote ->
                         // Open Note Editor Screen

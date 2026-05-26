@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -102,7 +103,9 @@ fun AuthBody(
             focusRequester = emailFieldFocusRequester,
             onValueChange = { email = it },
             keyboardType = KeyboardType.Email,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("input_auth_1"),
             imeAction = ImeAction.Next,
         )
 
@@ -125,7 +128,9 @@ fun AuthBody(
             focusRequester = passwordFieldFocusRequester,
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("input_auth_2"),
             imeAction = if (confirmPassword == null) ImeAction.Done else ImeAction.Next,
             keyboardActions = if (confirmPassword == null) keyboardActions else KeyboardActions.Default,
         )
@@ -137,7 +142,9 @@ fun AuthBody(
                 label = "Confirm password",
                 onValueChange = { confirmPassword.value = it },
                 keyboardType = KeyboardType.Password,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("input_auth_3"),
                 imeAction = ImeAction.Done,
                 keyboardActions =
                     KeyboardActions(

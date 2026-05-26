@@ -16,6 +16,11 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
+        <!--  Uncomment to enable benchmark testing -->
+<!--        <profileable-->
+<!--            android:shell="true"-->
+<!--            tools:targetApi="29" />-->
+
         <!--
             Helper class to perform component initialization
             More:
@@ -34,7 +39,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,7 +64,6 @@
                     android:pathPrefix="@string/verification_path"
                     android:scheme="https" />
             </intent-filter>
-
         </activity>
     </application>
 

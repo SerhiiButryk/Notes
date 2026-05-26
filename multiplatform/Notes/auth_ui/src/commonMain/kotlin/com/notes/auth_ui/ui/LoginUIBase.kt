@@ -15,6 +15,7 @@ import com.notes.ui.NetworkStateMessage
 
 @Composable
 fun LoginUIImpl(
+    modifier: Modifier = Modifier,
     state: LoginUIState,
     onLogin: (LoginUIState) -> Unit,
     content: @Composable (
@@ -24,8 +25,11 @@ fun LoginUIImpl(
         innerPadding: PaddingValues
     ) -> Unit
 ) {
+
+    val finalModifier = Modifier.fillMaxSize().then(modifier)
+
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = finalModifier,
     ) { innerPadding ->
 
         Column(

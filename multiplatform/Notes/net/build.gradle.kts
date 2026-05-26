@@ -25,7 +25,8 @@ kotlin {
         }
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            val target = project.properties["jvm.target"].toString()
+            jvmTarget.set(JvmTarget.fromTarget(target))
         }
     }
 

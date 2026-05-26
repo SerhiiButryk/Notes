@@ -14,6 +14,7 @@ import com.notes.ui.NetworkStateMessage
 
 @Composable
 fun RegisterUIImpl(
+    modifier: Modifier = Modifier,
     onRegister: (RegisterUIState) -> Unit,
     content: @Composable (
         emailState: MutableState<String>,
@@ -24,8 +25,10 @@ fun RegisterUIImpl(
     ) -> Unit
 ) {
 
+    val finalModifier = Modifier.fillMaxSize().then(modifier)
+
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = finalModifier,
     ) { innerPadding ->
 
         val email = rememberSaveable { mutableStateOf("") }

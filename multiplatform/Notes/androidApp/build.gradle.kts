@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    alias(libs.plugins.baselineprofile)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
@@ -10,7 +11,8 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
+        val target = project.properties["jvm.target"].toString()
+        jvmTarget = JvmTarget.fromTarget(target)
     }
 }
 
@@ -48,6 +50,13 @@ dependencies {
 
     // Navigation 3
     implementation(libs.jetbrains.navigation3.ui)
+    implementation(libs.androidx.profileinstaller)
+
+    // The consumer app ('androidApp') knows where to get the generated profile from.
+    baselineProfile(project(":benchmark"))
+
+    // Perfetto tracing
+    implementation(libs.androidx.runtime.tracing)
 
     // Test modules
     androidTestImplementation(projects.localDb)
@@ -95,11 +104,20 @@ android {
                 "proguard-rules.pro"
             )
         }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+            // When generating baseline profile makes sure that the app is not obfuscated
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        val target = project.properties["jvm.target"].toString()
+        sourceCompatibility = JavaVersion.toVersion(target)
+        targetCompatibility = JavaVersion.toVersion(target)
     }
 
     packaging {
@@ -107,6 +125,8 @@ android {
             excludes += "/META-INF/DEPENDENCIES"
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/INDEX.LIST"
+            // Exclude debug info from Android apk
+            resources.excludes += "DebugProbesKt.bin"
         }
     }
 

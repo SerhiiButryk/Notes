@@ -12,7 +12,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     id("com.google.gms.google-services") version "4.4.4" apply false // Google firebase
     alias(libs.plugins.ktlint) apply false // Static analysis
-    alias(libs.plugins.detekt) apply false // Static analysis
+    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.baselineprofile) apply false // Static analysis
 }
 
 subprojects {

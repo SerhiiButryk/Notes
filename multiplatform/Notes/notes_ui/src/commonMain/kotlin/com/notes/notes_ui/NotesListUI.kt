@@ -29,12 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import api.data.Notes
+import api.data.NotesCollection
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
-import api.data.Notes
-import api.data.NotesCollection
 import com.notes.ui.SearchBarField
 
 @Composable
@@ -78,7 +79,9 @@ fun NotesListUI(
         },
     ) { innerPadding ->
         NotesList(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .padding(innerPadding)
+                .testTag("notes_list"),
             notes = notes,
             onSelected = onSelected,
             isPhoneSize = isPhoneSize
