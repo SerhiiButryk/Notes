@@ -1,5 +1,6 @@
 [versions]
 agp = "9.1.1" # Upgrading could lead to new build issues.
+coilCompose = "3.4.0"
 composeMultiplatform = "1.10.3" # Upgrading could lead to new build issues.
 composeHotReload = "1.0.0"
 kotlin = "2.3.2"
@@ -18,6 +19,7 @@ kotlinx-coroutines = "1.11.0"
 adaptiveLayout = "1.2.0"
 kotlinxCoroutinesTest = "1.11.0"
 lifecycleViewmodel = "2.10.0"
+material = "1.14.0"
 material3 = "1.9.0"
 materialIconsExtendedVersion = "1.7.3"
 media3 = "1.9.3"
@@ -78,6 +80,7 @@ androidx-tracing-perfetto = { module = "androidx.tracing:tracing-perfetto", vers
 androidx-tracing-perfetto-binary = { module = "androidx.tracing:tracing-perfetto-binary", version.ref = "tracingPerfetto" }
 androidx-tracing-wire = { module = "androidx.tracing:tracing-wire", version.ref = "tracingWire" }
 androidx-tracing = { module = "androidx.tracing:tracing", version.ref = "tracing" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 components-splitpane = { module = "org.jetbrains.compose.components:components-splitpane", version.ref = "componentsSplitpane" }
 gitlive-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
@@ -114,6 +117,7 @@ firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 ksoup-entities = { module = "com.mohamedrejeb.ksoup:ksoup-entities", version.ref = "ksoupHtml" }
 ksoup-html = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "ksoupHtml" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
 material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }

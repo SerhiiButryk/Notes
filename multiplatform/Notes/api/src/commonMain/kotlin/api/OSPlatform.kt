@@ -3,6 +3,7 @@ package api
 import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
+import api.repo.BaseRepo
 import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
@@ -23,7 +24,7 @@ interface OSPlatform {
 
     val netStateManager: NetStateManager
 
-    val appRepo: Repository
+    val appRepo: BaseRepo
 
     val httpClient: HttpClient
 }

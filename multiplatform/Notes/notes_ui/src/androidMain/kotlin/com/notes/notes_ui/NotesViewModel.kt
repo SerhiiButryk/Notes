@@ -1,15 +1,22 @@
 package com.notes.notes_ui
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import api.Platform
+import api.data.Attachments
+import api.data.Image
 import api.data.Notes
 import api.data.NotesCollection
+import api.repo.RepoCallback
+import api.repo.Repository
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.data.getToolsList
 import com.notes.notes_ui.editor.EditorCommand
-import api.repo.RepoCallback
-import api.repo.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +28,24 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 
 class NotesViewModel(
+    filesDir: File,
     appRepository: Repository = Platform().appRepo,
     // For test support
     scopeOverride: CoroutineScope? = null
 ) : ViewModel(), RepoCallback {
+
+    companion object {
+        fun getFactory(context: Context): ViewModelProvider.Factory {
+            return viewModelFactory {
+                initializer {
+                    NotesViewModel(filesDir = context.filesDir)
+                }
+            }
+        }
+    }
 
     private val scope: CoroutineScope = scopeOverride ?: viewModelScope
 
@@ -50,6 +69,14 @@ class NotesViewModel(
 
     private val uiEvents = Channel<UiEvent>(capacity = Channel.BUFFERED)
     val events = uiEvents.receiveAsFlow()
+
+    val attachments = interactor
+        .getAttachments(filesDir)
+        .stateIn(
+            scope = scope,
+            started = WhileSubscribed(stopTimeoutMillis = 5000),
+            Attachments(),
+        )
 
     override fun onCleared() {
         interactor.onClear()
@@ -102,4 +129,16 @@ class NotesViewModel(
     fun sendEditorCommand(command: EditorCommand) {
         interactor.sendEditorCommand(command)
     }
+
+    fun onImageSelected(uri: Uri?, context: Context) {
+        if (uri != null) {
+            val openNoteId = _noteState.value.id
+            interactor.onImageSelected(uri, openNoteId, context)
+        }
+    }
+
+    fun onDelete(image: Image) {
+        interactor.onDelete(image)
+    }
+
 }

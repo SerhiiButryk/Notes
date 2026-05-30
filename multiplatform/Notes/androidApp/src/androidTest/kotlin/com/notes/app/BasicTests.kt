@@ -179,7 +179,7 @@ class BasicTests {
     @Test
     fun test04_backup_files() = runTest {
 
-        val filesManager = FilesManager()
+        val filesManager = FilesManager(appContext.filesDir)
 
         val notes = listOf(Notes(content = "note 1", id = 1), Notes(content = "note 2", id = 2),
             Notes(content = "note 3", id = 3))
@@ -225,7 +225,7 @@ class BasicTests {
 
     @Test
     fun test05_backup_no_files() = runTest {
-        val filesManager = FilesManager()
+        val filesManager = FilesManager(appContext.filesDir)
         val notes = filesManager.readFromDisk()
         assertThat(notes.isEmpty()).isTrue()
     }
@@ -233,7 +233,7 @@ class BasicTests {
     @Test
     fun test06_override_files() = runTest {
 
-        val filesManager = FilesManager()
+        val filesManager = FilesManager(appContext.filesDir)
 
         // Create files
 

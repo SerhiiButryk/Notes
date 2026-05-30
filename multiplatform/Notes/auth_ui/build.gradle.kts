@@ -81,9 +81,6 @@ kotlin {
             implementation(libs.jetbrains.navigation3.ui)
             // View Model
             implementation(libs.androidx.lifecycle.viewmodel)
-
-            // Preview support
-            // implementation(libs.jetbrains.ui.tooling.preview)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

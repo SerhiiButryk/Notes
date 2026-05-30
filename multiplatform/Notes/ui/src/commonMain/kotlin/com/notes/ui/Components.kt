@@ -1,5 +1,11 @@
 package com.notes.ui
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +21,19 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +48,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -250,10 +269,28 @@ fun SearchBarField(
 fun AccentButton(
     onClick: () -> Unit, label: String, modifier: Modifier = Modifier
 ) {
+    val transition = rememberInfiniteTransition(label = "accent-button")
+    val colorPhase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "accent-button-color-phase",
+    )
+    val startColor = Color(0xFF9DCEFF)
+    val endColor = Color(0xFFC58BF2)
+
     Button(
         onClick = { onClick() },
         modifier = modifier.fillMaxWidth().background(
-            brush = Brush.horizontalGradient(listOf(Color(0xFF9DCEFF), Color(0xFFC58BF2))),
+            brush = Brush.horizontalGradient(
+                listOf(
+                    lerp(startColor, endColor, colorPhase),
+                    lerp(endColor, startColor, colorPhase),
+                ),
+            ),
             shape = RoundedCornerShape(50.dp)
         ),
         colors = ButtonDefaults.buttonColors(Color.Transparent)

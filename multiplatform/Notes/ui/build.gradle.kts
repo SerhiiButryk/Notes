@@ -73,9 +73,7 @@ kotlin {
             implementation(libs.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-
-            // Preview support
-            // implementation(libs.jetbrains.ui.tooling.preview)
+            implementation(libs.jetbrains.ui.tooling.preview)
 
             // Resources
             implementation(libs.components.resources)

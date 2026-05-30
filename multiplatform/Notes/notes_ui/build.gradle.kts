@@ -85,10 +85,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.jetbrains.material.icons.extended)
             implementation(libs.components.splitpane)
-            implementation(libs.jetbrains.ui.tooling.preview)
 
-            // Preview support
-            // implementation(libs.jetbrains.ui.tooling.preview)
+            // Image loading
+            implementation(libs.coil.compose)
 
             // Serialization
             implementation(libs.serializationJson)

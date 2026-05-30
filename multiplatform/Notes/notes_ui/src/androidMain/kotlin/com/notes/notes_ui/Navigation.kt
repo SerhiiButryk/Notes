@@ -11,21 +11,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import api.Platform
-import com.notes.ui.Auth
-import com.notes.ui.MainContent
-import com.notes.ui.NotesAccount
-import com.notes.ui.NotesPreview
-import com.notes.ui.NotesSettings
+import api.data.Image
 import api.data.Notes
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
 import com.notes.ui.Access
+import com.notes.ui.Auth
+import com.notes.ui.MainContent
+import com.notes.ui.MediaPreview
+import com.notes.ui.NotesAccount
+import com.notes.ui.NotesPreview
+import com.notes.ui.NotesSettings
 import com.notes.ui.getViewModel
 import com.notes.ui.isTabletOrFoldableExpanded
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +39,10 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
     navigation<MainContent>(startDestination = NotesPreview()) {
         composable<NotesPreview> { backStackEntry ->
 
-            val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController)
+            val context = LocalContext.current
+            val factory = NotesViewModel.getFactory(context)
+
+            val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController, factory)
 
             val noteList by viewModel.notesState.collectAsStateWithLifecycle()
             val note by viewModel.noteState.collectAsStateWithLifecycle()
@@ -57,7 +64,6 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val toolsPaneItems = viewModel.richTools
 
-            val context = LocalContext.current
             val onBackButtonClicked: () -> Unit = {
                 // Back stack is empty at this point so we use activity context
                 val activity = context as? Activity
@@ -69,6 +75,17 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             }
 
             val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
+            val attachments by viewModel.attachments.collectAsStateWithLifecycle()
+
+            val onOpenPreview: (Image) -> Unit = {
+                val uri = it.location as Uri
+                navController.navigate(MediaPreview(uri.toString(), it.name))
+            }
+
+            val onDelete: (Image) -> Unit = {
+                viewModel.onDelete(it)
+            }
 
             NotesUI(
                 notes = noteList,
@@ -82,7 +99,11 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onSettingsClick = onSettingsClicked,
                 onBackClick = onBackButtonClicked,
                 showNavRail = isTabletOrFoldableExpanded(sizeClass),
-                isPhoneSize = !isTabletOrFoldableExpanded(sizeClass)
+                isPhoneSize = !isTabletOrFoldableExpanded(sizeClass),
+                onImage = { viewModel.onImageSelected(it, context) },
+                attachments = attachments,
+                onOpenPreview = onOpenPreview,
+                onDelete = onDelete,
             )
         }
 
@@ -92,7 +113,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val onBackClicked: () -> Unit = { navController.popBackStack() }
+            val onBackClick: () -> Unit = { navController.popBackStack() }
 
             val onAccountSelected = { navController.navigate(NotesAccount()) }
             val onExport: (uri: Uri?, context: Context) -> Unit = { uri, context ->
@@ -110,7 +131,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             }
 
             SettingsUI(
-                onBackClick = onBackClicked,
+                onBackClick = onBackClick,
                 onAccountClick = onAccountSelected,
                 onExportClick = {
                     // Ask User to select a folder for notes export
@@ -159,5 +180,20 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             )
 
         }
+
+        composable<MediaPreview> { backStackEntry ->
+
+            val args = backStackEntry.toRoute<MediaPreview>()
+
+            PreviewScreen(
+                uri = args.uri.toUri(),
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                title = args.name,
+            )
+
+        }
+
     }
 }

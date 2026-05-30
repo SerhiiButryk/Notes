@@ -1,11 +1,13 @@
 package com.notes.os
 
+import api.data.Attachments
+import api.data.Image
 import api.data.Notes
 import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateInfo
 import api.net.NetStateManager
-import api.repo.Repository
+import api.repo.BaseRepo
 import api.security.Base64Operations
 import api.security.CryptoOperations
 import api.security.DerivedKeyOperations
@@ -14,6 +16,7 @@ import com.notes.os.impl.AppLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import java.io.File
 
 internal actual class PlatformFactory {
 
@@ -104,8 +107,9 @@ internal actual class PlatformFactory {
         }
     }
 
-    actual fun provideAppRepository(): Repository {
-        return object : Repository {
+    actual fun provideAppRepository(): BaseRepo {
+        val file = File("")
+        return object : BaseRepo(file) {
 
             override fun getNotes(): Flow<List<Notes>> {
                 return flow {
@@ -145,6 +149,22 @@ internal actual class PlatformFactory {
 
             override suspend fun canChangePassword(): Boolean {
                 return false
+            }
+
+            override fun onAttachments(
+                attachment: Any,
+                noteId: Long,
+                info: Any?
+            ) {
+                super.onAttachments(attachment, noteId, info)
+            }
+
+            override fun getAttachments(filesDir: File): Flow<Attachments> {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDelete(image: Image) {
+                super.onDelete(image)
             }
         }
     }

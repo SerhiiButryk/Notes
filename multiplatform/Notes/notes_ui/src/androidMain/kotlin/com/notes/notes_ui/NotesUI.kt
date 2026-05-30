@@ -1,7 +1,21 @@
 package com.notes.notes_ui
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
@@ -12,12 +26,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import api.data.Attachments
+import api.data.Image
 import api.data.Notes
 import api.data.NotesCollection
+import coil3.compose.AsyncImage
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.notes.notes_ui.components.NotesNavRail
 import com.notes.notes_ui.data.Tools
@@ -40,7 +59,11 @@ fun NotesUI(
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
-    isPhoneSize: Boolean
+    isPhoneSize: Boolean,
+    onImage: (Uri?) -> Unit,
+    attachments: Attachments,
+    onOpenPreview: (Image) -> Unit,
+    onDelete: (Image) -> Unit,
 ) {
     NotesUIImpl(
         notes = notes,
@@ -54,7 +77,11 @@ fun NotesUI(
         onSettingsClick = onSettingsClick,
         onBackClick = onBackClick,
         showNavRail = showNavRail,
-        isPhoneSize = isPhoneSize
+        isPhoneSize = isPhoneSize,
+        onImage = onImage,
+        attachments = attachments,
+        onOpenPreview = onOpenPreview,
+        onDelete = onDelete,
     )
 }
 
@@ -71,7 +98,11 @@ private fun NotesUIImpl(
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
-    isPhoneSize: Boolean
+    isPhoneSize: Boolean,
+    onImage: (Uri?) -> Unit,
+    attachments: Attachments,
+    onOpenPreview: (Image) -> Unit,
+    onDelete: (Image) -> Unit,
 ) {
     Row {
 
@@ -91,7 +122,11 @@ private fun NotesUIImpl(
             getEvents = getEvents,
             onSettingsClick = onSettingsClick,
             onBackClick = onBackClick,
-            isPhoneSize = isPhoneSize
+            isPhoneSize = isPhoneSize,
+            onImage = onImage,
+            attachments = attachments,
+            onOpenPreview = onOpenPreview,
+            onDelete = onDelete,
         )
     }
 }
@@ -109,7 +144,11 @@ private fun ListDetailUI(
     getEvents: suspend () -> Flow<UiEvent>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    isPhoneSize: Boolean
+    isPhoneSize: Boolean,
+    onImage: (Uri?) -> Unit,
+    attachments: Attachments,
+    onOpenPreview: (Image) -> Unit,
+    onDelete: (Image) -> Unit,
 ) {
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
@@ -179,6 +218,12 @@ private fun ListDetailUI(
         detailPane = {
             AnimatedPane {
 
+                val launcher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.PickVisualMedia()
+                ) { uri ->
+                    onImage(uri)
+                }
+
                 LaunchedEffect(note) {
                     getEvents().collect { event ->
                         when (event) {
@@ -205,13 +250,81 @@ private fun ListDetailUI(
                     }
                 }
 
+                val onAttacheFile = {
+                    // Ask User to select an image
+                    launcher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                }
+
                 NotesEditorUI(
                     notes = note,
                     state = state,
                     toolsPaneItems = toolsPaneItems,
                     onTextChanged = onTextChanged,
-                )
+                    onAttacheFile = onAttacheFile,
+                    showFolderButton = attachments.hasAttachmentsFor(note.id)
+                ) {
+                    MediaPreview(
+                        attachments,
+                        note,
+                        onOpenPreview,
+                        onDelete
+                    )
+                }
+
             }
         },
     )
+}
+
+@Composable
+fun MediaPreview(
+    attachments: Attachments,
+    notes: Notes,
+    onClick: (Image) -> Unit,
+    onDelete: (Image) -> Unit,
+) {
+    if (attachments.images.isNotEmpty()) {
+        LazyRow {
+            for (image in attachments.images) {
+                // Image name is "1_img_09"
+                // '1' - id of note which it belongs to
+                // So, we add only images which actually attached to this note
+                if (image.name.startsWith(notes.id.toString())) {
+                    item(image.location) {
+                        Box(
+                            modifier = Modifier
+                                .width(250.dp)
+                                .height(250.dp)
+                                .clickable {
+                                    onClick(image)
+                                },
+                        ) {
+
+                            AsyncImage(
+                                model = image.location as Uri,
+                                contentDescription = "",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Inside
+                            )
+
+                            IconButton(
+                                onClick = { onDelete(image) },
+                                modifier = Modifier.align(Alignment.TopEnd)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = ""
+                                )
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

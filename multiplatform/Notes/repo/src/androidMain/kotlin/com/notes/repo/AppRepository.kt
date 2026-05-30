@@ -1,55 +1,62 @@
 package com.notes.repo
 
+import android.content.Context
 import api.AppServices
 import api.Platform
 import api.data.AbstractStorageService
+import api.data.Image
 import api.data.Notes
-import api.data.isEqualTo
-import api.repo.Repository
+import api.repo.BaseRepo
 import com.notes.db.LocalNoteDatabase
 import com.notes.db.isAllInSyncWithRemote
 import com.notes.db.json.isPendingDeletionOnRemote
 import com.notes.db.toEntity
 import com.notes.db.toNote
+import com.notes.repo.feature.ChangePasswordUseCase
+import com.notes.repo.feature.MediaStoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.collections.mutableListOf
+import java.io.File
 
 class AppRepository private constructor(
-    private val remoteRepository: RemoteRepository
-) : Repository {
+    private val remoteRepository: RemoteRepository,
+    filesDir: File,
+) : BaseRepo(filesDir) {
 
     companion object {
 
         // Factory to create this repository
 
-        fun create(): AppRepository {
+        fun create(context: Context): AppRepository {
             return AppRepository(
-                RemoteRepository(AppServices.dataStoreService)
+                remoteRepository = RemoteRepository(AppServices.dataStoreService),
+                filesDir = context.filesDir,
             )
         }
 
-        fun create(services: List<AbstractStorageService>): AppRepository {
+        fun create(context: Context, services: List<AbstractStorageService>): AppRepository {
             return AppRepository(
-                RemoteRepository(services)
+                remoteRepository = RemoteRepository(services),
+                filesDir = context.filesDir,
             )
         }
     }
 
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)
-    private val filesManager = FilesManager()
 
-    private var cachedLocalNotes: List<Notes> = emptyList()
+    var cachedLocalNotes: List<Notes> = emptyList()
+
+    private val changePass = ChangePasswordUseCase(filesDir)
+    private val mediaStore = MediaStoreUseCase(scope, filesDir)
 
     override fun getNotes(): Flow<List<Notes>> =
         flow {
@@ -143,55 +150,19 @@ class AppRepository private constructor(
             Platform().logger.logi("OfflineRepository::delete(${note.id})")
             // Trigger deletion
             remoteRepository.delete(scope, note)
+            // Delete local files related of this note
+            mediaStore.onDelete(note.id)
             // Notify UI
             callback(note.id)
         }
     }
 
     override suspend fun canChangePassword(): Boolean {
-
-        if (!Platform().netStateManager.isNetworkAvailable()) {
-            Platform().logger.loge("OfflineRepository::canChangePassword() no network")
-            return false
-        }
-
-        if (!isDataInSync()) {
-            Platform().logger.loge("OfflineRepository::canChangePassword() " +
-                    "local data is not up-to-date with remote")
-            return false
-        }
-
-        val remoteNotes = remoteRepository.fetchCopy()
-        if (!remoteNotes.isEqualTo(cachedLocalNotes)) {
-            Platform().logger.loge("OfflineRepository::canChangePassword() " +
-                    "remote data is not up-to-date with local data")
-            return false
-        }
-
-        // Create backup files
-        val result = filesManager.saveToDisk(remoteNotes)
-        Platform().logger.logi("OfflineRepository::canChangePassword: $result")
-        return result
+        return changePass.canChangePassword(this, remoteRepository)
     }
 
     override suspend fun onPasswordChanged() {
-        Platform().logger.logi("OfflineRepository::onPasswordChanged()")
-
-        coroutineScope {
-            val notesFromDisk = filesManager.readFromDisk()
-            for (note in notesFromDisk) {
-                remoteRepository.saveNote(scope = this, note = note)
-            }
-        }
-
-        clearLocalAppStorage()
-
-        coroutineScope {
-            // This should get our app in sync when password has changed
-            remoteRepository.fetch(scope = this)
-        }
-
-        Platform().logger.logi("OfflineRepository::onPasswordChanged() done")
+        return changePass.onPasswordChanged(this, remoteRepository)
     }
 
     override suspend fun clearLocalAppStorage() {
@@ -209,4 +180,13 @@ class AppRepository private constructor(
         scope.cancel()
     }
 
+    override fun onAttachments(attachment: Any, noteId: Long, info: Any?) {
+        mediaStore.onAttachments(attachment, noteId, info)
+    }
+
+    override fun getAttachments(filesDir: File) = mediaStore.getAttachments(filesDir)
+
+    override fun onDelete(image: Image) {
+        mediaStore.onDelete(image)
+    }
 }

@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
+import api.repo.BaseRepo
 import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
@@ -53,8 +54,9 @@ internal actual class PlatformFactory(context: Context) {
         return com.notes.net.NetStateManager(connectivityManager)
     }
 
-    actual fun provideAppRepository(): Repository {
-        return AppRepository.create()
+    actual fun provideAppRepository(): BaseRepo {
+        val context = weakContextRef.get()
+        return AppRepository.create(context!!)
     }
 
     actual fun provideHttpClient(): HttpClient {

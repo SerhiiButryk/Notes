@@ -1,5 +1,7 @@
 package com.notes.notes_ui
 
+import api.data.Attachments
+import api.data.Image
 import api.data.Notes
 import api.repo.RepoCallback
 import api.repo.Repository
@@ -7,6 +9,7 @@ import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.editor.EditorState
 import com.notes.notes_ui.features.RedoUndoAction
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 class Interactor(
     private val repository: Repository,
@@ -55,5 +58,16 @@ class Interactor(
 
     fun onClear() {
         repository.clear()
+    }
+
+    fun onImageSelected(file: Any, noteId: Long, info: Any?) {
+        repository.onAttachments(file, noteId, info)
+    }
+
+    fun getAttachments(filesDir: File) : Flow<Attachments> =
+        repository.getAttachments(filesDir)
+
+    fun onDelete(image: Image) {
+        repository.onDelete(image)
     }
 }

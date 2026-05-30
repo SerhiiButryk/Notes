@@ -1,22 +1,40 @@
 package com.notes.notes_ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import api.data.Notes
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
@@ -34,10 +52,23 @@ fun NotesEditorUI(
     state: RichTextState,
     toolsPaneItems: Tools,
     onTextChanged: (EditorCommand) -> Unit,
+    onAttacheFile: () -> Unit = {},
+    showFolderButton: Boolean = false,
+    content: @Composable () -> Unit = {},
 ) {
-    EditorUI(modifier, notes, state, toolsPaneItems, onTextChanged)
+    EditorUI(
+        modifier,
+        notes,
+        state,
+        toolsPaneItems,
+        onTextChanged,
+        onAttacheFile,
+        content,
+        showFolderButton
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorUI(
     modifier: Modifier = Modifier,
@@ -45,8 +76,59 @@ private fun EditorUI(
     state: RichTextState,
     toolsPaneItems: Tools,
     onTextChanged: (EditorCommand) -> Unit,
+    onAttacheFile: () -> Unit,
+    content: @Composable () -> Unit,
+    showFolderButton: Boolean,
 ) {
+
+    var showFolderContent by rememberSaveable { mutableStateOf(showFolderButton) }
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
+    val scope = rememberCoroutineScope()
+    SideEffect {
+        if (sheetState.isVisible && !showFolderButton) {
+            scope.launch {  sheetState.hide() }
+        }
+    }
+
     Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.padding(bottom = 4.dp),
+                title = { },
+                actions = {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (showFolderButton) {
+                            IconButton(onClick = {
+                                showFolderContent = true
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Folder,
+                                    contentDescription = ""
+                                )
+                            }
+                        }
+                        IconButton(onClick = { onAttacheFile() }) {
+                            Icon(
+                                imageVector = Icons.Default.AttachFile,
+                                contentDescription = ""
+                            )
+                        }
+                    }
+
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    titleContentColor = MaterialTheme.colorScheme.surfaceContainer,
+                )
+            )
+        },
         modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
 
@@ -65,29 +147,50 @@ private fun EditorUI(
                     .imePadding(),
         ) { note -> } */
 
-        if (notes == Notes.AbsentNote()) {
-            InfoLabel()
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .imePadding(),
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding(),
+        ) {
+
+            if (notes == Notes.AbsentNote()) {
+                InfoLabel()
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+
+                ) {
+                    EditorLayout(
+                        state = state,
+                        // add weight modifier to the composable to ensure
+                        // that the composable is measured after the other
+                        // composable is measured specifically after the tools pane.
+                        modifier = Modifier.weight(1f),
+                        onTextChanged = onTextChanged,
+                    )
+                    ToolsBar(
+                        state = state,
+                        toolsPaneItems = toolsPaneItems,
+                        notes = notes,
+                    )
+                }
+            }
+        }
+
+        if (showFolderContent) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showFolderContent = false
+                },
+                sheetState = sheetState,
+                dragHandle = {
+                    BottomSheetDefaults.DragHandle()
+                }
             ) {
-                EditorLayout(
-                    state = state,
-                    // add weight modifier to the composable to ensure
-                    // that the composable is measured after the other
-                    // composable is measured specifically after the tools pane.
-                    modifier = Modifier.weight(1f),
-                    onTextChanged = onTextChanged,
-                )
-                ToolsBar(
-                    state = state,
-                    toolsPaneItems = toolsPaneItems,
-                    notes = notes,
-                )
+                content()
             }
         }
     }

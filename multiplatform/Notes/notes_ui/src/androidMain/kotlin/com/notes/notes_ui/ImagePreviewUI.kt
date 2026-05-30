@@ -1,7 +1,6 @@
 package com.notes.notes_ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import android.net.Uri
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -25,25 +23,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
-import com.notes.ui.CommonIcon
-import com.notes.ui.googleIcon
-import com.notes.ui.iconsCollection
+import coil3.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImagePreviewScreen(
-    imageUrl: String = "",
-    title: String = "Preview",
-    onBackClick: () -> Unit = {}
+fun PreviewScreen(
+    uri: Uri,
+    title: String,
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -55,37 +48,25 @@ fun ImagePreviewScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = ""
                         )
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Black,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
             )
         },
-        containerColor = Color.Black
     ) { padding ->
-
-        val painter = iconsCollection[googleIcon]?.painter()
-        if (painter != null) {
-            ZoomableImage(
-                painter = painter,
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .background(Color.Black)
-            )
-        }
-
+        ZoomableImage(
+            uri = uri,
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        )
     }
 }
 
 @Composable
 private fun ZoomableImage(
-    painter: Painter,
+    uri: Uri,
     modifier: Modifier = Modifier
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
@@ -135,9 +116,9 @@ private fun ZoomableImage(
         contentAlignment = Alignment.Center
     ) {
 
-        Image(
-            painter = painter,
-            contentDescription = "Zoomable image",
+        AsyncImage(
+            model = uri,
+            contentDescription = "",
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
@@ -149,5 +130,6 @@ private fun ZoomableImage(
                 },
             contentScale = ContentScale.Fit
         )
+
     }
 }

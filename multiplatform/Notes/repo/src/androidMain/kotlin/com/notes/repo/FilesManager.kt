@@ -1,6 +1,9 @@
 package com.notes.repo
 
+import android.net.Uri
 import api.Platform
+import api.data.Attachments
+import api.data.Image
 import api.data.Notes
 import api.data.getStringRep
 import api.data.toNote
@@ -8,9 +11,11 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
 
-class FilesManager {
+class FilesManager(private val rootDir: File) {
 
     suspend fun saveToDisk(notes: List<Notes>): Boolean {
         val cacheDir = Platform().storage.getCacheDir()
@@ -83,6 +88,53 @@ class FilesManager {
         return notes
     }
 
+    fun saveImage(inputStream: InputStream, folder: File, fileName: String) {
+        Platform().logger.logi("saveImage:")
+
+        val imageFolder = getOrCreateImageFolder(folder)
+
+        val file = File(imageFolder, fileName)
+
+        try {
+            FileOutputStream(file).use { outputStream ->
+                inputStream.use { input ->
+                    input.copyTo(outputStream)
+                }
+            }
+            Platform().logger.logi("saveImage: done, name - '$fileName'")
+        } catch (e: IOException) {
+            Platform().logger.loge("saveImage: exception = $e")
+            e.printStackTrace()
+        }
+    }
+
+    fun getOrCreateImageFolder(root: File): File {
+
+        val imageFolder = File(root, "img")
+
+        if (!imageFolder.exists()) {
+            val isCreated = imageFolder.mkdirs()
+            if (!isCreated) {
+                Platform().logger.loge("saveImage: failed to create subfolder")
+            } else {
+                Platform().logger.logi("saveImage: subfolder is created")
+            }
+        }
+
+        return imageFolder
+    }
+
+    fun scanFolder(path: String): Attachments {
+        val images = mutableListOf<Image>()
+        val imgFolder = File(path)
+        val files = imgFolder.listFiles()
+        files?.forEach { f ->
+            val uri = Uri.fromFile(f)
+            images.add(Image(uri, f.name))
+        }
+        return Attachments(images)
+    }
+
     suspend fun clearCache() {
         val cacheDir = Platform().storage.getCacheDir()
         val files = File(cacheDir).listFiles()
@@ -94,6 +146,26 @@ class FilesManager {
             }
         }
         Platform().logger.logi("clearCache: cache has been cleared up")
+    }
+
+    fun delete(image: Image) {
+        Platform().logger.logi("delete: image deleting...")
+        // Should not be null at this point
+        val imgFolder = getOrCreateImageFolder(rootDir)
+        val fileToDelete = File(imgFolder, image.name)
+        val result = fileToDelete.delete()
+        Platform().logger.logi("delete: delete = '${result}' file '${image.name}'")
+    }
+
+    fun deleteAllFor(noteId: Long) {
+        Platform().logger.logi("delete: all for $noteId")
+        // Should not be null at this point
+        val imgFolder = getOrCreateImageFolder(rootDir)
+        imgFolder.listFiles()?.forEach { file ->
+            if (file.name.startsWith(noteId.toString()))
+                file.delete()
+        }
+        Platform().logger.logi("delete: done")
     }
 
 }

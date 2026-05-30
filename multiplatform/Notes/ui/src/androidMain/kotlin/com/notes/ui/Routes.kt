@@ -44,3 +44,6 @@ class NotesSettings : Screen()
 
 @Serializable
 class NotesAccount : Screen()
+
+@Serializable
+class MediaPreview(val uri: String, val name: String) : Screen()

@@ -58,6 +58,8 @@ dependencies {
     // Perfetto tracing
     implementation(libs.androidx.runtime.tracing)
 
+    implementation(libs.material)
+
     // Test modules
     androidTestImplementation(projects.localDb)
     androidTestImplementation(projects.repo)

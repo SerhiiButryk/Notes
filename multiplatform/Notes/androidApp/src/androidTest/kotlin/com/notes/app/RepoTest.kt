@@ -85,7 +85,8 @@ class RepoTest : AppTest() {
     }
 
     private val appRepo = AppRepository.create(
-        listOf(mockedStoreServiceGoogle, mockedStoreServiceFirebase)
+        appContext,
+        listOf(mockedStoreServiceGoogle, mockedStoreServiceFirebase),
     )
 
     @Before

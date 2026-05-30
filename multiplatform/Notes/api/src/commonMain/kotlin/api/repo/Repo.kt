@@ -1,7 +1,10 @@
 package api.repo
 
+import api.data.Attachments
+import api.data.Image
 import api.data.Notes
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface RepoCallback {
     fun onNoteAdded(id: Long)
@@ -33,4 +36,12 @@ interface Repository {
     suspend fun isDataInSync(): Boolean
 
     fun clear()
+
+    fun onAttachments(attachment: Any, noteId: Long, info: Any? = null) {}
+
+    fun getAttachments(filesDir: File) : Flow<Attachments>
+
+    fun onDelete(image: Image) {}
 }
+
+abstract class BaseRepo(protected val rootFileDir: File) : Repository

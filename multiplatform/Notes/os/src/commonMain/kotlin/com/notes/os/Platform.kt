@@ -4,6 +4,7 @@ import api.OSPlatform
 import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
+import api.repo.BaseRepo
 import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
@@ -17,7 +18,7 @@ internal expect class PlatformFactory {
     fun provideStorageOperations(): StorageOperations
     fun provideLogger(): Log
     fun provideNetStateManager(): NetStateManager
-    fun provideAppRepository(): Repository
+    fun provideAppRepository(): BaseRepo
     fun provideHttpClient(): HttpClient
 }
 
@@ -35,7 +36,7 @@ internal class Platform(factory: PlatformFactory) : OSPlatform {
 
     override val netStateManager: NetStateManager = factory.provideNetStateManager()
 
-    override val appRepo: Repository = factory.provideAppRepository()
+    override val appRepo: BaseRepo = factory.provideAppRepository()
 
     override val httpClient: HttpClient = factory.provideHttpClient()
 }

@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import api.data.AbstractStorageService
+import api.data.Attachments
 import api.data.Document
+import api.data.Image
 import api.data.Notes
 import api.repo.Repository
 import com.google.common.truth.Truth.assertThat
@@ -26,6 +28,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.reflect.full.declaredMemberFunctions
@@ -95,9 +98,25 @@ class ViewModelNotesTest {
             override suspend fun isDataInSync(): Boolean {
                 return false
             }
+
+            override fun onAttachments(
+                attachment: Any,
+                noteId: Long,
+                info: Any?
+            ) {
+
+            }
+
+            override fun getAttachments(filesDir: File): Flow<Attachments> {
+                return flow {  }
+            }
+
+            override fun onDelete(image: Image) {
+
+            }
         }
 
-        viewModel = NotesViewModel(repo)
+        viewModel = NotesViewModel(appRepository = repo, filesDir = appContext.filesDir)
     }
 
     @After
@@ -284,7 +303,11 @@ class ViewModelNotesTest {
     }
 
     private fun setupVMWithRealRepo(repo: AppRepository, scope: CoroutineScope): NotesViewModel {
-        val viewModel = NotesViewModel(repo, scope)
+        val viewModel = NotesViewModel(
+            appRepository = repo,
+            scopeOverride = scope,
+            filesDir = appContext.filesDir
+        )
         return viewModel
     }
 
@@ -316,7 +339,10 @@ class ViewModelNotesTest {
 
         }
 
-        return AppRepository.create(listOf(mockedStoreService))
+        return AppRepository.create(
+            appContext,
+            listOf(mockedStoreService)
+        )
     }
 
 }
