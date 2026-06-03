@@ -2,6 +2,10 @@ package com.notes.notes_ui
 
 import android.content.Context
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -36,6 +40,11 @@ class NotesViewModel(
     // For test support
     scopeOverride: CoroutineScope? = null
 ) : ViewModel(), RepoCallback {
+
+    @Immutable
+    data class DialogState(
+        val show: Boolean = false,
+    )
 
     companion object {
         fun getFactory(context: Context): ViewModelProvider.Factory {
@@ -77,6 +86,9 @@ class NotesViewModel(
             started = WhileSubscribed(stopTimeoutMillis = 5000),
             Attachments(),
         )
+
+    private val _dialogState = MutableStateFlow<DialogState>(DialogState())
+    val dialogState = _dialogState.asStateFlow()
 
     override fun onCleared() {
         interactor.onClear()
@@ -130,10 +142,27 @@ class NotesViewModel(
         interactor.sendEditorCommand(command)
     }
 
-    fun onImageSelected(uri: Uri?, context: Context) {
+    fun onAttachFile(launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>) {
+        // Show dialog
+        scope.launch {
+            _dialogState.emit(DialogState(true))
+        }
+        // Ask User to select an image
+        launcher.launch(
+            PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.ImageOnly
+            )
+        )
+    }
+
+    fun onAttachments(uri: Uri?, context: Context) {
         if (uri != null) {
             val openNoteId = _noteState.value.id
-            interactor.onImageSelected(uri, openNoteId, context)
+            interactor.onAttachments(uri, openNoteId, context)
+        }
+        // Hide dialog
+        scope.launch {
+            _dialogState.emit(DialogState(false))
         }
     }
 

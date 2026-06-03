@@ -9,6 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
@@ -25,6 +26,7 @@ import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
 import com.notes.ui.Access
 import com.notes.ui.Auth
+import com.notes.ui.LoadingDialog
 import com.notes.ui.MainContent
 import com.notes.ui.MediaPreview
 import com.notes.ui.NotesAccount
@@ -35,6 +37,9 @@ import com.notes.ui.isTabletOrFoldableExpanded
 import kotlinx.coroutines.flow.Flow
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
+
+    val onBackClick: () -> Unit = { navController.popBackStack() }
+
     // Main app content graph
     navigation<MainContent>(startDestination = NotesPreview()) {
         composable<NotesPreview> { backStackEntry ->
@@ -87,6 +92,16 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 viewModel.onDelete(it)
             }
 
+            val launcher = rememberLauncherForActivityResult(
+                ActivityResultContracts.PickVisualMedia()
+            ) { uri ->
+                viewModel.onAttachments(uri, context)
+            }
+
+            val onAttachFile = {
+                viewModel.onAttachFile(launcher)
+            }
+
             NotesUI(
                 notes = noteList,
                 toolsPaneItems = toolsPaneItems,
@@ -100,11 +115,13 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onBackClick = onBackButtonClicked,
                 showNavRail = isTabletOrFoldableExpanded(sizeClass),
                 isPhoneSize = !isTabletOrFoldableExpanded(sizeClass),
-                onImage = { viewModel.onImageSelected(it, context) },
                 attachments = attachments,
                 onOpenPreview = onOpenPreview,
                 onDelete = onDelete,
+                onAttachFile = onAttachFile,
             )
+
+            Dialog(viewModel)
         }
 
         composable<NotesSettings> { backStackEntry ->
@@ -112,8 +129,6 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val context = LocalContext.current
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
-
-            val onBackClick: () -> Unit = { navController.popBackStack() }
 
             val onAccountSelected = { navController.navigate(NotesAccount()) }
             val onExport: (uri: Uri?, context: Context) -> Unit = { uri, context ->
@@ -144,8 +159,6 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
         composable<NotesAccount> { backStackEntry ->
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
-
-            val onBackClick: () -> Unit = { navController.popBackStack() }
 
             val onSignOut = {
                 viewModel.singOut {
@@ -187,13 +200,21 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             PreviewScreen(
                 uri = args.uri.toUri(),
-                onBackClick = {
-                    navController.popBackStack()
-                },
+                onBackClick = onBackClick,
                 title = args.name,
             )
+
+            BackHandler(enabled = true) {
+                onBackClick()
+            }
 
         }
 
     }
+}
+
+@Composable
+private fun Dialog(viewModel: NotesViewModel) {
+    val dialogState = viewModel.dialogState.collectAsStateWithLifecycle()
+    LoadingDialog(dialogState.value.show)
 }

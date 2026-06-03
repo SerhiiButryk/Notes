@@ -60,7 +60,7 @@ class Interactor(
         repository.clear()
     }
 
-    fun onImageSelected(file: Any, noteId: Long, info: Any?) {
+    fun onAttachments(file: Any, noteId: Long, info: Any?) {
         repository.onAttachments(file, noteId, info)
     }
 

@@ -73,12 +73,12 @@ fun NotesCommonUI(
         Column(
             modifier = Modifier.weight(2f)
         ) {
-            NotesEditorUI(
-                notes = note,
-                state = state,
-                toolsPaneItems = toolsPaneItems,
-                onTextChanged = onTextChanged,
-            )
+//            NotesEditorUI(
+//                notes = note,
+//                state = state,
+//                toolsPaneItems = toolsPaneItems,
+//                onTextChanged = onTextChanged,
+//            )
         }
 
     }

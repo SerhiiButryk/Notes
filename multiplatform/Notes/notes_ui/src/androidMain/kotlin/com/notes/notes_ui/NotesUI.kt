@@ -2,9 +2,6 @@ package com.notes.notes_ui
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -22,8 +20,10 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -60,10 +60,10 @@ fun NotesUI(
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
     isPhoneSize: Boolean,
-    onImage: (Uri?) -> Unit,
     attachments: Attachments,
     onOpenPreview: (Image) -> Unit,
     onDelete: (Image) -> Unit,
+    onAttachFile: () -> Unit,
 ) {
     NotesUIImpl(
         notes = notes,
@@ -78,10 +78,10 @@ fun NotesUI(
         onBackClick = onBackClick,
         showNavRail = showNavRail,
         isPhoneSize = isPhoneSize,
-        onImage = onImage,
         attachments = attachments,
         onOpenPreview = onOpenPreview,
         onDelete = onDelete,
+        onAttachFile = onAttachFile,
     )
 }
 
@@ -99,10 +99,10 @@ private fun NotesUIImpl(
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
     isPhoneSize: Boolean,
-    onImage: (Uri?) -> Unit,
     attachments: Attachments,
     onOpenPreview: (Image) -> Unit,
     onDelete: (Image) -> Unit,
+    onAttachFile: () -> Unit,
 ) {
     Row {
 
@@ -123,15 +123,15 @@ private fun NotesUIImpl(
             onSettingsClick = onSettingsClick,
             onBackClick = onBackClick,
             isPhoneSize = isPhoneSize,
-            onImage = onImage,
             attachments = attachments,
             onOpenPreview = onOpenPreview,
             onDelete = onDelete,
+            onAttachFile = onAttachFile,
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun ListDetailUI(
     notes: NotesCollection,
@@ -145,10 +145,10 @@ private fun ListDetailUI(
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     isPhoneSize: Boolean,
-    onImage: (Uri?) -> Unit,
     attachments: Attachments,
     onOpenPreview: (Image) -> Unit,
     onDelete: (Image) -> Unit,
+    onAttachFile: () -> Unit,
 ) {
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
 
@@ -218,12 +218,6 @@ private fun ListDetailUI(
         detailPane = {
             AnimatedPane {
 
-                val launcher = rememberLauncherForActivityResult(
-                    ActivityResultContracts.PickVisualMedia()
-                ) { uri ->
-                    onImage(uri)
-                }
-
                 LaunchedEffect(note) {
                     getEvents().collect { event ->
                         when (event) {
@@ -250,13 +244,17 @@ private fun ListDetailUI(
                     }
                 }
 
-                val onAttacheFile = {
-                    // Ask User to select an image
-                    launcher.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                        )
-                    )
+                val scope = rememberCoroutineScope()
+
+                val bottomSheetState = rememberModalBottomSheetState(
+                    skipPartiallyExpanded = false
+                )
+
+                val showFolderButton = attachments.hasAttachmentsFor(note.id)
+                SideEffect {
+                    if (bottomSheetState.isVisible && !showFolderButton) {
+                        scope.launch {  bottomSheetState.hide() }
+                    }
                 }
 
                 NotesEditorUI(
@@ -264,13 +262,19 @@ private fun ListDetailUI(
                     state = state,
                     toolsPaneItems = toolsPaneItems,
                     onTextChanged = onTextChanged,
-                    onAttacheFile = onAttacheFile,
-                    showFolderButton = attachments.hasAttachmentsFor(note.id)
+                    onAttacheFile = onAttachFile,
+                    showFolderButton = showFolderButton,
+                    bottomSheetState = bottomSheetState,
                 ) {
                     MediaPreview(
                         attachments,
                         note,
-                        onOpenPreview,
+                        {
+                            scope.launch {
+                                bottomSheetState.hide()
+                                onOpenPreview(it)
+                            }
+                        },
                         onDelete
                     )
                 }

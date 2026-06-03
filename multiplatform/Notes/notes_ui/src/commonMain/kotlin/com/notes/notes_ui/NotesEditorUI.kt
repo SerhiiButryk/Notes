@@ -19,12 +19,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +44,7 @@ import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.editor.TextInputCommand
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesEditorUI(
     modifier: Modifier = Modifier,
@@ -53,7 +53,8 @@ fun NotesEditorUI(
     toolsPaneItems: Tools,
     onTextChanged: (EditorCommand) -> Unit,
     onAttacheFile: () -> Unit = {},
-    showFolderButton: Boolean = false,
+    showFolderButton: Boolean,
+    bottomSheetState: SheetState,
     content: @Composable () -> Unit = {},
 ) {
     EditorUI(
@@ -64,7 +65,8 @@ fun NotesEditorUI(
         onTextChanged,
         onAttacheFile,
         content,
-        showFolderButton
+        showFolderButton,
+        bottomSheetState,
     )
 }
 
@@ -79,20 +81,10 @@ private fun EditorUI(
     onAttacheFile: () -> Unit,
     content: @Composable () -> Unit,
     showFolderButton: Boolean,
+    bottomSheetState: SheetState,
 ) {
 
     var showFolderContent by rememberSaveable { mutableStateOf(showFolderButton) }
-
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
-    )
-
-    val scope = rememberCoroutineScope()
-    SideEffect {
-        if (sheetState.isVisible && !showFolderButton) {
-            scope.launch {  sheetState.hide() }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -185,7 +177,7 @@ private fun EditorUI(
                 onDismissRequest = {
                     showFolderContent = false
                 },
-                sheetState = sheetState,
+                sheetState = bottomSheetState,
                 dragHandle = {
                     BottomSheetDefaults.DragHandle()
                 }
