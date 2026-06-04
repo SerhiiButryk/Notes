@@ -77,12 +77,12 @@ fun NotesScreenImpl(onSettingsClick: () -> Unit) {
 
         // The "Second" pane (Right side)
         second(minSize = 200.dp) {
-            NotesEditorUI(
-                notes = note,
-                state = state,
-                toolsPaneItems = Tools(emptyList()),
-                onTextChanged = {},
-            )
+//            NotesEditorUI(
+//                notes = note,
+//                state = state,
+//                toolsPaneItems = Tools(emptyList()),
+//                onTextChanged = {},
+//            )
         }
 
         // The "Splitter" (The draggable handle)
