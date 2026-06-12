@@ -6,16 +6,20 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Base64
 import java.io.IOException
 import java.nio.charset.StandardCharsets
-import java.security.*
+import java.security.InvalidAlgorithmParameterException
+import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.NoSuchProviderException
+import java.security.UnrecoverableEntryException
 import java.security.cert.CertificateException
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 /**
- * Class provides an access to Android keystore interface for crypto operations
+ * Class provides access to Android keystore interface for crypto operations
  */
 class CryptoKeystore {
     private var keyStore: KeyStore? = null
@@ -101,56 +105,6 @@ class CryptoKeystore {
             e.printStackTrace()
         }
         return Result(error = CryptoError.UNKNOWN)
-    }
-
-    fun encryptSymmetricWithKey(
-        message: String,
-        key: ByteArray,
-    ): String {
-
-        if (message.isEmpty()) return ""
-        if (key.isEmpty()) return ""
-
-        val secretKey = SecretKeySpec(key, "AES")
-        val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
-
-        val iv = ByteArray(12)
-        SecureRandom().nextBytes(iv)
-        val spec = GCMParameterSpec(128, iv)
-
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec)
-        val ciphertext = cipher.doFinal(message.toByteArray())
-
-        return String(Base64.encode(iv + ciphertext, Base64.NO_WRAP))
-    }
-
-    fun decryptSymmetricWithKey(
-        message: String,
-        key: ByteArray,
-    ): String {
-
-        if (message.isEmpty()) return ""
-        if (key.isEmpty()) return ""
-
-        try {
-
-            val decoded = Base64.decode(message, Base64.NO_WRAP)
-
-            val secretKey = SecretKeySpec(key, "AES")
-            val cipher = Cipher.getInstance(SECRET_KEY_ALGORITHM)
-
-            val iv = decoded.take(12)
-            val spec = GCMParameterSpec(128, iv.toByteArray())
-
-            val messageBytes = decoded.slice(12 until decoded.size)
-
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-            return String(cipher.doFinal(messageBytes.toByteArray()))
-
-        } catch (e: Exception) {
-            logger.loge("$TAG: failed to decrypt: " + e.message)
-            return ""
-        }
     }
 
     private fun init(

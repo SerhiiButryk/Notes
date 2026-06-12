@@ -4,17 +4,17 @@ import api.AppServices
 import api.Platform
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
-import api.data.getUserEmail
-import api.data.saveUserEmail
+import api.data.getRegisteredUser
+import api.data.setRegisteredUser
+import api.data.userDataState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 
-internal class Interactor(
-    private val authService: AbstractAuthService = AppServices.getDefaultAuthService()!!,
+class Interactor(
+    private val authService: AbstractAuthService = AppServices.getDefaultAuthService(),
 ) {
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)
@@ -31,9 +31,9 @@ internal class Interactor(
                 // Save user email if it's not saved
                 // It's the case if user didn't register and did sing in with
                 // an existed account
-                val emailStored = getUserEmail()
+                val emailStored = getRegisteredUser()
                 if (emailStored.isEmpty() && result.isSuccess()) {
-                    saveUserEmail(email = result.email)
+                    setRegisteredUser(email = result.email)
                 }
                 result
             }
@@ -60,16 +60,22 @@ internal class Interactor(
         return job.await()
     }
 
-    suspend fun verifyCode(code: String): Boolean {
+    private suspend fun verifyCode(code: String): Boolean {
         val job = scope.async { authService.verifyCode(code) }
         return job.await()
+    }
+
+    suspend fun verifyCode() {
+        if (userDataState.value.code.isNotEmpty()) {
+            verifyCode(userDataState.value.code)
+        }
     }
 
     suspend fun isEmailVerified(): Boolean {
         val job =
             scope.async {
                 if (authService.isEmailVerified()) {
-                    saveUserEmail(email = authService.getUserEmail())
+                    setRegisteredUser(email = authService.getUserEmail())
                     Platform().logger.logi("isEmailVerified(): email is verified")
                     true
                 } else {
@@ -81,11 +87,13 @@ internal class Interactor(
     }
 
     suspend fun getEmail(): String {
-        val email = getUserEmail()
+        val email = getRegisteredUser()
         return email.ifEmpty { authService.getUserEmail() }
     }
 
-        suspend fun changePassword(newPass: String): Boolean {
+    suspend fun hasRegisteredUser() = getRegisteredUser().isNotEmpty()
+
+    suspend fun changePassword(newPass: String): Boolean {
         val job = scope.async {
 
             // When user changes the password we must update derived key.
@@ -105,7 +113,7 @@ internal class Interactor(
             if (result) {
 
                 // Update derived key
-                Platform().crypto.onLoginCompleted(newPass, getEmail(), true)
+                Platform().crypto.onAuthCompleted(newPass, getEmail(), true)
 
                 Platform().appRepo.onPasswordChanged()
             }

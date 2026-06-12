@@ -7,16 +7,13 @@ import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
 import api.repo.BaseRepo
-import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
-import api.security.DerivedKeyOperations
 import api.utils.Log
 import com.notes.net.NetHttpClient
 import com.notes.os.impl.AppLogger
 import com.notes.os.impl.Base64Provider
 import com.notes.os.impl.CryptoProvider
-import com.notes.os.impl.DerivedKeyProvider
 import com.notes.os.impl.StorageProvider
 import com.notes.repo.AppRepository
 import java.lang.ref.WeakReference
@@ -27,10 +24,6 @@ internal actual class PlatformFactory(context: Context) {
 
     actual fun provideBase64Operations(): Base64Operations {
         return Base64Provider()
-    }
-
-    actual fun provideDerivedKeyOperations(): DerivedKeyOperations {
-        return DerivedKeyProvider()
     }
 
     actual fun provideCryptoOperations(): CryptoOperations {
@@ -55,8 +48,7 @@ internal actual class PlatformFactory(context: Context) {
     }
 
     actual fun provideAppRepository(): BaseRepo {
-        val context = weakContextRef.get()
-        return AppRepository.create(context!!)
+        return AppRepository.create()
     }
 
     actual fun provideHttpClient(): HttpClient {

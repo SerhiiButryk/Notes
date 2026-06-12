@@ -21,6 +21,7 @@ class StorageProvider(
     private val contextRef = WeakReference(context)
     private val fileName = "AppSettings"
     private val cacheDir: File = context.externalCacheDir ?: context.cacheDir
+    private val rootDir: File = context.filesDir
 
     // This should be a single instance across whole app !
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(fileName)
@@ -58,4 +59,9 @@ class StorageProvider(
     override fun getCacheDir(): String {
         return cacheDir.absolutePath
     }
+
+    override fun getRootFilesDir(): String {
+        return rootDir.absolutePath
+    }
+
 }

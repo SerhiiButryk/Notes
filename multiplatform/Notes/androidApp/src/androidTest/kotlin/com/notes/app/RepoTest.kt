@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import api.AppService
 import api.data.AbstractStorageService
 import api.data.Document
 import api.data.Notes
@@ -34,7 +35,7 @@ class RepoTest : AppTest() {
 
     private val mockedStoreServiceFirebase = object : AbstractStorageService() {
 
-        override val name: String = "firebase"
+        override val key: Any = AppService.FIREBASE_STORAGE
 
         init {
             canUse = true
@@ -60,7 +61,7 @@ class RepoTest : AppTest() {
 
     private val mockedStoreServiceGoogle = object : AbstractStorageService() {
 
-        override val name: String = "googledrive"
+        override val key: Any = AppService.GOOGLE_STORAGE
 
         init {
             canUse = true
@@ -85,7 +86,6 @@ class RepoTest : AppTest() {
     }
 
     private val appRepo = AppRepository.create(
-        appContext,
         listOf(mockedStoreServiceGoogle, mockedStoreServiceFirebase),
     )
 

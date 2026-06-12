@@ -1,10 +1,13 @@
 package com.notes.auth_ui
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import api.Platform
+import api.data.isFirstLaunch
 import com.notes.auth_ui.data.LoginUIState
 import com.notes.auth_ui.data.RegisterUIState
+import com.notes.ui.LoginScreen
+import com.notes.ui.OnBoardingNoteScreen
+import com.notes.ui.RegistrationScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,9 +18,7 @@ private const val tag = "AuthVM"
 class AuthVM(
     // For test support
     scopeOverride: CoroutineScope? = null
-) : ViewModel() {
-
-    private val scope: CoroutineScope = scopeOverride ?: viewModelScope
+) : AuthVMBase(scopeOverride) {
 
     private val _uiStateRegister = MutableStateFlow(RegisterUIState())
     val registerUIState = _uiStateRegister.asStateFlow()
@@ -25,13 +26,21 @@ class AuthVM(
     private val _uiStateLogin = MutableStateFlow(LoginUIState())
     val loginUIState = _uiStateLogin.asStateFlow()
 
+    var startDestination: NavKey? = null
+
     init {
-
         scope.launch {
-            onShowRegisterScreen()
-            onShowLoginScreen()
+            startDestination = if (isFirstLaunch())
+                OnBoardingNoteScreen
+            else if (interactor.hasRegisteredUser()) {
+                onShowLoginScreen()
+                LoginScreen
+            } else {
+                onShowRegisterScreen()
+                RegistrationScreen
+            }
+            Platform().logger.logi("AuthVM() init completed")
         }
-
     }
 
     fun login(
@@ -39,9 +48,18 @@ class AuthVM(
         onSuccess: () -> Unit,
     ) {
 
-        Platform().logger.logi("login()")
+        Platform().logger.logi("$tag::login()")
 
-        onSuccess()
+        scope.launch {
+            val result = interactor.login(password = state.password, email = state.email, null)
+            if (result.isSuccess()) {
+                Platform().logger.logi("$tag::login() success")
+                onSuccess()
+            } else {
+                Platform().logger.logi("$tag::register() failed")
+                handleResult(result)
+            }
+        }
     }
 
     fun register(
@@ -49,19 +67,37 @@ class AuthVM(
         onSuccess: () -> Unit,
     ) {
 
-        Platform().logger.logi("register()")
+        Platform().logger.logi("$tag::register()")
+
+        scope.launch {
+            val result = interactor.register(
+                password = state.password,
+                email = state.email,
+                confirmPassword = state.confirmPassword
+            )
+            if (result.isSuccess()) {
+                Platform().logger.logi("$tag::register() success")
+                onSuccess()
+            } else {
+                Platform().logger.logi("$tag::register() failed")
+                handleResult(result)
+            }
+        }
 
         onSuccess()
     }
 
     suspend fun onShowRegisterScreen() {
-        val newState = RegisterUIState(hasFocus = true)
-        _uiStateRegister.emit(newState)
+        _uiStateRegister.emit(createRegisterUIState())
     }
 
     suspend fun onShowLoginScreen() {
-        val newState = LoginUIState(hasFocus = true, email = "")
-        _uiStateLogin.emit(newState)
+        _uiStateLogin.emit(createLoginUIState())
+    }
+
+    suspend fun onOnBoardingContinue() {
+        // Showing Register UI
+        onShowRegisterScreen()
     }
 
 }

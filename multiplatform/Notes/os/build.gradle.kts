@@ -31,6 +31,9 @@ kotlin {
             dependencies {
                 implementation(projects.api)
                 implementation(projects.ui)
+                implementation(projects.ext.services)
+                implementation(projects.repo)
+
                 // Kotlin coroutines
                 implementation(libs.kotlinx.coroutines.core)
                 // For some Compose APIs
@@ -41,9 +44,7 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(projects.net)
-                implementation(projects.ext.services)
                 implementation(projects.localDb)
-                implementation(projects.repo)
 
                 // API to initialize components
                 implementation(libs.androidx.startup.runtime)

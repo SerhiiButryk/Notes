@@ -4,16 +4,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import api.data.isFirstLaunch
 import com.notes.auth_ui.authDestination
 import com.notes.auth_ui.onboardingDestination
 import com.notes.notes_ui.mainContentDestination
-import com.notes.ui.getStartRoute
+import com.notes.ui.Auth
+import com.notes.ui.OnBoardingScreen
 
 @Composable
 fun EntryScreen(modifier: Modifier = Modifier) {
+
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = getStartRoute()) {
+    val startDestination =  if (isFirstLaunch()) OnBoardingScreen() else Auth()
+
+    NavHost(navController = navController, startDestination = startDestination) {
         onboardingDestination(navController = navController)
 
         authDestination(navController = navController)

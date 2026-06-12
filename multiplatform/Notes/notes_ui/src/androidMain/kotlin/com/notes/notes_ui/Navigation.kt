@@ -45,7 +45,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
         composable<NotesPreview> { backStackEntry ->
 
             val context = LocalContext.current
-            val factory = NotesViewModel.getFactory(context)
+            val factory = NotesViewModel.getFactory()
 
             val viewModel = backStackEntry.getViewModel<NotesViewModel>(navController, factory)
 

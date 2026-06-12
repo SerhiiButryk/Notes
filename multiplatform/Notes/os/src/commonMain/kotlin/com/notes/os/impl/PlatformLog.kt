@@ -5,6 +5,9 @@ import api.utils.Log
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
+/**
+ * Platform base implementation of a log utility
+ */
 abstract class PlatformLog : Log {
 
     @OptIn(ExperimentalAtomicApi::class)

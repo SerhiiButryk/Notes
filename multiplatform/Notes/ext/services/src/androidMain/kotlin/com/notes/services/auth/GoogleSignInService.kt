@@ -7,6 +7,8 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.NoCredentialException
+import api.AppService.Companion.GOOGLE_AUTH
+import api.AppService.Companion.GOOGLE_STORAGE
 import api.AppServices
 import api.Platform
 import api.auth.AbstractAuthService
@@ -27,7 +29,7 @@ class GoogleSignInService : AbstractAuthService() {
     @OptIn(ExperimentalAtomicApi::class)
     private val authenticated = AtomicBoolean(false)
 
-    override val name: String = "google"
+    override val key = GOOGLE_AUTH
 
     // Whether to select account automatically if it's possible
     private var autoSelectEnabled = false
@@ -89,8 +91,7 @@ class GoogleSignInService : AbstractAuthService() {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
             // Sign in to Firebase using the token
             val idToken = googleIdTokenCredential.idToken
-            val result = AppServices
-                .getDefaultAuthService()!!
+            val result = AppServices.getDefaultAuthService()
                 .login(idToken, activityContext)
 
             if (result.isSuccess()) {
@@ -99,8 +100,7 @@ class GoogleSignInService : AbstractAuthService() {
 
                 requestGoogleDriveAccess(activityContext)
 
-                val email = AppServices
-                    .getDefaultAuthService()!!
+                val email = AppServices.getDefaultAuthService()
                     .getUserEmail()
 
                 return AuthResult.loginSuccess(email)
@@ -119,10 +119,6 @@ class GoogleSignInService : AbstractAuthService() {
     @OptIn(ExperimentalAtomicApi::class)
     override suspend fun signOut(): Boolean {
         Platform().logger.logi("GoogleSignInService::signOut()")
-        // Firebase sign out
-        AppServices
-            .getDefaultAuthService()!!
-            .signOut()
         authenticated.store(false)
         try {
             val clearRequest = ClearCredentialStateRequest()
@@ -137,8 +133,8 @@ class GoogleSignInService : AbstractAuthService() {
 
     // This should show a dialog for a user to get permissions
     private suspend fun requestGoogleDriveAccess(activityContext: Any?) {
-        val googleDriveService = AppServices
-            .__delicateCall_getOriginalStoreService("googledrive") as GoogleDriveService
+        val googleDriveService =
+            AppServices.__delicateCall_getOriginalServiceByKey(GOOGLE_STORAGE) as GoogleDriveService
         googleDriveService.askForAccess(activityContext, callback)
     }
 }

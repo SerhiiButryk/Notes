@@ -1,5 +1,6 @@
 package com.notes.db.json
 
+import api.AppService
 import api.Platform
 import api.data.AbstractStorageService
 import com.notes.db.NotesMetadataEntity
@@ -47,13 +48,13 @@ fun NotesMetadataEntity.updateForDatastore(
     pendingDelete: Boolean? = null,
     pendingUpdate: Boolean? = null,
 ): String {
-    if (dataStore.name == "firebase") {
+    if (dataStore.key == AppService.FIREBASE_STORAGE) {
         return update(
             pendingDeleteFirebase = pendingDelete,
             pendingUpdateFirebase = pendingUpdate,
         )
     }
-    if (dataStore.name == "googledrive") {
+    if (dataStore.key == AppService.GOOGLE_STORAGE) {
         return update(
             pendingDeleteGoogle = pendingDelete,
             pendingUpdateGoogle = pendingUpdate,

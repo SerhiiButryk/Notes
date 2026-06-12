@@ -15,7 +15,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
-class FilesManager(private val rootDir: File) {
+class FilesManager {
 
     suspend fun saveToDisk(notes: List<Notes>): Boolean {
         val cacheDir = Platform().storage.getCacheDir()
@@ -88,10 +88,10 @@ class FilesManager(private val rootDir: File) {
         return notes
     }
 
-    fun saveImage(inputStream: InputStream, folder: File, fileName: String) {
+    fun saveImage(inputStream: InputStream, fileName: String) {
         Platform().logger.logi("saveImage:")
 
-        val imageFolder = getOrCreateImageFolder(folder)
+        val imageFolder = getOrCreateImageFolder()
 
         val file = File(imageFolder, fileName)
 
@@ -108,9 +108,11 @@ class FilesManager(private val rootDir: File) {
         }
     }
 
-    fun getOrCreateImageFolder(root: File): File {
+    fun getOrCreateImageFolder(): File {
 
-        val imageFolder = File(root, "img")
+        val rootDir = File(Platform().storage.getRootFilesDir())
+
+        val imageFolder = File(rootDir, "img")
 
         if (!imageFolder.exists()) {
             val isCreated = imageFolder.mkdirs()
@@ -151,7 +153,7 @@ class FilesManager(private val rootDir: File) {
     fun delete(image: Image) {
         Platform().logger.logi("delete: image deleting...")
         // Should not be null at this point
-        val imgFolder = getOrCreateImageFolder(rootDir)
+        val imgFolder = getOrCreateImageFolder()
         val fileToDelete = File(imgFolder, image.name)
         val result = fileToDelete.delete()
         Platform().logger.logi("delete: delete = '${result}' file '${image.name}'")
@@ -160,7 +162,7 @@ class FilesManager(private val rootDir: File) {
     fun deleteAllFor(noteId: Long) {
         Platform().logger.logi("delete: all for $noteId")
         // Should not be null at this point
-        val imgFolder = getOrCreateImageFolder(rootDir)
+        val imgFolder = getOrCreateImageFolder()
         imgFolder.listFiles()?.forEach { file ->
             if (file.name.startsWith(noteId.toString()))
                 file.delete()

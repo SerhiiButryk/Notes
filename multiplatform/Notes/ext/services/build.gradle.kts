@@ -55,7 +55,7 @@ kotlin {
             implementation(libs.google.http.client.jackson2)
             implementation(libs.google.auth.library.oauth2.http)
 
-            // To fix undef grpc class issue. TODO: workaround need to analyze deps and get rid of this
+            // To fix undef grpc class issue.
             implementation(libs.grpc.okhttp)
             implementation(libs.grpc.android)
             implementation(libs.grpc.stub)
@@ -63,19 +63,11 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.api)
-            // Firebase SDK
-            // The unofficial Firebase Kotlin SDK for KMP
-            implementation(libs.firebase.common)
-            // Firebase auth
-            implementation(libs.gitlive.firebase.auth)
         }
         jvmMain.dependencies {
-            // https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master
-            // Firebase SDK
-            // The unofficial Firebase Kotlin SDK for KMP
-//            implementation(libs.firebase.common)
-            // Firebase auth
-//            implementation(libs.gitlive.firebase.auth)
+            // The unofficial Firebase Kotlin SDK
+            implementation(libs.firebase.app)
+            implementation(libs.devfirebase.auth)
         }
     }
 }

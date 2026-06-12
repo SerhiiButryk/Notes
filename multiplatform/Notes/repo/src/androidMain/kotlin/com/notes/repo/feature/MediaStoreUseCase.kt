@@ -17,23 +17,20 @@ import java.io.File
 
 class MediaStoreUseCase(
     private val scope: CoroutineScope,
-    rootFileDir: File,
 ) {
 
-    private val filesManager = FilesManager(rootFileDir)
+    private val filesManager = FilesManager()
 
     fun onAttachments(attachment: Any, noteId: Long, info: Any?) {
         val context = info as Context
         val uri = attachment as Uri
         val name = getImageNameFromUri(context, uri)
         val fileName = "${noteId}_img_$name"
-        val folder: File = context.filesDir
         scope.launch {
             runCatching {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     filesManager.saveImage(
                         inputStream = inputStream,
-                        folder = folder,
                         fileName = fileName
                     )
                 }
@@ -41,9 +38,9 @@ class MediaStoreUseCase(
         }
     }
 
-    fun getAttachments(filesDir: File): Flow<Attachments> =
+    fun getAttachments(): Flow<Attachments> =
         filesManager
-            .getOrCreateImageFolder(filesDir)
+            .getOrCreateImageFolder()
             .observeAsFlow()
 
     fun onDelete(image: Image) {

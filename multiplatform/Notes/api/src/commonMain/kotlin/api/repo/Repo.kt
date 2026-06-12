@@ -1,10 +1,14 @@
 package api.repo
 
+import api.Platform
 import api.data.Attachments
 import api.data.Image
 import api.data.Notes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import java.io.File
 
 interface RepoCallback {
     fun onNoteAdded(id: Long)
@@ -24,7 +28,7 @@ interface Repository {
 
     fun deleteNote(
         note: Notes,
-        callback: (Long) -> Unit,
+        onDeleted: (Long) -> Unit,
     )
 
     suspend fun onPasswordChanged()
@@ -39,9 +43,19 @@ interface Repository {
 
     fun onAttachments(attachment: Any, noteId: Long, info: Any? = null) {}
 
-    fun getAttachments(filesDir: File) : Flow<Attachments>
+    fun getAttachments() : Flow<Attachments>
 
     fun onDelete(image: Image) {}
 }
 
-abstract class BaseRepo(protected val rootFileDir: File) : Repository
+abstract class BaseRepo : Repository {
+
+    private val coroutineContext = SupervisorJob() + Dispatchers.IO
+    protected val scope = CoroutineScope(coroutineContext)
+
+    override fun clear() {
+        Platform().logger.logi("BaseRepo::clear()")
+        scope.cancel()
+    }
+
+}

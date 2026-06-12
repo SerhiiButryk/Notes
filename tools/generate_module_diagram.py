@@ -21,16 +21,16 @@ PNG_PATH = OUT_DIR / "package_structure.png"
 #   images/package_structure_diagram.excalidraw
 #   images/package_structure.png
 #   images/package_structure.dot
-DIAGRAM_TITLE = "Project multi-module structure"
-LEGEND_TEXT = "solid: main dependency    dashed: Android-only    dotted: test/baseline/target"
-DOT_LEGEND_TEXT = "solid: main dependency   dashed: Android-only   dotted: test/baseline/target"
+DIAGRAM_TITLE = "Project module dependency structure"
+LEGEND_TEXT = "" # Empty 
+DOT_LEGEND_TEXT = "" # Empty
 COLOR_LEGEND_TITLE = "Colors"
 COLOR_LEGEND = [
-    ("app", "App / entry modules"),
+    ("app", "App modules"),
     ("feature", "Feature UI modules"),
     ("core", "Core contracts / platform glue"),
-    ("data", "Data and service modules"),
-    ("external", "External integrated module"),
+    ("data", "Data and domain modules"),
+    ("external", "3rd party modules"),
 ]
 DOT_COLOR_LEGEND_POS = (-1.4, 1.1)
 EXCALIDRAW_COLOR_LEGEND_POS = (1100, 500)
@@ -54,7 +54,7 @@ MODULE_META = {
 
 EDGE_STYLE = {
     "main": "solid",
-    "android": "dashed",
+    "android": "solid",
     "androidTest": "dotted",
     "baselineProfile": "dotted",
     "target": "dotted",
@@ -144,7 +144,7 @@ def section_for(text: str, index: int) -> str:
 
 
 def extract_edges(modules: list[str]) -> list[tuple[str, str, str]]:
-    edges = []
+    edges = [] 
     known = set(modules)
     for module in modules:
         build = build_file_for(module)
@@ -156,17 +156,24 @@ def extract_edges(modules: list[str]) -> list[tuple[str, str, str]]:
             if target not in known:
                 continue
             section = section_for(text, match.start())
-            if section == "androidTestImplementation":
-                kind = "androidTest"
-            elif section == "baselineProfile":
-                kind = "baselineProfile"
-            elif section == "androidMain":
-                kind = "android"
-            else:
-                kind = "main"
-            edges.append((module, target, kind))
+
+            # print(f"Retrieved edge from {module} to {target} in section {section}")
+
+            # Skip test dependencies
+            if section != "androidTestImplementation":
+                       
+                if section == "baselineProfile":
+                    kind = "baselineProfile"
+                else:
+                    kind = "main"
+
+                print(f"Adding edge from {module} to {target} in section {section}")    
+
+                # Add an edge to build relationship: (from_module, to_module, kind)     
+                edges.append((module, target, kind))
+
     # Benchmark's targetProjectPath is not a normal dependency, but it is part of the app graph.
-    edges.append((":benchmark", ":androidApp", "target"))
+    edges.append((":benchmark", ":androidApp", "baselineProfile"))
     return sorted(set(edges))
 
 

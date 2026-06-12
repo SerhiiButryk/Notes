@@ -1,10 +1,9 @@
 package api.auth
 
+import api.AppService
 import java.lang.ref.WeakReference
 
-interface AuthService {
-
-    val name: String
+interface AuthService : AppService {
 
     suspend fun createUser(
         pass: String,

@@ -64,8 +64,8 @@ class Interactor(
         repository.onAttachments(file, noteId, info)
     }
 
-    fun getAttachments(filesDir: File) : Flow<Attachments> =
-        repository.getAttachments(filesDir)
+    fun getAttachments() : Flow<Attachments> =
+        repository.getAttachments()
 
     fun onDelete(image: Image) {
         repository.onDelete(image)

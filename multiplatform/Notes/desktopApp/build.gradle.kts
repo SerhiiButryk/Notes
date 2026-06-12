@@ -15,7 +15,6 @@ dependencies {
     implementation(projects.authUi)
     implementation(projects.os)
 
-    //debugImplementation(libs.ui.tooling)
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
 
@@ -34,6 +33,12 @@ dependencies {
 
     // Navigation 3
     implementation(libs.jetbrains.navigation3.ui)
+
+    // Tests
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlinx.coroutines.core)
 }
 
 compose.desktop {

@@ -3,6 +3,9 @@ package com.notes.notes_ui
 import android.content.Context
 import android.net.Uri
 import androidx.activity.result.IntentSenderRequest
+import api.AppService.Companion.FIREBASE_AUTH
+import api.AppService.Companion.GOOGLE_AUTH
+import api.AppService.Companion.GOOGLE_STORAGE
 import api.AppServices
 import api.auth.AuthCallback
 import api.repo.Repository
@@ -29,31 +32,38 @@ class SettingsInteractor(private val repo: Repository) {
     }
 
     suspend fun singOut(callback: (Boolean) -> Unit) {
-        val result = AppServices
-            .getAuthServiceByName("google")!!
+
+        AppServices
+            .getAuthServiceByKey(FIREBASE_AUTH)
             .signOut()
+
+        val result = AppServices
+            .getAuthServiceByKey(GOOGLE_AUTH)
+            .signOut()
+
         callback(result)
         if (result) {
             repo.clearLocalAppStorage()
         }
+
     }
 
     suspend fun getAccountInfo(pending: Boolean = false): AccountInfo {
 
         val email = AppServices
-            .getDefaultAuthService()!!
+            .getDefaultAuthService()
             .getUserEmail()
 
         val googleIsActive = AppServices
-            .getAuthServiceByName("google")!!
+            .getAuthServiceByKey(GOOGLE_AUTH)
             .isAuthenticated()
 
         val firebaseIsActive = AppServices
-            .getAuthServiceByName("firebase")!!
+            .getAuthServiceByKey(FIREBASE_AUTH)
             .isAuthenticated()
 
         val googleDriveIsActive = AppServices
-            .getStoreService("googledrive")!!
+            .getStoreServicesByKey(GOOGLE_STORAGE)
             .canUse
 
         val grantPermission = !googleDriveIsActive
@@ -74,8 +84,7 @@ class SettingsInteractor(private val repo: Repository) {
         onSuccess: (IntentSenderRequest) -> Unit,
         onUpdate: () -> Unit
     ) {
-        val service = AppServices
-            .getAuthServiceByName("google")!!
+        val service = AppServices.getAuthServiceByKey(GOOGLE_AUTH)
         service.resetSettings()
         val callback = object : AuthCallback {
             override fun onUserAction(data: Any?) {

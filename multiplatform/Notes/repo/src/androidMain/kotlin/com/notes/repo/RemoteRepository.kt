@@ -1,5 +1,6 @@
 package com.notes.repo
 
+import api.AppServices
 import api.Platform
 import api.data.AbstractStorageService
 import api.data.Document
@@ -25,14 +26,23 @@ import kotlinx.coroutines.sync.withLock
 /**
  * Class which handles data synchronization between remote and local datastore
  */
-internal class RemoteRepository(private val allServicesList: List<AbstractStorageService>) {
+internal class RemoteRepository() {
+
+    constructor(storeServices: List<AbstractStorageService>) : this() {
+        this.storeServices = storeServices
+    }
+
+    private var storeServices: List<AbstractStorageService>? = null
 
     private val protectMetadataUpdate = Mutex()
 
     private fun getServices(): List<AbstractStorageService> {
+        if (storeServices == null) {
+            storeServices = AppServices.getStoreServices()
+        }
         val services = mutableListOf<AbstractStorageService>()
-        for (service in allServicesList) {
-            if (service.canUse) services.add(service)
+        storeServices?.forEach {
+            if (it.canUse) services.add(it)
         }
         Platform().logger.logi("RemoteRepository::getServices() available services = '${services.size}'")
         return services
@@ -47,7 +57,7 @@ internal class RemoteRepository(private val allServicesList: List<AbstractStorag
             val services = getServices()
             for (service in services) {
 
-                Platform().logger.logi("RemoteRepository::saveNote() to '${service.name}'...")
+                Platform().logger.logi("RemoteRepository::saveNote() to '${service.key}'...")
 
                 updateMetadata(dataStore = service, note = note, pendingUpdate = true)
 
@@ -56,7 +66,7 @@ internal class RemoteRepository(private val allServicesList: List<AbstractStorag
                 if (result) {
                     updateMetadata(dataStore = service, note = note, pendingUpdate = false)
                 } else {
-                    Platform().logger.loge("RemoteRepository::saveNote() failed for '${service.name}'")
+                    Platform().logger.loge("RemoteRepository::saveNote() failed for '${service.key}'")
                 }
             }
 
@@ -143,7 +153,7 @@ internal class RemoteRepository(private val allServicesList: List<AbstractStorag
 
                 val job = scope.launch {
 
-                    Platform().logger.logi("RemoteRepository::delete: note = '${note.id}' for '${service.name}'")
+                    Platform().logger.logi("RemoteRepository::delete: note = '${note.id}' for '${service.key}'")
 
                     updateMetadata(dataStore = service, note = note, pendingDelete = true)
 
@@ -151,10 +161,10 @@ internal class RemoteRepository(private val allServicesList: List<AbstractStorag
                     if (result) {
                         updateMetadata(dataStore = service, note = note, pendingDelete = false)
                         Platform().logger.logi(
-                            "RemoteRepository::delete: deleted note = '${note.id}' for '${service.name}'"
+                            "RemoteRepository::delete: deleted note = '${note.id}' for '${service.key}'"
                         )
                     } else {
-                        Platform().logger.loge("RemoteRepository::delete: failed for '${service.name}', note = '${note.id}'")
+                        Platform().logger.loge("RemoteRepository::delete: failed for '${service.key}', note = '${note.id}'")
                     }
 
                 }
@@ -270,11 +280,12 @@ internal class RemoteRepository(private val allServicesList: List<AbstractStorag
                     metaDb.updateMetadata(currMetadata.copy(metadata = newMetadata))
 
                     Platform().logger.logi(
-                        "RemoteRepository::updateMetadata() updated meta id = '${currMetadata.uid}', " + "note id = '${currMetadata.original}' for '${dataStore.name}'"
+                        "RemoteRepository::updateMetadata() updated meta id = '${currMetadata.uid}', "
+                                + "note id = '${currMetadata.original}' for '${dataStore.key}'"
                     )
                 } else {
                     Platform().logger.loge(
-                        "RemoteRepository::updateMetadata() absent for '${dataStore.name}'"
+                        "RemoteRepository::updateMetadata() absent for '${dataStore.key}'"
                     )
                 }
 
@@ -295,7 +306,8 @@ internal class RemoteRepository(private val allServicesList: List<AbstractStorag
 
                 val id = metaDb.insertMetadata(newMetadata.copy(metadata = updated))
 
-                Platform().logger.logi("RemoteRepository::updateMetadata() added new metadata = '$id' for ${dataStore.name}")
+                Platform().logger.logi("RemoteRepository::updateMetadata() added new metadata = " +
+                        "'$id' for ${dataStore.key}")
 
             }
 

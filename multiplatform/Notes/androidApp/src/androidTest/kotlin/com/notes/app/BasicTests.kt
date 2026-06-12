@@ -5,6 +5,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import api.AppService
 import api.Platform
 import api.data.AbstractStorageService
 import api.data.Document
@@ -31,6 +32,8 @@ class BasicTests {
     private val mockedStoreService = MockedService()
 
     class MockedService : AbstractStorageService() {
+
+        override val key: Any = AppService.FIREBASE_STORAGE
 
         private val list = mutableListOf<Document>()
 
@@ -59,8 +62,6 @@ class BasicTests {
         fun clear() {
             list.clear()
         }
-
-        override val name: String = ""
     }
 
     @Before
@@ -79,7 +80,7 @@ class BasicTests {
         val key = Platform().storage.get("derived_key_pass")
         assertThat(key.isEmpty()).isTrue()
 
-        crypto.onLoginCompleted("hellohellohello", "reitueoirrngeorg490904r3094rjr209jowmf.a,c2")
+        crypto.onAuthCompleted("hellohellohello", "reitueoirrngeorg490904r3094rjr209jowmf.a,c2")
 
         val key2 = Platform().storage.get("derived_key_pass")
         assertThat(key2.isEmpty()).isFalse()
@@ -100,7 +101,7 @@ class BasicTests {
     @Test
     fun test02_encryptedStore() = runTest {
 
-        Platform().crypto.onLoginCompleted("test", "test") // Gen derived key
+        Platform().crypto.onAuthCompleted("test", "test") // Gen derived key
 
         val doc1 = Document("doc1", "data 1")
 
@@ -179,7 +180,7 @@ class BasicTests {
     @Test
     fun test04_backup_files() = runTest {
 
-        val filesManager = FilesManager(appContext.filesDir)
+        val filesManager = FilesManager()
 
         val notes = listOf(Notes(content = "note 1", id = 1), Notes(content = "note 2", id = 2),
             Notes(content = "note 3", id = 3))
@@ -225,7 +226,7 @@ class BasicTests {
 
     @Test
     fun test05_backup_no_files() = runTest {
-        val filesManager = FilesManager(appContext.filesDir)
+        val filesManager = FilesManager()
         val notes = filesManager.readFromDisk()
         assertThat(notes.isEmpty()).isTrue()
     }
@@ -233,7 +234,7 @@ class BasicTests {
     @Test
     fun test06_override_files() = runTest {
 
-        val filesManager = FilesManager(appContext.filesDir)
+        val filesManager = FilesManager()
 
         // Create files
 

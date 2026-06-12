@@ -2,7 +2,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,7 +30,7 @@ import java.awt.Cursor
 private fun Modifier.cursorForHorizontalResize(): Modifier =
     pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
 
-@OptIn(ExperimentalSplitPaneApi::class)
+@OptIn(ExperimentalSplitPaneApi::class, ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun NotesScreenImpl(onSettingsClick: () -> Unit) {
@@ -77,12 +79,19 @@ fun NotesScreenImpl(onSettingsClick: () -> Unit) {
 
         // The "Second" pane (Right side)
         second(minSize = 200.dp) {
-//            NotesEditorUI(
-//                notes = note,
-//                state = state,
-//                toolsPaneItems = Tools(emptyList()),
-//                onTextChanged = {},
-//            )
+
+            val bottomSheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = false
+            )
+
+            NotesEditorUI(
+                notes = note,
+                state = state,
+                toolsPaneItems = Tools(emptyList()),
+                onTextChanged = {},
+                bottomSheetState = bottomSheetState,
+                showFolderButton = false,
+            )
         }
 
         // The "Splitter" (The draggable handle)

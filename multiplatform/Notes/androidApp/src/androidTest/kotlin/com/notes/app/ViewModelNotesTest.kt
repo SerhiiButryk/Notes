@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import api.AppService
 import api.data.AbstractStorageService
 import api.data.Attachments
 import api.data.Document
@@ -28,7 +29,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.reflect.full.declaredMemberFunctions
@@ -77,7 +77,7 @@ class ViewModelNotesTest {
             ) {
             }
 
-            override fun deleteNote(note: Notes, callback: (Long) -> Unit) {}
+            override fun deleteNote(note: Notes, onDeleted: (Long) -> Unit) {}
 
             override fun clear() {
                 Log.i("ViewModelNotesTests", "clear()")
@@ -107,7 +107,7 @@ class ViewModelNotesTest {
 
             }
 
-            override fun getAttachments(filesDir: File): Flow<Attachments> {
+            override fun getAttachments(): Flow<Attachments> {
                 return flow {  }
             }
 
@@ -116,7 +116,7 @@ class ViewModelNotesTest {
             }
         }
 
-        viewModel = NotesViewModel(appRepository = repo, filesDir = appContext.filesDir)
+        viewModel = NotesViewModel(appRepository = repo)
     }
 
     @After
@@ -306,7 +306,6 @@ class ViewModelNotesTest {
         val viewModel = NotesViewModel(
             appRepository = repo,
             scopeOverride = scope,
-            filesDir = appContext.filesDir
         )
         return viewModel
     }
@@ -315,7 +314,7 @@ class ViewModelNotesTest {
 
         val mockedStoreService = object : AbstractStorageService() {
 
-            override val name: String = "firebase"
+            override val key: Any = AppService.FIREBASE_STORAGE
 
             init {
                 canUse = true
@@ -339,10 +338,7 @@ class ViewModelNotesTest {
 
         }
 
-        return AppRepository.create(
-            appContext,
-            listOf(mockedStoreService)
-        )
+        return AppRepository.create(listOf(mockedStoreService))
     }
 
 }

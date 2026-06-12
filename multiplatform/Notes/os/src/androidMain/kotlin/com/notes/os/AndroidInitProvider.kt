@@ -21,8 +21,8 @@ internal class AndroidInitProvider : Initializer<Platform> {
         platform = osPlatform
 
         // Set services
-        AppServices.addService(FirebaseFirestore())
         AppServices.addService(FirebaseAuthService())
+        AppServices.addService(FirebaseFirestore())
         AppServices.addService(GoogleDriveService())
 
         val googleSignInService = GoogleSignInService()

@@ -4,10 +4,8 @@ import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
 import api.repo.BaseRepo
-import api.repo.Repository
 import api.security.Base64Operations
 import api.security.CryptoOperations
-import api.security.DerivedKeyOperations
 import api.utils.Log
 
 interface OSPlatform {
@@ -15,8 +13,6 @@ interface OSPlatform {
     val base64: Base64Operations
 
     val storage: StorageOperations
-
-    val derivedKey: DerivedKeyOperations
 
     val logger: Log
 

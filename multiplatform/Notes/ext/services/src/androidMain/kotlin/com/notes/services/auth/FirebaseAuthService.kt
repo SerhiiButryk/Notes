@@ -1,6 +1,8 @@
 package com.notes.services.auth
 
 import android.app.Activity
+import api.AppService.Companion.FIREBASE_AUTH
+import api.AppService.Companion.GOOGLE_AUTH
 import api.AppServices
 import api.Platform
 import api.auth.AbstractAuthService
@@ -22,7 +24,7 @@ class FirebaseAuthService : AbstractAuthService() {
 
     private val auth: FirebaseAuth = Firebase.auth
 
-    override val name: String = "firebase"
+    override val key = FIREBASE_AUTH
 
     override suspend fun createUser(
         pass: String,
@@ -76,7 +78,7 @@ class FirebaseAuthService : AbstractAuthService() {
             // Now we can try sign in silently with Google account to get access to Google APIs
             signInUsingGoogleSilent(activityContext)
             // Done
-            callback?.onLoginCompleted(pass, getUserEmail())
+            callback?.onAuthCompleted(pass, getUserEmail())
         }
         return result
     }
@@ -211,7 +213,7 @@ class FirebaseAuthService : AbstractAuthService() {
             // and then to finish firebase authentication
 
             val googleSignInService = AppServices
-                .getAuthServiceByName("google") as GoogleSignInService
+                .getAuthServiceByKey(GOOGLE_AUTH) as GoogleSignInService
 
             googleSignInService.setAutoSelectEnabled(true)
             googleSignInService.setFilterByAuthorizedAccounts(true)

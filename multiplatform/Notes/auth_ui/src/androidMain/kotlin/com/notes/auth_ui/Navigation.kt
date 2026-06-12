@@ -23,10 +23,8 @@ import com.notes.ui.Access
 import com.notes.ui.AlertDialogUI
 import com.notes.ui.Auth
 import com.notes.ui.EmailVerification
-import com.notes.ui.NotesSettings
+import com.notes.ui.MainContent
 import com.notes.ui.OnBoardingScreen
-import com.notes.ui.SettingsScreen
-import com.notes.ui.getStartDestination
 import com.notes.ui.getViewModel
 import com.notes.ui.navAndPopUpCurrent
 
@@ -52,7 +50,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
             if (state.value is LoginUIState) {
                 val onSuccess = {
-                    navController.navAndPopUpCurrent(getStartDestination())
+                    navController.navAndPopUpCurrent(MainContent())
                 }
 
                 val loginUIState = state.value as LoginUIState

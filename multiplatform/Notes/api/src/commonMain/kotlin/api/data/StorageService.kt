@@ -1,13 +1,12 @@
 package api.data
 
+import api.AppService
 import api.AppServices
 import api.Platform
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-interface StorageService {
-
-    val name: String
+interface StorageService : AppService {
 
     suspend fun store(document: Document): Boolean
 
@@ -59,14 +58,14 @@ abstract class AbstractStorageService : StorageService {
 
     protected fun isAuthenticated(): Boolean {
         val authService = AppServices.getDefaultAuthService()
-        val uid = authService?.getUserId()
+        val uid = authService.getUserId()
 
-        if (authService == null || !authService.isAuthenticated()) {
+        if (!authService.isAuthenticated()) {
             Platform().logger.loge("$tag::isAuthenticated() not authenticated")
             return false
         }
 
-        if (uid.isNullOrEmpty()) {
+        if (uid.isEmpty()) {
             Platform().logger.loge("$tag::isAuthenticated() uid is invalid")
             return false
         }

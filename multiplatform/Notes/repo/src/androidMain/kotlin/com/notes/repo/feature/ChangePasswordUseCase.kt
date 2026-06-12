@@ -6,13 +6,10 @@ import com.notes.repo.AppRepository
 import com.notes.repo.FilesManager
 import com.notes.repo.RemoteRepository
 import kotlinx.coroutines.coroutineScope
-import java.io.File
 
-internal class ChangePasswordUseCase(
-    rootFileDir: File,
-) {
+internal class ChangePasswordUseCase {
 
-    private val filesManager = FilesManager(rootFileDir)
+    private val filesManager = FilesManager()
 
     suspend fun canChangePassword(repo: AppRepository, remoteRepo: RemoteRepository): Boolean {
 

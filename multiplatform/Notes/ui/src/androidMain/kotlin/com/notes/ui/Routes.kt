@@ -1,16 +1,6 @@
 package com.notes.ui
 
-import api.data.isFirstLaunch
 import kotlinx.serialization.Serializable
-
-fun getStartDestination(): Screen = MainContent()
-
-fun getStartRoute(): Screen {
-    if (isFirstLaunch()) {
-        return OnBoardingScreen()
-    }
-    return Auth()
-}
 
 // Object: Use an object for routes without arguments.
 // Class: Use a class or data class for routes with arguments.

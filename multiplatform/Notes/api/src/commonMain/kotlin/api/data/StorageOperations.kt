@@ -8,5 +8,7 @@ interface StorageOperations {
 
     suspend fun get(key: String): String
     suspend fun clearAll()
+
     fun getCacheDir(): String
+    fun getRootFilesDir(): String
 }

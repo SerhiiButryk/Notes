@@ -8,7 +8,7 @@
       "type": "text",
       "x": 268,
       "y": -90,
-      "width": 522.0,
+      "width": 609.0,
       "height": 40.5,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -29,13 +29,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "Project multi-module structure",
+      "text": "Project module dependency structure",
       "fontSize": 30,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": null,
-      "originalText": "Project multi-module structure",
+      "originalText": "Project module dependency structure",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -44,7 +44,7 @@
       "type": "text",
       "x": 450,
       "y": -35,
-      "width": 678.5999999999999,
+      "width": 80,
       "height": 20.25,
       "angle": 0,
       "strokeColor": "#495057",
@@ -65,13 +65,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "solid: main dependency    dashed: Android-only    dotted: test/baseline/target",
+      "text": "",
       "fontSize": 15,
       "fontFamily": 1,
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": null,
-      "originalText": "solid: main dependency    dashed: Android-only    dotted: test/baseline/target",
+      "originalText": "",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1122,50 +1122,6 @@
       "type": "arrow",
       "x": 270.0,
       "y": 126,
-      "width": 0.0,
-      "height": 454,
-      "angle": 0,
-      "strokeColor": "#495057",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 1,
-      "strokeStyle": "dotted",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "roundness": {
-        "type": 2
-      },
-      "seed": 1,
-      "version": 1,
-      "versionNonce": 1,
-      "isDeleted": false,
-      "boundElements": null,
-      "updated": 1,
-      "link": null,
-      "locked": false,
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          0.0,
-          454
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startBinding": null,
-      "endBinding": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "id": "edge_4",
-      "type": "arrow",
-      "x": 270.0,
-      "y": 126,
       "width": -60.0,
       "height": 94,
       "angle": 0,
@@ -1206,7 +1162,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_5",
+      "id": "edge_4",
       "type": "arrow",
       "x": 270.0,
       "y": 126,
@@ -1250,51 +1206,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_6",
-      "type": "arrow",
-      "x": 270.0,
-      "y": 126,
-      "width": 230.0,
-      "height": 274,
-      "angle": 0,
-      "strokeColor": "#495057",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 1,
-      "strokeStyle": "dotted",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "roundness": {
-        "type": 2
-      },
-      "seed": 1,
-      "version": 1,
-      "versionNonce": 1,
-      "isDeleted": false,
-      "boundElements": null,
-      "updated": 1,
-      "link": null,
-      "locked": false,
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          230.0,
-          274
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startBinding": null,
-      "endBinding": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "id": "edge_7",
+      "id": "edge_5",
       "type": "arrow",
       "x": 270.0,
       "y": 126,
@@ -1338,7 +1250,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_8",
+      "id": "edge_6",
       "type": "arrow",
       "x": 500.0,
       "y": 306,
@@ -1382,7 +1294,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_9",
+      "id": "edge_7",
       "type": "arrow",
       "x": 500.0,
       "y": 306,
@@ -1393,7 +1305,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 1,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -1426,7 +1338,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_10",
+      "id": "edge_8",
       "type": "arrow",
       "x": 610,
       "y": 263.0,
@@ -1470,7 +1382,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_11",
+      "id": "edge_9",
       "type": "arrow",
       "x": 60,
       "y": 83.0,
@@ -1514,7 +1426,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_12",
+      "id": "edge_10",
       "type": "arrow",
       "x": 610.0,
       "y": 126,
@@ -1558,7 +1470,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_13",
+      "id": "edge_11",
       "type": "arrow",
       "x": 610.0,
       "y": 126,
@@ -1602,7 +1514,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_14",
+      "id": "edge_12",
       "type": "arrow",
       "x": 610.0,
       "y": 126,
@@ -1646,7 +1558,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_15",
+      "id": "edge_13",
       "type": "arrow",
       "x": 610.0,
       "y": 126,
@@ -1690,7 +1602,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_16",
+      "id": "edge_14",
       "type": "arrow",
       "x": 610.0,
       "y": 126,
@@ -1734,7 +1646,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_17",
+      "id": "edge_15",
       "type": "arrow",
       "x": 950.0,
       "y": 580,
@@ -1778,7 +1690,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_18",
+      "id": "edge_16",
       "type": "arrow",
       "x": 270.0,
       "y": 580,
@@ -1822,7 +1734,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_19",
+      "id": "edge_17",
       "type": "arrow",
       "x": 610.0,
       "y": 580,
@@ -1866,7 +1778,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_20",
+      "id": "edge_18",
       "type": "arrow",
       "x": 210.0,
       "y": 306,
@@ -1910,7 +1822,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_21",
+      "id": "edge_19",
       "type": "arrow",
       "x": 210.0,
       "y": 306,
@@ -1954,7 +1866,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_22",
+      "id": "edge_20",
       "type": "arrow",
       "x": 320,
       "y": 263.0,
@@ -1998,7 +1910,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_23",
+      "id": "edge_21",
       "type": "arrow",
       "x": 1080.0,
       "y": 306,
@@ -2042,7 +1954,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_24",
+      "id": "edge_22",
       "type": "arrow",
       "x": 1080.0,
       "y": 306,
@@ -2053,7 +1965,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 1,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -2086,7 +1998,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_25",
+      "id": "edge_23",
       "type": "arrow",
       "x": 1080.0,
       "y": 306,
@@ -2097,7 +2009,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 1,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -2130,7 +2042,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_26",
+      "id": "edge_24",
       "type": "arrow",
       "x": 1080.0,
       "y": 306,
@@ -2141,7 +2053,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 1,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -2174,7 +2086,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_27",
+      "id": "edge_25",
       "type": "arrow",
       "x": 1080.0,
       "y": 306,
@@ -2185,7 +2097,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 1,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -2218,7 +2130,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_28",
+      "id": "edge_26",
       "type": "arrow",
       "x": 970,
       "y": 263.0,
@@ -2262,7 +2174,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_29",
+      "id": "edge_27",
       "type": "arrow",
       "x": 610,
       "y": 443.0,
@@ -2306,7 +2218,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_30",
+      "id": "edge_28",
       "type": "arrow",
       "x": 500.0,
       "y": 486,
@@ -2317,7 +2229,7 @@
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 1,
-      "strokeStyle": "dashed",
+      "strokeStyle": "solid",
       "roughness": 0,
       "opacity": 100,
       "groupIds": [],
@@ -2350,7 +2262,7 @@
       "endArrowhead": "arrow"
     },
     {
-      "id": "edge_31",
+      "id": "edge_29",
       "type": "arrow",
       "x": 800.0,
       "y": 306,
@@ -2492,7 +2404,7 @@
       "type": "text",
       "x": 1148,
       "y": 549,
-      "width": 143.26,
+      "width": 82.94,
       "height": 17.55,
       "angle": 0,
       "strokeColor": "#343a40",
@@ -2513,13 +2425,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "App / entry modules",
+      "text": "App modules",
       "fontSize": 13,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "middle",
       "containerId": null,
-      "originalText": "App / entry modules",
+      "originalText": "App modules",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -2687,7 +2599,7 @@
       "type": "text",
       "x": 1148,
       "y": 627,
-      "width": 180.95999999999998,
+      "width": 173.42,
       "height": 17.55,
       "angle": 0,
       "strokeColor": "#343a40",
@@ -2708,13 +2620,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "Data and service modules",
+      "text": "Data and domain modules",
       "fontSize": 13,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "middle",
       "containerId": null,
-      "originalText": "Data and service modules",
+      "originalText": "Data and domain modules",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -2752,7 +2664,7 @@
       "type": "text",
       "x": 1148,
       "y": 653,
-      "width": 196.04,
+      "width": 128.17999999999998,
       "height": 17.55,
       "angle": 0,
       "strokeColor": "#343a40",
@@ -2773,13 +2685,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "External integrated module",
+      "text": "3rd party modules",
       "fontSize": 13,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "middle",
       "containerId": null,
-      "originalText": "External integrated module",
+      "originalText": "3rd party modules",
       "autoResize": true,
       "lineHeight": 1.25
     }

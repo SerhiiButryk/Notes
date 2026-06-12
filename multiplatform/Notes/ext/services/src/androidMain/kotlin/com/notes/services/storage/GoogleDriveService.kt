@@ -2,6 +2,7 @@ package com.notes.services.storage
 
 import android.content.Context
 import androidx.activity.result.IntentSenderRequest
+import api.AppService.Companion.GOOGLE_STORAGE
 import api.Platform
 import api.auth.AuthCallback
 import api.data.AbstractStorageService
@@ -31,7 +32,7 @@ import java.io.IOException
  */
 class GoogleDriveService : AbstractStorageService() {
 
-    override val name: String = "googledrive"
+    override val key = GOOGLE_STORAGE
 
     private var drive: Drive? = null
 
@@ -57,7 +58,7 @@ class GoogleDriveService : AbstractStorageService() {
 
         val content = ByteArrayContent.fromString("application/json", payload)
 
-        val oldFile = getFile(name)
+        val oldFile = getFile(file.name)
 
         try {
             if (oldFile == null) {

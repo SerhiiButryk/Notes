@@ -6,6 +6,7 @@ import api.Platform
 import api.data.Notes
 import api.data.NotesCollection
 import api.repo.RepoCallback
+import api.repo.Repository
 import com.notes.notes_ui.data.getToolsList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,15 +17,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class NotesVM(
+    repository: Repository = Platform().appRepo,
     // For test support
-    scopeOverride: CoroutineScope? = null
+    scopeOverride: CoroutineScope? = null,
 ) : ViewModel() {
 
     private val scope: CoroutineScope = scopeOverride ?: viewModelScope
 
-    private val repository = Platform().appRepo
-
     private val interactor = Interactor(repository, object : RepoCallback {
+
         override fun onNoteAdded(id: Long) {
         }
 
@@ -33,6 +34,7 @@ class NotesVM(
 
         override fun onNoteNavigateBack() {
         }
+
     })
 
 

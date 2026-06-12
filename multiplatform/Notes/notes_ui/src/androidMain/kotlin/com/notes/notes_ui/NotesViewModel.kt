@@ -32,10 +32,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.File
 
 class NotesViewModel(
-    filesDir: File,
     appRepository: Repository = Platform().appRepo,
     // For test support
     scopeOverride: CoroutineScope? = null
@@ -47,10 +45,10 @@ class NotesViewModel(
     )
 
     companion object {
-        fun getFactory(context: Context): ViewModelProvider.Factory {
+        fun getFactory(): ViewModelProvider.Factory {
             return viewModelFactory {
                 initializer {
-                    NotesViewModel(filesDir = context.filesDir)
+                    NotesViewModel()
                 }
             }
         }
@@ -80,7 +78,7 @@ class NotesViewModel(
     val events = uiEvents.receiveAsFlow()
 
     val attachments = interactor
-        .getAttachments(filesDir)
+        .getAttachments()
         .stateIn(
             scope = scope,
             started = WhileSubscribed(stopTimeoutMillis = 5000),

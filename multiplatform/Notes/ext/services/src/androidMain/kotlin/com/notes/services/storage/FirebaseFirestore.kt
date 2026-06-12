@@ -1,5 +1,6 @@
 package com.notes.services.storage
 
+import api.AppService.Companion.FIREBASE_STORAGE
 import api.AppServices
 import api.Platform
 import api.data.AbstractStorageService
@@ -28,7 +29,7 @@ class FirebaseFirestore : AbstractStorageService() {
     private val tag = "FirebaseFirestore"
     private val database = Firebase.firestore
 
-    override val name: String = "firebase"
+    override val key = FIREBASE_STORAGE
 
     override var canUse: Boolean = false
         get() = isAuthenticated()
@@ -42,7 +43,7 @@ class FirebaseFirestore : AbstractStorageService() {
 
         if (!isAuthenticated()) return emptyList()
 
-        val authService = AppServices.getDefaultAuthService()!!
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         return suspendCancellableCoroutine { continuation ->
@@ -75,7 +76,7 @@ class FirebaseFirestore : AbstractStorageService() {
             return false
         }
 
-        val authService = AppServices.getDefaultAuthService()!!
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         return suspendCancellableCoroutine { continuation ->
@@ -95,7 +96,7 @@ class FirebaseFirestore : AbstractStorageService() {
     private suspend fun storeImpl(
         document: Document
     ): Boolean {
-        val authService = AppServices.getDefaultAuthService()!!
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         if (!paramsCheck(document.name)) {
@@ -128,7 +129,7 @@ class FirebaseFirestore : AbstractStorageService() {
     }
 
     private suspend fun loadImpl(name: String): Document? {
-        val authService = AppServices.getDefaultAuthService()!!
+        val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
         if (!paramsCheck(name)) {

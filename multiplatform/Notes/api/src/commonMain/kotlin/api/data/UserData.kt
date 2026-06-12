@@ -12,11 +12,11 @@ val userDataState = MutableStateFlow(UserInfo())
 
 private const val REGISTERED_USER_EMAIL = "REGISTERED_USER_EMAIL"
 
-suspend fun saveUserEmail(email: String) {
+suspend fun setRegisteredUser(email: String) {
     Platform().storage.save(email, REGISTERED_USER_EMAIL)
 }
 
-suspend fun getUserEmail(): String = Platform().storage.get(REGISTERED_USER_EMAIL)
+suspend fun getRegisteredUser(): String = Platform().storage.get(REGISTERED_USER_EMAIL)
 
 suspend fun loadUserData() {
     val email = Platform().storage.get(REGISTERED_USER_EMAIL)

@@ -1,7 +1,7 @@
 package api.security
 
 interface Base64Operations {
-    fun encode(byteArray: ByteArray): String
+    fun encode(input: ByteArray): ByteArray
 
-    fun decode(token: String): ByteArray
+    fun decode(input: String): ByteArray
 }

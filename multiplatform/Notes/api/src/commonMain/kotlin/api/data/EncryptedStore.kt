@@ -7,7 +7,7 @@ import api.Platform
  */
 class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageService() {
 
-    override val name: String = delegate.name
+    override val key = delegate.key
 
     override var canUse: Boolean = delegate.canUse
         get() = delegate.canUse

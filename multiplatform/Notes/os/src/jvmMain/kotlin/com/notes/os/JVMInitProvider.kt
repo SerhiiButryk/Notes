@@ -1,6 +1,9 @@
 package com.notes.os
 
+import api.AppServices
 import api.platform
+import com.notes.services.FirebaseAuthService
+import com.notes.services.FirebaseService
 import com.notes.ui.initResources
 
 object JVMInitProvider {
@@ -11,6 +14,9 @@ object JVMInitProvider {
         val osPlatform = Platform(factory)
         platform = osPlatform
         initResources()
+        // Set services
+        AppServices.addService(FirebaseService())
+        AppServices.addService(FirebaseAuthService())
     }
 
 }
