@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
@@ -20,13 +19,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import api.Platform
-import api.data.Image
 import api.data.Notes
+import api.data.UserFile
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.editor.EditorCommand
 import com.notes.ui.Access
+import com.notes.ui.AlertDialogStateful
 import com.notes.ui.Auth
-import com.notes.ui.LoadingDialog
+import com.notes.ui.LoadingDialogStateful
 import com.notes.ui.MainContent
 import com.notes.ui.MediaPreview
 import com.notes.ui.NotesAccount
@@ -83,13 +83,13 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val attachments by viewModel.attachments.collectAsStateWithLifecycle()
 
-            val onOpenPreview: (Image) -> Unit = {
+            val onOpenPreview: (UserFile) -> Unit = {
                 val uri = it.location as Uri
                 navController.navigate(MediaPreview(uri.toString(), it.name))
             }
 
-            val onDelete: (Image) -> Unit = {
-                viewModel.onDelete(it)
+            val onDelete: (UserFile) -> Unit = {
+                viewModel.onDeleteAttachment(it)
             }
 
             val launcher = rememberLauncherForActivityResult(
@@ -99,7 +99,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             }
 
             val onAttachFile = {
-                viewModel.onAttachFile(launcher)
+                viewModel.onShowFilePicker(launcher)
             }
 
             NotesUI(
@@ -121,7 +121,9 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onAttachFile = onAttachFile,
             )
 
-            Dialog(viewModel)
+            // Shows one of these dialogs
+            AlertDialogStateful(viewModel)
+            LoadingDialogStateful(viewModel)
         }
 
         composable<NotesSettings> { backStackEntry ->
@@ -211,10 +213,4 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
         }
 
     }
-}
-
-@Composable
-private fun Dialog(viewModel: NotesViewModel) {
-    val dialogState = viewModel.dialogState.collectAsStateWithLifecycle()
-    LoadingDialog(dialogState.value.show)
 }

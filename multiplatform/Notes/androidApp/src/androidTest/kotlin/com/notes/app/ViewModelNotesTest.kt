@@ -8,7 +8,6 @@ import api.AppService
 import api.data.AbstractStorageService
 import api.data.Attachments
 import api.data.Document
-import api.data.Image
 import api.data.Notes
 import api.repo.Repository
 import com.google.common.truth.Truth.assertThat
@@ -99,20 +98,8 @@ class ViewModelNotesTest {
                 return false
             }
 
-            override fun onAttachments(
-                attachment: Any,
-                noteId: Long,
-                info: Any?
-            ) {
-
-            }
-
             override fun getAttachments(): Flow<Attachments> {
                 return flow {  }
-            }
-
-            override fun onDelete(image: Image) {
-
             }
         }
 
@@ -324,11 +311,11 @@ class ViewModelNotesTest {
                 return true
             }
 
-            override suspend fun load(name: String): Document {
+            override suspend fun load(document: Document): Document {
                 return Document("", "")
             }
 
-            override suspend fun delete(name: String): Boolean {
+            override suspend fun delete(document: Document): Boolean {
                 return setDelete
             }
 

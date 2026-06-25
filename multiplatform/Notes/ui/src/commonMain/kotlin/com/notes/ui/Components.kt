@@ -48,9 +48,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -302,7 +304,7 @@ fun SearchBarField(
 }
 
 /**
- * Material button component
+ * Material button animated component
  */
 
 @Composable
@@ -310,7 +312,8 @@ fun AccentButton(
     onClick: () -> Unit, label: String, modifier: Modifier = Modifier
 ) {
     val transition = rememberInfiniteTransition(label = "accent-button")
-    val colorPhase by transition.animateFloat(
+
+    val colorPhaseState = transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -319,21 +322,33 @@ fun AccentButton(
         ),
         label = "accent-button-color-phase",
     )
+
     val startColor = Color(0xFF9DCEFF)
     val endColor = Color(0xFFC58BF2)
 
     Button(
         onClick = { onClick() },
-        modifier = modifier.fillMaxWidth().background(
-            brush = Brush.horizontalGradient(
-                listOf(
-                    lerp(startColor, endColor, colorPhase),
-                    lerp(endColor, startColor, colorPhase),
-                ),
-            ),
-            shape = RoundedCornerShape(50.dp)
-        ),
-        colors = ButtonDefaults.buttonColors(Color.Transparent)
+        modifier = modifier
+            .fillMaxWidth()
+            .drawBehind {
+
+                val phase = colorPhaseState.value
+
+                val currentStart = lerp(startColor, endColor, phase)
+                val currentEnd = lerp(endColor, startColor, phase)
+
+                // Replicate the 50.dp RoundedCornerShape (50.dp in pixels is height / 2)
+                val cornerRadius = CornerRadius(size.height / 2f, size.height / 2f)
+
+                drawRoundRect(
+                    brush = Brush.horizontalGradient(
+                        listOf(currentStart, currentEnd)
+                    ),
+                    cornerRadius = cornerRadius
+                )
+
+            },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
     ) {
         Text(text = label, color = Color.White)
     }

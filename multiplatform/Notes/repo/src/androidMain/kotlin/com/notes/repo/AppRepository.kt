@@ -2,7 +2,7 @@ package com.notes.repo
 
 import api.Platform
 import api.data.AbstractStorageService
-import api.data.Image
+import api.data.UserFile
 import api.data.Notes
 import api.repo.BaseRepo
 import com.notes.db.LocalNoteDatabase
@@ -51,7 +51,14 @@ class AppRepository private constructor(
         flow {
             Platform().logger.logi("AppRepository::getNotes()")
 
-            // TODO: Might do this periodically in Work manager or something else
+            // TODO: Log internal folder content
+            // FilesManager().printFolderInfo()
+
+            // TODO: We may do this periodically on demand
+
+            // Trigger sync with server
+            syncData()
+
             // Trigger fetch from remote server
             remoteRepository.fetch(scope = scope)
 
@@ -162,15 +169,32 @@ class AppRepository private constructor(
     override suspend fun isDataInSync() = isAllInSyncWithRemote()
 
     fun syncData(newScope: CoroutineScope? = null) =
-        remoteRepository.updateIfNeeded(newScope ?: scope)
+        remoteRepository.syncIfNeeded(newScope ?: scope)
 
-    override fun onAttachments(attachment: Any, noteId: Long, info: Any?) {
-        mediaStore.onAttachments(attachment, noteId, info)
+    override suspend fun onAttachments(attachment: Any, noteId: Long, info: Any?): Boolean {
+        val createdFile = mediaStore.onAttachments(attachment, noteId, info)
+        return if (createdFile != null) {
+            val result = remoteRepository.saveAttachment(scope = scope, file = createdFile)
+            if (!result) {
+                // Delete created file
+                createdFile.delete()
+            }
+            result
+        } else {
+            false
+        }
     }
 
     override fun getAttachments() = mediaStore.getAttachments()
 
-    override fun onDelete(image: Image) {
-        mediaStore.onDelete(image)
+    override suspend fun onDeleteAttachment(file: UserFile): Boolean {
+        // First, delete on the remote
+        return if (remoteRepository.deleteAttachment(scope = scope, name = file.name)) {
+            // Then delete locally
+            mediaStore.onDelete(file)
+            true
+        } else {
+            false
+        }
     }
 }

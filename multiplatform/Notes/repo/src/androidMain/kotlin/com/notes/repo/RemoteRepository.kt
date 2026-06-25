@@ -1,5 +1,6 @@
 package com.notes.repo
 
+import api.AppService
 import api.AppServices
 import api.Platform
 import api.data.AbstractStorageService
@@ -16,17 +17,20 @@ import com.notes.db.toEntity
 import com.notes.db.toNote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.io.File
 
 /**
  * Class which handles data synchronization between remote and local datastore
  */
-internal class RemoteRepository() {
+class RemoteRepository() {
 
     constructor(storeServices: List<AbstractStorageService>) : this() {
         this.storeServices = storeServices
@@ -74,7 +78,7 @@ internal class RemoteRepository() {
     }
 
     // TODO: Think if we can return data one by one but not all at once
-    // So if we can use Channel instead of list
+    // So if we can make a good use of Channel
     suspend fun fetchCopy(): List<Notes> {
         val notesFound = mutableListOf<Notes>()
         // Merge results from several sources
@@ -102,9 +106,12 @@ internal class RemoteRepository() {
         }
     }
 
-    // Start checking if we need to process anything
+    // Start checking if we need to process anything that's not been synced
 
-    fun updateIfNeeded(scope: CoroutineScope) {
+    fun syncIfNeeded(scope: CoroutineScope) {
+
+        Platform().logger.logi("RemoteRepository::syncIfNeeded() start")
+
         scope.launch {
 
             val metaDb = LocalNoteDatabase.accessNoteMetadata()
@@ -157,7 +164,7 @@ internal class RemoteRepository() {
 
                     updateMetadata(dataStore = service, note = note, pendingDelete = true)
 
-                    val result = service.delete(note.id.toString())
+                    val result = service.delete(Document(name = note.id.toString()))
                     if (result) {
                         updateMetadata(dataStore = service, note = note, pendingDelete = false)
                         Platform().logger.logi(
@@ -180,6 +187,45 @@ internal class RemoteRepository() {
 
         }
 
+    }
+
+    suspend fun saveAttachment(
+        scope: CoroutineScope,
+        file: File,
+    ): Boolean {
+        val result = scope.async {
+            Platform().logger.logi("RemoteRepository::saveAttachment")
+            val services = getServices()
+            for (service in services) {
+                // Google Drive is only supported
+                if (service.key == AppService.GOOGLE_STORAGE) {
+                    val document = Document(file)
+                    return@async service.store(document)
+                }
+            }
+            return@async false
+        }
+        return result.await()
+    }
+
+    suspend fun deleteAttachment(
+        scope: CoroutineScope,
+        name: String,
+    ): Boolean {
+        val result = scope.async {
+            Platform().logger.logi("RemoteRepository::deleteAttachment")
+            val services = getServices()
+            for (service in services) {
+                // Google Drive is only supported
+                if (service.key == AppService.GOOGLE_STORAGE) {
+                    val document = Document(name = name)
+                    document.isFile = true
+                    return@async service.delete(document)
+                }
+            }
+            return@async false
+        }
+        return result.await()
     }
 
     private suspend fun deleteNoteLocally(note: Notes) {

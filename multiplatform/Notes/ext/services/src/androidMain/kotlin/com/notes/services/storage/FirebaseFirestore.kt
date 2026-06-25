@@ -17,11 +17,15 @@ import kotlin.coroutines.resume
  *
  * Basic concepts of firestore:
  *
- * Google defines 'collection' and 'document'. 'Collection' is like a folder,
- * and 'document' is like a database file which actually stores data.
+ * Google defines 'collection' and 'document'. The 'Collection' is like a folder,
+ * and the 'document' is like a database file which actually stores data.
  * We can access a document using a path like 'users/{userId}/user_notes/{noteId}'.
  *
- * Permissions can be controlled by special rules on firebase console.
+ * Access permissions of 'collection' and 'document' are be managed
+ * by special rules on firebase console.
+ *
+ * Limitations:
+ * We can store anly data like a Map or a POJO java classes.
  */
 
 class FirebaseFirestore : AbstractStorageService() {
@@ -36,7 +40,7 @@ class FirebaseFirestore : AbstractStorageService() {
 
     override suspend fun store(document: Document): Boolean = storeImpl(document)
 
-    override suspend fun load(name: String): Document? = loadImpl(name)
+    override suspend fun load(document: Document): Document? = loadImpl(document)
 
     override suspend fun fetchAll(): List<Document> {
         Platform().logger.logi("$tag::fetchAll()")
@@ -51,10 +55,10 @@ class FirebaseFirestore : AbstractStorageService() {
                 .collection("users/$uid/user_notes")
                 .get()
                 .addOnSuccessListener { snapshots ->
-                    Platform().logger.logi("$tag::fetchAll() sz = ${snapshots.size()}")
+                    Platform().logger.logi("$tag::fetchAll() size = ${snapshots.size()}")
                     val list = mutableListOf<Document>()
                     for (snapshot in snapshots) {
-                        Platform().logger.logi("$tag::fetchAll() <= ${snapshot.id}")
+                        Platform().logger.logi("$tag::fetchAll() done for ${snapshot.id}")
                         val json = snapshot.data["content"] as? String ?: ""
                         val doc = json.toDocument()
                         if (!doc.isEmpty()) {
@@ -69,10 +73,9 @@ class FirebaseFirestore : AbstractStorageService() {
         }
     }
 
-    override suspend fun delete(name: String): Boolean {
-        Platform().logger.logi("$tag::delete()")
+    override suspend fun delete(document: Document): Boolean {
 
-        if (!paramsCheck(name)) {
+        if (!paramsCheck(document.name)) {
             return false
         }
 
@@ -81,13 +84,14 @@ class FirebaseFirestore : AbstractStorageService() {
 
         return suspendCancellableCoroutine { continuation ->
             database
-                .document("users/$uid/user_notes/$name")
+                .document("users/$uid/user_notes/${document.name}")
                 .delete()
                 .addOnSuccessListener {
-                    Platform().logger.logi("$tag::delete() success, deleted name = $name")
+                    Platform().logger.logi("$tag::delete($${document.name}) done")
                     continuation.resume(true)
                 }.addOnFailureListener { e ->
-                    Platform().logger.loge("$tag::delete() failed to delete name = $name")
+                    Platform().logger.loge("$tag::delete($${document.name}) failed, error: $e")
+                    e.printStackTrace()
                     continuation.resume(false)
                 }
         }
@@ -119,26 +123,26 @@ class FirebaseFirestore : AbstractStorageService() {
             userNoteDocument
                 .set(payload)
                 .addOnSuccessListener {
-                    Platform().logger.logi("$tag::storeImpl() => '${document.name}'")
+                    Platform().logger.logi("$tag::storeImpl(${document.name}) done")
                     continuation.resume(true)
                 }.addOnFailureListener { e ->
-                    Platform().logger.loge("$tag::storeImpl() failed, error: $e")
+                    Platform().logger.loge("$tag::storeImpl(${document.name}) failed, error: $e")
                     continuation.resume(false)
                 }
         }
     }
 
-    private suspend fun loadImpl(name: String): Document? {
+    private suspend fun loadImpl(document: Document): Document? {
         val authService = AppServices.getDefaultAuthService()
         val uid = authService.getUserId()
 
-        if (!paramsCheck(name)) {
+        if (!paramsCheck(document.name)) {
             return null
         }
 
         return suspendCancellableCoroutine { continuation ->
 
-            val noteId = name
+            val noteId = document.name
 
             // Get the location:
             // users/{userId}/user_notes/{noteId}
@@ -149,13 +153,13 @@ class FirebaseFirestore : AbstractStorageService() {
                 .addOnSuccessListener { snapshot ->
                     if (snapshot != null && snapshot.exists()) {
                         val document = snapshot.toString().toDocument()
-                        Platform().logger.loge("$tag::loadImpl() <= ${document.name}")
+                        Platform().logger.loge("$tag::loadImpl($noteId) done")
                         continuation.resume(document)
                     } else {
                         continuation.resume(null)
                     }
                 }.addOnFailureListener { e ->
-                    Platform().logger.loge("$tag::loadImpl() failed, error: $e")
+                    Platform().logger.loge("$tag::loadImpl($noteId) failed, error: $e")
                     continuation.resume(null)
                 }
         }

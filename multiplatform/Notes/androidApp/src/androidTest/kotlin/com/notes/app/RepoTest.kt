@@ -45,11 +45,11 @@ class RepoTest : AppTest() {
             return mockedStoreServiceStoreResult
         }
 
-        override suspend fun load(name: String): Document {
+        override suspend fun load(document: Document): Document {
             return Document("", "")
         }
 
-        override suspend fun delete(name: String): Boolean {
+        override suspend fun delete(document: Document): Boolean {
             return mockedStoreServiceDeleteResult
         }
 
@@ -71,11 +71,11 @@ class RepoTest : AppTest() {
             return mockedStoreServiceStoreResult
         }
 
-        override suspend fun load(name: String): Document {
+        override suspend fun load(document: Document): Document {
             return Document("", "")
         }
 
-        override suspend fun delete(name: String): Boolean {
+        override suspend fun delete(document: Document): Boolean {
             return mockedStoreServiceDeleteResult
         }
 

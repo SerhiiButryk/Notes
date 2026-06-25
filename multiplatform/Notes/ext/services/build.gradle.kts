@@ -35,6 +35,8 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
+            implementation(projects.repo)
+
             // Firebase SDK
             implementation(project.dependencies.platform(libs.firebase.bom))
             // Firebase AI Logic

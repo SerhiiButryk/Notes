@@ -8,14 +8,18 @@ import kotlinx.coroutines.flow.first
 suspend fun isAllInSyncWithRemote(): Boolean {
     val db = LocalNoteDatabase.accessNoteMetadata()
     val metadataList = db.getAllMetadata().first()
+    var isInSync = true
     for (metadata in metadataList) {
         if (metadata.isPendingDeletionOnRemote() || metadata.isPendingUpdateOnRemote()) {
+            // Log for debugging
             Platform().logger.loge("isAllInSyncWithRemote() not in sync, " +
                     "pending delete = ${metadata.isPendingDeletionOnRemote()}, " +
                     "pending update = ${metadata.isPendingUpdateOnRemote()}\n" +
                     "meta data = $metadata")
-            return false
+            if (isInSync) {
+                isInSync = false
+            }
         }
     }
-    return true
+    return isInSync
 }

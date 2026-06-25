@@ -1,7 +1,6 @@
 package com.notes.repo
 
 import api.data.Attachments
-import api.data.Image
 import api.data.Notes
 import api.repo.BaseRepo
 import kotlinx.coroutines.flow.Flow
@@ -41,14 +40,8 @@ class AppRepoCommon : BaseRepo() {
 
     }
 
-    override fun onAttachments(attachment: Any, noteId: Long, info: Any?) {
-    }
-
     override fun getAttachments(): Flow<Attachments> {
         return emptyFlow()
-    }
-
-    override fun onDelete(image: Image) {
     }
 
 }

@@ -10,9 +10,9 @@ interface StorageService : AppService {
 
     suspend fun store(document: Document): Boolean
 
-    suspend fun load(name: String): Document?
+    suspend fun load(document: Document): Document?
 
-    suspend fun delete(name: String): Boolean
+    suspend fun delete(document: Document): Boolean
 
     suspend fun fetchAll(): List<Document>
 }

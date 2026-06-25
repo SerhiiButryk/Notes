@@ -33,7 +33,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import api.data.Attachments
-import api.data.Image
+import api.data.Document.Companion.isUserFile
+import api.data.UserFile
 import api.data.Notes
 import api.data.NotesCollection
 import coil3.compose.AsyncImage
@@ -61,8 +62,8 @@ fun NotesUI(
     showNavRail: Boolean,
     isPhoneSize: Boolean,
     attachments: Attachments,
-    onOpenPreview: (Image) -> Unit,
-    onDelete: (Image) -> Unit,
+    onOpenPreview: (UserFile) -> Unit,
+    onDelete: (UserFile) -> Unit,
     onAttachFile: () -> Unit,
 ) {
     NotesUIImpl(
@@ -100,8 +101,8 @@ private fun NotesUIImpl(
     showNavRail: Boolean,
     isPhoneSize: Boolean,
     attachments: Attachments,
-    onOpenPreview: (Image) -> Unit,
-    onDelete: (Image) -> Unit,
+    onOpenPreview: (UserFile) -> Unit,
+    onDelete: (UserFile) -> Unit,
     onAttachFile: () -> Unit,
 ) {
     Row {
@@ -146,8 +147,8 @@ private fun ListDetailUI(
     onBackClick: () -> Unit = {},
     isPhoneSize: Boolean,
     attachments: Attachments,
-    onOpenPreview: (Image) -> Unit,
-    onDelete: (Image) -> Unit,
+    onOpenPreview: (UserFile) -> Unit,
+    onDelete: (UserFile) -> Unit,
     onAttachFile: () -> Unit,
 ) {
     val defaultDirective = rememberListDetailPaneScaffoldNavigator().scaffoldDirective
@@ -288,35 +289,32 @@ private fun ListDetailUI(
 fun MediaPreview(
     attachments: Attachments,
     notes: Notes,
-    onClick: (Image) -> Unit,
-    onDelete: (Image) -> Unit,
+    onClick: (UserFile) -> Unit,
+    onDelete: (UserFile) -> Unit,
 ) {
-    if (attachments.images.isNotEmpty()) {
+    if (attachments.files.isNotEmpty()) {
         LazyRow {
-            for (image in attachments.images) {
-                // Image name is "1_img_09"
-                // '1' - id of note which it belongs to
-                // So, we add only images which actually attached to this note
-                if (image.name.startsWith(notes.id.toString())) {
-                    item(image.location) {
+            for (file in attachments.files) {
+                if (isUserFile(file.name, notes.id)) {
+                    item(file.location) {
                         Box(
                             modifier = Modifier
                                 .width(250.dp)
                                 .height(250.dp)
                                 .clickable {
-                                    onClick(image)
+                                    onClick(file)
                                 },
                         ) {
 
                             AsyncImage(
-                                model = image.location as Uri,
+                                model = file.location as Uri,
                                 contentDescription = "",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Inside
                             )
 
                             IconButton(
-                                onClick = { onDelete(image) },
+                                onClick = { onDelete(file) },
                                 modifier = Modifier.align(Alignment.TopEnd)
                             ) {
                                 Icon(

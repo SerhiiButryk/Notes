@@ -13,21 +13,25 @@ class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageServ
         get() = delegate.canUse
 
     override suspend fun store(document: Document): Boolean {
+        // Do not encrypt, hope it doesn't have sensitive information
+        if (document.isFile) {
+            return delegate.store(document)
+        }
         val encrypted = Platform().crypto.encryptWithDerivedKey(document.data)
         return delegate.store(Document(document.name, encrypted))
     }
 
-    override suspend fun load(name: String): Document? {
-        val data = delegate.load(name)
-        if (data != null) {
-            val decrypted = Platform().crypto.decryptWithDerivedKey(data.data)
-            return Document(data = decrypted, name = name)
+    override suspend fun load(document: Document): Document? {
+        val document = delegate.load(document)
+        if (document != null) {
+            val decrypted = Platform().crypto.decryptWithDerivedKey(document.data)
+            return Document(data = decrypted, name = document.name)
         }
         return null
     }
 
-    override suspend fun delete(name: String): Boolean {
-        return delegate.delete(name)
+    override suspend fun delete(document: Document): Boolean {
+        return delegate.delete(document)
     }
 
     override suspend fun fetchAll(): List<Document> {

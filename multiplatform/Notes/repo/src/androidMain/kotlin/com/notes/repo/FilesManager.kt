@@ -3,8 +3,8 @@ package com.notes.repo
 import android.net.Uri
 import api.Platform
 import api.data.Attachments
-import api.data.Image
 import api.data.Notes
+import api.data.UserFile
 import api.data.getStringRep
 import api.data.toNote
 import java.io.BufferedReader
@@ -14,15 +14,18 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.io.OutputStream
+
+private const val tag = "FilesManager"
 
 class FilesManager {
 
-    suspend fun saveToDisk(notes: List<Notes>): Boolean {
+    suspend fun cacheNotes(notes: List<Notes>): Boolean {
         val cacheDir = Platform().storage.getCacheDir()
         for (note in notes) {
             // A name of a file is note id
             val file = File(cacheDir, note.id.toString())
-            Platform().logger.logi("saveToDisk: note = ${note.id}, file = ${file.name}")
+            Platform().logger.logi("$tag::cacheNotes: note = ${note.id}, file = ${file.name}")
             try {
                 val payload = note.getStringRep()
                 val cipherText = Platform().crypto.encrypt(payload)
@@ -30,7 +33,7 @@ class FilesManager {
                     output.write(cipherText.toByteArray())
                 }
             } catch (e: Exception) {
-                Platform().logger.logi("saveToDisk: error: $e")
+                Platform().logger.logi("$tag::cacheNotes: error: $e")
                 e.printStackTrace()
                 // Try to delete file
                 file.delete()
@@ -38,11 +41,11 @@ class FilesManager {
                 return false
             }
         }
-        Platform().logger.logi("saveToDisk: done")
+        Platform().logger.logi("$tag::cacheNotes: done")
         return true
     }
 
-    suspend fun readFromDisk(): List<Notes> {
+    suspend fun readCache(): List<Notes> {
 
         val cacheDir = Platform().storage.getCacheDir()
 
@@ -51,7 +54,7 @@ class FilesManager {
         val files = File(cacheDir).listFiles()
 
         if (files == null) {
-            Platform().logger.logi("readFromDisk: no files")
+            Platform().logger.logi("$tag::readCache: no files")
             return notes
         }
 
@@ -68,7 +71,7 @@ class FilesManager {
                         }
                     }
                 } catch (e: Exception) {
-                    Platform().logger.loge("readFromDisk: error $e reading a file: ${file.name}")
+                    Platform().logger.loge("$tag::readCache: error $e reading a file: ${file.name}")
                     e.printStackTrace()
                     null
                 }
@@ -83,13 +86,13 @@ class FilesManager {
             }
         }
 
-        Platform().logger.logi("readFromDisk: size = ${notes.size}")
+        Platform().logger.logi("$tag::readCache: size = ${notes.size}")
 
         return notes
     }
 
-    fun saveImage(inputStream: InputStream, fileName: String) {
-        Platform().logger.logi("saveImage:")
+    fun saveImage(inputStream: InputStream, fileName: String): File? {
+        Platform().logger.logi("$tag::saveImage:")
 
         val imageFolder = getOrCreateImageFolder()
 
@@ -101,11 +104,20 @@ class FilesManager {
                     input.copyTo(outputStream)
                 }
             }
-            Platform().logger.logi("saveImage: done, name - '$fileName'")
+            Platform().logger.logi("$tag::saveImage: done, name - '$fileName'")
+            return file
         } catch (e: IOException) {
-            Platform().logger.loge("saveImage: exception = $e")
+            Platform().logger.loge("$tag::saveImage: exception = $e")
             e.printStackTrace()
         }
+        return null
+    }
+
+    fun getOutputStreamForImage(fileName: String): OutputStream {
+        Platform().logger.logi("$tag::getOutputStreamForImage:")
+        val imageFolder = getOrCreateImageFolder()
+        val file = File(imageFolder, fileName)
+        return FileOutputStream(file)
     }
 
     fun getOrCreateImageFolder(): File {
@@ -117,22 +129,30 @@ class FilesManager {
         if (!imageFolder.exists()) {
             val isCreated = imageFolder.mkdirs()
             if (!isCreated) {
-                Platform().logger.loge("saveImage: failed to create subfolder")
+                Platform().logger.loge("$tag::saveImage: failed to create subfolder")
             } else {
-                Platform().logger.logi("saveImage: subfolder is created")
+                Platform().logger.logi("$tag::saveImage: subfolder is created")
             }
         }
 
         return imageFolder
     }
 
+    fun printFolderInfo() {
+        Platform().logger.logi("$tag::printFolderInfo:")
+        val rootDir = getOrCreateImageFolder()
+        rootDir.listFiles()?.forEach { file ->
+            Platform().logger.logi("$tag::printFolderInfo: file = ${file.name}, size = ${file.length()}")
+        }
+    }
+
     fun scanFolder(path: String): Attachments {
-        val images = mutableListOf<Image>()
+        val images = mutableListOf<UserFile>()
         val imgFolder = File(path)
         val files = imgFolder.listFiles()
         files?.forEach { f ->
             val uri = Uri.fromFile(f)
-            images.add(Image(uri, f.name))
+            images.add(UserFile(uri, f.name))
         }
         return Attachments(images)
     }
@@ -147,27 +167,39 @@ class FilesManager {
                 }
             }
         }
-        Platform().logger.logi("clearCache: cache has been cleared up")
+        Platform().logger.logi("$tag::clearCache: cache has been cleared up")
     }
 
-    fun delete(image: Image) {
-        Platform().logger.logi("delete: image deleting...")
+    fun delete(file: UserFile) {
+        Platform().logger.logi("$tag::delete: deleting...")
         // Should not be null at this point
         val imgFolder = getOrCreateImageFolder()
-        val fileToDelete = File(imgFolder, image.name)
+        val fileToDelete = File(imgFolder, file.name)
         val result = fileToDelete.delete()
-        Platform().logger.logi("delete: delete = '${result}' file '${image.name}'")
+        Platform().logger.logi("$tag::delete: delete = '${result}' file '${file.name}'")
     }
 
     fun deleteAllFor(noteId: Long) {
-        Platform().logger.logi("delete: all for $noteId")
+        Platform().logger.logi("$tag::delete: all for $noteId")
         // Should not be null at this point
         val imgFolder = getOrCreateImageFolder()
         imgFolder.listFiles()?.forEach { file ->
             if (file.name.startsWith(noteId.toString()))
                 file.delete()
         }
-        Platform().logger.logi("delete: done")
+        Platform().logger.logi("$tag::delete: done")
+    }
+
+    fun hasFile(name: String): Boolean {
+        val files = getOrCreateImageFolder().listFiles()
+        if (files != null) {
+            files.forEach { file ->
+                if (file.name == name) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
 }

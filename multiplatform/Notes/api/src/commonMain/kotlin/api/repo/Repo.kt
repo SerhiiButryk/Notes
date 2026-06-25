@@ -2,7 +2,7 @@ package api.repo
 
 import api.Platform
 import api.data.Attachments
-import api.data.Image
+import api.data.UserFile
 import api.data.Notes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,11 +41,11 @@ interface Repository {
 
     fun clear()
 
-    fun onAttachments(attachment: Any, noteId: Long, info: Any? = null) {}
+    suspend fun onAttachments(attachment: Any, noteId: Long, info: Any? = null): Boolean = false
 
     fun getAttachments() : Flow<Attachments>
 
-    fun onDelete(image: Image) {}
+    suspend fun onDeleteAttachment(file: UserFile): Boolean = false
 }
 
 abstract class BaseRepo : Repository {

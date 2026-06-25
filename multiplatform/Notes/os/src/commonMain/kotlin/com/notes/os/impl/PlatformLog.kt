@@ -11,17 +11,21 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 abstract class PlatformLog : Log {
 
     @OptIn(ExperimentalAtomicApi::class)
-    protected var isDebug = AtomicBoolean(false)
+    var _isDebug = AtomicBoolean(false)
+
+    @OptIn(ExperimentalAtomicApi::class)
+    override val isDebug: Boolean
+        get() = _isDebug.load()
 
     @OptIn(ExperimentalAtomicApi::class)
     override fun setDebug(isDebug: Boolean) {
-        this.isDebug.store(isDebug)
+        this._isDebug.store(isDebug)
         Platform().logger.logi("setDebug: isDebug = $isDebug")
     }
 
     @OptIn(ExperimentalAtomicApi::class)
     override fun logd(message: String) {
-        if (isDebug.load()) {
+        if (_isDebug.load()) {
             logDebug(message)
         }
     }

@@ -32,7 +32,7 @@ internal class ChangePasswordUseCase {
         }
 
         // Create backup files
-        val result = filesManager.saveToDisk(remoteNotes)
+        val result = filesManager.cacheNotes(remoteNotes)
         Platform().logger.logi("PasswordHelper::canChangePassword: $result")
         return result
     }
@@ -41,7 +41,7 @@ internal class ChangePasswordUseCase {
         Platform().logger.logi("PasswordHelper::onPasswordChanged()")
 
         coroutineScope {
-            val notesFromDisk = filesManager.readFromDisk()
+            val notesFromDisk = filesManager.readCache()
             for (note in notesFromDisk) {
                 remoteRepo.saveNote(scope = this, note = note)
             }

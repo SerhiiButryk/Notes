@@ -1,7 +1,7 @@
 package com.notes.notes_ui
 
 import api.data.Attachments
-import api.data.Image
+import api.data.UserFile
 import api.data.Notes
 import api.repo.RepoCallback
 import api.repo.Repository
@@ -9,7 +9,6 @@ import com.notes.notes_ui.editor.EditorCommand
 import com.notes.notes_ui.editor.EditorState
 import com.notes.notes_ui.features.RedoUndoAction
 import kotlinx.coroutines.flow.Flow
-import java.io.File
 
 class Interactor(
     private val repository: Repository,
@@ -60,14 +59,14 @@ class Interactor(
         repository.clear()
     }
 
-    fun onAttachments(file: Any, noteId: Long, info: Any?) {
-        repository.onAttachments(file, noteId, info)
+    suspend fun onAttachments(file: Any, noteId: Long, info: Any?): Boolean {
+        return repository.onAttachments(file, noteId, info)
     }
 
     fun getAttachments() : Flow<Attachments> =
         repository.getAttachments()
 
-    fun onDelete(image: Image) {
-        repository.onDelete(image)
+    suspend fun onDeleteAttachment(file: UserFile): Boolean {
+        return repository.onDeleteAttachment(file)
     }
 }

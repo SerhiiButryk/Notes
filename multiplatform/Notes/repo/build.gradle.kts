@@ -30,6 +30,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.api)
+                implementation(projects.ui)
                 // Kotlin coroutines
                 implementation(libs.kotlinx.coroutines.core)
             }

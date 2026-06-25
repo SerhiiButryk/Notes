@@ -7,9 +7,39 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import java.io.File
 
-data class Document(val name: String, val data: String) {
+data class Document(val name: String = "", val data: String = "") {
+
+    /**
+     * Second constructor
+     */
+    constructor(file: File, override: Boolean = false) : this(file.name, "") {
+        this.file = file
+        this.isFile = true
+        this.override = override
+    }
+
+    var file: File? = null
+    var override: Boolean = false
+
+    var isFile: Boolean = false
+
     fun isEmpty() = name.isEmpty() && data.isEmpty()
+
+    companion object {
+
+        // File name follows specific pattern to filter data fast
+        fun createFileName(id: Long, name: String) = "${getFilePrefix(id)}_img_$name"
+
+        private fun getUserFilePrefix() = "userfile"
+        private fun getFilePrefix(id: Long) = "${getUserFilePrefix()}_${id}"
+
+        fun isUserFile(name: String, id: Long): Boolean {
+            return name.startsWith(getFilePrefix(id))
+        }
+
+    }
 }
 
 fun Document.toJson(): String {

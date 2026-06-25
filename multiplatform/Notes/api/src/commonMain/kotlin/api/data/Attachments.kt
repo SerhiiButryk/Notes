@@ -1,20 +1,20 @@
 package api.data
 
 import androidx.compose.runtime.Immutable
-import api.Platform
+import api.data.Document.Companion.isUserFile
 
-data class Image(
+data class UserFile(
     val location: Any,
     val name: String,
 )
 
 @Immutable // To mark it stable for compose
 data class Attachments(
-    val images: List<Image> = emptyList()
+    val files: List<UserFile> = emptyList()
 ) {
-    fun hasAttachmentsFor(noteId: Long): Boolean {
-        images.forEach {
-            if (it.name.startsWith(noteId.toString())) {
+    fun hasAttachmentsFor(id: Long): Boolean {
+        files.forEach {
+            if (isUserFile(it.name, id)) {
                 return true
             }
         }

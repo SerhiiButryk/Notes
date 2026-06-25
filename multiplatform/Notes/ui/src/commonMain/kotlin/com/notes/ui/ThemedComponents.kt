@@ -8,16 +8,23 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import kotlin.math.max
 
 /**
@@ -30,106 +37,113 @@ fun AnimatedBackground(content: @Composable () -> Unit) {
     val easing = CubicBezierEasing(0.45f, 0f, 0.15f, 1f)
 
     val transition = rememberInfiniteTransition(label = "animated-background")
-    val primaryDrift by transition.animateFloat(
-        initialValue = -1f,
-        targetValue = 1f,
+
+    val primaryDriftState = transition.animateFloat(
+        initialValue = -1f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 12000, easing = easing),
-            repeatMode = RepeatMode.Reverse,
+            animation = tween(12000, easing = easing),
+            repeatMode = RepeatMode.Reverse
         ),
-        label = "primary-drift",
+        label = "primary-drift"
     )
-    val secondaryDrift by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = -1f,
+    val secondaryDriftState = transition.animateFloat(
+        initialValue = 1f, targetValue = -1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 17000, easing = easing),
-            repeatMode = RepeatMode.Reverse,
+            animation = tween(17000, easing = easing),
+            repeatMode = RepeatMode.Reverse
         ),
-        label = "secondary-drift",
+        label = "secondary-drift"
     )
-    val glowPulse by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
+    val glowPulseState = transition.animateFloat(
+        initialValue = 0f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 9000, easing = easing),
-            repeatMode = RepeatMode.Reverse,
+            animation = tween(9000, easing = easing),
+            repeatMode = RepeatMode.Reverse
         ),
-        label = "glow-pulse",
+        label = "glow-pulse"
     )
-    val primaryColorPhase by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
+    val primaryColorPhaseState = transition.animateFloat(
+        initialValue = 0f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 20000, easing = easing),
-            repeatMode = RepeatMode.Restart,
+            animation = tween(20000, easing = easing),
+            repeatMode = RepeatMode.Restart
         ),
-        label = "primary-color-phase",
+        label = "primary-color-phase"
     )
-    val secondaryColorPhase by transition.animateFloat(
-        initialValue = 0.35f,
-        targetValue = 1.35f,
+    val secondaryColorPhaseState = transition.animateFloat(
+        initialValue = 0.35f, targetValue = 1.35f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 28000, easing = easing),
-            repeatMode = RepeatMode.Restart,
+            animation = tween(28000, easing = easing),
+            repeatMode = RepeatMode.Restart
         ),
-        label = "secondary-color-phase",
+        label = "secondary-color-phase"
     )
-    val tertiaryColorPhase by transition.animateFloat(
-        initialValue = 0.68f,
-        targetValue = 1.68f,
+    val tertiaryColorPhaseState = transition.animateFloat(
+        initialValue = 0.68f, targetValue = 1.68f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 22000, easing = easing),
-            repeatMode = RepeatMode.Restart,
+            animation = tween(22000, easing = easing),
+            repeatMode = RepeatMode.Restart
         ),
-        label = "tertiary-color-phase",
+        label = "tertiary-color-phase"
     )
 
     val primaryAlpha = if (isDarkTheme) 0.42f else 0.22f
     val secondaryAlpha = if (isDarkTheme) 0.34f else 0.18f
     val tertiaryAlpha = if (isDarkTheme) 0.30f else 0.16f
     val surfaceAlpha = if (isDarkTheme) 0.20f else 0.48f
-    val primaryGlow = animatedGradientColor(
-        progress = primaryColorPhase,
-        colors = listOf(
-            colorScheme.primary,
-            colorScheme.tertiary,
-            colorScheme.secondary,
-            colorScheme.primaryContainer,
-        ),
-    )
-    val secondaryGlow = animatedGradientColor(
-        progress = secondaryColorPhase,
-        colors = listOf(
-            colorScheme.secondary,
-            colorScheme.primaryContainer,
-            colorScheme.tertiaryContainer,
-            colorScheme.secondaryContainer,
-        ),
-    )
-    val tertiaryGlow = animatedGradientColor(
-        progress = tertiaryColorPhase,
-        colors = listOf(
-            colorScheme.tertiary,
-            colorScheme.secondaryContainer,
-            colorScheme.primary,
-            colorScheme.tertiaryContainer,
-        ),
-    )
-    val ambientTone = animatedGradientColor(
-        progress = tertiaryColorPhase,
-        colors = listOf(
-            colorScheme.surfaceVariant,
-            colorScheme.primaryContainer,
-            colorScheme.tertiaryContainer,
-            colorScheme.secondaryContainer,
-        ),
-    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .drawBehind {
+
+                val primaryDrift = primaryDriftState.value
+                val secondaryDrift = secondaryDriftState.value
+                val glowPulse = glowPulseState.value
+                val primaryColorPhase = primaryColorPhaseState.value
+                val secondaryColorPhase = secondaryColorPhaseState.value
+                val tertiaryColorPhase = tertiaryColorPhaseState.value
+
+                val primaryGlow = animatedGradientColor(
+                    primaryColorPhase,
+                    listOf(
+                        colorScheme.primary,
+                        colorScheme.tertiary,
+                        colorScheme.secondary,
+                        colorScheme.primaryContainer
+                    )
+                )
+
+                val secondaryGlow = animatedGradientColor(
+                    secondaryColorPhase,
+                    listOf(
+                        colorScheme.secondary,
+                        colorScheme.primaryContainer,
+                        colorScheme.tertiaryContainer,
+                        colorScheme.secondaryContainer
+                    )
+                )
+
+                val tertiaryGlow = animatedGradientColor(
+                    tertiaryColorPhase,
+                    listOf(
+                        colorScheme.tertiary,
+                        colorScheme.secondaryContainer,
+                        colorScheme.primary,
+                        colorScheme.tertiaryContainer
+                    )
+                )
+
+                val ambientTone = animatedGradientColor(
+                    tertiaryColorPhase,
+                    listOf(
+                        colorScheme.surfaceVariant,
+                        colorScheme.primaryContainer,
+                        colorScheme.tertiaryContainer,
+                        colorScheme.secondaryContainer
+                    )
+                )
+
                 val radius = max(size.width, size.height) * (0.78f + glowPulse * 0.12f)
                 val primaryCenter = Offset(
                     x = size.width * (0.18f + primaryDrift * 0.10f),
@@ -160,8 +174,14 @@ fun AnimatedBackground(content: @Composable () -> Unit) {
                             Color.Transparent,
                             tertiaryGlow.copy(alpha = tertiaryAlpha * 0.55f),
                         ),
-                        start = Offset(size.width * (0.08f + primaryDrift * 0.06f), -size.height * 0.10f),
-                        end = Offset(size.width * (0.94f + secondaryDrift * 0.05f), size.height * 1.08f),
+                        start = Offset(
+                            size.width * (0.08f + primaryDrift * 0.06f),
+                            -size.height * 0.10f
+                        ),
+                        end = Offset(
+                            size.width * (0.94f + secondaryDrift * 0.05f),
+                            size.height * 1.08f
+                        ),
                     ),
                 )
                 drawCircle(
@@ -204,6 +224,47 @@ fun AnimatedBackground(content: @Composable () -> Unit) {
     ) {
         content()
     }
+}
+
+/**
+ * Styled chip with a text
+ */
+@Composable
+fun BoxScope.StyledChip(text: String) {
+
+    SuggestionChip(
+        onClick = {},
+        label = {
+            Text(
+                text = text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .align(Alignment.TopEnd),
+        colors = SuggestionChipDefaults.suggestionChipColors(
+            containerColor = if (isSystemInDarkTheme())
+                MaterialTheme.colorScheme.primary
+            else
+                MaterialTheme.colorScheme.secondaryContainer,
+            labelColor = Color.Black
+        ),
+        border = SuggestionChipDefaults.suggestionChipBorder(
+            enabled = true,
+            borderColor = Color.White,          // Custom border color
+            disabledBorderColor = Color.LightGray,  // Border color when disabled
+            borderWidth = 1.dp                      // Thicker stroke width
+        ),
+        /*elevation = SuggestionChipDefaults.suggestionChipElevation(
+            elevation = 4.dp,          // Default floating state elevation
+            pressedElevation = 8.dp,   // Elevation when the user presses down
+            hoveredElevation = 6.dp,   // Elevation when hovered (Desktop/Web)
+            focusedElevation = 6.dp    // Elevation when focused via keyboard/accessibility
+        )*/
+    )
+
 }
 
 private fun animatedGradientColor(

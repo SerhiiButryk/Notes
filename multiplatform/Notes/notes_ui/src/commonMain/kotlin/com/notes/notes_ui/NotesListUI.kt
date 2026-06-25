@@ -22,21 +22,28 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import api.Platform
 import api.data.Notes
 import api.data.NotesCollection
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import com.notes.ui.SearchBarField
+import com.notes.ui.StyledChip
 
 @Composable
 fun NotesListUI(
@@ -102,7 +109,12 @@ fun NotesList(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text("Create your first note by tapping '+' button")
+            SuggestionChip(
+                onClick = {},
+                label = {
+                    Text("Create your first note by tapping '+' button")
+                }
+            )
         }
     } else {
         if (isPhoneSize) {
@@ -111,7 +123,10 @@ fun NotesList(
             ) {
                 for (note in notes.collection) {
                     item(key = note.id) {
-                        EditorPreviewStateful(content = note.content) { onSelected(note) }
+                        EditorPreviewStateful(
+                            content = note.content,
+                            id = note.id,
+                        ) { onSelected(note) }
                     }
                 }
             }
@@ -122,7 +137,10 @@ fun NotesList(
             ) {
                 for (note in notes.collection) {
                     item(key = note.id) {
-                        EditorPreviewStateful(content = note.content) { onSelected(note) }
+                        EditorPreviewStateful(
+                            content = note.content,
+                            id = note.id,
+                        ) { onSelected(note) }
                     }
                 }
             }
@@ -133,27 +151,40 @@ fun NotesList(
 @Composable
 private fun EditorPreviewStateful(
     content: String,
+    id: Long,
     onClicked: () -> Unit,
 ) {
+
+    var title by rememberSaveable {
+        mutableStateOf("")
+    }
+
     // Do not use rememberRichTextState as it dramatically slows down the list
-    val state = remember(false) {
+    val state = remember {
         RichTextState()
     }
 
     LaunchedEffect(content) {
         state.clear()
         state.setHtml(content)
+        // Get first line as a title
+        val textContent = state.toText()
+        val firstLine = textContent.substringBefore('\n')
+        title = if (Platform().logger.isDebug) "[id=${id}] $firstLine"
+        else firstLine
     }
 
-    EditorPreview(state = state) {
+    EditorPreview(state = state, title = title) {
         onClicked()
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorPreview(
     state: RichTextState,
+    title: String,
     onClicked: () -> Unit,
 ) {
     val contentModifier =
@@ -164,6 +195,9 @@ private fun EditorPreview(
     Box(
         modifier = contentModifier,
     ) {
+
+        val padding = Modifier.padding(4.dp)
+
         // Readonly field doesn't react on click events
         RichTextEditor(
             state = state,
@@ -175,10 +209,10 @@ private fun EditorPreview(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
-            modifier =
-                contentModifier
-                    .padding(4.dp),
+            modifier = contentModifier.then(padding),
         )
+
+        StyledChip(title)
 
         // Composable to be able to intercept click events
         Box(

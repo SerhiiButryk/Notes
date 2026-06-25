@@ -60,16 +60,6 @@ class RegisterUIState(
 // the class is already stable, because all properties are stable.
 // However, keep it for clarity.
 @Stable
-class DialogState(
-    val title: String,
-    val subtitle: String,
-    val onConfirm: (() -> Unit)? = null
-)
-
-// This annotation could be redundant as
-// the class is already stable, because all properties are stable.
-// However, keep it for clarity.
-@Stable
 class VerificationUIState(
     val emailVerificationSent: Boolean = false,
     val email: String = "",

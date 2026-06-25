@@ -5,14 +5,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.FileObserver
 import android.provider.OpenableColumns
+import api.Platform
 import api.data.Attachments
-import api.data.Image
+import api.data.Document.Companion.createFileName
+import api.data.UserFile
 import com.notes.repo.FilesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.launch
 import java.io.File
 
 class MediaStoreUseCase(
@@ -21,21 +22,24 @@ class MediaStoreUseCase(
 
     private val filesManager = FilesManager()
 
-    fun onAttachments(attachment: Any, noteId: Long, info: Any?) {
+    fun onAttachments(
+        attachment: Any, noteId: Long, info: Any?
+    ): File? {
         val context = info as Context
         val uri = attachment as Uri
-        val name = getImageNameFromUri(context, uri)
-        val fileName = "${noteId}_img_$name"
-        scope.launch {
-            runCatching {
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    filesManager.saveImage(
-                        inputStream = inputStream,
-                        fileName = fileName
-                    )
-                }
+        val name = getImageNameFromUri(context, uri) ?: throw IllegalStateException("Can't get file name")
+        val fileName = createFileName(noteId, name)
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                return filesManager.saveImage(
+                    inputStream = inputStream,
+                    fileName = fileName
+                )
             }
+        } catch (e: Exception) {
+            Platform().logger.logi("MediaStoreUseCase::onAttachments: failed, error = $e")
         }
+        return null
     }
 
     fun getAttachments(): Flow<Attachments> =
@@ -43,8 +47,8 @@ class MediaStoreUseCase(
             .getOrCreateImageFolder()
             .observeAsFlow()
 
-    fun onDelete(image: Image) {
-        filesManager.delete(image)
+    fun onDelete(file: UserFile) {
+        filesManager.delete(file)
     }
 
     fun onDelete(noteId: Long) {

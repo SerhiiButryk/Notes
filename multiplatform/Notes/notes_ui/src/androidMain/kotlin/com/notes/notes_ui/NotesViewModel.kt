@@ -5,22 +5,20 @@ import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Immutable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import api.Platform
 import api.data.Attachments
-import api.data.Image
 import api.data.Notes
 import api.data.NotesCollection
+import api.data.UserFile
 import api.repo.RepoCallback
 import api.repo.Repository
 import com.notes.notes_ui.data.UiEvent
 import com.notes.notes_ui.data.getToolsList
 import com.notes.notes_ui.editor.EditorCommand
+import com.notes.ui.model.BaseAppVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,12 +35,7 @@ class NotesViewModel(
     appRepository: Repository = Platform().appRepo,
     // For test support
     scopeOverride: CoroutineScope? = null
-) : ViewModel(), RepoCallback {
-
-    @Immutable
-    data class DialogState(
-        val show: Boolean = false,
-    )
+) : BaseAppVM(scopeOverride), RepoCallback {
 
     companion object {
         fun getFactory(): ViewModelProvider.Factory {
@@ -53,8 +46,6 @@ class NotesViewModel(
             }
         }
     }
-
-    private val scope: CoroutineScope = scopeOverride ?: viewModelScope
 
     private val interactor: Interactor = Interactor(appRepository, this)
 
@@ -85,10 +76,8 @@ class NotesViewModel(
             Attachments(),
         )
 
-    private val _dialogState = MutableStateFlow<DialogState>(DialogState())
-    val dialogState = _dialogState.asStateFlow()
-
     override fun onCleared() {
+        super.onCleared()
         interactor.onClear()
     }
 
@@ -140,10 +129,10 @@ class NotesViewModel(
         interactor.sendEditorCommand(command)
     }
 
-    fun onAttachFile(launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>) {
+    fun onShowFilePicker(launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>) {
         // Show dialog
         scope.launch {
-            _dialogState.emit(DialogState(true))
+            showLoadingDialog()
         }
         // Ask User to select an image
         launcher.launch(
@@ -154,18 +143,28 @@ class NotesViewModel(
     }
 
     fun onAttachments(uri: Uri?, context: Context) {
-        if (uri != null) {
-            val openNoteId = _noteState.value.id
-            interactor.onAttachments(uri, openNoteId, context)
-        }
-        // Hide dialog
+        if (uri == null) return
         scope.launch {
-            _dialogState.emit(DialogState(false))
+            val openNoteId = _noteState.value.id
+            val result = interactor.onAttachments(uri, openNoteId, context)
+            dismissLoadingDialog()
+            if (!result) {
+                val title = "An error"
+                val subtitle = "Sorry, failed to add the file. Please, try again."
+                showDialog(title = title, subtitle = subtitle)
+            }
         }
     }
 
-    fun onDelete(image: Image) {
-        interactor.onDelete(image)
+    fun onDeleteAttachment(file: UserFile) {
+        scope.launch {
+            val result = interactor.onDeleteAttachment(file)
+            if (!result) {
+                val title = "An error"
+                val subtitle = "Sorry, failed to delete. Please, try again."
+                showDialog(title = title, subtitle = subtitle)
+            }
+        }
     }
 
 }

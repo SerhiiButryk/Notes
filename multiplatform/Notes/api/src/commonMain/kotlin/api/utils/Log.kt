@@ -3,6 +3,7 @@ package api.utils
 import java.io.Closeable
 
 interface Log : Closeable {
+    val isDebug: Boolean
     fun logi(message: String)
     fun loge(message: String)
     fun logd(message: String)

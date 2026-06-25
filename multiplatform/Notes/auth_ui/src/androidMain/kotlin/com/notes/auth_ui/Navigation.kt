@@ -3,7 +3,6 @@ package com.notes.auth_ui
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,7 +19,7 @@ import com.notes.auth_ui.ui.OnboardingScreen
 import com.notes.auth_ui.ui.RegisterUI
 import com.notes.auth_ui.ui.VerificationEmailUI
 import com.notes.ui.Access
-import com.notes.ui.AlertDialogUI
+import com.notes.ui.AlertDialogStateful
 import com.notes.ui.Auth
 import com.notes.ui.EmailVerification
 import com.notes.ui.MainContent
@@ -114,7 +113,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                 )
             }
 
-            Dialog(viewModel)
+            AlertDialogStateful(viewModel)
         }
 
         composable<EmailVerification> { backStackEntry ->
@@ -141,23 +140,6 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                 activity?.moveTaskToBack(true)
             }
         }
-    }
-}
-
-@Composable
-private fun Dialog(viewModel: AuthViewModel) {
-    val dialogState = viewModel.dialogState.collectAsStateWithLifecycle()
-    val dialogValue = dialogState.value
-    if (dialogValue != null) {
-        AlertDialogUI(
-            onDismissRequest = { viewModel.dismissDialog() },
-            onConfirmation = {
-                viewModel.dismissDialog()
-                dialogValue.onConfirm?.invoke()
-            },
-            dialogTitle = dialogValue.title,
-            dialogText = dialogValue.subtitle,
-        )
     }
 }
 

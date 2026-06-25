@@ -42,16 +42,16 @@ class BasicTests {
             return true
         }
 
-        override suspend fun load(name: String): Document? {
-            for (document in list) {
-                if (document.name == name) {
-                    return document
+        override suspend fun load(document: Document): Document? {
+            for (item in list) {
+                if (document.name == item.name) {
+                    return item
                 }
             }
             return null
         }
 
-        override suspend fun delete(name: String): Boolean {
+        override suspend fun delete(document: Document): Boolean {
             return true
         }
 
@@ -110,7 +110,7 @@ class BasicTests {
         var res = encryptedStore.store(doc1)
         assertThat(res).isTrue()
 
-        val retDoc = encryptedStore.load("doc1")
+        val retDoc = encryptedStore.load(Document(name = "doc1"))
 
         assertThat(retDoc).isNotNull()
         assertThat(retDoc).isEqualTo(doc1)
@@ -185,7 +185,7 @@ class BasicTests {
         val notes = listOf(Notes(content = "note 1", id = 1), Notes(content = "note 2", id = 2),
             Notes(content = "note 3", id = 3))
 
-        filesManager.saveToDisk(notes)
+        filesManager.cacheNotes(notes)
 
         val cacheDir = Platform().storage.getCacheDir()
         val file = File(cacheDir)
@@ -202,7 +202,7 @@ class BasicTests {
             assertThat(file.name).isEqualTo(notes[i].id.toString())
         }
 
-        val restoredNotes = filesManager.readFromDisk()
+        val restoredNotes = filesManager.readCache()
 
         assertThat(restoredNotes).isNotNull()
         assertThat(restoredNotes.size).isEqualTo(notes.size)
@@ -214,20 +214,20 @@ class BasicTests {
             assertThat(n.userId).isEqualTo(notes[i].userId)
         }
 
-        val notes2 = filesManager.readFromDisk()
+        val notes2 = filesManager.readCache()
         assertThat(notes2.isEmpty()).isFalse()
 
         // Remove created files
         filesManager.clearCache()
 
-        val notes3 = filesManager.readFromDisk()
+        val notes3 = filesManager.readCache()
         assertThat(notes3.isEmpty()).isTrue()
     }
 
     @Test
     fun test05_backup_no_files() = runTest {
         val filesManager = FilesManager()
-        val notes = filesManager.readFromDisk()
+        val notes = filesManager.readCache()
         assertThat(notes.isEmpty()).isTrue()
     }
 
@@ -241,7 +241,7 @@ class BasicTests {
         val notes = listOf(Notes(content = "note 1", id = 1), Notes(content = "note 2", id = 2),
             Notes(content = "note 3", id = 3))
 
-        filesManager.saveToDisk(notes)
+        filesManager.cacheNotes(notes)
 
         val cacheDir = Platform().storage.getCacheDir()
         val file = File(cacheDir)
@@ -258,7 +258,7 @@ class BasicTests {
             assertThat(file.name).isEqualTo(notes[i].id.toString())
         }
 
-        val restoredNotes = filesManager.readFromDisk()
+        val restoredNotes = filesManager.readCache()
 
         assertThat(restoredNotes).isNotNull()
         assertThat(restoredNotes.size).isEqualTo(notes.size)
@@ -276,9 +276,9 @@ class BasicTests {
             Notes(content = "note 2 Override", id = 2),
             Notes(content = "note 3 Override", id = 3))
 
-        filesManager.saveToDisk(notesOverrideList)
+        filesManager.cacheNotes(notesOverrideList)
 
-        val restoredNotesAfterOverride = filesManager.readFromDisk()
+        val restoredNotesAfterOverride = filesManager.readCache()
 
         assertThat(restoredNotesAfterOverride).isNotNull()
         assertThat(restoredNotesAfterOverride.size).isEqualTo(notesOverrideList.size)
@@ -293,7 +293,7 @@ class BasicTests {
         // Remove created files
         filesManager.clearCache()
 
-        val notesList = filesManager.readFromDisk()
+        val notesList = filesManager.readCache()
         assertThat(notesList.isEmpty()).isTrue()
 
     }
