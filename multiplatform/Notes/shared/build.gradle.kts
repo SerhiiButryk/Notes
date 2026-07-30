@@ -16,7 +16,7 @@ kotlin {
         minSdk = libs.versions.android.minSdk.get().toInt()
 
         compilerOptions {
-            val target = project.properties["jvm.target"].toString()
+            val target = libs.versions.javaversion.get()
             jvmTarget.set(JvmTarget.fromTarget(target))
         }
         androidResources {

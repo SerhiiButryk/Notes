@@ -6,16 +6,12 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -62,6 +58,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -195,12 +192,15 @@ fun AlertDialogUI(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                },
-            ) {
-                Text("Cancel")
+            // Button is disabled
+            if (false) {
+                TextButton(
+                    onClick = {
+                        onDismissRequest()
+                    },
+                ) {
+                    Text("Cancel")
+                }
             }
         },
     )
@@ -407,16 +407,20 @@ fun NetworkStateMessage() {
     val color = if (networkIsAvailable) Color(0xFF46923c) else Color(0xFFc30010)
 
     if (show) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .background(color),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom,
+        Surface(
+            color = color,
         ) {
-            val message = if (networkIsAvailable) "Network is available" else "Network is not available"
-            Text(text = message, fontSize = 16.sp)
+            val message = if (networkIsAvailable) "Network is available"
+            else "Network is not available"
+            Text(
+                text = message,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .systemBarsPadding(),
+            )
         }
     }
 

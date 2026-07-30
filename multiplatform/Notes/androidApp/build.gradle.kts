@@ -11,7 +11,7 @@ plugins {
 
 kotlin {
     compilerOptions {
-        val target = project.properties["jvm.target"].toString()
+        val target = libs.versions.javaversion.get()
         jvmTarget = JvmTarget.fromTarget(target)
     }
 }
@@ -117,7 +117,7 @@ android {
     }
 
     compileOptions {
-        val target = project.properties["jvm.target"].toString()
+        val target = libs.versions.javaversion.get()
         sourceCompatibility = JavaVersion.toVersion(target)
         targetCompatibility = JavaVersion.toVersion(target)
     }

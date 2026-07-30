@@ -190,22 +190,18 @@ class RemoteRepository() {
     }
 
     suspend fun saveAttachment(
-        scope: CoroutineScope,
         file: File,
     ): Boolean {
-        val result = scope.async {
-            Platform().logger.logi("RemoteRepository::saveAttachment")
-            val services = getServices()
-            for (service in services) {
-                // Google Drive is only supported
-                if (service.key == AppService.GOOGLE_STORAGE) {
-                    val document = Document(file)
-                    return@async service.store(document)
-                }
+        Platform().logger.logi("RemoteRepository::saveAttachment")
+        val services = getServices()
+        for (service in services) {
+            // Google Drive is only supported
+            if (service.key == AppService.GOOGLE_STORAGE) {
+                val document = Document(file)
+                return service.store(document)
             }
-            return@async false
         }
-        return result.await()
+        return false
     }
 
     suspend fun deleteAttachment(

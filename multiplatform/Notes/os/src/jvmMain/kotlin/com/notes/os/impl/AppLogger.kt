@@ -56,7 +56,7 @@ class AppLogger : PlatformLog() {
 
             override fun isTraceInProgress(): Boolean {
                 // Always enabled
-                return isDebug.load()
+                return isDebug
             }
 
             override fun traceEventEnd() {

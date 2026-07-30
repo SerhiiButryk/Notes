@@ -143,11 +143,13 @@ class NotesViewModel(
     }
 
     fun onAttachments(uri: Uri?, context: Context) {
+        scope.launch {
+            dismissLoadingDialog()
+        }
         if (uri == null) return
         scope.launch {
             val openNoteId = _noteState.value.id
             val result = interactor.onAttachments(uri, openNoteId, context)
-            dismissLoadingDialog()
             if (!result) {
                 val title = "An error"
                 val subtitle = "Sorry, failed to add the file. Please, try again."

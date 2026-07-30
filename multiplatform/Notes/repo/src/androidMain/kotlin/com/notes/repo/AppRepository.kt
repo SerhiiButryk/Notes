@@ -14,6 +14,7 @@ import com.notes.repo.feature.ChangePasswordUseCase
 import com.notes.repo.feature.MediaStoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -172,17 +173,19 @@ class AppRepository private constructor(
         remoteRepository.syncIfNeeded(newScope ?: scope)
 
     override suspend fun onAttachments(attachment: Any, noteId: Long, info: Any?): Boolean {
-        val createdFile = mediaStore.onAttachments(attachment, noteId, info)
-        return if (createdFile != null) {
-            val result = remoteRepository.saveAttachment(scope = scope, file = createdFile)
-            if (!result) {
-                // Delete created file
-                createdFile.delete()
+        return scope.async {
+            val createdFile = mediaStore.onAttachments(attachment, noteId, info)
+            if (createdFile != null) {
+                val result = remoteRepository.saveAttachment(file = createdFile)
+                if (!result) {
+                    // Delete created file
+                    createdFile.delete()
+                }
+                result
+            } else {
+                false
             }
-            result
-        } else {
-            false
-        }
+        }.await()
     }
 
     override fun getAttachments() = mediaStore.getAttachments()
