@@ -109,6 +109,7 @@ fun SettingsScreen(
                     GeneralSettingsScreen(
                         title = "Account",
                         onBackClick = onBackClick,
+                        alignment = Alignment.CenterHorizontally,
                     ) {
                         AccountSettings(accountInfo = accountInfo)
                     }
@@ -123,6 +124,7 @@ fun SettingsScreen(
 private fun GeneralSettingsScreen(
     title: String,
     onBackClick: () -> Unit,
+    alignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable () -> Unit,
 ) {
     Column {
@@ -152,7 +154,7 @@ private fun GeneralSettingsScreen(
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(scrollState),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = alignment,
         ) {
             content()
         }

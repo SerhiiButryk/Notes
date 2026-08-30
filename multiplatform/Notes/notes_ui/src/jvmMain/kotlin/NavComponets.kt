@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun EntryProviderScope<NavKey>.mainContentDestination(
     onSettingsClick: () -> Unit,
-    onAccountClick: () -> Unit,
+    onNavToAuth: () -> Unit,
     onBack: () -> Unit,
 ) {
 
@@ -62,7 +62,11 @@ fun EntryProviderScope<NavKey>.mainContentDestination(
             onBackClick = onBack,
             accountInfo = accountInfo,
             onDebugModeChanged = viewModel::onDebugChanged,
-            onSignOut = viewModel::onSignOut,
+            onSignOut = {
+                viewModel.onSignOut {
+                    onNavToAuth()
+                }
+            },
             isDebugMode = settings.isDebug,
         )
 

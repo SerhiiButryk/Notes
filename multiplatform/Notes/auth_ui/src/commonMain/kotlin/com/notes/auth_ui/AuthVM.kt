@@ -44,6 +44,15 @@ class AuthVM(
         }
     }
 
+    fun onOpen() {
+        // Reset state when UI gets open
+        scope.launch {
+            _uiStateLogin.showProgress(show = false)
+            dismissDialog()
+            dismissLoadingDialog()
+        }
+    }
+
     fun login(
         state: LoginUIState,
         onSuccess: () -> Unit,

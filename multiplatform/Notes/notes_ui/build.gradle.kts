@@ -66,9 +66,6 @@ kotlin {
 
             // Compose tracing
             // implementation(libs.androidx.compose.runtime.tracing)
-
-            // Image loading
-            implementation(libs.coil.compose)
         }
         commonMain.dependencies {
 
@@ -85,6 +82,15 @@ kotlin {
             // Kotlin coroutines
             implementation(libs.kotlinx.coroutines.core)
 
+            // Image loading
+            implementation(libs.coil.compose)
+
+            // Serialization
+            implementation(libs.serializationJson)
+
+            // Navigation 3
+            implementation(libs.navigation3.ui)
+
             // Compose
             implementation(libs.runtime)
             implementation(libs.foundation)
@@ -95,21 +101,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.jetbrains.material.icons.extended)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-
             implementation(libs.components.splitpane)
-
-            // Image loading
-            implementation(libs.coil.compose)
-
-            // Serialization
-            implementation(libs.serializationJson)
-            // Navigation 3
-            implementation(libs.jetbrains.navigation3.ui)
-            // View Model
-            implementation(libs.androidx.lifecycle.viewmodel)
+        }
+        jvmMain.dependencies {
         }
     }
 }

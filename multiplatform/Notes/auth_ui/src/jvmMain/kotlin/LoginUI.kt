@@ -14,7 +14,13 @@ import kotlin.String
 fun LoginScreenImpl(
     state: LoginUIState,
     onLogin: (LoginUIState) -> Unit,
+    onOpen: () -> Unit,
 ) {
+
+    LaunchedEffect(false) {
+        onOpen()
+    }
+
     LoginUIImpl(
         state = state,
         onLogin = onLogin,

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Copyright 2026. Happy coding ! :)
 # Author: Serhii Butryk 
 
 # Fail if somthing is wrong
@@ -39,11 +38,19 @@ pushd ${SCRIPT_RELEVANT_PATH}/../
 popd
 
 # Copy final jar file
-<<<<<<< HEAD
-cp -rf -v ${PROJECT_FOLDER}/composeApp/build/compose/jars/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
-=======
 cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/compose/jars/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
->>>>>>> 5e85d9b7 (A merge from master branch:)
+
+print_message "******** Running tests *********"
+
+pushd ${PROJECT_FOLDER}
+./gradlew --console plain -Pandroid.testInstrumentationRunnerArguments.class=com.notes.app.JvmBasicTests desktopApp:test
+popd
+
+# Copy test results
+cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/test-results/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/test-results
+cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/reports/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}/test-results
+
+print_message "******** Done with tests *********"
 
 # Print folder content
 print_message "******** Log output folder *********"

@@ -32,6 +32,7 @@ fun EntryProviderScope<NavKey>.authDestination(
                 viewModel.login(state = it, onSuccess = onNavLogin)
             },
             state = uiState,
+            onOpen = viewModel::onOpen,
         )
     }
 

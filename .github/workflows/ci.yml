@@ -15,21 +15,13 @@ jobs:
         api-level: [26]
     steps:
       - name: Checkout code
-<<<<<<< HEAD
-        uses: actions/checkout@v4
-=======
         uses: actions/checkout@v6
->>>>>>> 5e85d9b7 (A merge from master branch:)
         with:
           submodules: true 
           fetch-depth: 0
 
       - name: Set up JDK
-<<<<<<< HEAD
-        uses: actions/setup-java@v4
-=======
         uses: actions/setup-java@v5
->>>>>>> 5e85d9b7 (A merge from master branch:)
         with:
           java-version: '21'
           distribution: 'zulu'
@@ -44,11 +36,7 @@ jobs:
           ./tools/build.sh
 
       - name: "Cache AVD"
-<<<<<<< HEAD
-        uses: actions/cache@v4
-=======
         uses: actions/cache@v5
->>>>>>> 5e85d9b7 (A merge from master branch:)
         id: avd-cache
         with:
           path: |
@@ -68,18 +56,10 @@ jobs:
 
       - name: Upload Android Artifacts
         if: always()
-<<<<<<< HEAD
-        uses: actions/upload-artifact@v4
-        with:
-          name: Android_Artifact
-          # NOTE: Verify if your output is actually in /Notes-App or in /app/build/outputs/apk/
-          path: "**/build/outputs/apk/**/*.apk" 
-=======
         uses: actions/upload-artifact@v6
         with:
           name: Android_Artifact
           path: "./Notes-App/**" 
->>>>>>> 5e85d9b7 (A merge from master branch:)
           if-no-files-found: warn
 
   # Job 2: Build JVM Desktop target
@@ -87,21 +67,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-<<<<<<< HEAD
-        uses: actions/checkout@v4
-=======
         uses: actions/checkout@v6
->>>>>>> 5e85d9b7 (A merge from master branch:)
         with:
           submodules: true 
           fetch-depth: 0
 
       - name: Set up JDK
-<<<<<<< HEAD
-        uses: actions/setup-java@v4
-=======
         uses: actions/setup-java@v5
->>>>>>> 5e85d9b7 (A merge from master branch:)
         with:
           java-version: '21'
           distribution: 'zulu'
@@ -114,12 +86,8 @@ jobs:
 
       - name: Upload Desktop Artifacts
         if: always()
-<<<<<<< HEAD
-        uses: actions/upload-artifact@v4
-=======
         uses: actions/upload-artifact@v6
->>>>>>> 5e85d9b7 (A merge from master branch:)
         with:
           name: JVM_Desktop_Artifact
-          path: "**/build/compose/jars/*.jar"
+          path: "./Notes-App/**"
           if-no-files-found: warn

@@ -48,8 +48,6 @@ dependencies {
     // Serialization
     implementation(libs.serializationJson)
 
-    // Navigation 3
-    implementation(libs.jetbrains.navigation3.ui)
     implementation(libs.androidx.profileinstaller)
 
     // The consumer app ('androidApp') knows where to get the generated profile from.

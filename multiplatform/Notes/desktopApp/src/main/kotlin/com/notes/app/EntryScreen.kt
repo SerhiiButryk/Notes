@@ -100,10 +100,11 @@ fun Navigation(viewModel: AuthVM, startDestination: NavKey) {
                     onSettingsClick = {
                         backstack.add(SettingsScreen)
                     },
-                    onAccountClick = {
-                        backstack.add(AccountInfoScreen)
-                    },
                     onBack = onBack,
+                    onNavToAuth = {
+                        backstack.clear()
+                        backstack.add(LoginScreen)
+                    },
                 )
 
             },

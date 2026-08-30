@@ -41,7 +41,7 @@ dependencies {
     implementation(libs.serializationJson)
 
     // Navigation 3
-    implementation(libs.jetbrains.navigation3.ui)
+    implementation(libs.navigation3.ui)
 
     // Testing modules
     testImplementation(projects.localDb)
