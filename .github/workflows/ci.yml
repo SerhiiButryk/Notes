@@ -79,10 +79,10 @@ jobs:
           distribution: 'zulu'
           cache: gradle
 
-      - name: Build Jvm Desktop
+      - name: Build Desktop
         run: |
           chmod +x tools/build_desktop.sh
-          ./tools/build_jvm_desktop.sh
+          ./tools/build_desktop.sh
 
       - name: Upload Desktop Artifacts
         if: always()

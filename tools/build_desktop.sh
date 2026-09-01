@@ -18,9 +18,9 @@ REPORTS_FOLDER_NAME="reports"
 
 print_message "******** Started building *********"
 
-# Build app
+# Build app for MacOS
 pushd ${PROJECT_FOLDER}
-./gradlew packageUberJarForCurrentOS --console=plain
+./gradlew packageDmg --console=plain
 popd
 
 print_message "******** Finished *********"
@@ -37,7 +37,7 @@ pushd ${SCRIPT_RELEVANT_PATH}/../
 popd
 
 # Copy final jar file
-cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/compose/jars/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/compose/binaries/main/dmg/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 print_message "******** Running tests *********"
 

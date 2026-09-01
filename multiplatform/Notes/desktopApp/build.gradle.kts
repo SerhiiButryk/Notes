@@ -59,9 +59,14 @@ compose.desktop {
         mainClass = "com.notes.app.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Deb)
+            targetFormats(TargetFormat.Deb, TargetFormat.Dmg, TargetFormat.AppImage)
             packageName = "com.notes.app"
             packageVersion = "1.0.0"
+
+            macOS {
+                bundleID = "com.notes.app"
+                dockName = "Notes"
+            }
         }
     }
 }
