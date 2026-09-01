@@ -12,7 +12,6 @@ SCRIPT_RELEVANT_PATH=$( dirname $BASH_SOURCE[0] )
 SCRIPT_ABSOLUTE_PATH="$( dirname $( pwd )$(cut -c 2- <<< $0) )"
 
 PROJECT_FOLDER="${SCRIPT_RELEVANT_PATH}/../multiplatform/Notes"
-OUTPUT_FOLDER="${SCRIPT_RELEVANT_PATH}/../multiplatform/Notes/composeApp/build/outputs"
 
 ARTIFACT_FOLDER_NAME="Notes-App"
 REPORTS_FOLDER_NAME="reports"

@@ -62,9 +62,9 @@ jobs:
           path: "./Notes-App/**" 
           if-no-files-found: warn
 
-  # Job 2: Build JVM Desktop target
+  # Job 2: Build for Desktop target
   build-jvm-desktop:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -81,7 +81,7 @@ jobs:
 
       - name: Build Jvm Desktop
         run: |
-          chmod +x tools/build_jvm_desktop.sh
+          chmod +x tools/build_desktop.sh
           ./tools/build_jvm_desktop.sh
 
       - name: Upload Desktop Artifacts
