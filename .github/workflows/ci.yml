@@ -79,7 +79,7 @@ jobs:
           distribution: 'zulu'
           cache: gradle
 
-      - name: Build Desktop
+      - name: Build & Test Desktop
         run: |
           chmod +x tools/build_desktop.sh
           ./tools/build_desktop.sh

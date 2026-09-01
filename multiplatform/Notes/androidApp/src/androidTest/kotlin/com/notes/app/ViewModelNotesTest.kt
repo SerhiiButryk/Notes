@@ -31,6 +31,7 @@ import org.junit.runner.RunWith
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.reflect.full.declaredMemberFunctions
+import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
 
 @OptIn(ExperimentalAtomicApi::class)
@@ -105,7 +106,7 @@ class ViewModelNotesTest {
     @After
     fun onFinish() {
         assertThat(cleared.load()).isFalse()
-        val onClear = viewModel!!::class.declaredMemberFunctions.find { it.name == "onCleared" }
+        val onClear = viewModel!!::class.memberFunctions.find { it.name == "onCleared" }
         if (onClear != null) {
             onClear.isAccessible = true
             onClear.call(viewModel)
