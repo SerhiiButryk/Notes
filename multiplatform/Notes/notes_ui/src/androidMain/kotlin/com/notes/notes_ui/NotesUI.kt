@@ -175,7 +175,7 @@ private fun ListDetailUI(
     val coroutineScope = rememberCoroutineScope()
 
     var state by remember(note.content) {
-        mutableStateOf(createEditorState(note))
+        mutableStateOf(createEditorState(note.richString))
     }
 
     NavigableListDetailPaneScaffold(
@@ -192,7 +192,7 @@ private fun ListDetailUI(
                     onSelected = { selectedNote ->
                         // Open Note Editor Screen
                         coroutineScope.launch {
-                            state = createEditorState(selectedNote)
+                            state = createEditorState(selectedNote.richString)
                             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onSelectAction(selectedNote)
                         }
@@ -200,7 +200,7 @@ private fun ListDetailUI(
                     addAction = {
                         // Open Note Editor Screen
                         coroutineScope.launch {
-                            state = createEditorState(Notes())
+                            state = createEditorState(Notes().richString)
                             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onAddAction()
                         }

@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import api.Platform
 import com.notes.auth_ui.data.LoginUIState
 import com.notes.auth_ui.data.RegisterUIState
+import com.notes.ui.LoadingNoteScreen
 import com.notes.ui.LoginScreen
 import com.notes.ui.OnBoardingNoteScreen
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +28,7 @@ class AuthVM(
     private val _uiStateLogin = MutableStateFlow(LoginUIState())
     val loginUIState = _uiStateLogin.asStateFlow()
 
-    val startDestination = mutableStateOf<NavKey?>(null)
+    val startDestination = mutableStateOf<NavKey>(LoadingNoteScreen)
 
     init {
         val firstLaunch = scope.async (Dispatchers.IO) {

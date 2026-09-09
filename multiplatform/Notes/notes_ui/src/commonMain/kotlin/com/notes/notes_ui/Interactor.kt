@@ -1,21 +1,20 @@
 package com.notes.notes_ui
 
-import api.Platform
 import api.data.Attachments
 import api.data.Notes
 import api.data.UserFile
 import api.repo.RepoCallback
 import api.repo.Repository
 import com.notes.notes_ui.editor.Command
-import com.notes.notes_ui.editor.HtmlParser
 import com.notes.notes_ui.editor.RichEditor
-import com.notes.notes_ui.editor.toHtml
+import com.notes.notes_ui.editor.mapToHtml
 import dev.mkeeda.arranger.richtext.editor.RichTextState
+import dev.mkeeda.arranger.richtext.html.toHtml
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class Interactor(
@@ -23,6 +22,7 @@ class Interactor(
     private val repoCallback: RepoCallback,
     private val textEditor: RichEditor = RichEditor(),
     private val scope: CoroutineScope,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
     fun onEditorOpen() {
     }
@@ -38,13 +38,17 @@ class Interactor(
         textEditor.onCommand(command, state)
     }
 
+    fun isActiveCommand(
+        command: Command,
+        state: RichTextState,
+    ): Boolean = textEditor.isActive(command, state)
+
     fun saveNote(
         state: RichTextState,
         note: Notes,
     ) {
-        // Transforms rich state to HTML and saves it
-        scope.launch(Dispatchers.Default) {
-            repository.saveNote(note.copy(content = state.toHtml())) {
+        scope.launch(context = dispatcher) {
+            repository.saveNote(note.copy(content = state.richString.toHtml())) {
                 repoCallback.onNoteAdded(it)
             }
         }
@@ -56,22 +60,13 @@ class Interactor(
         }
     }
 
-    // Transforms HTML to rich state and sets 'richString' field
     fun getNotes(): Flow<List<Notes>> =
         flow {
             repository
                 .getNotes()
-                .collect { list ->
-                    val newList = mutableListOf<Notes>()
-                    list.forEach { note ->
-                        Platform().logger.logi("getNotes(): Parsing note ('${note.id}')...")
-                        val richString = HtmlParser().parse(note.content)
-                        note.richString = richString
-                        newList.add(note)
-                    }
-                    emit(newList)
-                }
-        }.flowOn(Dispatchers.Default)
+                .mapToHtml(context = dispatcher)
+                .collect { emit(it) }
+        }
 
     fun getNotes(id: Long): Flow<Notes?> = repository.getNotes(id)
 
@@ -87,5 +82,6 @@ class Interactor(
 
     fun getAttachments(): Flow<Attachments> = repository.getAttachments()
 
-    suspend fun onDeleteAttachment(file: UserFile): Boolean = repository.onDeleteAttachment(file)
+    suspend fun onDeleteAttachment(file: UserFile): Boolean =
+        repository.onDeleteAttachment(file)
 }

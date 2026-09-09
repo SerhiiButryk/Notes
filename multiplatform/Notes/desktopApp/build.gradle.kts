@@ -59,7 +59,7 @@ compose.desktop {
         mainClass = "com.notes.app.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Deb, TargetFormat.Dmg, TargetFormat.AppImage)
+            targetFormats(TargetFormat.Dmg)
             packageName = "com.notes.app"
             packageVersion = "1.0.0"
 
@@ -67,6 +67,23 @@ compose.desktop {
                 bundleID = "com.notes.app"
                 dockName = "Notes"
             }
+
+            // Explicitly add the missing sun/misc/Unsafe module
+            modules("jdk.unsupported")
+            // Explicitly add the missing sql module
+            modules("java.sql")
+        }
+
+        // Configure ProGuard for the release build type
+        buildTypes.release.proguard {
+            isEnabled.set(true)    // Enables ProGuard processing
+            obfuscate.set(false)   // Enables code obfuscation (renaming classes/methods)
+            optimize.set(false)    // Enables bytecode optimization
+
+            // Proguard version
+            version.set("7.5.0")
+
+            configurationFiles.from(project.file("compose-desktop.pro"))
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Folder
@@ -33,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
@@ -44,6 +46,7 @@ import api.data.AppSettings
 import api.data.Notes
 import com.notes.notes_ui.components.ToolsBar
 import com.notes.notes_ui.models.Tools
+import com.notes.ui.theme.backgroundColor
 import dev.mkeeda.arranger.richtext.editor.RichTextEditor
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 import dev.mkeeda.arranger.richtext.editor.material3.rememberMaterial3AttributeStyleResolver
@@ -58,6 +61,7 @@ fun NotesEditorUI(
     onAttacheFile: () -> Unit = {},
     showFolderButton: Boolean,
     bottomSheetState: SheetState,
+    showTopBar: Boolean = true,
     content: @Composable () -> Unit = {},
 ) {
     EditorUI(
@@ -69,6 +73,7 @@ fun NotesEditorUI(
         content,
         showFolderButton,
         bottomSheetState,
+        showTopBar,
     )
 }
 
@@ -83,6 +88,7 @@ private fun EditorUI(
     content: @Composable () -> Unit,
     showFolderButton: Boolean,
     bottomSheetState: SheetState,
+    showTopBar: Boolean,
 ) {
     // Controller to hide the keyboard when Boot Sheet is going to be shown.
     // In such case we will have smooth UI transition to new state
@@ -98,7 +104,7 @@ private fun EditorUI(
 
     Scaffold(
         topBar = {
-            if (notes != Notes.AbsentNote()) {
+            if (notes != Notes.AbsentNote() && showTopBar) {
                 TopAppBar(
                     modifier = Modifier.padding(bottom = 4.dp),
                     title = { },
@@ -169,7 +175,9 @@ private fun EditorUI(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .background(color = MaterialTheme.colorScheme.surface),
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(color = backgroundColor()),
                 ) {
                     EditorLayout(
                         state = state,
@@ -178,11 +186,14 @@ private fun EditorUI(
                         // composable is measured specifically after the tools pane.
                         modifier = Modifier.weight(1f),
                     )
-                    ToolsBar(
-                        state = state,
-                        tools = tools,
-                        notes = notes,
-                    )
+                    // If we don't show top bar then don't show toolbar as well
+                    if (showTopBar) {
+                        ToolsBar(
+                            state = state,
+                            tools = tools,
+                            notes = notes,
+                        )
+                    }
                 }
             }
         }
@@ -222,12 +233,10 @@ fun EditorLayout(
     RichTextEditor(
         state = state,
         readOnly = readOnly,
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 6.dp)
-                .focusRequester(focusRequester)
-                .then(modifier),
+        modifier = Modifier
+            .fillMaxSize()
+            .focusRequester(focusRequester)
+            .then(modifier),
         textStyle =
             MaterialTheme.typography.bodyLarge.copy(
                 fontSize = fontSize,

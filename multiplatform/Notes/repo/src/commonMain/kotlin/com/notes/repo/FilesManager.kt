@@ -19,9 +19,13 @@ private const val tag = "FilesManager"
 
 class FilesManager {
 
+    // Application cach dirs
+    val firstCacheDir = Platform().getCacheDir()
+    val secondCacheDir = Platform().getCacheDir() + "/cache"
+
     suspend fun cacheNotes(
         notes: List<Notes>,
-        cacheDir: String = Platform().getCacheDir()
+        cacheDir: String = firstCacheDir,
     ): Boolean {
         for (note in notes) {
             // A name of a file is note id
@@ -48,7 +52,7 @@ class FilesManager {
     }
 
     suspend fun readCache(
-        cacheDir: String = Platform().getCacheDir()
+        cacheDir: String = firstCacheDir
     ): List<Notes> {
 
         val notes = mutableListOf<Notes>()
@@ -149,17 +153,17 @@ class FilesManager {
     }
 
     fun scanFolder(path: String): Attachments {
-        val images = mutableListOf<UserFile>()
-        val imgFolder = File(path)
-        val files = imgFolder.listFiles()
+        val userFiles = mutableListOf<UserFile>()
+        val folder = File(path)
+        val files = folder.listFiles()
         files?.forEach { f ->
-            images.add(UserFile(f))
+            userFiles.add(UserFile(f))
         }
-        return Attachments(images)
+        return Attachments(userFiles)
     }
 
     suspend fun clearCache() {
-        val cacheDir = Platform().getCacheDir()
+        val cacheDir = firstCacheDir
         val files = File(cacheDir).listFiles()
         if (files != null) {
             files.forEach { file ->

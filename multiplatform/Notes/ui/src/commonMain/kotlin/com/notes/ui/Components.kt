@@ -32,6 +32,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SearchBar
@@ -52,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.CornerRadius
@@ -59,6 +62,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -70,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import api.Platform
+import com.notes.ui.theme.iconColor
 import kotlinx.coroutines.delay
 
 /**
@@ -492,6 +497,47 @@ fun NetworkStateMessage() {
                         .fillMaxWidth()
                         .padding(10.dp)
                         .systemBarsPadding(),
+            )
+        }
+    }
+}
+
+/**
+ * A button which can be in active or inactive state
+ */
+@Composable
+fun ToggleButton(
+    modifier: Modifier = Modifier,
+    isActive: Boolean,
+    isEnabled: Boolean,
+    onClick: () -> Unit,
+    imageVector: ImageVector?,
+    painter: Painter?,
+) {
+    val unfocusableModifier = Modifier.focusProperties { canFocus = false }
+    val colors =
+        IconButtonDefaults.iconToggleButtonColors(
+            checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    IconToggleButton(
+        checked = isActive,
+        onCheckedChange = { onClick() },
+        enabled = isEnabled,
+        colors = colors,
+        modifier = modifier.then(unfocusableModifier),
+    ) {
+        if (imageVector != null) {
+            Icon(
+                tint = iconColor(isEnabled),
+                imageVector = imageVector,
+                contentDescription = "",
+            )
+        } else {
+            Icon(
+                tint = iconColor(isEnabled),
+                painter = painter!!,
+                contentDescription = "",
             )
         }
     }

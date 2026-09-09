@@ -88,7 +88,7 @@ fun SidebarItem(
             .clip(RoundedCornerShape(12.dp))
             .background(itemColor)
             .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(all = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

@@ -15,9 +15,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EntryProviderScope<NavKey>.mainContentDestination(
-    onSettingsClick: () -> Unit,
     onNavToAuth: () -> Unit,
     onBack: () -> Unit,
+    onThemeChange: () -> Unit,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -30,7 +30,6 @@ fun EntryProviderScope<NavKey>.mainContentDestination(
         val note by viewModel.noteState.collectAsState()
 
         NotesScreenImpl(
-            onSettingsClick = onSettingsClick,
             noteList = noteList,
             note = note,
             onSelectAction = {
@@ -68,6 +67,7 @@ fun EntryProviderScope<NavKey>.mainContentDestination(
                 }
             },
             isDebugMode = settings.isDebug,
+            onThemeChange = onThemeChange,
         )
 
     }

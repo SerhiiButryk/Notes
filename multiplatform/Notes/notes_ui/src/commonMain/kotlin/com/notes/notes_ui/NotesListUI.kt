@@ -16,10 +16,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -32,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import api.Platform
@@ -40,6 +39,7 @@ import api.data.Notes
 import api.data.NotesCollection
 import com.notes.notes_ui.editor.createEditorState
 import com.notes.ui.StyledChip
+import com.notes.ui.theme.backgroundColor
 import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 
@@ -138,7 +138,7 @@ private fun EditorPreviewStateful(
 
     val state =
         remember(note.content) {
-            createEditorState(note)
+            createEditorState(note.richString)
         }
 
     LaunchedEffect(note.content) {
@@ -158,7 +158,6 @@ private fun EditorPreviewStateful(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorPreview(
     state: RichTextState,
@@ -169,17 +168,27 @@ private fun EditorPreview(
         Modifier
             .fillMaxWidth()
             .heightIn(max = 250.dp)
-            .padding(4.dp)
+            .padding(all = 6.dp)
+
+    val shape = RoundedCornerShape(10)
 
     Box(
         modifier =
             contentModifier.background(
-                shape = RoundedCornerShape(10),
-                color = MaterialTheme.colorScheme.surface,
+                shape = shape,
+                color = backgroundColor(),
+            ).shadow(
+                elevation = 0.dp,
+                shape = shape,
+                clip = true,
             ),
     ) {
         // Readonly field doesn't react on click events
-        EditorLayout(state = state, readOnly = true)
+        EditorLayout(
+            state = state,
+            readOnly = true,
+            modifier = Modifier.padding(all = 6.dp)
+        )
 
         StyledChip(title)
 

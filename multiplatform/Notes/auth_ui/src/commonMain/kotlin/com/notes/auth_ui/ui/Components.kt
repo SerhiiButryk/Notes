@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notes.ui.AccentButton
 import com.notes.ui.InputTextField
-import com.notes.ui.theme.SurfaceColor
+import com.notes.ui.theme.surfaceColor
 
 @Composable
 fun AuthHeader(
@@ -194,7 +194,7 @@ fun SurfaceContainer(
             Modifier
                 .padding(all = 10.dp)
                 .then(modifier),
-        color = SurfaceColor(),
+        color = surfaceColor(),
     ) {
         content()
     }

@@ -20,7 +20,7 @@ print_message "******** Started building *********"
 
 # Build app for MacOS
 pushd ${PROJECT_FOLDER}
-./gradlew packageDmg --console=plain
+./gradlew packageReleaseDmg --console=plain
 popd
 
 print_message "******** Finished *********"

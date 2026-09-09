@@ -190,17 +190,22 @@ private fun ToolsMenu(
             forceAnimation = startAnimation,
         )
 
+        val dismiss = {
+            expanded = false
+            startAnimation.value = false
+        }
+
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-                startAnimation.value = false
-            },
+            onDismissRequest = dismiss,
         ) {
             for (tool in tools.list) {
                 MenuItem(
                     tool = tool,
-                    onAction = { tool.onClick(state, notes) },
+                    onAction = {
+                        tool.onClick(state, notes)
+                        dismiss()
+                    },
                 )
             }
         }

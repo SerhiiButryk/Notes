@@ -1,18 +1,24 @@
 [versions]
+
 # Upgrading could lead to new build issues.
+
 agp = "9.1.1"
+
 # Kotlin versions
-firebaseFirestore = "2.6.0"
+
 kotlin = "2.3.2"
 kotlinPlugin = "2.3.20"
+
 # Android versions
+
 android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "37"
 javaversion = "21"
+
 # Other versions
-arrangerRichtextEditor = "0.3.0-alpha03"
-arrangerRichtextEditorMaterial3 = "0.3.0-alpha03"
+
+arrangerRichtextEditor = "0.4.0-alpha02"
 coilCompose = "3.4.0"
 composeMultiplatform = "1.10.3" # Upgrading could lead to new build issues.
 composeHotReload = "1.2.0"
@@ -41,7 +47,6 @@ jsonserialization = "1.11.0"
 runner = "1.7.0"
 navigation = "2.9.8"
 runtime = "1.11.1"
-serialization = "2.4.10"
 startupRuntime = "1.2.0"
 tinkAndroid = "1.16.0"
 tracingPerfetto = "1.0.1"
@@ -79,6 +84,7 @@ roomCommonJvm = "2.7.0"
 roomRuntimeJvm = "2.7.0"
 sqliteBundledJvmVersion = "2.5.0"
 sqliteJvm = "2.7.0"
+firebaseFirestore = "2.6.0"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -93,7 +99,8 @@ androidx-tracing-perfetto-binary = { module = "androidx.tracing:tracing-perfetto
 androidx-tracing-wire = { module = "androidx.tracing:tracing-wire", version.ref = "tracingWire" }
 androidx-tracing = { module = "androidx.tracing:tracing", version.ref = "tracing" }
 arranger-richtext-editor = { module = "dev.mkeeda.arranger:arranger-richtext-editor", version.ref = "arrangerRichtextEditor" }
-arranger-richtext-editor-material3 = { module = "dev.mkeeda.arranger:arranger-richtext-editor-material3", version.ref = "arrangerRichtextEditorMaterial3" }
+arranger-richtext-editor-material3 = { module = "dev.mkeeda.arranger:arranger-richtext-editor-material3", version.ref = "arrangerRichtextEditor" }
+arranger-richtext-html = { module = "dev.mkeeda.arranger:arranger-richtext-html", version.ref = "arrangerRichtextEditor" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 components-splitpane = { module = "org.jetbrains.compose.components:components-splitpane", version.ref = "componentsSplitpane" }
 devfirebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseCommon" }
@@ -179,7 +186,7 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinPlugin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "klint" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }

@@ -1,11 +1,15 @@
 package com.notes.app
 
+import api.AppService
 import api.Platform
+import api.data.AbstractStorageService
+import api.data.Document
 import api.data.Notes
 import com.google.common.truth.Truth.assertThat
 import com.notes.db.impl.getDatabaseInstance
 import com.notes.db.model.NoteMetadata
 import com.notes.os.impl.crypto.JVMKeyStore
+import com.notes.repo.FilesManager
 import com.notes.repo.JvmSyncManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -138,7 +142,8 @@ class JvmBasicTests : BaseTest() {
 
             val syncManager = JvmSyncManager()
 
-            val dir = File(syncManager.cacheDir)
+            val fileManager = FilesManager()
+            val dir = File(fileManager.secondCacheDir)
             assertThat(dir.isDirectory).isTrue()
             assertThat(dir.list().size == 0).isTrue()
 
@@ -202,9 +207,84 @@ class JvmBasicTests : BaseTest() {
             val records = syncManager.database.fetch()
             assertThat(records.isEmpty()).isTrue()
 
-            val dirAfter = File(syncManager.cacheDir)
+            val dirAfter = File(fileManager.secondCacheDir)
             assertThat(dirAfter.isDirectory).isTrue()
             assertThat(dirAfter.list().size == 0).isTrue()
         }
+
+    @Test
+    fun test06_clear_local_storage() =
+
+        runTest {
+
+            val syncManager = JvmSyncManager()
+
+            // Make sure directory and database are empty
+
+            val fileManager = FilesManager()
+            val dir = File(fileManager.secondCacheDir)
+            assertThat(dir.isDirectory).isTrue()
+            assertThat(dir.list().size == 0).isTrue()
+
+            assertThat(syncManager.database.fetch().isEmpty()).isTrue()
+
+            // Perform testing
+
+            val note = Notes(content = "Test1", id = 1)
+
+            syncManager.store(notes = listOf(note), false, this)
+
+            assertThat(dir.list().size == 1).isTrue()
+
+            syncManager.updateMetadata(dataStore = FakeDataStore(), note = note)
+
+            assertThat(syncManager.isAllInSync()).isTrue()
+
+            val records = syncManager.database.fetch()
+            assertThat(records.isEmpty()).isFalse()
+            assertThat(records.size == 1).isTrue()
+
+            // Clean up
+
+            syncManager.clearLocalStorage()
+
+            // Check actual result
+
+            val recordsAfter = syncManager.database.fetch()
+            assertThat(recordsAfter.isEmpty()).isTrue()
+            assertThat(recordsAfter.size == 0).isTrue()
+
+            assertThat(dir.list().size == 0).isTrue()
+
+        }
+
+    private class FakeDataStore : AbstractStorageService() {
+
+        override val key: Any
+            get() = AppService.FIREBASE_STORAGE
+
+        override var canUse: Boolean = true
+
+        override suspend fun store(document: Document): Boolean {
+            return true
+        }
+
+        override suspend fun load(document: Document): Document? {
+            return null
+        }
+
+        override suspend fun delete(document: Document): Boolean {
+            return true
+        }
+
+        override suspend fun selectDocName(initial: Long): Long? {
+            return null
+        }
+
+        override suspend fun fetchAll(): List<Document> {
+            return emptyList()
+        }
+
+    }
 
 }

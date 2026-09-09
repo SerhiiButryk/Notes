@@ -27,7 +27,7 @@ import kotlin.concurrent.thread
 class JvmSyncManager : ClientSyncManager {
 
     private val fileManager = FilesManager()
-    val cacheDir = Platform().getCacheDir() + "/cache"
+
     private val tag = "JvmSyncManager"
 
     private val scanSignal = Channel<Unit>()
@@ -35,18 +35,18 @@ class JvmSyncManager : ClientSyncManager {
     val database = getDatabaseInstance()
 
     init {
-        startFileObserver(cacheDir)
+        startFileObserver(fileManager.secondCacheDir)
     }
 
     override val notes: Flow<List<Notes>> = flow {
         // Get initial data
-        val notes = fileManager.readCache(cacheDir)
+        val notes = fileManager.readCache(fileManager.secondCacheDir)
         emit(notes)
         while (true) {
             scanSignal.receive()
             Platform().logger.logi("$tag: received file change event")
             // Rescan folder
-            val notes = fileManager.readCache(cacheDir)
+            val notes = fileManager.readCache(fileManager.secondCacheDir)
             Platform().logger.logi("$tag: emitting...")
             emit(notes)
         }
@@ -63,22 +63,22 @@ class JvmSyncManager : ClientSyncManager {
 
                 val noteId = item.noteId!!
 
-                val exists = fileManager.hasNoteById(id = noteId, path = cacheDir)
+                val exists = fileManager.hasNoteById(id = noteId, path = fileManager.secondCacheDir)
 
                 if (exists) {
 
-                    val note = Notes(id = noteId)
-
                     if (item.metadata.isPendingUpdateOnRemote()) {
-//                        action.onSaveRequired(note)
+                        val note = Notes(id = noteId)
+                        action.onSaveRequired(note)
                     }
 
                     if (item.metadata.isPendingDeletionOnRemote()) {
-//                        action.onDeleteRequired(note)
+                        val note = Notes(id = noteId)
+                        action.onDeleteRequired(note)
                     }
 
                 } else {
-                    Platform().logger.logi("$tag:syncIfNeeded() may be in a wrong state, " +
+                    Platform().logger.logi("$tag:syncIfNeeded() might be in a wrong state, " +
                             "no file for $noteId")
                 }
 
@@ -111,7 +111,7 @@ class JvmSyncManager : ClientSyncManager {
             val metadata = foundRecord.metadata
             if (!metadata.isPendingDeletionOnRemote() && foundRecord.pendingDelete) {
                 database.delete(foundRecord.id)
-                val filePath = cacheDir + "/" + note.id
+                val filePath = fileManager.secondCacheDir + "/" + note.id
                 fileManager.delete(File(filePath))
                 Platform().logger.logi("$tag:deleteLocally() for ${note.id} done")
             }
@@ -168,7 +168,7 @@ class JvmSyncManager : ClientSyncManager {
         forceOverride: Boolean,
         scope: CoroutineScope
     ) {
-        fileManager.cacheNotes(notes = notes, cacheDir = cacheDir)
+        fileManager.cacheNotes(notes = notes, cacheDir = fileManager.secondCacheDir)
     }
 
     override suspend fun isAllInSync(): Boolean {
@@ -190,6 +190,18 @@ class JvmSyncManager : ClientSyncManager {
             }
         }
         return isInSync
+    }
+
+    override suspend fun clearLocalStorage() {
+        database.deleteAll()
+        val dir = File(fileManager.secondCacheDir)
+        if (dir.exists()) {
+            val files = dir.listFiles()
+            files.forEach {
+                it.delete()
+            }
+        }
+        Platform().logger.logi("$tag:clearLocalStorage(): Local storage has been cleared")
     }
 
     private suspend fun searchMetadataFor(noteId: Long): NoteMetadata? {

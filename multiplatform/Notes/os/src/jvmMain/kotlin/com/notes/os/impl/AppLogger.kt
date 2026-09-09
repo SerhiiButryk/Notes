@@ -50,7 +50,8 @@ class AppLogger : PlatformLog() {
         val timestamp = LocalDateTime.now().format(formatter)
         val tid = Thread.currentThread().threadId()
         val pid = ProcessHandle.current().pid()
-        return "[$pid:$tid | $timestamp] NOTES [$level] $message"
+        val tname = Thread.currentThread().name
+        return "[$pid:$tid:$tname | $timestamp] NOTES [$level] $message"
     }
 
     override fun close() {

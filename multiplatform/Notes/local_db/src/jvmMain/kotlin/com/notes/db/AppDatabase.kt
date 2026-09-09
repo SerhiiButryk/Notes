@@ -29,6 +29,10 @@ class AppDatabase(builder: RoomDatabase.Builder<NoteDatabase>) {
         )
     }
 
+    suspend fun deleteAll() {
+        db.metadataDao().deleteAll()
+    }
+
     suspend fun select(id: Long): NoteMetadata? {
         val metadata = db.metadataDao().getMetadata(id).first()
         return if (metadata == null) {

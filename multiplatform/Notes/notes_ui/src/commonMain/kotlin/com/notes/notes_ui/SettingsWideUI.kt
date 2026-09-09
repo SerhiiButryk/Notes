@@ -34,6 +34,7 @@ fun SettingsScreen(
     isDebugMode: Boolean = false,
     onDebugModeChanged: (isDebugMode: Boolean) -> Unit = {},
     onSignOut: () -> Unit = {},
+    onThemeChange: () -> Unit = {},
 ) {
     var selectedTab by remember { mutableStateOf(SettingsTab.GENERAL) }
 
@@ -64,6 +65,8 @@ fun SettingsScreen(
                 onClick = { selectedTab = SettingsTab.GENERAL },
             )
 
+            Spacer(modifier = Modifier.height(10.dp))
+
             SidebarItem(
                 icon = Icons.Default.AccountBox,
                 label = "Account",
@@ -71,7 +74,7 @@ fun SettingsScreen(
                 onClick = { selectedTab = SettingsTab.ACCOUNT },
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
         // Vertical Separator Line
@@ -101,6 +104,7 @@ fun SettingsScreen(
                             isDebugMode = isDebugMode,
                             onDebugModeChanged = onDebugModeChanged,
                             onSignOut = onSignOut,
+                            onThemeChange = onThemeChange,
                         )
                     }
                 }

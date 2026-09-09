@@ -24,4 +24,7 @@ interface NoteMetadataDao {
 
     @Update
     suspend fun updateMetadata(note: MetadataEntity)
+
+    @Query("delete from notes_metadata")
+    suspend fun deleteAll()
 }

@@ -7,6 +7,8 @@ import androidx.compose.material.icons.automirrored.outlined.FormatAlignRight
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.FormatAlignCenter
 import androidx.compose.material.icons.outlined.FormatBold
+import androidx.compose.material.icons.outlined.FormatClear
+import androidx.compose.material.icons.outlined.FormatColorText
 import androidx.compose.material.icons.outlined.FormatItalic
 import androidx.compose.material.icons.outlined.FormatUnderlined
 import androidx.compose.material.icons.outlined.StrikethroughS
@@ -36,6 +38,7 @@ import dev.mkeeda.arranger.richtext.HeadingLevel
 import dev.mkeeda.arranger.richtext.ItalicKey
 import dev.mkeeda.arranger.richtext.ListIndentLevel
 import dev.mkeeda.arranger.richtext.OrderedListKey
+import dev.mkeeda.arranger.richtext.RgbaColor
 import dev.mkeeda.arranger.richtext.StrikethroughKey
 import dev.mkeeda.arranger.richtext.TextAlignment
 import dev.mkeeda.arranger.richtext.UnderlineKey
@@ -48,13 +51,18 @@ data class Tool(
     val imageVector: ImageVector? = null,
     val getIcon: @Composable () -> Painter? = { null },
     val enabled: Boolean = false,
-    val onClick: (richTextState: RichTextState, Notes) -> Unit,
+    val onClick: (richTextState: RichTextState, Notes) -> Unit = { _, _ -> },
+    val onColorPicked: (richTextState: RichTextState, color1: RgbaColor?, color2: RgbaColor?) -> Unit
+        = {_, _, _ -> },
     val key: Long = uuid++,
     val highlight: Boolean = true,
     val text: String = "",
     val showConfirmDialog: Boolean = false,
+    val showColorPickerDialog: Boolean = false,
     val title: String = "",
     val message: String = "",
+    val isActive: (richTextState: RichTextState) -> Boolean = { false },
+    val isEnable: (richTextState: RichTextState) -> Boolean = { true },
 )
 
 @Immutable
@@ -107,6 +115,9 @@ fun getToolsList(interactor: Interactor): Tools {
                 interactor.sendEditorCommand(Command.Undo(), state)
             },
             highlight = false,
+            isEnable = { state ->
+                interactor.isActiveCommand(Command.Undo(), state)
+            },
         ),
     )
 
@@ -117,6 +128,9 @@ fun getToolsList(interactor: Interactor): Tools {
                 interactor.sendEditorCommand(Command.Redo(), state)
             },
             highlight = false,
+            isEnable = { state ->
+                interactor.isActiveCommand(Command.Redo(), state)
+            },
         ),
     )
 
@@ -146,6 +160,33 @@ fun getToolsList(interactor: Interactor): Tools {
         ),
     )
 
+    builder.addTool(
+        Tool(
+            imageVector = Icons.Outlined.FormatColorText,
+            onColorPicked = { state, color1, color2 ->
+                interactor.sendEditorCommand(
+                    command = Command.ColorFill(color1, color2),
+                    state = state
+                )
+            },
+            highlight = false,
+            showColorPickerDialog = true,
+            isActive = { state ->
+                interactor.isActiveCommand(Command.ColorFill(null, null), state)
+            },
+        ),
+    )
+
+    builder.addTool(
+        Tool(
+            imageVector = Icons.Outlined.FormatClear,
+            onClick = { state, note ->
+                interactor.sendEditorCommand(Command.ClearFormatting(), state)
+            },
+            highlight = false,
+        ),
+    )
+
     // Disabled for now
     // TODO: After user cleared editor, undo action didn't work
 //    builder.addTool(
@@ -165,11 +206,17 @@ fun getToolsList(interactor: Interactor): Tools {
                 interactor.sendEditorCommand(Command.HFormat(HeadingLevel.H1), state)
             },
             text = "size",
+            isActive = { state ->
+                interactor.isActiveCommand(Command.HFormat(HeadingLevel.H1), state)
+            }
         ),
         Tool(
             getIcon = { toPainter(h2FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.HFormat(HeadingLevel.H2), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.HFormat(HeadingLevel.H2), state)
             },
             text = "size",
         ),
@@ -178,12 +225,18 @@ fun getToolsList(interactor: Interactor): Tools {
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.HFormat(HeadingLevel.H3), state)
             },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.HFormat(HeadingLevel.H3), state)
+            },
             text = "size",
         ),
         Tool(
             getIcon = { toPainter(h4FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.HFormat(HeadingLevel.H4), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.HFormat(HeadingLevel.H4), state)
             },
             text = "size",
         ),
@@ -192,12 +245,18 @@ fun getToolsList(interactor: Interactor): Tools {
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.HFormat(HeadingLevel.H5), state)
             },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.HFormat(HeadingLevel.H5), state)
+            },
             text = "size",
         ),
         Tool(
             getIcon = { toPainter(h6FormatIcon) },
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.HFormat(HeadingLevel.H6), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.HFormat(HeadingLevel.H6), state)
             },
             text = "size",
         ),
@@ -210,11 +269,17 @@ fun getToolsList(interactor: Interactor): Tools {
                 interactor.sendEditorCommand(Command.StringFormat(BoldKey), state)
             },
             text = "Bold",
+            isActive = { state ->
+                interactor.isActiveCommand(Command.StringFormat(BoldKey), state)
+            },
         ),
         Tool(
             imageVector = Icons.Outlined.FormatItalic,
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.StringFormat(ItalicKey), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.StringFormat(ItalicKey), state)
             },
             text = "Italic",
         ),
@@ -223,12 +288,18 @@ fun getToolsList(interactor: Interactor): Tools {
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.StringFormat(UnderlineKey), state)
             },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.StringFormat(UnderlineKey), state)
+            },
             text = "Underlined",
         ),
         Tool(
             imageVector = Icons.Outlined.StrikethroughS,
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.StringFormat(StrikethroughKey), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.StringFormat(StrikethroughKey), state)
             },
             text = "Strike through",
         ),
@@ -240,6 +311,9 @@ fun getToolsList(interactor: Interactor): Tools {
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.TextAlign(TextAlignment.Center), state)
             },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.TextAlign(TextAlignment.Center), state)
+            },
             text = "Align center",
         ),
         Tool(
@@ -247,12 +321,18 @@ fun getToolsList(interactor: Interactor): Tools {
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.TextAlign(TextAlignment.Left), state)
             },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.TextAlign(TextAlignment.Left), state)
+            },
             text = "Align left",
         ),
         Tool(
             imageVector = Icons.AutoMirrored.Outlined.FormatAlignRight,
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.TextAlign(TextAlignment.Right), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.TextAlign(TextAlignment.Right), state)
             },
             text = "Align right",
         ),
@@ -264,12 +344,18 @@ fun getToolsList(interactor: Interactor): Tools {
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.List(BulletListKey, ListIndentLevel.Level1), state)
             },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.List(BulletListKey, ListIndentLevel.Level1), state)
+            },
             text = "Simple list",
         ),
         Tool(
             imageVector = Format_list_numbered,
             onClick = { state, note ->
                 interactor.sendEditorCommand(Command.List(OrderedListKey, ListIndentLevel.Level1), state)
+            },
+            isActive = { state ->
+                interactor.isActiveCommand(Command.List(OrderedListKey, ListIndentLevel.Level1), state)
             },
             text = "Numbered list",
         ),

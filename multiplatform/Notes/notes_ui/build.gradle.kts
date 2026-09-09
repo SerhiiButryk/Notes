@@ -76,6 +76,7 @@ kotlin {
             // Github: https://github.com/mkeeda/arranger
             implementation(libs.arranger.richtext.editor)
             implementation(libs.arranger.richtext.editor.material3)
+            implementation(libs.arranger.richtext.html)
             // Html parsing
             implementation(libs.ksoup)
 
