@@ -2,14 +2,15 @@ package com.notes.notes_ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Folder
@@ -19,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -102,15 +102,43 @@ private fun EditorUI(
         }
     }
 
-    Scaffold(
-        topBar = {
+    // TODO:
+    // Crossfade() animation adds flickering ui issues
+    // and it doen't look good. Disabled for now.
+    // Adds cross fade animation when selecting a note from the list
+    /*Crossfade(
+        targetState = notes,
+        label = "Editor cross fade animation",
+        modifier =
+            Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding(),
+    ) { note -> } */
+
+    if (notes == Notes.AbsentNote()) {
+        InfoLabel()
+    } else {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 6.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(color = backgroundColor())
+        ) {
+
             if (notes != Notes.AbsentNote() && showTopBar) {
                 TopAppBar(
-                    modifier = Modifier.padding(bottom = 4.dp),
+                    modifier = Modifier
+                        .height(90.dp),
                     title = { },
                     actions = {
                         Row(
-                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .height(90.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             if (showFolderButton) {
@@ -141,75 +169,40 @@ private fun EditorUI(
                         ),
                 )
             }
-        },
-        modifier = modifier.fillMaxSize(),
-    ) { innerPadding ->
 
-        // TODO:
-        // Crossfade() animation adds flickering ui issues
-        // and it doen't look good. Disabled for now.
-
-        // Adds cross fade animation when selecting a note from the list
-        /*Crossfade(
-            targetState = notes,
-            label = "Editor cross fade animation",
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .imePadding(),
-        ) { note -> } */
-
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .imePadding(),
-        ) {
-            if (notes == Notes.AbsentNote()) {
-                InfoLabel()
-            } else {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(4.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(color = backgroundColor()),
-                ) {
-                    EditorLayout(
-                        state = state,
-                        // add weight modifier to the composable to ensure
-                        // that the composable is measured after the other
-                        // composable is measured specifically after the tools pane.
-                        modifier = Modifier.weight(1f),
-                    )
-                    // If we don't show top bar then don't show toolbar as well
-                    if (showTopBar) {
-                        ToolsBar(
-                            state = state,
-                            tools = tools,
-                            notes = notes,
-                        )
-                    }
-                }
+            // If we don't show top bar then don't show toolbar as well
+            if (showTopBar) {
+                ToolsBar(
+                    state = state,
+                    tools = tools,
+                    notes = notes,
+                )
             }
-        }
 
-        if (showFolderContent) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showFolderContent = false
-                },
-                sheetState = bottomSheetState,
-                dragHandle = {
-                    BottomSheetDefaults.DragHandle()
-                },
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
             ) {
-                content()
+                EditorLayout(
+                    state = state,
+                )
             }
+
+        }
+    }
+
+    if (showFolderContent) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showFolderContent = false
+            },
+            sheetState = bottomSheetState,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle()
+            },
+        ) {
+            content()
         }
     }
 }
@@ -235,6 +228,7 @@ fun EditorLayout(
         readOnly = readOnly,
         modifier = Modifier
             .fillMaxSize()
+            .padding(6.dp)
             .focusRequester(focusRequester)
             .then(modifier),
         textStyle =

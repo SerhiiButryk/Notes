@@ -1,7 +1,10 @@
 package com.notes.notes_ui.components
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,9 +12,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -21,6 +35,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import api.data.Notes
+import com.notes.notes_ui.editor.ColorPickerDialog
+import com.notes.notes_ui.editor.getBackgroundTextColor
+import com.notes.notes_ui.editor.getTextColor
 import com.notes.notes_ui.models.Tool
 import com.notes.notes_ui.models.ToolCollection
 import com.notes.notes_ui.models.Tools
@@ -34,73 +51,79 @@ fun ToolsBar(
     tools: Tools,
     notes: Notes,
 ) {
-    Surface(
-        shape = CircleShape,
-        shadowElevation = 10.dp,
-        modifier =
-            Modifier
-                .padding(4.dp)
-                .fillMaxWidth(),
+    var showDialogForTool by rememberSaveable { mutableStateOf<Tool?>(null) }
+
+    var showColorPicker by remember { mutableStateOf(false) }
+
+    LazyRow(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
     ) {
-        var savedOption by rememberSaveable { mutableLongStateOf(0) }
-
-        val backgroundColor =
-            if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.background
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-
-        LazyRow(
-            modifier =
-                Modifier
-                    .background(backgroundColor),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            for (tools in tools.collection) {
-                // Add one option
-                if (tools.list.size == 1) {
-                    val option = tools.list.first()
-                    item(key = option.key) {
-                        ToolButton(
-                            imageVector = option.imageVector,
-                            icon = option.getIcon(),
-                            onClick = {
-                                if (option.showConfirmDialog) {
-                                    savedOption = option.key
-                                } else {
-                                    option.onClick(state, notes)
-                                }
-                            },
-                            animated = option.highlight,
-                        )
-                    }
-                    // Add a list of options
-                } else {
-                    item {
-                        ToolsMenu(tools, state, notes)
-                    }
-                }
-            }
-        }
-
-        if (savedOption != 0L) {
-            for (tool in tools.collection) {
-                val option = tool.list.first()
-                if (tool.list.size == 1 && option.key == savedOption) {
-                    AlertDialogUI(
-                        onDismissRequest = { savedOption = 0 },
-                        onConfirmation = {
-                            option.onClick(state, notes)
-                            savedOption = 0
+        for (tools in tools.collection) {
+            // Add one option
+            if (tools.list.size == 1) {
+                val option = tools.list.first()
+                item(key = option.key) {
+                    ToolButton(
+                        imageVector = option.imageVector,
+                        icon = option.getIcon(),
+                        onClick = {
+                            if (option.showColorPickerDialog) {
+                                showColorPicker = true
+                                showDialogForTool = option
+                            } else if (option.showConfirmDialog) {
+                                showDialogForTool = option
+                            } else {
+                                option.onClick(state, notes)
+                            }
                         },
-                        dialogTitle = option.title,
-                        dialogText = option.message,
+                        animated = option.highlight,
                     )
                 }
+                // Add a list of options
+            } else {
+                item {
+                    ToolsMenu(tools, state, notes)
+                }
             }
         }
+    }
+
+    if (showColorPicker) {
+        val dismiss = {
+            showColorPicker = false
+            showDialogForTool = null
+        }
+        val textColor = getTextColor(state)
+        val backgroundColor = getBackgroundTextColor(state)
+        ColorPickerDialog(
+            backgroundColor = backgroundColor,
+            textColor = textColor,
+            onBackgroundColorChange = {
+                showDialogForTool?.onColorPicked(state, null, it)
+                dismiss()
+            },
+            onTextColorChange = {
+                showDialogForTool?.onColorPicked(state, it, null)
+                dismiss()
+            },
+            onDismiss = dismiss
+        )
+    } else if (showDialogForTool != null) {
+        AlertDialogUI(
+            onDismissRequest = {
+                showDialogForTool = null
+            },
+            onConfirmation = {
+                showDialogForTool!!.onClick(state, notes)
+                showDialogForTool = null
+            },
+            dialogTitle = showDialogForTool!!.title,
+            dialogText = showDialogForTool!!.message,
+        )
     }
 }
 

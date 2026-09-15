@@ -67,7 +67,7 @@ fun NotesListUI(
         NotesList(
             modifier =
                 Modifier
-                    .padding(innerPadding)
+                    .padding(top = innerPadding.calculateTopPadding())
                     .testTag("notes_list"),
             notes = notes,
             onSelected = onSelected,
@@ -144,7 +144,8 @@ private fun EditorPreviewStateful(
     LaunchedEffect(note.content) {
         // Get first line as a title
         val textContent = (note.richString as RichString).text
-        val firstLine = textContent.substringBefore('\n')
+        var firstLine = textContent.substringBefore('\n')
+        if (firstLine.isEmpty()) firstLine = "No title"
         title =
             if (AppSettings.isDebugEnabled) {
                 "[id=${note.id}] $firstLine"

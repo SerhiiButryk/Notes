@@ -107,10 +107,8 @@ class GoogleSignInService : AbstractAuthService() {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
             // Sign in to Firebase using the token
             val idToken = googleIdTokenCredential.idToken
-            val result =
-                AppServices
-                    .getDefaultAuthService()
-                    .login(idToken, activityContext)
+            val service = AppServices.getDefaultAuthService()
+            val result = service.login(idToken, activityContext)
 
             if (result.isSuccess()) {
                 authenticated.store(true)
