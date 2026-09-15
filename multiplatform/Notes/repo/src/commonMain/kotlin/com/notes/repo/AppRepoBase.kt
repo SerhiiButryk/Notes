@@ -12,10 +12,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-class AppRepoBase(
+open class AppRepoBase(
     private val syncManager: ClientSyncManager,
-    private val remoteRepository: RemoteRepository = RemoteRepository(syncManager)
-) : BaseRepo() {
+    private val remoteRepository: RemoteRepository = RemoteRepository(syncManager),
+    // For test support
+    scopeOverride: CoroutineScope? = null,
+) : BaseRepo(scopeOverride) {
+
+    var cachedLocalNotes: List<Notes> = emptyList()
 
     override fun getNotes(): Flow<List<Notes>> = flow {
         // Trigger sync with server
@@ -24,6 +28,7 @@ class AppRepoBase(
         remoteRepository.fetch(scope = scope)
         // Waiting on some data
         syncManager.notes.collect {
+            cachedLocalNotes = it
             emit(it)
         }
     }
@@ -41,7 +46,7 @@ class AppRepoBase(
 
     override fun saveNote(
         note: Notes,
-        onNewAdded: suspend (Long) -> Unit,
+        onAdded: suspend (Long) -> Unit,
     ) {
         scope.launch {
             coroutineScope {
@@ -49,6 +54,7 @@ class AppRepoBase(
             }
             // Refresh after data gets saved
             remoteRepository.fetch(scope = this)
+            onAdded(note.id)
         }
     }
 

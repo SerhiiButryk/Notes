@@ -194,17 +194,17 @@ class JvmBasicTests : BaseTest() {
             // Insert fake metadata to test correct deletion
 
             val metadataFirst = NoteMetadata(noteId = first.id, pendingDelete = true)
-            syncManager.database.insert(metadataFirst)
+            syncManager.__getDatabase_FOR_TEST().insert(metadataFirst)
 
             val metadataSecond = NoteMetadata(noteId = second.id, pendingDelete = true)
-            syncManager.database.insert(metadataSecond)
+            syncManager.__getDatabase_FOR_TEST().insert(metadataSecond)
 
             syncManager.delete(first)
             syncManager.delete(second)
 
             // -------- End -------------------------------
 
-            val records = syncManager.database.fetch()
+            val records = syncManager.__getDatabase_FOR_TEST().fetch()
             assertThat(records.isEmpty()).isTrue()
 
             val dirAfter = File(fileManager.secondCacheDir)
@@ -226,7 +226,7 @@ class JvmBasicTests : BaseTest() {
             assertThat(dir.isDirectory).isTrue()
             assertThat(dir.list().size == 0).isTrue()
 
-            assertThat(syncManager.database.fetch().isEmpty()).isTrue()
+            assertThat(syncManager.__getDatabase_FOR_TEST().fetch().isEmpty()).isTrue()
 
             // Perform testing
 
@@ -240,7 +240,7 @@ class JvmBasicTests : BaseTest() {
 
             assertThat(syncManager.isAllInSync()).isTrue()
 
-            val records = syncManager.database.fetch()
+            val records = syncManager.__getDatabase_FOR_TEST().fetch()
             assertThat(records.isEmpty()).isFalse()
             assertThat(records.size == 1).isTrue()
 
@@ -250,7 +250,7 @@ class JvmBasicTests : BaseTest() {
 
             // Check actual result
 
-            val recordsAfter = syncManager.database.fetch()
+            val recordsAfter = syncManager.__getDatabase_FOR_TEST().fetch()
             assertThat(recordsAfter.isEmpty()).isTrue()
             assertThat(recordsAfter.size == 0).isTrue()
 

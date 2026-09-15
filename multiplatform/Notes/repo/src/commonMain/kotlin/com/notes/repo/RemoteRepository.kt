@@ -19,7 +19,7 @@ import java.io.File
  * Class which handles data synchronization between remote and local datastore
  */
 class RemoteRepository(
-    private val syncManager: ClientSyncManager
+    val syncManager: ClientSyncManager
 ) {
 
     constructor(

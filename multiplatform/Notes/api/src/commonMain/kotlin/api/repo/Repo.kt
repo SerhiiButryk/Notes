@@ -22,7 +22,7 @@ interface Repository {
 
     fun saveNote(
         note: Notes,
-        onNewAdded: suspend (Long) -> Unit,
+        onAdded: suspend (Long) -> Unit,
     )
 
     fun deleteNote(
@@ -51,9 +51,10 @@ interface Repository {
     suspend fun onDeleteAttachment(file: UserFile): Boolean = false
 }
 
-abstract class BaseRepo : Repository {
+abstract class BaseRepo(scopeOverride: CoroutineScope? = null) : Repository {
+
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
-    protected val scope = CoroutineScope(coroutineContext)
+    val scope = scopeOverride ?: CoroutineScope(coroutineContext)
 
     override fun clear() {
         Platform().logger.logi("BaseRepo::clear()")

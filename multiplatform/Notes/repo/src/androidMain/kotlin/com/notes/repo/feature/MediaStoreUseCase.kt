@@ -83,6 +83,7 @@ class MediaStoreUseCase(
         return fileName
     }
 
+    // Watch cache directory
     private fun File.observeAsFlow(): Flow<Attachments> =
         callbackFlow {
             val mask: Int =

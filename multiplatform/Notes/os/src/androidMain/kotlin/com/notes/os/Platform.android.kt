@@ -15,6 +15,7 @@ import com.notes.os.impl.AppLogger
 import com.notes.os.impl.Base64Provider
 import com.notes.os.impl.CryptoProvider
 import com.notes.os.impl.StorageProvider
+import com.notes.repo.AndroidSyncManager
 import com.notes.repo.AppRepository
 import java.lang.ref.WeakReference
 
@@ -42,7 +43,11 @@ internal actual class PlatformFactory(
         return com.notes.net.NetStateManager(connectivityManager)
     }
 
-    actual fun provideAppRepository(): BaseRepo = AppRepository.create()
+    actual fun provideAppRepository(): BaseRepo {
+        val context = weakContextRef.get()
+        requireNotNull(context) { "Null context" }
+        return AppRepository.create(AndroidSyncManager(context))
+    }
 
     actual fun provideHttpClient(): HttpClient = NetHttpClient()
 

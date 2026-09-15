@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.startup.Initializer
 import api.AppServices
 import api.platform
-import com.notes.db.LocalNoteDatabase
 import com.notes.services.auth.GoogleSignInService
 import com.notes.services.createFirebaseAuthService
 import com.notes.services.createFirebaseFirestoreService
@@ -26,9 +25,6 @@ internal class AndroidInitProvider : Initializer<Platform> {
         val googleSignInService = GoogleSignInService()
         googleSignInService.init(context.applicationContext)
         AppServices.addService(googleSignInService)
-
-        // TODO: Need to check if it's slow or not
-        LocalNoteDatabase.initialize(context.applicationContext)
 
         return osPlatform
     }

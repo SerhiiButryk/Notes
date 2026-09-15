@@ -15,7 +15,9 @@ import api.data.toDocument
 import api.data.toJson
 import com.google.common.truth.Truth.assertThat
 import com.notes.os.impl.CryptoProvider
+import com.notes.repo.AndroidSyncManager
 import com.notes.repo.FilesManager
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -212,14 +214,11 @@ class BasicTests {
                 assertThat(n.userId).isEqualTo(notes[i].userId)
             }
 
-            val notes2 = filesManager.readCache()
-            assertThat(notes2.isEmpty()).isFalse()
-
             // Remove created files
             filesManager.clearCache()
 
-            val notes3 = filesManager.readCache()
-            assertThat(notes3.isEmpty()).isTrue()
+            val notesAfter = filesManager.readCache()
+            assertThat(notesAfter.isEmpty()).isTrue()
         }
 
     @Test
@@ -319,5 +318,42 @@ class BasicTests {
             // Same input should always generate the same key
             val expected = "o8EEKagakb/WFhqhAT2HwFocLNHcuzLPIOxHFWCrTRI="
             assertThat(key2 == expected).isTrue()
+        }
+
+    @Test
+    fun test07_clear_cache_verify() =
+        runTest {
+
+            val syncManager = AndroidSyncManager(appContext)
+
+            val notes =
+                listOf(
+                    Notes(content = "note 1", id = 1),
+                    Notes(content = "note 2", id = 2),
+                    Notes(content = "note 3", id = 3),
+                )
+
+            coroutineScope {
+                syncManager.store(notes, true, this)
+            }
+
+            val fm = FilesManager()
+            fm.cacheNotes(notes)
+
+            val dir1 = File(fm.firstCacheDir)
+            val sz = dir1.listFiles()?.filter { it.isFile }
+            assertThat(sz?.size == 3).isTrue()
+
+            val dir2 = File(fm.secondCacheDir)
+            val sz2 = dir2.listFiles()?.filter { it.isFile }
+            assertThat(sz2?.size == 3).isTrue()
+
+            fm.clearCache()
+
+            val sz3 = dir1.listFiles()?.filter { it.isFile }
+            assertThat(sz3?.size == 0).isTrue()
+            val sz4 = dir2.listFiles()?.filter { it.isFile }
+            assertThat(sz4?.size == 0).isTrue()
+
         }
 }

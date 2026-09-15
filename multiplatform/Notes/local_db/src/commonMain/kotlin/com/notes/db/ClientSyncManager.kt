@@ -12,6 +12,8 @@ interface OnAction {
 
 interface ClientSyncManager {
 
+    var scope: CoroutineScope?
+
     val notes: Flow<List<Notes>>
 
     fun sync(scope: CoroutineScope, action: OnAction)

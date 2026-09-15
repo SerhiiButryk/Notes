@@ -27,6 +27,8 @@ class FilesManager {
         notes: List<Notes>,
         cacheDir: String = firstCacheDir,
     ): Boolean {
+        val dir = File(cacheDir)
+        if (!dir.exists()) dir.mkdirs()
         for (note in notes) {
             // A name of a file is note id
             val file = File(cacheDir, note.id.toString())
@@ -162,16 +164,24 @@ class FilesManager {
         return Attachments(userFiles)
     }
 
-    suspend fun clearCache() {
-        val cacheDir = firstCacheDir
-        val files = File(cacheDir).listFiles()
-        if (files != null) {
-            files.forEach { file ->
+    fun clearCache() {
+
+        File(firstCacheDir)
+            .listFiles()
+            ?.forEach { file ->
                 if (file.isFile) {
                     file.delete()
                 }
             }
-        }
+
+        File(secondCacheDir)
+            .listFiles()
+            ?.forEach { file ->
+                if (file.isFile) {
+                    file.delete()
+                }
+            }
+
         Platform().logger.logi("$tag::clearCache: cache has been cleared up")
     }
 

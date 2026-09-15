@@ -11,8 +11,8 @@ import api.data.Document
 import api.data.Notes
 import api.repo.Repository
 import com.google.common.truth.Truth.assertThat
-import com.notes.db.LocalNoteDatabase
 import com.notes.notes_ui.NotesViewModel
+import com.notes.repo.AndroidSyncManager
 import com.notes.repo.AppRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +33,8 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
+
+private const val tag = "ViewModelNotesTest"
 
 @OptIn(ExperimentalAtomicApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -57,8 +59,6 @@ class ViewModelNotesTest {
 
     @Before
     fun onStart() {
-        LocalNoteDatabase.initialize(appContext)
-
         val repo =
             object : Repository {
                 override fun getNotes(): Flow<List<Notes>> {
@@ -73,7 +73,7 @@ class ViewModelNotesTest {
 
                 override fun saveNote(
                     note: Notes,
-                    onNewAdded: suspend (Long) -> Unit,
+                    onAdded: suspend (Long) -> Unit,
                 ) {
                 }
 
@@ -113,7 +113,6 @@ class ViewModelNotesTest {
         }
         assertThat(cleared.load()).isTrue()
         viewModel = null
-        LocalNoteDatabase.close()
     }
 
     @Test
@@ -210,21 +209,21 @@ class ViewModelNotesTest {
         }
 
     @Test
-    fun test04_collect_notesState_and_deletion_in_remote_failed() =
+    fun test04_deletion_verify() =
         runTest {
-            val realRepo = setupRealRemoteRepo(setDelete = false)
-            val realVM = setupVMWithRealRepo(realRepo, backgroundScope)
+
+            val syncManager = AndroidSyncManager(appContext)
+
+            val repo = createAppRepo(false, syncManager, backgroundScope)
+            val viewModel = createViewModel(repo, backgroundScope)
 
             val notes = Channel<List<Notes>>(capacity = Channel.CONFLATED)
 
             // Trigger 'notesState' sharing
             val job =
                 launch(Dispatchers.IO) {
-                    realVM.notesState.collect {
-                        Log.i(
-                            "ViewModelNotesTest",
-                            "test04_collect_notesState_and_deletion_in_remote_failed: got = $it",
-                        )
+                    viewModel.notesState.collect {
+                        Log.i(tag, "test04_deletion_verify: first got = $it")
                         if (it.collection.size == 2) {
                             notes.send(it.collection)
                             cancel() // Done!
@@ -232,12 +231,22 @@ class ViewModelNotesTest {
                     }
                 }
 
-            val note1 = Notes(content = "test04_test1", userId = "test04_userid1", time = "test04_time1")
-            val note2 = Notes(content = "test04_test2", userId = "test04_userid2", time = "test04_time2")
+            val note1 = Notes(id = 1, content = "test04_test1", userId = "test04_userid1", time = "test04_time1")
+            val note2 = Notes(id = 2, content = "test04_test2", userId = "test04_userid2", time = "test04_time2")
 
             coroutineScope {
-                realRepo.saveNote(this, note1, {})
-                realRepo.saveNote(this, note2, {})
+                val documents = listOf(
+                    Document(name = note1.id.toString(), data = note1.content),
+                    Document(name = note2.id.toString(), data = note2.content),
+                )
+                val localRepo = createAppRepo(
+                    setDelete = false,
+                    syncManager = syncManager,
+                    scope = this,
+                    docsList = documents,
+                )
+                localRepo.saveNote(note = note1, onAdded = {})
+                localRepo.saveNote(note = note2, onAdded = {})
             }
 
             job.join()
@@ -251,18 +260,19 @@ class ViewModelNotesTest {
             coroutineScope {
                 val noteToDelete = list1[0] // Delete first note
                 deletedNoteId = noteToDelete.id
-
-                realRepo.deleteNote(this, noteToDelete, {})
+                val localRepo = createAppRepo(
+                    setDelete = true,
+                    syncManager = syncManager,
+                    scope = this
+                )
+                localRepo.deleteNote(noteToDelete, {})
             }
 
             // Trigger 'notesState' sharing
             val job2 =
                 launch(Dispatchers.IO) {
-                    realVM.notesState.collect {
-                        Log.i(
-                            "ViewModelNotesTest",
-                            "test04_collect_notesState_and_deletion_in_remote_failed: got = $it",
-                        )
+                    viewModel.notesState.collect {
+                        Log.i(tag,"test04_deletion_verify: second got = $it")
                         if (it.collection.size == 1) {
                             notes.send(it.collection)
                             cancel() // Done!
@@ -278,19 +288,16 @@ class ViewModelNotesTest {
             assertThat(list2[0].id != deletedNoteId).isTrue()
 
             // Clear VM
-            val onClear = realVM::class.declaredMemberFunctions.find { it.name == "onCleared" }
+            val onClear = viewModel::class.declaredMemberFunctions.find { it.name == "onCleared" }
             if (onClear != null) {
                 onClear.isAccessible = true
-                onClear.call(realVM)
+                onClear.call(viewModel)
             }
 
-            Log.i(
-                "ViewModelNotesTests",
-                "test04_collect_notesState_and_deletion_in_remote_failed() done",
-            )
+            Log.i(tag,"test04_deletion_verify() done")
         }
 
-    private fun setupVMWithRealRepo(
+    private fun createViewModel(
         repo: AppRepository,
         scope: CoroutineScope,
     ): NotesViewModel {
@@ -302,7 +309,12 @@ class ViewModelNotesTest {
         return viewModel
     }
 
-    private fun setupRealRemoteRepo(setDelete: Boolean): AppRepository {
+    private fun createAppRepo(
+        setDelete: Boolean,
+        syncManager: AndroidSyncManager,
+        scope: CoroutineScope? = null,
+        docsList: List<Document> = emptyList(),
+    ): AppRepository {
         val mockedStoreService =
             object : AbstractStorageService() {
                 override val key: Any = AppService.FIREBASE_STORAGE
@@ -317,9 +329,9 @@ class ViewModelNotesTest {
 
                 override suspend fun delete(document: Document): Boolean = setDelete
 
-                override suspend fun fetchAll(): List<Document> = emptyList()
+                override suspend fun fetchAll(): List<Document> = docsList
             }
 
-        return AppRepository.create(listOf(mockedStoreService))
+        return AppRepository.create(listOf(mockedStoreService), syncManager, scope)
     }
 }
