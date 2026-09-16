@@ -103,7 +103,6 @@ fun NotesList(
             ) {
                 for (note in notes.collection) {
                     item(key = note.id) {
-                        Platform().logger.logi("LazyColumn: adding key = ${note.id}")
                         EditorPreviewStateful(note = note) {
                             onSelected(note)
                         }

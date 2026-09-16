@@ -5,6 +5,7 @@ import api.data.Notes
 import api.repo.BaseRepo
 import com.notes.db.ClientSyncManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -19,8 +20,10 @@ open class AppRepoBase(
     scopeOverride: CoroutineScope? = null,
 ) : BaseRepo(scopeOverride) {
 
+    @Volatile // Make sure that the updated value is visible to all threads
     var cachedLocalNotes: List<Notes> = emptyList()
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun getNotes(): Flow<List<Notes>> = flow {
         // Trigger sync with server
         syncData()
@@ -46,15 +49,18 @@ open class AppRepoBase(
 
     override fun saveNote(
         note: Notes,
-        onAdded: suspend (Long) -> Unit,
+        onAdded: suspend (Notes?) -> Unit,
     ) {
         scope.launch {
+            var savedNote: Notes? = null
             coroutineScope {
-                remoteRepository.saveNote(scope = this, note = note)
+                remoteRepository.saveNote(scope = this, note = note) {
+                    savedNote = it
+                }
             }
-            // Refresh after data gets saved
-            remoteRepository.fetch(scope = this)
-            onAdded(note.id)
+            // Refresh and wait while it completes
+            remoteRepository.fetch(scope = this).join()
+            onAdded(savedNote)
         }
     }
 
@@ -62,7 +68,13 @@ open class AppRepoBase(
         note: Notes,
         onDeleted: (Long) -> Unit,
     ) {
-        remoteRepository.delete(scope = scope, note = note)
+        scope.launch {
+            coroutineScope {
+                remoteRepository.delete(scope = this, note = note)
+            }
+            // Refresh
+            remoteRepository.fetch(scope = scope)
+        }
         onDeleted(note.id)
     }
 

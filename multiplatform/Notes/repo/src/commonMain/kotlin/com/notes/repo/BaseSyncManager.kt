@@ -150,7 +150,7 @@ abstract class BaseSyncManager(
         forceOverride: Boolean,
         scope: CoroutineScope
     ) {
-        fileManager.cacheNotes(notes = notes, cacheDir = fileManager.secondCacheDir)
+        fileManager.writeCache(notes = notes, cacheDir = fileManager.secondCacheDir)
     }
 
     override suspend fun isAllInSync(): Boolean {

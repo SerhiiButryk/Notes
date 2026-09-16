@@ -186,7 +186,7 @@ class BasicTests {
                     Notes(content = "note 3", id = 3),
                 )
 
-            filesManager.cacheNotes(notes)
+            filesManager.writeCache(notes)
 
             val cacheDir = Platform().getCacheDir()
             val file = File(cacheDir)
@@ -243,7 +243,7 @@ class BasicTests {
                     Notes(content = "note 3", id = 3),
                 )
 
-            filesManager.cacheNotes(notes)
+            filesManager.writeCache(notes)
 
             val cacheDir = Platform().getCacheDir()
             val file = File(cacheDir)
@@ -280,7 +280,7 @@ class BasicTests {
                     Notes(content = "note 3 Override", id = 3),
                 )
 
-            filesManager.cacheNotes(notesOverrideList)
+            filesManager.writeCache(notesOverrideList)
 
             val restoredNotesAfterOverride = filesManager.readCache()
 
@@ -338,7 +338,7 @@ class BasicTests {
             }
 
             val fm = FilesManager()
-            fm.cacheNotes(notes)
+            fm.writeCache(notes)
 
             val dir1 = File(fm.firstCacheDir)
             val sz = dir1.listFiles()?.filter { it.isFile }

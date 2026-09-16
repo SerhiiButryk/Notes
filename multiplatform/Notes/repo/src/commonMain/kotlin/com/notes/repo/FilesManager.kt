@@ -22,8 +22,7 @@ class FilesManager {
     // Application cach dirs
     val firstCacheDir = Platform().getCacheDir()
     val secondCacheDir = Platform().getCacheDir() + "/cache"
-
-    suspend fun cacheNotes(
+    suspend fun writeCache(
         notes: List<Notes>,
         cacheDir: String = firstCacheDir,
     ): Boolean {
@@ -32,7 +31,7 @@ class FilesManager {
         for (note in notes) {
             // A name of a file is note id
             val file = File(cacheDir, note.id.toString())
-            Platform().logger.logi("$tag::cacheNotes: note = ${note.id}, " +
+            Platform().logger.logi("$tag::writeCache: note = ${note.id}, " +
                     "path = ${file.absolutePath}")
             try {
                 val payload = note.getStringRep()
@@ -41,7 +40,7 @@ class FilesManager {
                     output.write(cipherText.toByteArray())
                 }
             } catch (e: Exception) {
-                Platform().logger.logi("$tag::cacheNotes: error: $e")
+                Platform().logger.logi("$tag::writeCache: error: $e")
                 e.printStackTrace()
                 // Try to delete file
                 file.delete()
@@ -49,7 +48,7 @@ class FilesManager {
                 return false
             }
         }
-        Platform().logger.logi("$tag::cacheNotes: done")
+        Platform().logger.logi("$tag::writeCache: done")
         return true
     }
 

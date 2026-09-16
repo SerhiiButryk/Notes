@@ -11,7 +11,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 
 interface RepoCallback {
-    fun onNoteAdded(id: Long)
+    fun onNoteAdded(note: Notes?)
     fun onEditorNavBack()
 }
 
@@ -22,7 +22,7 @@ interface Repository {
 
     fun saveNote(
         note: Notes,
-        onAdded: suspend (Long) -> Unit,
+        onAdded: suspend (Notes?) -> Unit,
     )
 
     fun deleteNote(

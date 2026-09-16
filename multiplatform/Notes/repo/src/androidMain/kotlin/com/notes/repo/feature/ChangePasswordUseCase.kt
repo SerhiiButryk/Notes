@@ -37,7 +37,7 @@ internal class ChangePasswordUseCase {
         }
 
         // Create backup files
-        val result = filesManager.cacheNotes(remoteNotes)
+        val result = filesManager.writeCache(remoteNotes)
         Platform().logger.logi("PasswordHelper::canChangePassword: $result")
         return result
     }

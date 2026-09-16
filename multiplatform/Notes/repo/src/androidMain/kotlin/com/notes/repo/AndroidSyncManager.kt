@@ -6,9 +6,9 @@ import android.os.FileObserver
 import api.Platform
 import api.data.Notes
 import com.notes.db.getDatabaseInstance
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -18,64 +18,68 @@ class AndroidSyncManager(
 
     private val tag = "AndroidSyncManager"
 
-    override val notes: Flow<List<Notes>> = observeAsFlow()
+    private val sharedFlow = MutableSharedFlow<List<Notes>>()
+    override val notes: Flow<List<Notes>> = sharedFlow
 
-    // Watch cache directory
-    private fun observeAsFlow(): Flow<List<Notes>> =
-        callbackFlow {
+    override suspend fun store(
+        notes: List<Notes>,
+        forceOverride: Boolean,
+        scope: CoroutineScope
+    ) {
+        Platform().logger.logd("$tag::store:")
+        super.store(notes, forceOverride, scope)
+        sharedFlow.emit(notes)
+    }
 
-            val file = File(fileManager.secondCacheDir)
+    suspend fun startWatchingCacheDir() {
 
-            if (!file.exists()) {
-                val result = file.mkdirs()
-                Platform().logger.logi("$tag::observeAsFlow: create dir ($result)")
-            }
+        val file = File(fileManager.secondCacheDir)
 
-            val mask: Int =
-                FileObserver.CREATE or FileObserver.DELETE or
-                        FileObserver.MODIFY or FileObserver.MOVED_TO
+        if (!file.exists()) {
+            val result = file.mkdirs()
+            Platform().logger.logd("$tag::startWatchingCacheDir: create dir ($result)")
+        }
 
-            val observer =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    object : FileObserver(file, mask) {
-                        override fun onEvent(
-                            event: Int,
-                            path: String?,
-                        ) {
-                            Platform().logger.logi("$tag::onEvent: $event")
-                            scope!!.launch {
-                                val notes = fileManager.readCache(file.path)
-                                trySend(notes)
-                            }
-                        }
-                    }
-                } else {
-                    @Suppress("DEPRECATION")
-                    object : FileObserver(file.absolutePath, mask) {
-                        override fun onEvent(
-                            event: Int,
-                            path: String?,
-                        ) {
-                            Platform().logger.logi("$tag::onEvent: $event")
-                            scope!!.launch {
-                                val notes = fileManager.readCache(file.path)
-                                trySend(notes)
-                            }
+        val mask: Int =
+            FileObserver.CREATE or FileObserver.DELETE or
+                    FileObserver.MODIFY or FileObserver.MOVED_TO
+
+        val observer =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                object : FileObserver(file, mask) {
+                    override fun onEvent(
+                        event: Int,
+                        path: String?,
+                    ) {
+                        Platform().logger.logd("$tag::onEvent: $event")
+                        scope!!.launch {
+                            val notes = fileManager.readCache(file.path)
+                            sharedFlow.emit(notes)
                         }
                     }
                 }
-
-            // Start watching the file system folder
-            observer.startWatching()
-
-            val notes = fileManager.readCache(file.path)
-            trySend(notes)
-
-            // Keep the Flow active. When the collector cancels or its lifecycle scope ends,
-            // this block executes to clean up resources and prevent memory leaks.
-            awaitClose {
-                observer.stopWatching()
+            } else {
+                @Suppress("DEPRECATION")
+                object : FileObserver(file.absolutePath, mask) {
+                    override fun onEvent(
+                        event: Int,
+                        path: String?,
+                    ) {
+                        Platform().logger.logd("$tag::onEvent: $event")
+                        scope!!.launch {
+                            val notes = fileManager.readCache(file.path)
+                            sharedFlow.emit(notes)
+                        }
+                    }
+                }
             }
-        }
+
+        // Start watching the file system folder
+        observer.startWatching()
+
+        val notes = fileManager.readCache(file.path)
+        sharedFlow.emit(notes)
+
+    }
 
 }

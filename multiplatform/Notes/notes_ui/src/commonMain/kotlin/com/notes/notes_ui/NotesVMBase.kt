@@ -73,11 +73,7 @@ open class NotesVMBase(
     }
 
     // Note has been updated in repository
-    override fun onNoteAdded(id: Long) {
-        scope.launch {
-            // Select updated note to make sure that ui has the latest state
-            onSelectAction(Notes(id = id))
-        }
+    override fun onNoteAdded(note: Notes?) {
     }
 
     // Need to nav back because of some state changes or user interaction

@@ -46,6 +46,7 @@ class RemoteRepository(
     fun saveNote(
         scope: CoroutineScope,
         note: Notes,
+        onSaved: (Notes) -> Unit = {},
     ) {
         scope.launch {
             val services = getServices()
@@ -68,6 +69,7 @@ class RemoteRepository(
 
                 if (result) {
                     syncManager.updateMetadata(dataStore = service, note = noteToSave, pendingUpdate = false)
+                    onSaved(noteToSave)
                 } else {
                     Platform().logger.loge("RemoteRepository::saveNote() failed note '${noteToSave.id}' for '${service.key}'")
                 }
@@ -78,6 +80,7 @@ class RemoteRepository(
     // TODO: Think if we can return data one by one but not all at once
     // So if we can make a good use of Channel
     suspend fun fetchCopy(): List<Notes> {
+        Platform().logger.logi("RemoteRepository::fetchCopy()")
         val notesFound = mutableListOf<Notes>()
         // Merge results from several sources
         // Ideally it should have exact list but do check a merge for safety
@@ -101,9 +104,8 @@ class RemoteRepository(
         scope: CoroutineScope,
     ): Job {
         return scope.launch {
-            Platform().logger.logi("RemoteRepository::fetch()")
             val foundNotes = fetchCopy()
-            Platform().logger.logi("RemoteRepository::fetch() size = ${foundNotes.size}")
+            Platform().logger.logi("RemoteRepository::fetch() data size = ${foundNotes.size}")
             // We are going to update local db with data fetched from remote.
             syncManager.store(
                 notes = foundNotes,

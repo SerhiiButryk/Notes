@@ -7,6 +7,7 @@ import com.notes.repo.feature.ChangePasswordUseCase
 import com.notes.repo.feature.MediaStoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class AppRepository private constructor(
     private val remoteRepository: RemoteRepository,
@@ -38,8 +39,11 @@ class AppRepository private constructor(
     }
 
     init {
-        // Set scope
-        remoteRepository.syncManager.scope = scope
+        val manager = remoteRepository.syncManager as AndroidSyncManager
+        manager.scope = scope
+        scope.launch {
+            manager.startWatchingCacheDir()
+        }
         Platform().logger.logi("AppRepository() created")
     }
 
