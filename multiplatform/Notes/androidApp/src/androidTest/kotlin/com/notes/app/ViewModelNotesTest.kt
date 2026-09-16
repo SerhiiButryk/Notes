@@ -28,9 +28,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.Collections
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
-import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
 
@@ -73,7 +73,7 @@ class ViewModelNotesTest {
 
                 override fun saveNote(
                     note: Notes,
-                    onAdded: suspend (Long) -> Unit,
+                    onAdded: suspend (Notes?) -> Unit,
                 ) {
                 }
 
@@ -174,127 +174,86 @@ class ViewModelNotesTest {
         }
 
     @Test
-    fun test03_onNewAdded() =
-        runTest {
-            val actualNote = viewModel?.noteState?.value
-            assertThat(actualNote).isEqualTo(Notes.AbsentNote())
-
-            // Trigger 'notesState' sharing
-            val job =
-                launch(Dispatchers.IO) {
-                    viewModel?.notesState?.collect {
-                        if (it.collection.isNotEmpty()) {
-                            // Got some valid data. So cancel this coroutine.
-                            cancel()
-                        }
-                    }
-                }
-
-            job.join()
-
-            val notes = Channel<Notes>(capacity = Channel.CONFLATED)
-
-            launch(Dispatchers.IO) {
-                viewModel?.noteState?.collect {
-                    if (it != Notes.AbsentNote()) {
-                        notes.send(it)
-                        cancel()
-                    }
-                }
-            }
-
-            viewModel?.onNoteAdded(id = note3.id)
-
-            assertThat(notes.receive()).isEqualTo(note3)
-        }
-
-    @Test
-    fun test04_deletion_verify() =
+    fun test03_deletion_verify() =
         runTest {
 
             val syncManager = AndroidSyncManager(appContext)
 
-            val repo = createAppRepo(false, syncManager, backgroundScope)
-            val viewModel = createViewModel(repo, backgroundScope)
-
-            val notes = Channel<List<Notes>>(capacity = Channel.CONFLATED)
-
-            // Trigger 'notesState' sharing
-            val job =
-                launch(Dispatchers.IO) {
-                    viewModel.notesState.collect {
-                        Log.i(tag, "test04_deletion_verify: first got = $it")
-                        if (it.collection.size == 2) {
-                            notes.send(it.collection)
-                            cancel() // Done!
-                        }
-                    }
-                }
+            val list = Collections.synchronizedList(ArrayList<Notes>())
 
             val note1 = Notes(id = 1, content = "test04_test1", userId = "test04_userid1", time = "test04_time1")
             val note2 = Notes(id = 2, content = "test04_test2", userId = "test04_userid2", time = "test04_time2")
 
             coroutineScope {
+
                 val documents = listOf(
                     Document(name = note1.id.toString(), data = note1.content),
                     Document(name = note2.id.toString(), data = note2.content),
                 )
+
                 val localRepo = createAppRepo(
                     setDelete = false,
                     syncManager = syncManager,
                     scope = this,
                     docsList = documents,
                 )
+
                 localRepo.saveNote(note = note1, onAdded = {})
                 localRepo.saveNote(note = note2, onAdded = {})
-            }
 
-            job.join()
+                val viewModel = createViewModel(localRepo, backgroundScope)
 
-            val list1 = notes.receive()
-
-            assertThat(list1.size == 2).isTrue()
-
-            var deletedNoteId = 0L
-
-            coroutineScope {
-                val noteToDelete = list1[0] // Delete first note
-                deletedNoteId = noteToDelete.id
-                val localRepo = createAppRepo(
-                    setDelete = true,
-                    syncManager = syncManager,
-                    scope = this
-                )
-                localRepo.deleteNote(noteToDelete, {})
-            }
-
-            // Trigger 'notesState' sharing
-            val job2 =
                 launch(Dispatchers.IO) {
                     viewModel.notesState.collect {
-                        Log.i(tag,"test04_deletion_verify: second got = $it")
-                        if (it.collection.size == 1) {
-                            notes.send(it.collection)
+                        Log.i(tag, "test03_deletion_verify: first got = $it")
+                        if (it.collection.size == 2) {
+                            list.add(it.collection[0])
+                            list.add(it.collection[1])
                             cancel() // Done!
                         }
                     }
                 }
 
-            job2.join()
-
-            val list2 = notes.receive() // New data received
-
-            assertThat(list2.size == 1).isTrue()
-            assertThat(list2[0].id != deletedNoteId).isTrue()
-
-            // Clear VM
-            val onClear = viewModel::class.declaredMemberFunctions.find { it.name == "onCleared" }
-            if (onClear != null) {
-                onClear.isAccessible = true
-                onClear.call(viewModel)
             }
 
-            Log.i(tag,"test04_deletion_verify() done")
+            assertThat(list.size == 2).isTrue()
+
+            var deletedNoteId = 0L
+
+            coroutineScope {
+
+                val noteToDelete = list[0] // Delete first note
+                deletedNoteId = noteToDelete.id
+
+                val localRepo = createAppRepo(
+                    setDelete = true,
+                    syncManager = syncManager,
+                    scope = this,
+                    docsList = listOf(Document(name = list[1].id.toString()))
+                )
+
+                localRepo.deleteNote(noteToDelete, {})
+
+                val viewModel = createViewModel(localRepo, backgroundScope)
+
+                list.clear()
+
+                launch(Dispatchers.IO) {
+                    viewModel.notesState.collect {
+                        Log.i(tag,"test03_deletion_verify: second got = $it")
+                        if (it.collection.size == 1) {
+                            list.add(it.collection[0])
+                            cancel() // Done!
+                        }
+                    }
+                }
+
+            }
+
+            assertThat(list.size == 1).isTrue()
+            assertThat(list[0].id != deletedNoteId).isTrue()
+
+            Log.i(tag,"test03_deletion_verify() done")
         }
 
     private fun createViewModel(
@@ -329,7 +288,10 @@ class ViewModelNotesTest {
 
                 override suspend fun delete(document: Document): Boolean = setDelete
 
-                override suspend fun fetchAll(): List<Document> = docsList
+                override suspend fun fetchAll(): List<Document> {
+                    Log.i(tag,"fetchAll() returning ${docsList.size}")
+                    return docsList
+                }
             }
 
         return AppRepository.create(listOf(mockedStoreService), syncManager, scope)

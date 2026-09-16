@@ -1,5 +1,6 @@
 package com.notes.repo
 
+import api.Platform
 import api.data.Attachments
 import api.data.Notes
 import api.repo.BaseRepo
@@ -14,8 +15,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 open class AppRepoBase(
-    private val syncManager: ClientSyncManager,
-    private val remoteRepository: RemoteRepository = RemoteRepository(syncManager),
+    protected val syncManager: ClientSyncManager,
+    protected val remoteRepository: RemoteRepository = RemoteRepository(syncManager),
     // For test support
     scopeOverride: CoroutineScope? = null,
 ) : BaseRepo(scopeOverride) {
@@ -68,6 +69,7 @@ open class AppRepoBase(
         note: Notes,
         onDeleted: (Long) -> Unit,
     ) {
+        Platform().logger.logi("deleteNote() ${note.id}")
         scope.launch {
             coroutineScope {
                 remoteRepository.delete(scope = this, note = note)

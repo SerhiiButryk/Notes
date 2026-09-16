@@ -3,6 +3,7 @@ package com.notes.repo
 import api.Platform
 import api.data.Notes
 import com.notes.db.impl.getDatabaseInstance
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -22,7 +23,7 @@ class JvmSyncManager : BaseSyncManager(getDatabaseInstance()) {
     private val scanSignal = Channel<Unit>()
 
     init {
-        startFileObserver(fileManager.secondCacheDir)
+        startCacheDirWatching()
     }
 
     override val notes: Flow<List<Notes>> = flow {
@@ -40,7 +41,9 @@ class JvmSyncManager : BaseSyncManager(getDatabaseInstance()) {
     }
 
 
-    private fun startFileObserver(dirPath: String) {
+    override fun startCacheDirWatching(scope: CoroutineScope?) {
+
+        val dirPath = fileManager.secondCacheDir
 
         File(dirPath).apply { mkdirs() }
 

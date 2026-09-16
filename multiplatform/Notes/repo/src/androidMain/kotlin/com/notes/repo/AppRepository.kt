@@ -1,16 +1,14 @@
 package com.notes.repo
 
-import api.Platform
 import api.data.AbstractStorageService
 import api.data.UserFile
 import com.notes.repo.feature.ChangePasswordUseCase
 import com.notes.repo.feature.MediaStoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 class AppRepository private constructor(
-    private val remoteRepository: RemoteRepository,
+    remoteRepository: RemoteRepository,
     // For test support
     scopeOverride: CoroutineScope? = null,
 ) : AppRepoBase(remoteRepository.syncManager, remoteRepository, scopeOverride) {
@@ -39,12 +37,7 @@ class AppRepository private constructor(
     }
 
     init {
-        val manager = remoteRepository.syncManager as AndroidSyncManager
-        manager.scope = scope
-        scope.launch {
-            manager.startWatchingCacheDir()
-        }
-        Platform().logger.logi("AppRepository() created")
+        syncManager.startCacheDirWatching(scope = scope)
     }
 
     private val changePass = ChangePasswordUseCase()

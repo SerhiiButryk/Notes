@@ -7,8 +7,10 @@ import api.Platform
 import api.data.Notes
 import com.notes.db.getDatabaseInstance
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -18,26 +20,28 @@ class AndroidSyncManager(
 
     private val tag = "AndroidSyncManager"
 
-    private val sharedFlow = MutableSharedFlow<List<Notes>>()
-    override val notes: Flow<List<Notes>> = sharedFlow
+    private val sharedFlow = MutableSharedFlow<List<Notes>>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    override val notes: Flow<List<Notes>> = sharedFlow.asSharedFlow()
 
     override suspend fun store(
         notes: List<Notes>,
         forceOverride: Boolean,
         scope: CoroutineScope
     ) {
-        Platform().logger.logd("$tag::store:")
+        Platform().logger.logi("store() ${notes.size}")
         super.store(notes, forceOverride, scope)
         sharedFlow.emit(notes)
     }
 
-    suspend fun startWatchingCacheDir() {
+    override fun startCacheDirWatching(scope: CoroutineScope?) {
 
         val file = File(fileManager.secondCacheDir)
 
         if (!file.exists()) {
             val result = file.mkdirs()
-            Platform().logger.logd("$tag::startWatchingCacheDir: create dir ($result)")
         }
 
         val mask: Int =
@@ -52,7 +56,8 @@ class AndroidSyncManager(
                         path: String?,
                     ) {
                         Platform().logger.logd("$tag::onEvent: $event")
-                        scope!!.launch {
+                        require(scope != null)
+                        scope.launch {
                             val notes = fileManager.readCache(file.path)
                             sharedFlow.emit(notes)
                         }
@@ -66,7 +71,8 @@ class AndroidSyncManager(
                         path: String?,
                     ) {
                         Platform().logger.logd("$tag::onEvent: $event")
-                        scope!!.launch {
+                        require(scope != null)
+                        scope.launch {
                             val notes = fileManager.readCache(file.path)
                             sharedFlow.emit(notes)
                         }
@@ -77,8 +83,11 @@ class AndroidSyncManager(
         // Start watching the file system folder
         observer.startWatching()
 
-        val notes = fileManager.readCache(file.path)
-        sharedFlow.emit(notes)
+        require(scope != null)
+        scope.launch {
+            val notes = fileManager.readCache(file.path)
+            sharedFlow.emit(notes)
+        }
 
     }
 

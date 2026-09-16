@@ -22,8 +22,6 @@ abstract class BaseSyncManager(
 
     private val tag = "BaseSyncManager"
 
-    override var scope: CoroutineScope? = null
-
     protected val fileManager = FilesManager()
 
     private val metadataMutex = Mutex()
