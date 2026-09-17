@@ -64,7 +64,7 @@ jobs:
 
   # Job 2: Build for Desktop target
   build-jvm-desktop:
-    runs-on: macos-latest
+    runs-on: macos-26-intel
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
