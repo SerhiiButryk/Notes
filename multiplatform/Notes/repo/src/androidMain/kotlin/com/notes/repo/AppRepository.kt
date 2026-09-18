@@ -1,6 +1,5 @@
 package com.notes.repo
 
-import api.data.AbstractStorageService
 import api.data.UserFile
 import com.notes.repo.feature.ChangePasswordUseCase
 import com.notes.repo.feature.MediaStoreUseCase
@@ -22,17 +21,12 @@ class AppRepository private constructor(
             )
 
         fun create(
-            services: List<AbstractStorageService>,
             syncManager: AndroidSyncManager,
-            scope: CoroutineScope? = null,
+            scopeOverride: CoroutineScope? = null,
         ): AppRepository =
             AppRepository(
-                scopeOverride = scope,
-                remoteRepository =
-                    RemoteRepository(
-                        services,
-                        syncManager
-                    ),
+                scopeOverride = scopeOverride,
+                remoteRepository = RemoteRepository(syncManager),
             )
     }
 

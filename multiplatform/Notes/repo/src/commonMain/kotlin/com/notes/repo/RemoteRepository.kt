@@ -22,24 +22,15 @@ class RemoteRepository(
     val syncManager: ClientSyncManager
 ) {
 
-    constructor(
-        storeServices: List<AbstractStorageService>,
-        syncManager: ClientSyncManager
-    ) : this(syncManager) {
-        this.storeServices = storeServices
-    }
-
-    private var storeServices: List<AbstractStorageService>? = null
+    private val tag = "RemoteRepository"
 
     private fun getServices(): List<AbstractStorageService> {
-        if (storeServices == null) {
-            storeServices = AppServices.getStoreServices()
-        }
+        val storeServices = AppServices.getStoreServices()
         val services = mutableListOf<AbstractStorageService>()
-        storeServices?.forEach {
+        storeServices.forEach {
             if (it.canUse) services.add(it)
         }
-        Platform().logger.logi("RemoteRepository::getServices() available services = '${services.size}'")
+        Platform().logger.logi("$tag::getServices() available services = '${services.size}'")
         return services
     }
 
@@ -51,7 +42,7 @@ class RemoteRepository(
         scope.launch {
             val services = getServices()
             for (service in services) {
-                Platform().logger.logi("RemoteRepository::saveNote() note '${note.id}' to '${service.key}'...")
+                Platform().logger.logi("$tag::saveNote() note '${note.id}' to '${service.key}'...")
 
                 var noteToSave = note
 
@@ -71,7 +62,7 @@ class RemoteRepository(
                     syncManager.updateMetadata(dataStore = service, note = noteToSave, pendingUpdate = false)
                     onSaved(noteToSave)
                 } else {
-                    Platform().logger.loge("RemoteRepository::saveNote() failed note '${noteToSave.id}' for '${service.key}'")
+                    Platform().logger.loge("$tag::saveNote() failed note '${noteToSave.id}' for '${service.key}'")
                 }
             }
         }
@@ -80,7 +71,7 @@ class RemoteRepository(
     // TODO: Think if we can return data one by one but not all at once
     // So if we can make a good use of Channel
     suspend fun fetchCopy(): List<Notes> {
-        Platform().logger.logi("RemoteRepository::fetchCopy()")
+        Platform().logger.logi("$tag::fetchCopy()")
         val notesFound = mutableListOf<Notes>()
         // Merge results from several sources
         // Ideally it should have exact list but do check a merge for safety
@@ -105,7 +96,7 @@ class RemoteRepository(
     ): Job {
         return scope.launch {
             val foundNotes = fetchCopy()
-            Platform().logger.logi("RemoteRepository::fetch() data size = ${foundNotes.size}")
+            Platform().logger.logi("$tag::fetch() data size = ${foundNotes.size}")
             // We are going to update local db with data fetched from remote.
             syncManager.store(
                 notes = foundNotes,
@@ -118,13 +109,13 @@ class RemoteRepository(
     // Start checking if we need to process anything that's not been synced
 
     fun sync(scope: CoroutineScope) {
-        Platform().logger.logi("RemoteRepository::sync()")
+        Platform().logger.logi("$tag::sync()")
         syncManager.sync(scope = scope, action = object : OnAction {
             override fun onDeleteRequired(note: Notes) {
-                saveNote(scope = scope, note = note)
+                delete(scope = scope, note = note)
             }
             override fun onSaveRequired(note: Notes) {
-                delete(scope = scope, note = note)
+                saveNote(scope = scope, note = note)
             }
         })
     }
@@ -134,7 +125,7 @@ class RemoteRepository(
         note: Notes,
     ) {
         scope.launch {
-            Platform().logger.logi("RemoteRepository::delete: started")
+            Platform().logger.logi("$tag::delete: started")
 
             syncManager.markPendingDeletion(note)
 
@@ -144,7 +135,7 @@ class RemoteRepository(
             for (service in services) {
                 val job =
                     scope.launch {
-                        Platform().logger.logi("RemoteRepository::delete: note '${note.id}' for '${service.key}'")
+                        Platform().logger.logi("$tag::delete: note '${note.id}' for '${service.key}'")
 
                         syncManager.updateMetadata(dataStore = service, note = note, pendingDelete = true)
 
@@ -152,10 +143,10 @@ class RemoteRepository(
                         if (result) {
                             syncManager.updateMetadata(dataStore = service, note = note, pendingDelete = false)
                             Platform().logger.logi(
-                                "RemoteRepository::delete: deleted note '${note.id}' for '${service.key}'",
+                                "$tag::delete: deleted note '${note.id}' for '${service.key}'",
                             )
                         } else {
-                            Platform().logger.loge("RemoteRepository::delete: failed note '${note.id}' for '${service.key}', note = '${note.id}'")
+                            Platform().logger.loge("$tag::delete: failed note '${note.id}' for '${service.key}', note = '${note.id}'")
                         }
                     }
 
@@ -166,12 +157,12 @@ class RemoteRepository(
 
             syncManager.delete(note)
 
-            Platform().logger.logi("RemoteRepository::delete: done")
+            Platform().logger.logi("$tag::delete: done")
         }
     }
 
     suspend fun saveAttachment(file: File): Boolean {
-        Platform().logger.logi("RemoteRepository::saveAttachment")
+        Platform().logger.logi("$tag::saveAttachment")
         val services = getServices()
         for (service in services) {
             // Google Drive is only supported
@@ -189,7 +180,7 @@ class RemoteRepository(
     ): Boolean {
         val result =
             scope.async {
-                Platform().logger.logi("RemoteRepository::deleteAttachment")
+                Platform().logger.logi("$tag::deleteAttachment")
                 val services = getServices()
                 for (service in services) {
                     // Google Drive is only supported

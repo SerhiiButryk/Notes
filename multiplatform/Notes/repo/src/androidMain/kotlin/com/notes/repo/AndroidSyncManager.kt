@@ -31,7 +31,7 @@ class AndroidSyncManager(
         forceOverride: Boolean,
         scope: CoroutineScope
     ) {
-        Platform().logger.logi("store() ${notes.size}")
+        Platform().logger.logi("$tag::store()")
         super.store(notes, forceOverride, scope)
         sharedFlow.emit(notes)
     }
@@ -41,7 +41,7 @@ class AndroidSyncManager(
         val file = File(fileManager.secondCacheDir)
 
         if (!file.exists()) {
-            val result = file.mkdirs()
+            file.mkdirs()
         }
 
         val mask: Int =

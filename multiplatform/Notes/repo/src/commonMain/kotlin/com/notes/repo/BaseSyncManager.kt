@@ -42,11 +42,13 @@ abstract class BaseSyncManager(
                 if (exists) {
 
                     if (item.metadata.isPendingUpdateOnRemote()) {
+                        Platform().logger.logi("$tag:syncIfNeeded() pending save")
                         val note = Notes(id = noteId)
                         action.onSaveRequired(note)
                     }
 
                     if (item.metadata.isPendingDeletionOnRemote()) {
+                        Platform().logger.logi("$tag:syncIfNeeded() pending delete")
                         val note = Notes(id = noteId)
                         action.onDeleteRequired(note)
                     }
@@ -62,6 +64,7 @@ abstract class BaseSyncManager(
 
     override suspend fun markPendingDeletion(note: Notes) {
         val foundRecord = searchMetadataFor(note.id)
+        if (foundRecord?.pendingDelete == true) return
         if (foundRecord == null) {
             database.insert(
                 NoteMetadata(

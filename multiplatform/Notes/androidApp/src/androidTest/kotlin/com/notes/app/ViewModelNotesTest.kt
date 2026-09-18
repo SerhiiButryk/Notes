@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import api.AppService
-import api.data.AbstractStorageService
 import api.data.Attachments
 import api.data.Document
 import api.data.Notes
@@ -191,11 +189,14 @@ class ViewModelNotesTest {
                     Document(name = note2.id.toString(), data = note2.content),
                 )
 
-                val localRepo = createAppRepo(
+                setupServices(
                     setDelete = false,
+                    docsList = documents
+                )
+
+                val localRepo = createAppRepo(
                     syncManager = syncManager,
                     scope = this,
-                    docsList = documents,
                 )
 
                 localRepo.saveNote(note = note1, onAdded = {})
@@ -225,11 +226,14 @@ class ViewModelNotesTest {
                 val noteToDelete = list[0] // Delete first note
                 deletedNoteId = noteToDelete.id
 
-                val localRepo = createAppRepo(
+                setupServices(
                     setDelete = true,
+                    docsList = listOf(Document(name = list[1].id.toString()))
+                )
+
+                val localRepo = createAppRepo(
                     syncManager = syncManager,
                     scope = this,
-                    docsList = listOf(Document(name = list[1].id.toString()))
                 )
 
                 localRepo.deleteNote(noteToDelete, {})
@@ -268,32 +272,4 @@ class ViewModelNotesTest {
         return viewModel
     }
 
-    private fun createAppRepo(
-        setDelete: Boolean,
-        syncManager: AndroidSyncManager,
-        scope: CoroutineScope? = null,
-        docsList: List<Document> = emptyList(),
-    ): AppRepository {
-        val mockedStoreService =
-            object : AbstractStorageService() {
-                override val key: Any = AppService.FIREBASE_STORAGE
-
-                init {
-                    canUse = true
-                }
-
-                override suspend fun store(document: Document): Boolean = true
-
-                override suspend fun load(document: Document): Document = Document("", "")
-
-                override suspend fun delete(document: Document): Boolean = setDelete
-
-                override suspend fun fetchAll(): List<Document> {
-                    Log.i(tag,"fetchAll() returning ${docsList.size}")
-                    return docsList
-                }
-            }
-
-        return AppRepository.create(listOf(mockedStoreService), syncManager, scope)
-    }
 }
