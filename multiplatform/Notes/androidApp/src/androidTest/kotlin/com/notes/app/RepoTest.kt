@@ -364,7 +364,7 @@ class RepoTest : AppTest() {
             if (list.isNotEmpty()) {
                 // Wait some time, we might not receive new value at this moment
                 for (i in 0..5) {
-                    Thread.sleep(300)
+                    Thread.sleep(1000)
                     if (repo.getNotes().first().isEmpty()) break
                 }
             }

@@ -4,6 +4,7 @@ import api.AppService.Companion.DEFAULT_AUTH
 import api.auth.AbstractAuthService
 import api.data.AbstractStorageService
 import api.data.EncryptedStore
+import java.util.Collections
 
 /**
  * Generic app service definition.
@@ -33,7 +34,7 @@ interface AppService {
 object AppServices {
     var serverClientId = ""
 
-    private val appServices = mutableListOf<AppService>()
+    private val appServices = Collections.synchronizedList(ArrayList<AppService>())
 
     fun addService(appService: AppService) {
         appService.onCreate()
