@@ -55,7 +55,11 @@ internal actual class PlatformFactory {
 
     actual fun provideCacheDirPath(): String {
         val userHome = System.getProperty("user.home")
-        val appDir = File(userHome, ".notes").apply { mkdirs() }
+        val appDir = File(userHome, ".notes")
+            .apply {
+                if (!exists())
+                    mkdirs()
+            }
         return appDir.absolutePath
     }
 

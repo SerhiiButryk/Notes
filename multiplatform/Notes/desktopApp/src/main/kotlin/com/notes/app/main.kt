@@ -7,7 +7,7 @@ fun main() = run {
     applicationTraced {
         Window(
             onCloseRequest = ::exitApplication,
-            title = APP_TITLE,
+            title = APP_NAME,
         ) {
             // Set min width & height
             // window.minimumSize = Dimension(1200, 800)

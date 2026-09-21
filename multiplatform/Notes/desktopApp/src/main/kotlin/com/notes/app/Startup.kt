@@ -13,11 +13,15 @@ import com.notes.os.JVMInitProvider
 import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
-const val APP_TITLE = "Notes"
+const val APP_NAME = "Notes"
 
 fun run(block: () -> Unit) {
+
+    val home = System.getProperty("user.home")
+    val logFile = java.io.File(home, "app_crash.log")
+
     Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-        println("Uncaught exception in thread: ${thread.name}, throwable: $throwable")
+        logFile.appendBytes(throwable.stackTraceToString().toByteArray())
         throwable.printStackTrace()
     }
 
@@ -26,7 +30,8 @@ fun run(block: () -> Unit) {
         initApplication()
         block()
     } catch (e: Exception) {
-        println("Uncaught exception: $e")
+        logFile.appendBytes(e.stackTraceToString().toByteArray())
+        e.printStackTrace()
     }
 }
 
@@ -34,7 +39,7 @@ fun initApplication() {
     val osType = System.getProperty("os.name").lowercase()
     if (osType.contains("mac")) {
         // Set application title
-        System.setProperty("apple.awt.application.name", APP_TITLE)
+        System.setProperty("apple.awt.application.name", APP_NAME)
     }
     JVMInitProvider.onCreate()
 }

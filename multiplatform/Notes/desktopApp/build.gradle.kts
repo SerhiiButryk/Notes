@@ -60,7 +60,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg)
-            packageName = "com.notes.app"
+            packageName = "Notes"
             packageVersion = "1.0.0"
 
             macOS {

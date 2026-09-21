@@ -5,9 +5,9 @@ import androidx.compose.runtime.InternalComposeTracingApi
 import androidx.tracing.DelicateTracingApi
 import androidx.tracing.wire.TraceDriver
 import androidx.tracing.wire.TraceSink
+import api.Platform
 import api.data.AppSettings
 import java.io.File
-import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -20,12 +20,11 @@ class AppLogger : PlatformLog() {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
     init {
-        val currDir = Paths.get("").toAbsolutePath()
-        logsDir = "$currDir/logs"
-        logFile = File("$logsDir/logs.txt")
+        val home = Platform().getCacheDir()
+        logsDir = "$home/logs"
+        logFile = File("$logsDir/app.logs")
         driver = createTraceDriver()
         logi("App launched >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        logi("Logs: ${logFile.parent}")
     }
 
     override fun logi(message: String) {
