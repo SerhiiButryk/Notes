@@ -46,8 +46,10 @@ import coil3.compose.AsyncImage
 import com.notes.notes_ui.components.NotesNavRail
 import com.notes.notes_ui.models.Tools
 import com.notes.notes_ui.components.ViewModelCommand
-import com.notes.notes_ui.editor.createEditorState
+import com.notes.notes_ui.editor.EditorState
+import com.notes.notes_ui.editor.rememberRichEditorState
 import com.notes.ui.SearchBarField
+import dev.mkeeda.arranger.richtext.editor.RichTextState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -174,9 +176,7 @@ private fun ListDetailUI(
 
     val coroutineScope = rememberCoroutineScope()
 
-    var state by remember(note.content) {
-        mutableStateOf(createEditorState(note.richString))
-    }
+    var state by rememberRichEditorState(note)
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,
@@ -192,17 +192,15 @@ private fun ListDetailUI(
                     onSelected = { selectedNote ->
                         // Open Note Editor Screen
                         coroutineScope.launch {
-                            state = createEditorState(selectedNote.richString)
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onSelectAction(selectedNote)
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                         }
                     },
                     addAction = {
                         // Open Note Editor Screen
                         coroutineScope.launch {
-                            state = createEditorState(Notes().richString)
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onAddAction()
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                         }
                     },
                     isPhoneSize = isPhoneSize,

@@ -9,8 +9,8 @@ data class Notes(
     val userId: String = "",
     val time: String = "",
 ) {
-    // Rich string representing this note
-    var richString: Any? = null
+    // UI state representing this note
+    var richState: Any? = null
 
     companion object {
         fun NewNote() = Notes(id = -1)

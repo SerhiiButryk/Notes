@@ -10,8 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -23,7 +21,7 @@ import api.data.Notes
 import api.data.NotesCollection
 import com.notes.notes_ui.NotesEditorUI
 import com.notes.notes_ui.NotesListUI
-import com.notes.notes_ui.editor.createEditorState
+import com.notes.notes_ui.editor.rememberRichEditorState
 import com.notes.notes_ui.models.Tools
 import com.notes.ui.SearchBarFieldV2
 import kotlinx.coroutines.launch
@@ -45,9 +43,7 @@ fun NotesScreenImpl(
 
     val coroutineScope = rememberCoroutineScope()
 
-    var state by remember(note.content) {
-        mutableStateOf(createEditorState(note.richString))
-    }
+    var state by rememberRichEditorState(note)
 
     val splitterState = rememberSplitPaneState(initialPositionPercentage = 0.3f)
 
@@ -77,14 +73,12 @@ fun NotesScreenImpl(
                         onSelected = { selectedNote ->
                             // Open Note Editor Screen
                             coroutineScope.launch {
-                                state = createEditorState(selectedNote.richString)
                                 onSelectAction(selectedNote)
                             }
                         },
                         addAction = {
                             // Open Note Editor Screen
                             coroutineScope.launch {
-                                state = createEditorState(Notes().richString)
                                 onAddAction()
                             }
                         },
@@ -109,6 +103,7 @@ fun NotesScreenImpl(
                         bottomSheetState = bottomSheetState,
                         showFolderButton = false,
                         showTopBar = false,
+                        withAnimation = true,
                     )
                 }
 

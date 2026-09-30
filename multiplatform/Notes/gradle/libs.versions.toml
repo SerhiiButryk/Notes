@@ -18,7 +18,7 @@ javaversion = "21"
 
 # Other versions
 
-arrangerRichtextEditor = "0.4.0-alpha03"
+arrangerRichtextEditor = "0.4.0-alpha04"
 coilCompose = "3.4.0"
 composeMultiplatform = "1.10.3" # Upgrading could lead to new build issues.
 composeHotReload = "1.2.0"

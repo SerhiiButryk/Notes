@@ -5,8 +5,11 @@ import api.data.NotesCollection
 import api.repo.RepoCallback
 import api.repo.Repository
 import com.notes.notes_ui.components.ViewModelCommand
+import com.notes.notes_ui.editor.EditorState
 import com.notes.notes_ui.models.getToolsList
 import com.notes.ui.model.BaseAppVM
+import dev.mkeeda.arranger.richtext.RichString
+import dev.mkeeda.arranger.richtext.html.fromHtml
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,18 +60,21 @@ open class NotesVMBase(
     // User selected a note from list ui
     suspend fun onSelectAction(note: Notes) {
         val found = notesState.value.collection.firstOrNull { note.id == it.id }
-        if (found == null) {
-            val note = interactor.getNotes(note.id).first()!!
-            _noteState.emit(note)
-        } else {
-            _noteState.emit(found)
-        }
+        val note = found ?: interactor.getNotes(note.id).first()!!
+        // Create a copy so changes in Editor doesn't get reflected in List UI immediately
+        // Saving 'EditorState' to 'richState' to support state restore during screen rotation
+        val copy = note.copy()
+        copy.richState = EditorState(RichString.fromHtml(note.content))
+        _noteState.emit(copy)
         interactor.onEditorOpen()
     }
 
     // User clicked on '+' button in ui to create an empty note
     suspend fun onAddAction() {
-        _noteState.emit(Notes.NewNote())
+        // Saving 'EditorState' to 'richState' to support state restore during screen rotation
+        val note = Notes.NewNote()
+        note.richState = EditorState(null)
+        _noteState.emit(note)
         interactor.onEditorOpen()
     }
 

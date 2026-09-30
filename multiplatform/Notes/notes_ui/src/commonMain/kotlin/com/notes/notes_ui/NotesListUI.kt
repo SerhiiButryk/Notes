@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,14 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import api.Platform
 import api.data.AppSettings
 import api.data.Notes
 import api.data.NotesCollection
-import com.notes.notes_ui.editor.createEditorState
+import com.notes.notes_ui.editor.rememberRichEditorState
 import com.notes.ui.StyledChip
 import com.notes.ui.theme.backgroundColor
-import dev.mkeeda.arranger.richtext.RichString
 import dev.mkeeda.arranger.richtext.editor.RichTextState
 
 @Composable
@@ -135,14 +132,11 @@ private fun EditorPreviewStateful(
         mutableStateOf("")
     }
 
-    val state =
-        remember(note.content) {
-            createEditorState(note.richString)
-        }
+    val state by rememberRichEditorState(note)
 
     LaunchedEffect(note.content) {
         // Get first line as a title
-        val textContent = (note.richString as RichString).text
+        val textContent = state.richString.text
         var firstLine = textContent.substringBefore('\n')
         if (firstLine.isEmpty()) firstLine = "No title"
         title =

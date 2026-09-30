@@ -1,15 +1,18 @@
 package com.notes.notes_ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
@@ -34,11 +37,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,6 +65,7 @@ fun NotesEditorUI(
     showFolderButton: Boolean,
     bottomSheetState: SheetState,
     showTopBar: Boolean = true,
+    withAnimation: Boolean = false,
     content: @Composable () -> Unit = {},
 ) {
     EditorUI(
@@ -74,6 +78,7 @@ fun NotesEditorUI(
         showFolderButton,
         bottomSheetState,
         showTopBar,
+        withAnimation,
     )
 }
 
@@ -89,6 +94,7 @@ private fun EditorUI(
     showFolderButton: Boolean,
     bottomSheetState: SheetState,
     showTopBar: Boolean,
+    withAnimation: Boolean,
 ) {
     // Controller to hide the keyboard when Boot Sheet is going to be shown.
     // In such case we will have smooth UI transition to new state
@@ -102,20 +108,6 @@ private fun EditorUI(
         }
     }
 
-    // TODO:
-    // Crossfade() animation adds flickering ui issues
-    // and it doen't look good. Disabled for now.
-    // Adds cross fade animation when selecting a note from the list
-    /*Crossfade(
-        targetState = notes,
-        label = "Editor cross fade animation",
-        modifier =
-            Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .imePadding(),
-    ) { note -> } */
-
     if (notes == Notes.AbsentNote()) {
         InfoLabel()
     } else {
@@ -123,69 +115,42 @@ private fun EditorUI(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(bottom = 6.dp)
-                    .clip(RoundedCornerShape(10.dp))
                     .background(color = backgroundColor())
+                    .navigationBarsPadding()
+                    .then(modifier)
         ) {
 
-            if (notes != Notes.AbsentNote() && showTopBar) {
-                TopAppBar(
-                    modifier = Modifier
-                        .height(90.dp),
-                    title = { },
-                    actions = {
-                        Row(
-                            modifier = Modifier
-                                .height(90.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            if (showFolderButton) {
-                                IconButton(onClick = {
-                                    keyboardController?.hide()
-                                    showFolderContent = true
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Folder,
-                                        contentDescription = "",
-                                    )
-                                }
-                            }
-                            if (AppSettings.attachmentsEnabled) {
-                                IconButton(onClick = { onAttacheFile() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.AttachFile,
-                                        contentDescription = "",
-                                    )
-                                }
-                            }
-                        }
-                    },
-                    colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            titleContentColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
-                )
-            }
-
-            // If we don't show top bar then don't show toolbar as well
-            if (showTopBar) {
-                ToolsBar(
-                    state = state,
-                    tools = tools,
+            if (withAnimation) {
+                // Add Cross-fade animation
+                Crossfade(
+                    targetState = notes,
+                    label = "Editor cross fade animation",
+                ) { note ->
+                    EditorMainContent(
+                        notes = note,
+                        onAttacheFile = onAttacheFile,
+                        onShowFolder = {
+                            keyboardController?.hide()
+                            showFolderContent = true
+                        },
+                        showFolderButton = showFolderButton,
+                        state = state,
+                        showTopBar = showTopBar,
+                        tools = tools,
+                    )
+                }
+            } else {
+                EditorMainContent(
                     notes = notes,
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                EditorLayout(
+                    onAttacheFile = onAttacheFile,
+                    onShowFolder = {
+                        keyboardController?.hide()
+                        showFolderContent = true
+                    },
+                    showFolderButton = showFolderButton,
                     state = state,
+                    showTopBar = showTopBar,
+                    tools = tools,
                 )
             }
 
@@ -204,6 +169,77 @@ private fun EditorUI(
         ) {
             content()
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ColumnScope.EditorMainContent(
+    notes: Notes,
+    showTopBar: Boolean,
+    showFolderButton: Boolean,
+    onShowFolder: () -> Unit,
+    onAttacheFile: () -> Unit,
+    state: RichTextState,
+    tools: Tools,
+) {
+    if (notes != Notes.AbsentNote() && showTopBar) {
+        TopAppBar(
+            modifier = Modifier
+                .height(90.dp),
+            title = { },
+            actions = {
+                Row(
+                    modifier = Modifier
+                        .height(90.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (showFolderButton) {
+                        IconButton(onClick = onShowFolder) {
+                            Icon(
+                                imageVector = Icons.Default.Folder,
+                                contentDescription = "",
+                            )
+                        }
+                    }
+                    if (AppSettings.attachmentsEnabled) {
+                        IconButton(onClick = onAttacheFile) {
+                            Icon(
+                                imageVector = Icons.Default.AttachFile,
+                                contentDescription = "",
+                            )
+                        }
+                    }
+                }
+            },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = backgroundColor(),
+                    titleContentColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+        )
+    }
+
+    // If we don't show top bar then don't show toolbar as well
+    if (showTopBar) {
+        ToolsBar(
+            state = state,
+            tools = tools,
+            notes = notes,
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(6.dp)
+            .weight(1f)
+            .verticalScroll(rememberScrollState())
+    ) {
+        EditorLayout(
+            state = state,
+        )
     }
 }
 
@@ -228,7 +264,6 @@ fun EditorLayout(
         readOnly = readOnly,
         modifier = Modifier
             .fillMaxSize()
-            .padding(6.dp)
             .focusRequester(focusRequester)
             .then(modifier),
         textStyle =
@@ -238,6 +273,10 @@ fun EditorLayout(
             ),
         styleResolver = rememberMaterial3AttributeStyleResolver(),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+        keyboardOptions = KeyboardOptions(
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Text
+        ),
     )
 }
 
