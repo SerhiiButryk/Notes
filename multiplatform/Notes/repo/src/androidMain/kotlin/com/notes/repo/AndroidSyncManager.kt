@@ -36,6 +36,10 @@ class AndroidSyncManager(
         sharedFlow.emit(notes)
     }
 
+    override suspend fun reset() {
+        sharedFlow.emit(emptyList())
+    }
+
     override fun startCacheDirWatching(scope: CoroutineScope?) {
 
         val file = File(fileManager.secondCacheDir)

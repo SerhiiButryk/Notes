@@ -90,7 +90,10 @@ class ViewModelNotesTest {
 
                 override suspend fun canChangePassword(): Boolean = false
 
-                override suspend fun clearLocalAppStorage() {
+                override suspend fun clearAllData() {
+                }
+
+                override suspend fun clearAccountOnlyData() {
                 }
 
                 override suspend fun isDataInSync(): Boolean = false

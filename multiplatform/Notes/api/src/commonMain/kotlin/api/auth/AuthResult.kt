@@ -26,6 +26,7 @@ data class AuthResult private constructor(
         internal const val registrationSuccess: Int = 1
         internal const val loginSuccess: Int = 2
         internal const val verificationSentOk: Int = 3
+        const val accountHasChanged: Int = 4
 
         fun passwordEmptyOrNotMatching(email: String): AuthResult = AuthResult(email, passwordEmptyOrNotMatchingError)
 
@@ -41,6 +42,7 @@ data class AuthResult private constructor(
         fun loginSuccess(email: String): AuthResult = AuthResult(status = loginSuccess, email = email)
 
         fun loginFailed(): AuthResult = AuthResult(status = loginFailed)
+        fun loginAccountChanged(): AuthResult = AuthResult(status = accountHasChanged)
 
         fun verificationSentFailed(email: String): AuthResult = AuthResult(email = email, status = verificationSentError)
 

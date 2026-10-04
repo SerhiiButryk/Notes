@@ -4,6 +4,7 @@ import api.AppService
 import api.Platform
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
+import api.data.AppSettings
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -49,12 +50,12 @@ open class FirebaseAuthService(
             suspendCancellableCoroutine { continuation ->
                 auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Platform().logger.logi("$tag::login() success")
+                        Platform().logger.logi("$tag::login() success, uid = '${auth.uid}'")
                         continuation.resume(AuthResult.loginSuccess(email = email)) { _, _, _ ->
                             // no-op if coroutine is canceled
                         }
                     } else {
-                        Platform().logger.loge("$tag::login() failure: ${task.exception}")
+                        Platform().logger.loge("$tag::login(), uid = '${auth.uid}', failure: ${task.exception}")
                         continuation.resume(AuthResult.loginFailed()) { _, _, _ ->
                             // no-op if coroutine is canceled
                         }
@@ -65,8 +66,16 @@ open class FirebaseAuthService(
             val afterResult = onLoginSuccessful(activityContext)
             // Stop!
             if (!afterResult.isSuccess()) return afterResult
-            // Done
-            callback?.onAuthCompleted(pass, getUserEmail())
+            // Special case: we store the user's email after a successful login
+            // so it can be displayed as a hint the next time they log in.
+            // However, the user is free to ignore the hint and enter a different account.
+            // In this case, we must ensure we correctly switch to the new account
+            // and update the state accordingly. Here we do this.
+            val emailStored = AppSettings.getUserEmail()
+            if (emailStored.isNotEmpty() && getUserEmail() != emailStored) {
+                // Done
+                return AuthResult.loginAccountChanged()
+            }
         }
         return result
     }

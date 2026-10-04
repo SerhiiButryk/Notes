@@ -55,7 +55,7 @@ internal class ChangePasswordUseCase {
             }
         }
 
-        repo.clearLocalAppStorage()
+        repo.clearAllData()
 
         coroutineScope {
             // This should get our app in sync when password has changed

@@ -270,7 +270,7 @@ class GoogleDriveService : AbstractStorageService() {
 
                 try {
                     drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
-                    Platform().logger.logi("GoogleDriveService::fetchAll() file = '${file.name}' downloaded")
+                    Platform().logger.logd("GoogleDriveService::fetchAll() file = '${file.name}' downloaded")
                 } catch (e: IOException) {
                     Platform().logger.loge("GoogleDriveService::fetchAll() error = '$e' file = '${file.name}'")
                     continue
@@ -283,10 +283,10 @@ class GoogleDriveService : AbstractStorageService() {
 
                 val fileManager = FilesManager()
                 if (!fileManager.hasFile(file.name)) {
-                    val outputStream = fileManager.getOutputStreamForImage(file.name)
+                    val outputStream = fileManager.getOutputStreamForFile(file.name)
                     try {
                         drive!!.files().get(file.id).executeMediaAndDownloadTo(outputStream)
-                        Platform().logger.loge("GoogleDriveService::fetchAll() file = '${file.name}' downloaded")
+                        Platform().logger.logd("GoogleDriveService::fetchAll() file = '${file.name}' downloaded")
                     } catch (e: IOException) {
                         Platform().logger.loge("GoogleDriveService::fetchAll() error = '$e' file = '${file.name}'")
                         continue

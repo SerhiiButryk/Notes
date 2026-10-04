@@ -33,12 +33,11 @@ class Interactor(
             scope.async {
                 Platform().crypto.addAuthCallbackFor(authService)
 
-                val emailStored = AppSettings.getUserEmail()
-
                 // This is first user login attempt
                 // At this moment User must be able to chose Google Account!
                 val googleService = AppServices.getServiceByKey(GOOGLE_AUTH) as? AuthService
                 if (googleService != null) {
+                    val emailStored = AppSettings.getUserEmail()
                     if (emailStored.isEmpty()) {
                         Platform().logger.logi("login(): login for the first time")
                         googleService.setAccountAutoselect(false)
@@ -49,10 +48,20 @@ class Interactor(
 
                 val result = authService.login(password, email, context)
 
-                // Save user email if it's not been saved yet
-                // It's the case when user didn't chose registeration and went to Login Screen
+                if (result.status == AuthResult.accountHasChanged) {
+                    // Clear old user data cause it will be updated
+                    Platform().appRepo.clearAccountOnlyData()
+                }
+
+                // Call completion listeners
+                if (result.isSuccess()) {
+                    Platform().crypto.onAuthCompleted(password, authService.getUserEmail())
+                }
+
+                // Save the login email if it's not been saved, yet
+                val emailStored = AppSettings.getUserEmail()
                 if (emailStored.isEmpty() && result.isSuccess()) {
-                    AppSettings.setUserEmail(result.email)
+                    AppSettings.setUserEmail(authService.getUserEmail())
                 }
                 result
             }

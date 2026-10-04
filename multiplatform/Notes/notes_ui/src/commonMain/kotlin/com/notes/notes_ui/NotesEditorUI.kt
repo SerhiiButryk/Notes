@@ -100,7 +100,7 @@ private fun EditorUI(
     // In such case we will have smooth UI transition to new state
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var showFolderContent by rememberSaveable { mutableStateOf(showFolderButton) }
+    var showFolderContent by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(false) {
         if (showFolderButton) {

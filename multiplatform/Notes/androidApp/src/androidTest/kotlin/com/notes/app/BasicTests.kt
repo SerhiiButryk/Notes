@@ -7,7 +7,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import api.AppService
 import api.Platform
+import api.auth.AuthResult
 import api.data.AbstractStorageService
+import api.data.AppSettings
 import api.data.Document
 import api.data.EncryptedStore
 import api.data.Notes
@@ -354,6 +356,112 @@ class BasicTests {
             assertThat(sz3?.size == 0).isTrue()
             val sz4 = dir2.listFiles()?.filter { it.isFile }
             assertThat(sz4?.size == 0).isTrue()
+
+        }
+
+    @Test
+    fun test08_sign_in() =
+        runTest {
+
+            Platform().storage.save("", "derived_key_pass")
+
+            val fm = FilesManager()
+
+            val cacheDir1Files = File(fm.firstCacheDir)
+                .listFiles()?.filter { it.isFile } ?: emptyList()
+
+            assertThat(cacheDir1Files.isEmpty()).isTrue()
+
+            val cacheDir2IsEmpty = File(fm.secondCacheDir)
+                .listFiles()?.isEmpty() ?: true
+
+            assertThat(cacheDir2IsEmpty).isTrue()
+
+            val imageFolderIsEmpty = fm.getOrCreateImageFolder()
+                .listFiles()?.isEmpty() ?: true
+
+            assertThat(imageFolderIsEmpty).isTrue()
+
+            assertThat(AppSettings.getUserEmail()).isEmpty()
+            assertThat(Platform().storage.get("derived_key_pass")).isEmpty()
+
+            // Login fake creds
+
+            val email = "somegoodemail@gmail.com"
+            val pass = "mypass106"
+
+            // Sign out first time and check state
+
+            val interactor = com.notes.auth_ui.Interactor(authService = createFakeAuthServices(""))
+
+            val result = interactor.login(password = "", email = "", context = appContext)
+
+            assertThat(result == AuthResult.emailOrPassEmpty("")).isTrue()
+            assertThat(AppSettings.getUserEmail()).isEmpty()
+            assertThat(Platform().storage.get("derived_key_pass")).isEmpty()
+
+            val interactor2 = com.notes.auth_ui.Interactor(authService = createFakeAuthServices(email))
+
+            val result2 = interactor2.login(password = pass, email = email, context = appContext)
+
+            assertThat(result2.isSuccess()).isTrue()
+            assertThat(AppSettings.getUserEmail()).isNotEmpty()
+            assertThat(AppSettings.getUserEmail() == email).isTrue()
+            assertThat(Platform().storage.get("derived_key_pass")).isNotEmpty()
+
+            val oldKey = Platform().storage.get("derived_key_pass")
+
+            // Add a note
+
+            val notes = listOf(Notes("note 1", id = 1))
+
+            val syncManager = AndroidSyncManager(context = appContext)
+            syncManager.store(notes = notes, forceOverride = true, this)
+
+            val cacheDir2IsNotEmpty = File(fm.secondCacheDir)
+                .listFiles()?.isEmpty() ?: true
+
+            assertThat(cacheDir2IsNotEmpty).isFalse()
+            assertThat(File(fm.secondCacheDir).listFiles()?.size == 1).isTrue()
+
+            // Change account
+
+            val newEmail = "new_somegoodemail@gmail.com"
+            val newPass = "new_mypass106"
+
+            // Setup services
+
+            val interactor3 = com.notes.auth_ui.Interactor(authService = createFakeAuthServices(newEmail))
+
+            val resultNew = interactor3.login(password = newEmail, email = newPass, context = appContext)
+
+            // Check result
+
+            assertThat(resultNew.isSuccess()).isTrue()
+            assertThat(resultNew.status == AuthResult.accountHasChanged).isTrue()
+            assertThat(AppSettings.getUserEmail()).isNotEmpty()
+            assertThat(AppSettings.getUserEmail() == newEmail).isTrue()
+            assertThat(Platform().storage.get("derived_key_pass")).isNotEmpty()
+            assertThat(oldKey != Platform().storage.get("derived_key_pass")).isTrue()
+
+            // Check that folders are empty
+
+            val afterCacheDir2Files = File(fm.firstCacheDir)
+                .listFiles()?.filter { it.isFile } ?: emptyList()
+
+            assertThat(afterCacheDir2Files.isEmpty()).isTrue()
+
+            val afterCacheDir2IsEmpty = File(fm.secondCacheDir)
+                .listFiles()?.isEmpty() ?: true
+
+            assertThat(afterCacheDir2IsEmpty).isTrue()
+
+            val afterImageFolderIsEmpty = fm.getOrCreateImageFolder()
+                .listFiles()?.isEmpty() ?: true
+
+            assertThat(afterImageFolderIsEmpty).isTrue()
+
+            // Done!!! Looks like all is fine!
 
         }
 }

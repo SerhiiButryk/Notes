@@ -31,7 +31,7 @@ class FilesManager {
         for (note in notes) {
             // A name of a file is note id
             val file = File(cacheDir, note.id.toString())
-            Platform().logger.logi("$tag::writeCache: note = ${note.id}, " +
+            Platform().logger.logd("$tag::writeCache: note = ${note.id}, " +
                     "path = ${file.absolutePath}")
             try {
                 val payload = note.getStringRep()
@@ -121,8 +121,8 @@ class FilesManager {
         return null
     }
 
-    fun getOutputStreamForImage(fileName: String): OutputStream {
-        Platform().logger.logi("$tag::getOutputStreamForImage:")
+    fun getOutputStreamForFile(fileName: String): OutputStream {
+        Platform().logger.logi("$tag::getOutputStreamForFile:")
         val imageFolder = getOrCreateImageFolder()
         val file = File(imageFolder, fileName)
         return FileOutputStream(file)
@@ -174,6 +174,14 @@ class FilesManager {
             }
 
         File(secondCacheDir)
+            .listFiles()
+            ?.forEach { file ->
+                if (file.isFile) {
+                    file.delete()
+                }
+            }
+
+        getOrCreateImageFolder()
             .listFiles()
             ?.forEach { file ->
                 if (file.isFile) {

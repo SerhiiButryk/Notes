@@ -11,8 +11,9 @@ import javax.crypto.spec.SecretKeySpec
 
 private const val tag = "CryptoOperations"
 
+const val DERIVED_PASS_KEY = "derived_key_pass"
+
 abstract class CryptoOperations : AuthCallback {
-    private val DERIVED_PASS_KEY = "derived_key_pass"
 
     private val SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding"
 

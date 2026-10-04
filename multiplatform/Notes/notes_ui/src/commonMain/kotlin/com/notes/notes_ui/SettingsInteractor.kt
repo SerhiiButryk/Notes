@@ -25,7 +25,7 @@ open class SettingsInteractorBase(
 
         callback(result)
         if (result) {
-            repo.clearLocalAppStorage()
+            repo.clearAllData()
         }
     }
 

@@ -2,7 +2,9 @@ package com.notes.repo
 
 import api.Platform
 import api.data.AbstractStorageService
+import api.data.AppSettings
 import api.data.Notes
+import api.security.DERIVED_PASS_KEY
 import com.notes.db.AppDatabase
 import com.notes.db.ClientSyncManager
 import com.notes.db.OnAction
@@ -175,10 +177,19 @@ abstract class BaseSyncManager(
         return isInSync
     }
 
-    override suspend fun clearLocalStorage() {
+    override suspend fun clearAllData() {
         database.deleteAll()
         fileManager.clearCache()
-        Platform().logger.logi("$tag:clearLocalStorage(): Local storage has been cleared")
+        Platform().storage.clearAll()
+        Platform().logger.logi("$tag:clearAllData(): done")
+    }
+
+    override suspend fun clearAccountOnlyData() {
+        database.deleteAll()
+        fileManager.clearCache()
+        AppSettings.clearUserEmail()
+        Platform().storage.save(key = DERIVED_PASS_KEY, value = "")
+        Platform().logger.logi("$tag:clearAccountOnlyData(): done")
     }
 
     suspend fun __getMetadata_FOR_TEST() = database.fetch()

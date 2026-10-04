@@ -24,6 +24,10 @@ object AppSettings {
     @Volatile // Make sure that all thread will see the updated value
     var isDarkThemeEnabled = false
 
+    suspend fun clearUserEmail() {
+        Platform().storage.save("", REGISTERED_USER_EMAIL)
+    }
+
     suspend fun setUserEmail(email: String) {
         Platform().storage.save(email, REGISTERED_USER_EMAIL)
     }

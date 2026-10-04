@@ -153,7 +153,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onPasswordUpdateClick = onPasswordUpdateClick,
                 onSignOutClick = {
                     viewModel.singOut {
-                        navController.navigate(Auth())
+                        navController.navigate(Access(forceLoginUI = true))
                     }
                 },
             )

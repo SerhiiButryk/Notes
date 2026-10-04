@@ -80,8 +80,13 @@ open class AppRepoBase(
         onDeleted(note.id)
     }
 
-    override suspend fun clearLocalAppStorage() =
-        syncManager.clearLocalStorage()
+    override suspend fun clearAllData() {
+        syncManager.reset()
+        syncManager.clearAllData()
+    }
+
+    override suspend fun clearAccountOnlyData() =
+        syncManager.clearAccountOnlyData()
 
     override suspend fun isDataInSync(): Boolean =
         syncManager.isAllInSync()

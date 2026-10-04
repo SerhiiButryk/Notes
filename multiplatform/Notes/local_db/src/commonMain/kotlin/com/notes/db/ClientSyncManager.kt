@@ -37,6 +37,9 @@ interface ClientSyncManager {
 
     suspend fun isAllInSync() = false
 
-    suspend fun clearLocalStorage()
+    suspend fun clearAllData()
+    suspend fun clearAccountOnlyData()
+
+    suspend fun reset() {}
 
 }

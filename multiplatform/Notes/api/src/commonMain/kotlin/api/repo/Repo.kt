@@ -34,7 +34,8 @@ interface Repository {
 
     suspend fun canChangePassword(): Boolean
 
-    suspend fun clearLocalAppStorage()
+    suspend fun clearAllData()
+    suspend fun clearAccountOnlyData()
 
     suspend fun isDataInSync(): Boolean
 

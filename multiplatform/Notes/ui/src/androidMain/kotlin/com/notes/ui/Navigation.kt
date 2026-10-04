@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import api.Platform
 
@@ -14,6 +15,11 @@ import api.Platform
 
 // To navigate back safely
 fun NavController.navAndPopUpCurrent(destination: Any) {
+    val currentEntry = currentBackStackEntry ?: return
+    if (!currentEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+        return
+    }
+
     val route = this.currentDestination?.route
     navigate(destination) {
         // Pop up to the current destination of the graph to
