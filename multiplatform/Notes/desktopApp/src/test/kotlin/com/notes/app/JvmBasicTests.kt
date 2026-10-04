@@ -246,7 +246,7 @@ class JvmBasicTests : BaseTest() {
 
             // Clean up
 
-            syncManager.clearLocalStorage()
+            syncManager.clearAllData()
 
             // Check actual result
 

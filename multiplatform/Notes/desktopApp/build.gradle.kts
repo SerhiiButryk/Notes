@@ -60,12 +60,12 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg)
-            packageName = "Notes"
+            packageName = "MyNotes"
             packageVersion = "1.0.0"
 
             macOS {
                 bundleID = "com.notes.app"
-                dockName = "Notes"
+                dockName = "MyNotes"
             }
 
             // Explicitly add the missing sun/misc/Unsafe module
