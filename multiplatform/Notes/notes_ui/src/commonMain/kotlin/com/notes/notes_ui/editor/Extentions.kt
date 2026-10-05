@@ -17,12 +17,8 @@ import kotlin.coroutines.CoroutineContext
 fun EditorState(richString: Any?): RichTextState {
     val state = RichTextState(
         initialText = richString as? RichString ?: RichString(""),
+        initialSelection = TextRange.Zero,
     )
-    // TODO Workaround to set cursor to the start of the text
-    // https://github.com/mkeeda/arranger/issues/121
-    state.edit {
-        selection = TextRange.Zero
-    }
     return state
 }
 

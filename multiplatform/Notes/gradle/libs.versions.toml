@@ -1,67 +1,62 @@
 [versions]
 
-# Upgrading could lead to new build issues.
-
-agp = "9.1.1"
+agp = "9.1.1" # Upgrading could lead to build issues.
 
 # Kotlin versions
-
 kotlin = "2.3.2"
-kotlinPlugin = "2.3.20"
+kotlinPlugin = "2.4.20"
 
 # Android versions
-
 android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "37"
 javaversion = "21"
 
 # Other versions
-
-arrangerRichtextEditor = "0.4.0-alpha04"
-coilCompose = "3.4.0"
-composeMultiplatform = "1.10.3" # Upgrading could lead to new build issues.
+arrangerRichtextEditor = "0.5.0-alpha01"
+coilCompose = "3.6.3"
+composeMultiplatform = "1.10.3" # Upgrading could lead to build issues.
 composeHotReload = "1.2.0"
 androidx-activity = "1.13.0"
 androidx-appcompat = "1.8.0"
-androidx-core = "1.19.0"
+androidx-core = "1.19.1"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.11.0"
 kotlinx-coroutines = "1.11.0"
-adaptiveLayout = "1.2.0"
+adaptiveLayout = "1.3.0"
 kotlinxCoroutinesTest = "1.11.0"
 ksoup = "0.2.6"
 lifecycleViewmodel = "2.11.0"
 material = "1.14.0"
 material3 = "1.9.0"
 materialIconsExtendedVersion = "1.7.3"
-media3 = "1.10.1"
-firebaseBom = "34.11.0"
+media3 = "1.11.1"
+firebaseBom = "34.19.0"
 kotlinxCoroutinesAndroid = "1.11.0"
 lifecycleRuntimeKtx = "2.11.0"
 composeBom = "2026.09.00"
-okhttp = "5.4.0"
+okhttp = "5.5.0"
 playServicesAuth = "21.5.0"
 jsonserialization = "1.11.0"
 runner = "1.7.0"
-navigation = "2.9.8"
-runtime = "1.11.1"
+navigation = "2.10.2"
+runtime = "1.12.1"
 startupRuntime = "1.2.0"
-tinkAndroid = "1.16.0"
+tinkAndroid = "1.16.0" # Upgrading could lead to build issues.
 tracingPerfetto = "1.0.1"
-tracingWire = "2.0.0-alpha08"
-tracing = "1.3.0"
+tracingWire = "2.0.3"
+tracing = "2.0.3"
 truth = "1.4.5"
 klint = "14.2.0"
 detekt = "1.23.8"
 androidx-compose-ui = "1.12.1"
 kotlinxCoroutinesCore = "1.11.0"
-ui = "1.12.0"
-uiToolingPreview = "1.12.0"
-componentsResources = "1.10.3" # Upgrading could lead to new build issues.
-foundation = "1.12.0"
+ui = "1.12.1"
+uiToolingPreview = "1.12.1"
+componentsResources = "1.10.3" # Upgrading could lead to build issues.
+foundation = "1.12.1"
 credentials = "1.6.0"
-googleid = "1.2.0"
+googleid = "1.2.1"
 googleApiClientAndroid = "2.8.1"
 googleApiServicesDrive = "v3-rev20230822-2.0.0"
 googleHttpClientAndroid = "1.44.1"
@@ -70,17 +65,17 @@ grpc = "1.79.0"
 documentfile = "1.1.0"
 googleAuthLibraryOauth2Http = "1.43.0"
 multiplatform-nav3 = "1.1.1"
-firebaseCommon = "2.4.0"
-componentsSplitpane = "1.11.1"
+firebaseCommon = "2.7.0"
+componentsSplitpane = "1.12.1"
 junit = "1.3.0"
 uiautomator = "2.4.0"
-benchmarkMacroJunit4 = "1.4.1"
-baselineprofile = "1.5.0-beta01"
+benchmarkMacroJunit4 = "1.5.0"
+baselineprofile = "1.5.0"
 profileinstaller = "1.4.1"
 datastore = "1.2.1"
-room = "2.7.0"
-sqliteBundledJvmVersion = "2.5.0"
-firebaseFirestore = "2.6.0"
+room = "2.7.0" # Don't change without testing
+sqliteBundledJvmVersion = "2.5.0" # Don't change without testing
+firebaseFirestore = "2.7.0"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }

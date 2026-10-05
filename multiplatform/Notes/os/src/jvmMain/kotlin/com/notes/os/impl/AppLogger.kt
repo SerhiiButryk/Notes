@@ -71,7 +71,11 @@ class AppLogger : PlatformLog() {
                 // This is a fast then just saving a closable and then close it here
                 val process = driver.context.process
                 val thread = Thread.currentThread()
-                val threadTrack = process.getOrCreateThreadTrack(thread.id, thread.name)
+                val threadTrack = process.getOrCreateThreadTrack(
+                    thread.threadId(),
+                    ProcessHandle.current().pid(),
+                    thread.name,
+                )
                 threadTrack.endSection()
             }
 
