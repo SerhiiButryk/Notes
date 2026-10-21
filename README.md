@@ -2,7 +2,7 @@
 
 # Notes application 💜💜💜
 
-<img src="images/icons/Dark/Kotlin Multiplatform Logo.png">
+<img src="images/Banner.png">
 
 # What is it ? ✨
 
@@ -16,15 +16,11 @@ Under active development.
 
 <img src="images/package_structure.png">
 
-**Cloning the repo with submodules**
+# High level app architecture
 
-```
-$ git clone git@github.com:SerhiiButryk/Notes.git
-$ git submodule init
-$ git submodule update
-```
+<img src="images/App.png">
 
-**The ongoing improvements/features**
+**The ongoing tasks**
 
 1. Investigate memory issues during runtime
 

@@ -60,12 +60,13 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg)
-            packageName = "MyNotes"
+            packageName = "Notes"
             packageVersion = "1.0.0"
 
             macOS {
                 bundleID = "com.notes.app"
-                dockName = "MyNotes"
+                dockName = "Notes"
+                iconFile.set(project.file("../../images/AppIcon.icns"))
             }
 
             // Explicitly add the missing sun/misc/Unsafe module
