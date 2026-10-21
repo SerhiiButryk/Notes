@@ -66,7 +66,7 @@ compose.desktop {
             macOS {
                 bundleID = "com.notes.app"
                 dockName = "Notes"
-                iconFile.set(project.file("../../images/AppIcon.icns"))
+                iconFile.set(project.file("../../../images/AppIcon.icns"))
             }
 
             // Explicitly add the missing sun/misc/Unsafe module
