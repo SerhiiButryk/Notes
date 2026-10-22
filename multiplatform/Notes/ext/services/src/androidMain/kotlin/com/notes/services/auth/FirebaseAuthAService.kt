@@ -55,13 +55,13 @@ class FirebaseAuthAService(
         }
     }
 
-    override suspend fun onLoginSuccessful(activityContext: Any?) {
+    override suspend fun onLoginSuccessful(activityContext: Any?): AuthResult {
         // User is authenticated
         // Now we can try signing in silently with Google account to get access to Google APIs
-        signInUsingGoogleSilent(activityContext)
+        return signInUsingGoogleSilent(activityContext)
     }
 
-    private suspend fun signInUsingGoogleSilent(activityContext: Any?) {
+    private suspend fun signInUsingGoogleSilent(activityContext: Any?): AuthResult {
         if (activityContext != null) {
             Platform().logger.logi("$tag::signInUsingGoogleSilent() try to perform silent login")
 
@@ -79,9 +79,11 @@ class FirebaseAuthAService(
             } else {
                 Platform().logger.loge("$tag::signInUsingGoogleSilent() silent login has failed")
             }
+            return result
         } else {
             Platform().logger.logi("$tag::signInUsingGoogleSilent() can't perform silent login")
         }
+        return AuthResult.loginFailed()
     }
 
 }
