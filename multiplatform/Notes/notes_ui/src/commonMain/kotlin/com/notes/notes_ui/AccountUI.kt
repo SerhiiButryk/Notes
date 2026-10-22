@@ -45,7 +45,7 @@ fun AccountUI(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(20.dp)
+                    .padding(start = 6.dp, end = 6.dp)
                     .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

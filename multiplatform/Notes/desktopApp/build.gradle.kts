@@ -60,12 +60,12 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg)
-            packageName = "Notes"
+            packageName = "NotesApp"
             packageVersion = "1.0.0"
 
             macOS {
                 bundleID = "com.notes.app"
-                dockName = "Notes"
+                dockName = "NotesApp"
                 iconFile.set(project.file("../../../images/AppIcon.icns"))
             }
 
