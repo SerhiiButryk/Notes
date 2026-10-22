@@ -63,9 +63,7 @@ open class FirebaseAuthService(
                 }
             }
         if (result.isSuccess()) {
-            val afterResult = onLoginSuccessful(activityContext)
-            // Stop!
-            if (!afterResult.isSuccess()) return afterResult
+            onLoginSuccessful(activityContext)
             // Special case: we store the user's email after a successful login
             // so it can be displayed as a hint the next time they log in.
             // However, the user is free to ignore the hint and enter a different account.
@@ -80,8 +78,7 @@ open class FirebaseAuthService(
         return result
     }
 
-    open suspend fun onLoginSuccessful(activityContext: Any?): AuthResult {
-        return AuthResult.loginSuccess("")
+    open suspend fun onLoginSuccessful(activityContext: Any?) {
     }
 
     override fun getUserEmail(): String = auth.currentUser?.email ?: ""
