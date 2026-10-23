@@ -11,6 +11,7 @@
 -keep class org.sqlite.** { *; }
 -keep class android.app.Fragment { *; }
 -keep class android.content.** { *; }
+-keep class android.util.ArrayMap
 #-keep class android.content.Context { *; }
 #-keep class android.content.Intent { *; }
 #-keep class android.content.IntentFilter { *; }
