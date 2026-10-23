@@ -19,7 +19,7 @@ object AppSettings {
     var attachmentsEnabled = true
 
     @Volatile // Make sure that all thread will see the updated value
-    var isDebugEnabled = true
+    var isDebugEnabled = false
 
     @Volatile // Make sure that all thread will see the updated value
     var isDarkThemeEnabled = false

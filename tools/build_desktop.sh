@@ -38,6 +38,7 @@ popd
 
 # Copy final jar file
 cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/compose/binaries/main-release/dmg/* ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
+cp -rf -v ${PROJECT_FOLDER}/desktopApp/build/desktop-mapping.txt ${SCRIPT_RELEVANT_PATH}/../${ARTIFACT_FOLDER_NAME}
 
 print_message "******** Running tests *********"
 

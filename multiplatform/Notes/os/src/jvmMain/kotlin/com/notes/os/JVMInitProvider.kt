@@ -32,7 +32,7 @@ object JVMInitProvider {
         // Other app configs
         AppSettings.editorBackEnabled = false
         AppSettings.attachmentsEnabled = false
-        AppSettings.isDebugEnabled = true
+        AppSettings.isDebugEnabled = false
     }
 
     @OptIn(DelicateCoroutinesApi::class)

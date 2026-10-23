@@ -292,7 +292,7 @@ class GoogleDriveService : AbstractStorageService() {
                         continue
                     }
                 } else {
-                    Platform().logger.logi("GoogleDriveService::fetchAll() file = '${file.name}' is present!")
+                    Platform().logger.logd("GoogleDriveService::fetchAll() file = '${file.name}' is present!")
                 }
             }
         }
