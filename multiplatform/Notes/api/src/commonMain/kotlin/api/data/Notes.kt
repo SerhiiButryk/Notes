@@ -14,15 +14,18 @@ data class Notes(
 
     companion object {
         fun NewNote() = Notes(id = -1)
-
         fun AbsentNote() = Notes(id = -2)
+        fun LoadingNote() = Notes(id = -3)
     }
 }
 
 @Immutable // To mark it stable for compose
 data class NotesCollection(
     val collection: List<Notes> = emptyList(),
-)
+) {
+    fun isEmpty() = collection.isEmpty()
+    fun isLoading() = if (isEmpty()) false else collection.first().id == Notes.LoadingNote().id
+}
 
 fun Notes.getStringRep(): String = content
 

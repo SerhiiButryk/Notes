@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.notes.notes_ui.components.SwitchSettingItem
 import com.notes.ui.SimpleTopBar
 
 @Composable
@@ -28,6 +30,8 @@ fun SettingsUI(
     onExportClick: () -> Unit,
     onPasswordUpdateClick: () -> Unit,
     onSignOutClick: () -> Unit,
+    isDebugMode: Boolean,
+    onDebugModeChanged: (isDebugMode: Boolean) -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -43,15 +47,15 @@ fun SettingsUI(
         ) {
             SettingsListItem(
                 title = "Account",
-                subtitle = "Profile, privacy, and security",
+                subtitle = "Profile and account information",
                 icon = Icons.Default.Person,
                 onClick = onAccountClick,
                 showRightSign = true,
             )
 
             SettingsListItem(
-                title = "Export to a PDF file",
-                subtitle = "Save your notes to a pdf file",
+                title = "Export your notes",
+                subtitle = "Save your notes on your device",
                 icon = Icons.Default.Backup,
                 onClick = onExportClick,
                 showRightSign = false,
@@ -72,6 +76,14 @@ fun SettingsUI(
                 onClick = onSignOutClick,
                 showRightSign = false,
             )
+
+            SwitchSettingItem(
+                title = "Debug mode",
+                description = "Enable or disable debugging mode",
+                onCheckedChange = { value -> onDebugModeChanged(value) },
+                checked = isDebugMode
+            )
+
         }
     }
 }

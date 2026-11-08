@@ -3,6 +3,7 @@ package com.notes.os
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
+import android.os.Environment
 import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
@@ -61,5 +62,10 @@ internal actual class PlatformFactory(
         val context = weakContextRef.get()
         requireNotNull(context) { "Null context" }
         return context.filesDir.absolutePath
+    }
+
+    actual fun provideDownloadFilesDir(): String {
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        return downloadDir.absolutePath
     }
 }

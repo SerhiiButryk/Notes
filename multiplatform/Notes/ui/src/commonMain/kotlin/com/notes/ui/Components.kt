@@ -1,11 +1,16 @@
 package com.notes.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +26,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
@@ -36,11 +43,11 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,7 +63,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -64,7 +70,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -256,77 +261,14 @@ fun LoadingDialog(isLoading: Boolean) {
 }
 
 /**
- * Search bar component
- */
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchBarField(
-    modifier: Modifier = Modifier,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    onBackClick: () -> Unit = {},
-) {
-    val focusManager = LocalFocusManager.current
-    var shouldClear by remember { mutableStateOf(true) }
-
-    SearchBar(
-        inputField = {
-            SearchBarDefaults.InputField(
-                expanded = false,
-                query = "",
-                onQueryChange = { },
-                onSearch = { }, // Collapse on search submission
-                onExpandedChange = { },
-                placeholder = { Text("Search your notes...") },
-                leadingIcon = {
-//                    if (true) {
-                    IconButton(onClick = {
-                        onBackClick()
-//                            active = false
-//                            query = "" // Clear query when collapsing with back button
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-//                    } else {
-//                        Icon(Icons.Default.Search, contentDescription = "Search icon")
-//                    }
-                },
-                trailingIcon = {
-//                    if (/*active && query.isNotEmpty()*/false) {
-//                        IconButton(onClick = { /*query = ""*/ }) {
-//                            Icon(Icons.Default.Close, contentDescription = "Clear search")
-//                        }
-//                    }
-
-                    trailingIcon?.invoke()
-                },
-            )
-        },
-        expanded = false,
-        onExpandedChange = {},
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
-                .onFocusEvent {
-                    // TODO: Can cause crashes
-//                if (it.hasFocus && shouldClear) {
-//                    focusManager.clearFocus()
-//                    shouldClear = false
-//                }
-                },
-    ) {}
-}
-
-/**
  * A variant of search bar component
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBarFieldV2(
+    modifier: Modifier = Modifier,
     query: String = "",
     onQueryChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     BasicTextField(
@@ -541,4 +483,93 @@ fun ToggleButton(
             )
         }
     }
+}
+
+/**
+ * Search bar component
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CollapsibleSearchTopBar(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {},
+    trailingIcon: @Composable (() -> Unit)? = null,
+    searchQuery: String = "",
+    onQueryChange: (String) -> Unit = {},
+) {
+
+    var isSearching by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isSearching) {
+        if (isSearching) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    TopAppBar(
+        modifier = modifier,
+        title = {
+
+            AnimatedVisibility(
+                visible = isSearching,
+                enter = fadeIn() + slideInHorizontally { it / 2 },
+                exit = fadeOut() + slideOutHorizontally { it / 2 }
+            ) {
+                TextField(
+                    value = searchQuery,
+                    onValueChange = onQueryChange,
+                    placeholder = { Text("Search notes...") },
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                )
+            }
+
+            AnimatedVisibility(
+                visible = !isSearching,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            }
+        },
+        actions = {
+            if (isSearching) {
+                // Clear query or collapse if already empty
+                IconButton(onClick = {
+                    if (searchQuery.isEmpty()) {
+                        isSearching = false
+                    } else {
+                        onQueryChange("")
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Search"
+                    )
+                }
+            } else {
+
+                // Tap to expand search
+                IconButton(onClick = { isSearching = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Open Search"
+                    )
+                }
+
+                trailingIcon?.invoke()
+            }
+        }
+    )
 }

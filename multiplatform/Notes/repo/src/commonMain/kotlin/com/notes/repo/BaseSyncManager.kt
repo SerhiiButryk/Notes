@@ -44,13 +44,13 @@ abstract class BaseSyncManager(
                 if (exists) {
 
                     if (item.metadata.isPendingUpdateOnRemote()) {
-                        Platform().logger.logi("$tag:syncIfNeeded() pending save")
+                        Platform().logger.logi("$tag:syncIfNeeded() pending save for '${noteId}'")
                         val note = Notes(id = noteId)
                         action.onSaveRequired(note)
                     }
 
                     if (item.metadata.isPendingDeletionOnRemote()) {
-                        Platform().logger.logi("$tag:syncIfNeeded() pending delete")
+                        Platform().logger.logi("$tag:syncIfNeeded() pending delete for '${noteId}'")
                         val note = Notes(id = noteId)
                         action.onDeleteRequired(note)
                     }

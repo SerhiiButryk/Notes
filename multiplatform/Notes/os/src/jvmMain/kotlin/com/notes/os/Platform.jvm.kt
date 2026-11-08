@@ -64,4 +64,6 @@ internal actual class PlatformFactory {
     }
 
     actual fun provideRootFilesDir(): String = ""
+    actual fun provideDownloadFilesDir(): String = ""
+
 }

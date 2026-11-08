@@ -21,10 +21,10 @@ import com.notes.ui.previewIcon
 class Notes : Application() {
     override fun onCreate() {
         super.onCreate()
-        initRes()
+        init()
     }
 
-    private fun initRes() {
+    private fun init() {
         // Icons: https://icons8.com/icons/set/cloud
         iconsCollection[h1FormatIcon] = CommonIcon(R.drawable.format_h1)
         iconsCollection[h2FormatIcon] = CommonIcon(R.drawable.format_h2)
@@ -39,14 +39,5 @@ class Notes : Application() {
         iconsCollection[previewIcon] = CommonIcon(R.drawable.image_preview)
 
         AppServices.serverClientId = getString(R.string.server_client_id)
-
-        // TODO This should be moved to some lifecycle aware component
-        Platform().netStateManager.startObserver()
-
-        if (BuildConfig.DEBUG) {
-            AppSettings.isDebugEnabled = true
-        } else {
-            AppSettings.isDebugEnabled = false
-        }
     }
 }

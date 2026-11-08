@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.runtime.tracing)
 
     implementation(libs.material)
+    implementation(libs.androidx.core.splashscreen)
 
     // Test modules
     androidTestImplementation(projects.localDb)

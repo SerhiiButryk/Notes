@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.notes.notes_ui
 
 import android.app.Activity
@@ -21,10 +23,9 @@ import androidx.navigation.toRoute
 import api.Platform
 import api.data.Notes
 import api.data.UserFile
-import com.notes.notes_ui.components.ViewModelCommand
+import com.notes.notes_ui.components.UICommand
 import com.notes.ui.Access
 import com.notes.ui.AlertDialogStateful
-import com.notes.ui.Auth
 import com.notes.ui.LoadingDialogStateful
 import com.notes.ui.MainContent
 import com.notes.ui.MediaPreview
@@ -58,7 +59,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val onNavigatedBack: suspend () -> Unit = { viewModel.onNavigatedBack() }
 
-            val getEvents: suspend () -> Flow<ViewModelCommand> = { viewModel.vmCommands }
+            val getEvents: suspend () -> Flow<UICommand> = { viewModel.commands }
 
             val onSettingsClicked = { navController.navigate(NotesSettings()) }
 
@@ -70,7 +71,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 activity?.moveTaskToBack(true)
             }
 
-            BackHandler(enabled = true) {
+            BackHandler {
                 onBackButtonClicked()
             }
 
@@ -127,20 +128,26 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
+            val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
+
             val onAccountSelected = { navController.navigate(NotesAccount()) }
-            val onExport: (uri: Uri?, context: Context) -> Unit = { uri, context ->
-                viewModel.onExport(uri, context)
-            }
 
             val onPasswordUpdateClick = {
                 navController.navigate(Access(showChangePasswordUI = true))
             }
 
-            val launcher =
+            val launcherOnExport =
                 rememberLauncherForActivityResult(
                     ActivityResultContracts.OpenDocumentTree(),
                 ) { result ->
-                    onExport(result, context)
+                    viewModel.onExport(result, context)
+                }
+
+            val launcherOnSelectFolder =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.OpenDocumentTree(),
+                ) { result ->
+                    viewModel.onSelectFolder(result, context)
                 }
 
             SettingsUI(
@@ -148,12 +155,18 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 onAccountClick = onAccountSelected,
                 onExportClick = {
                     // Ask User to select a folder for notes export
-                    launcher.launch(null)
+                    launcherOnExport.launch(null)
                 },
                 onPasswordUpdateClick = onPasswordUpdateClick,
                 onSignOutClick = {
-                    viewModel.singOut {
+                    viewModel.onSignOut {
                         navController.navigate(Access(forceLoginUI = true))
+                    }
+                },
+                isDebugMode = settingsState.isDebug,
+                onDebugModeChanged = {
+                    viewModel.onDebugChanged(it) {
+                        launcherOnSelectFolder.launch(null)
                     }
                 },
             )
@@ -163,7 +176,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val accountInfo by viewModel.accountInfo.collectAsStateWithLifecycle()
+            val accountInfo by viewModel.accountInfoState.collectAsStateWithLifecycle()
 
             val activity = LocalActivity.current
 
@@ -178,7 +191,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val onSuccess = { sender: IntentSenderRequest ->
                 launcher.launch(sender)
-            }
+            } as (Any?) -> Unit
 
             val onGrantPermissionClick: () -> Unit =
                 { viewModel.requestPermissions(activity, onSuccess) }

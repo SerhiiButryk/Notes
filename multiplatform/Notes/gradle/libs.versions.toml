@@ -72,12 +72,14 @@ uiautomator = "2.4.0"
 benchmarkMacroJunit4 = "1.5.0"
 baselineprofile = "1.5.0"
 profileinstaller = "1.4.1"
-datastore = "1.2.1"
+datastore = "1.3.0"
 room = "2.7.0" # Don't change without testing
 sqliteBundledJvmVersion = "2.5.0" # Don't change without testing
 firebaseFirestore = "2.7.0"
+coreSplashscreen = "1.2.0"
 
 [libraries]
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junit" }

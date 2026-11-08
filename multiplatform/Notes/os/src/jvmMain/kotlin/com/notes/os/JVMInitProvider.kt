@@ -12,12 +12,20 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 object JVMInitProvider {
+
+    @OptIn(DelicateCoroutinesApi::class)
     fun onCreate() {
 
         // Perform initialization during the app launch
         val factory = PlatformFactory()
         val osPlatform = Platform(factory)
         platform = osPlatform
+
+        // This is fast and should not cause any issues
+        GlobalScope.launch {
+            AppSettings.loadAppSettings()
+        }
+
         initResources()
 
         // Set services
@@ -32,7 +40,8 @@ object JVMInitProvider {
         // Other app configs
         AppSettings.editorBackEnabled = false
         AppSettings.attachmentsEnabled = false
-        AppSettings.isDebugEnabled = false
+
+        Platform().logger.logi("App launched >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     }
 
     @OptIn(DelicateCoroutinesApi::class)

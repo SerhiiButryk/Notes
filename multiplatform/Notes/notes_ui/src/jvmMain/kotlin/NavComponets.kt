@@ -6,9 +6,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import api.Platform
 import com.notes.notes_ui.NotesVM
+import com.notes.notes_ui.SettingsInteractorBase
 import com.notes.notes_ui.SettingsScreen
-import com.notes.notes_ui.SettingsVM
+import com.notes.notes_ui.SettingsVMBase
 import com.notes.ui.PreviewScreen
 import com.notes.ui.SettingsScreen
 import kotlinx.coroutines.launch
@@ -49,7 +51,11 @@ fun EntryProviderScope<NavKey>.mainContentDestination(
 
     entry(SettingsScreen) {
 
-        val viewModel = viewModel { SettingsVM() }
+        val viewModel = viewModel {
+            val interactor = SettingsInteractorBase(Platform().appRepo)
+            SettingsVMBase(interactor = interactor)
+        }
+
         val accountInfo by viewModel.accountInfoState.collectAsState()
         val settings by viewModel.settingsState.collectAsState()
 

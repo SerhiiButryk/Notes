@@ -4,7 +4,7 @@ import api.data.Notes
 import api.data.NotesCollection
 import api.repo.RepoCallback
 import api.repo.Repository
-import com.notes.notes_ui.components.ViewModelCommand
+import com.notes.notes_ui.components.UICommand
 import com.notes.notes_ui.editor.EditorState
 import com.notes.notes_ui.models.getToolsList
 import com.notes.ui.model.BaseAppVM
@@ -38,7 +38,7 @@ open class NotesVMBase(
             .stateIn(
                 scope = scope,
                 started = WhileSubscribed(stopTimeoutMillis = 5000),
-                NotesCollection(),
+                NotesCollection(listOf(Notes.LoadingNote())),
             )
 
     // A state to hold the note which is open in UI Editor
@@ -49,15 +49,15 @@ open class NotesVMBase(
     val richTools = getToolsList(interactor)
 
     // To ask UI about something
-    protected val viewModelCommand = Channel<ViewModelCommand>(capacity = Channel.BUFFERED)
-    val vmCommands = viewModelCommand.receiveAsFlow()
+    protected val uiCommands = Channel<UICommand>(capacity = Channel.BUFFERED)
+    val commands = uiCommands.receiveAsFlow()
 
     override fun onCleared() {
         super.onCleared()
         interactor.onClear()
     }
 
-    // User selected a note from list ui
+    // User clicked on list ui
     suspend fun onSelectAction(note: Notes) {
         val found = notesState.value.collection.firstOrNull { note.id == it.id }
         val note = found ?: interactor.getNotes(note.id).first()!!

@@ -13,7 +13,7 @@ import api.data.Attachments
 import api.data.UserFile
 import api.repo.RepoCallback
 import api.repo.Repository
-import com.notes.notes_ui.components.ViewModelCommand
+import com.notes.notes_ui.components.UICommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
@@ -23,7 +23,7 @@ class NotesViewModel(
     appRepository: Repository = Platform().appRepo,
     // For test support
     scopeOverride: CoroutineScope? = null,
-) : NotesVMBase(scopeOverride, appRepository), RepoCallback {
+) : NotesVMBase(scopeOverride, appRepository) {
 
     companion object {
         fun getFactory(): ViewModelProvider.Factory =
@@ -46,7 +46,7 @@ class NotesViewModel(
 
     override fun onEditorNavBack() {
         scope.launch {
-            viewModelCommand.send(ViewModelCommand.NavigateToListPane())
+            uiCommands.send(UICommand.NavigateToListPane())
         }
     }
 

@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.sp
 // Toggle switch Composable
 @Composable
 fun SwitchSettingItem(
+    modifier: Modifier = Modifier,
     title: String,
     description: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -55,6 +55,7 @@ fun SwitchSettingItem(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Medium,
             )
             if (description != null) {
                 Spacer(modifier = Modifier.height(2.dp))

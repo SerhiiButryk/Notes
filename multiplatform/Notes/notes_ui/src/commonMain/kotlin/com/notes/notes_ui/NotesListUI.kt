@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -80,18 +83,26 @@ fun NotesList(
     onSelected: (Notes) -> Unit,
     isPhoneSize: Boolean,
 ) {
-    if (notes.collection.isEmpty()) {
+    if (notes.isEmpty() || notes.isLoading()) {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            SuggestionChip(
-                onClick = {},
-                label = {
-                    Text("Create your first note by tapping '+' button")
-                },
-            )
+            if (notes.isLoading()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(40.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    strokeWidth = 4.dp
+                )
+            } else {
+                SuggestionChip(
+                    onClick = {},
+                    label = {
+                        Text("Create your first note by tapping '+' button")
+                    },
+                )
+            }
         }
     } else {
         if (isPhoneSize) {

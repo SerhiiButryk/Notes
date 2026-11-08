@@ -6,11 +6,15 @@
 
 # What is it ? ✨
 
-Cross-platform, secure, fluent and rich editor for your notes, which is built with KMP.
+Cross-platform, secure, fluent and simple rich editor for your notes, which is built with KMP.
 
 # Current state
 
-Under active development.
+| Platform | Support Status | Target |
+| :--- | :---: | :--- |
+| **Android** | ✅ Supported | API Level 26+ |
+| **Desktop (JVM)** | ✅ Supported | macOS |
+| **iOS** | ⚠️ Supported | Early development |
 
 # Design
 
@@ -28,4 +32,4 @@ Under active development.
 
 3. Implement UI improvements (Search, Labels ...)
 
-4. Can add PlayIntgrity check using Firebase. However, it needs Google Play console configuration which is not possible now.
+4. Can add the PlayIntgrity checks throught Firebase SDK. However, it needs Google Play console configuration which is not possible now.

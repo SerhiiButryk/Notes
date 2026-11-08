@@ -42,7 +42,7 @@ class RemoteRepository(
         scope.launch {
             val services = getServices()
             for (service in services) {
-                Platform().logger.logi("$tag::saveNote() note '${note.id}' to '${service.key}'...")
+                Platform().logger.logi("$tag::saveNote() note (id='${note.id}') to '${service.key}', len = '${note.content.length}' ...")
 
                 var noteToSave = note
 
@@ -115,7 +115,14 @@ class RemoteRepository(
                 delete(scope = scope, note = note)
             }
             override fun onSaveRequired(note: Notes) {
-                saveNote(scope = scope, note = note)
+                scope.launch {
+                    val foundNotes = fetchCopy()
+                    foundNotes.forEach { freshNote ->
+                        if (freshNote.id == note.id) {
+                            saveNote(scope = scope, note = freshNote)
+                        }
+                    }
+                }
             }
         })
     }

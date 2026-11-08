@@ -28,8 +28,8 @@ fun GeneralSettings(
 ) {
 
     SwitchSettingItem(
-        title = "Debug",
-        description = "Enable or disable debug mode",
+        title = "Debug mode",
+        description = "Enable or disable debugging mode",
         onCheckedChange = { value -> onDebugModeChanged(value) },
         checked = isDebugMode
     )

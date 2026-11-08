@@ -7,50 +7,43 @@ import androidx.tracing.wire.TraceDriver
 import androidx.tracing.wire.TraceSink
 import api.Platform
 import api.data.AppSettings
+import api.utils.Log
 import java.io.File
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-class AppLogger : PlatformLog() {
+class AppLogger : Log() {
 
-    private val logsDir: String
+    private val logsDir: String = "${Platform().getCacheDir()}/logs"
+    private val logFile: File = File("$logsDir/${getLogFileName()}")
+
     private val driver: TraceDriver
-    private val logFile: File
-
-    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
     init {
-        val home = Platform().getCacheDir()
-        logsDir = "$home/logs"
-        logFile = File("$logsDir/app.logs")
         driver = createTraceDriver()
-        logi("App launched >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     }
 
-    override fun logi(message: String) {
-        val log = format(message, "INFO")
-        println(log)
-        logFile.appendText("$log\n")
+    override fun getPID(): Long {
+        return ProcessHandle.current().pid()
     }
 
-    override fun loge(message: String) {
-        val log = format(message, "ERROR")
-        println(log)
-        logFile.appendText("$log\n")
+    override fun logi(message: String): String {
+        println(super.logi(message))
+        return ""
     }
 
-    override fun logd(message: String) {
-        val log = format(message, "DEBUG")
-        println(log)
-        logFile.appendText("$log\n")
+    override fun loge(message: String): String {
+        println(super.loge(message))
+        return ""
     }
 
-    private fun format(message: String, level: String): String {
-        val timestamp = LocalDateTime.now().format(formatter)
-        val tid = Thread.currentThread().threadId()
-        val pid = ProcessHandle.current().pid()
-        val tname = Thread.currentThread().name
-        return "[$pid:$tid:$tname | $timestamp] NOTES [$level] $message"
+    override fun logd(message: String): String {
+        if (AppSettings.isDebugEnabled) {
+            println(super.logd(message))
+        }
+        return ""
+    }
+
+    override fun logToFile(message: String) {
+        logFile.appendText("$message\n")
     }
 
     override fun close() {
@@ -63,8 +56,10 @@ class AppLogger : PlatformLog() {
     )
     override fun createCustomComposeTracer(): Any {
         return object : CompositionTracer {
+
             override fun isTraceInProgress(): Boolean {
-                return AppSettings.isDebugEnabled
+                // TODO Uncomment if debugging UI
+                return false
             }
 
             override fun traceEventEnd() {

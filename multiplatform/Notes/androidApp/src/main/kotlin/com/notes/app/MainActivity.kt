@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import api.Platform
 import api.data.AppSettings
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -36,7 +38,22 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        Platform().logger.logi("MainActivity::onCreate() done")
+        Platform().logger.logd("MainActivity::onCreate()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Platform().logger.logd("MainActivity::onResume()")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Platform().logger.logd("MainActivity::onStop()")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Platform().logger.logd("MainActivity::onDestroy()")
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -44,11 +61,11 @@ class MainActivity : ComponentActivity() {
         val appLinkData: Uri? = intent?.data
 
         if (Intent.ACTION_VIEW == appLinkAction && appLinkData != null) {
-            Platform().logger.logi("MainActivity::handleIntent() intent received")
+            Platform().logger.logd("MainActivity::handleIntent() intent received")
 
             val oobCode = appLinkData.getQueryParameter("oobCode")
             if (oobCode != null) {
-                Platform().logger.logi(
+                Platform().logger.logd(
                     "MainActivity::handleIntent() " +
                         "looks like we got email verification response",
                 )

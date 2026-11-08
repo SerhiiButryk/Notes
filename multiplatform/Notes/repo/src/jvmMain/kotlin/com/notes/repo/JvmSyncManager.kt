@@ -29,7 +29,8 @@ class JvmSyncManager : BaseSyncManager(getDatabaseInstance()) {
     override val notes: Flow<List<Notes>> = flow {
         // Get initial data
         val notes = fileManager.readCache(fileManager.secondCacheDir)
-        emit(notes)
+        if (notes.isNotEmpty())
+            emit(notes)
         while (true) {
             scanSignal.receive()
             Platform().logger.logi("$tag: received file change event")
@@ -40,6 +41,14 @@ class JvmSyncManager : BaseSyncManager(getDatabaseInstance()) {
         }
     }
 
+    override suspend fun store(
+        notes: List<Notes>,
+        forceOverride: Boolean,
+        scope: CoroutineScope
+    ) {
+        super.store(notes, forceOverride, scope)
+        scanSignal.trySend(Unit)
+    }
 
     override fun startCacheDirWatching(scope: CoroutineScope?) {
 

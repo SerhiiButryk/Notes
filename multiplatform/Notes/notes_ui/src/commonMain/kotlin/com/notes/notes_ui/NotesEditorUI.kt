@@ -4,11 +4,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -128,28 +129,28 @@ private fun EditorUI(
                 ) { note ->
                     EditorMainContent(
                         notes = note,
-                        onAttacheFile = onAttacheFile,
+                        showTopBar = showTopBar,
+                        showFolderButton = showFolderButton,
                         onShowFolder = {
                             keyboardController?.hide()
                             showFolderContent = true
                         },
-                        showFolderButton = showFolderButton,
+                        onAttacheFile = onAttacheFile,
                         state = state,
-                        showTopBar = showTopBar,
                         tools = tools,
                     )
                 }
             } else {
                 EditorMainContent(
                     notes = notes,
-                    onAttacheFile = onAttacheFile,
+                    showTopBar = showTopBar,
+                    showFolderButton = showFolderButton,
                     onShowFolder = {
                         keyboardController?.hide()
                         showFolderContent = true
                     },
-                    showFolderButton = showFolderButton,
+                    onAttacheFile = onAttacheFile,
                     state = state,
-                    showTopBar = showTopBar,
                     tools = tools,
                 )
             }
@@ -174,7 +175,7 @@ private fun EditorUI(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ColumnScope.EditorMainContent(
+private fun EditorMainContent(
     notes: Notes,
     showTopBar: Boolean,
     showFolderButton: Boolean,
@@ -183,71 +184,80 @@ private fun ColumnScope.EditorMainContent(
     state: RichTextState,
     tools: Tools,
 ) {
-    if (notes != Notes.AbsentNote() && showTopBar) {
-        TopAppBar(
+    Scaffold(
+        containerColor = backgroundColor(),
+        topBar = {
+            if (notes != Notes.AbsentNote() && showTopBar) {
+                TopAppBar(
+                    modifier = Modifier.height(90.dp),
+                    title = { },
+                    actions = {
+                        Row(
+                            modifier = Modifier
+                                .height(90.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            if (showFolderButton) {
+                                IconButton(onClick = onShowFolder) {
+                                    Icon(
+                                        imageVector = Icons.Default.Folder,
+                                        contentDescription = "",
+                                    )
+                                }
+                            }
+                            if (AppSettings.attachmentsEnabled) {
+                                IconButton(onClick = onAttacheFile) {
+                                    Icon(
+                                        imageVector = Icons.Default.AttachFile,
+                                        contentDescription = "",
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = backgroundColor(),
+                            titleContentColor = MaterialTheme.colorScheme.surfaceContainer,
+                        ),
+                )
+            }
+        },
+        bottomBar = {
+            // If we don't show top bar then don't show toolbar as well
+            if (showTopBar) {
+                ToolsBar(
+                    modifier = Modifier.imePadding(),
+                    state = state,
+                    tools = tools,
+                    notes = notes,
+                )
+            }
+        }
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .height(90.dp),
-            title = { },
-            actions = {
-                Row(
-                    modifier = Modifier
-                        .height(90.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (showFolderButton) {
-                        IconButton(onClick = onShowFolder) {
-                            Icon(
-                                imageVector = Icons.Default.Folder,
-                                contentDescription = "",
-                            )
-                        }
-                    }
-                    if (AppSettings.attachmentsEnabled) {
-                        IconButton(onClick = onAttacheFile) {
-                            Icon(
-                                imageVector = Icons.Default.AttachFile,
-                                contentDescription = "",
-                            )
-                        }
-                    }
-                }
-            },
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor(),
-                    titleContentColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
-        )
-    }
-
-    // If we don't show top bar then don't show toolbar as well
-    if (showTopBar) {
-        ToolsBar(
-            state = state,
-            tools = tools,
-            notes = notes,
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .padding(6.dp)
-            .weight(1f)
-            .verticalScroll(rememberScrollState())
-    ) {
-        EditorLayout(
-            state = state,
-        )
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            EditorLayout(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .weight(1f),
+                state = state,
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorLayout(
-    state: RichTextState,
     modifier: Modifier = Modifier,
+    state: RichTextState,
     fontSize: TextUnit = 18.sp,
     readOnly: Boolean = false,
 ) {
@@ -263,7 +273,7 @@ fun EditorLayout(
         state = state,
         readOnly = readOnly,
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .focusRequester(focusRequester)
             .then(modifier),
         textStyle =

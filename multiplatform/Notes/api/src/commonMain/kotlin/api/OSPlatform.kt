@@ -26,6 +26,8 @@ interface OSPlatform {
     fun getCacheDir(): String
 
     fun getRootFilesDir(): String
+
+    fun getDownloadFilesDir(): String
 }
 
 var platform: OSPlatform? = null

@@ -69,7 +69,7 @@ fun AppThemeCommon(
     }
 
     LaunchedEffect(false) {
-        val isDark = AppSettings.isDarkTheme()
+        val isDark = AppSettings.isDarkThemeEnabled
         if (isDark) {
             theme = DarkColorScheme
         } else {

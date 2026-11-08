@@ -32,7 +32,7 @@ class FilesManager {
             // A name of a file is note id
             val file = File(cacheDir, note.id.toString())
             Platform().logger.logd("$tag::writeCache: note = ${note.id}, " +
-                    "path = ${file.absolutePath}")
+                    "len = '${note.content.length}'")
             try {
                 val payload = note.getStringRep()
                 val cipherText = Platform().crypto.encrypt(payload)

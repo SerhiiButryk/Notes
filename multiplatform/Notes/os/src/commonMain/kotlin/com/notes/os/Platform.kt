@@ -27,6 +27,8 @@ internal expect class PlatformFactory {
     fun provideCacheDirPath(): String
 
     fun provideRootFilesDir(): String
+
+    fun provideDownloadFilesDir(): String
 }
 
 internal class Platform(
@@ -49,4 +51,6 @@ internal class Platform(
     override fun getCacheDir() = factory.provideCacheDirPath()
 
     override fun getRootFilesDir() = factory.provideRootFilesDir()
+
+    override fun getDownloadFilesDir() = factory.provideDownloadFilesDir()
 }

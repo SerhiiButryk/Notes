@@ -71,6 +71,7 @@ kotlin {
 
             implementation(projects.api)
             implementation(projects.ui)
+            implementation(projects.repo)
 
             // Type-safe Rich Text Editor Engine for Compose Multiplatform
             // Github: https://github.com/mkeeda/arranger

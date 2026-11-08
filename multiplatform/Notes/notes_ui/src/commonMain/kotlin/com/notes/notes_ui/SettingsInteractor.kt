@@ -14,17 +14,19 @@ open class SettingsInteractorBase(
 ) {
 
     suspend fun singOut(callback: (Boolean) -> Unit) {
-        AppServices
+
+        val result1 = AppServices
             .getAuthServiceByKey(FIREBASE_AUTH)
             .signOut()
 
-        val result =
+        val result2 =
             (AppServices
                 .getServiceByKey(GOOGLE_AUTH) as? AuthService)
                 ?.signOut() ?: true
 
-        callback(result)
-        if (result) {
+        val success = result1 && result2
+        callback(success)
+        if (success) {
             repo.clearAllData()
         }
     }
@@ -62,5 +64,16 @@ open class SettingsInteractorBase(
             syncCompleted = repo.isDataInSync(),
         )
     }
+
+    open suspend fun onExport(
+        destination: Any?,
+        ctx: Any?,
+    ) { }
+
+    open suspend fun requestPermissions(
+        context: Any?,
+        onSuccess: (Any?) -> Unit,
+        onUpdate: () -> Unit,
+    ) { }
 
 }

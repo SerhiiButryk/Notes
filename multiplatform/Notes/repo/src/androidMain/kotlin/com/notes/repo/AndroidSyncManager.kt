@@ -90,7 +90,8 @@ class AndroidSyncManager(
         require(scope != null)
         scope.launch {
             val notes = fileManager.readCache(file.path)
-            sharedFlow.emit(notes)
+            if (notes.isNotEmpty())
+                sharedFlow.emit(notes)
         }
 
     }

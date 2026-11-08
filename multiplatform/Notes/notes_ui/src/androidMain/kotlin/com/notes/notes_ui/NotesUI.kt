@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -45,13 +44,14 @@ import api.data.UserFile
 import coil3.compose.AsyncImage
 import com.notes.notes_ui.components.NotesNavRail
 import com.notes.notes_ui.models.Tools
-import com.notes.notes_ui.components.ViewModelCommand
-import com.notes.notes_ui.editor.EditorState
+import com.notes.notes_ui.components.UICommand
 import com.notes.notes_ui.editor.rememberRichEditorState
-import com.notes.ui.SearchBarField
-import dev.mkeeda.arranger.richtext.editor.RichTextState
+import com.notes.ui.CollapsibleSearchTopBar
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NotesUI(
@@ -62,7 +62,7 @@ fun NotesUI(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    getEvents: suspend () -> Flow<ViewModelCommand>,
+    getEvents: suspend () -> Flow<UICommand>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
@@ -99,7 +99,7 @@ private fun NotesUIImpl(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    getEvents: suspend () -> Flow<ViewModelCommand>,
+    getEvents: suspend () -> Flow<UICommand>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
@@ -134,7 +134,7 @@ private fun NotesUIImpl(
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
 private fun ListDetailUI(
     notes: NotesCollection,
@@ -143,7 +143,7 @@ private fun ListDetailUI(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    getEvents: suspend () -> Flow<ViewModelCommand>,
+    getEvents: suspend () -> Flow<UICommand>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     isPhoneSize: Boolean,
@@ -205,7 +205,7 @@ private fun ListDetailUI(
                     },
                     isPhoneSize = isPhoneSize,
                     topBar = {
-                        SearchBarField(
+                        CollapsibleSearchTopBar(
                             trailingIcon = {
                                 // Show settings conditionally for phone devices
                                 if (isPhoneSize) {
@@ -229,18 +229,20 @@ private fun ListDetailUI(
         detailPane = {
             AnimatedPane {
                 LaunchedEffect(note) {
-                    getEvents().collect { event ->
-                        when (event) {
-                            // Close editor
-                            is ViewModelCommand.NavigateToListPane -> {
-                                try {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.List, null)
-                                } finally {
-                                    onNavigatedBack()
+                    getEvents()
+                        .debounce(400L.milliseconds)
+                        .collect { event ->
+                            when (event) {
+                                // Close editor
+                                is UICommand.NavigateToListPane -> {
+                                    try {
+                                        navigator.navigateTo(ListDetailPaneScaffoldRole.List, null)
+                                    } finally {
+                                        onNavigatedBack()
+                                    }
                                 }
                             }
                         }
-                    }
                 }
 
                 BackHandler(enabled = true) {

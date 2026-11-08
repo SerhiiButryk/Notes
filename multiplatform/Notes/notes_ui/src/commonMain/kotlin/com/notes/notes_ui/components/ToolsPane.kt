@@ -9,7 +9,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
@@ -33,7 +32,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import api.data.Notes
 import com.notes.notes_ui.editor.ColorPickerDialog
 import com.notes.notes_ui.editor.getBackgroundTextColor
@@ -47,6 +45,7 @@ import dev.mkeeda.arranger.richtext.editor.RichTextState
 
 @Composable
 fun ToolsBar(
+    modifier: Modifier = Modifier,
     state: RichTextState,
     tools: Tools,
     notes: Notes,
@@ -57,8 +56,8 @@ fun ToolsBar(
 
     LazyRow(
         modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .then(modifier),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
