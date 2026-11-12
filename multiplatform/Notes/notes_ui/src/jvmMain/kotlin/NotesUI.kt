@@ -1,119 +1,140 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import api.data.Notes
+import api.data.NotesCollection
 import com.notes.notes_ui.NotesEditorUI
 import com.notes.notes_ui.NotesListUI
-import com.notes.notes_ui.NotesVM
-import com.notes.notes_ui.data.Tools
+import com.notes.notes_ui.editor.rememberRichEditorState
+import com.notes.notes_ui.models.Tools
+import com.notes.ui.SearchBarFieldV2
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 import java.awt.Cursor
 
-private fun Modifier.cursorForHorizontalResize(): Modifier =
-    pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
-
 @OptIn(ExperimentalSplitPaneApi::class, ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun NotesScreenImpl(onSettingsClick: () -> Unit) {
-
-    val viewModel = viewModel { NotesVM() }
-
-    val noteList by viewModel.notesState.collectAsState()
-    val note by viewModel.noteState.collectAsState()
+fun NotesScreenImpl(
+    noteList: NotesCollection = NotesCollection(),
+    note: Notes = Notes(),
+    onSelectAction: (Notes) -> Unit = {},
+    onAddAction: () -> Unit = {},
+    tools: Tools = Tools(emptyList()),
+) {
 
     val coroutineScope = rememberCoroutineScope()
-    val state = rememberRichTextState()
 
-    LaunchedEffect(false) {
-        // Set text when the editor is open
-        state.clear()
-        state.setHtml(note.content)
-    }
+    var state by rememberRichEditorState(note)
 
     val splitterState = rememberSplitPaneState(initialPositionPercentage = 0.3f)
 
-    HorizontalSplitPane(splitPaneState = splitterState) {
-        // The "First" pane (Left side)
-        first(minSize = 150.dp) {
-            NotesListUI(
-                notes = noteList,
-                onSelected = { selectedNote ->
-                    // Open Note Editor Screen
-                    coroutineScope.launch {
-                        state.clear() // Clear editor before opening
-                        state.setHtml(selectedNote.content) // Set content
-                        //onSelectAction(selectedNote)
-                    }
-                },
-                addAction = {
-                    // Open Note Editor Screen
-                    coroutineScope.launch {
-                        state.clear() // Clear editor before opening
-//                        onAddAction()
-                    }
-                },
-                onSettingsClick = onSettingsClick,
-                onBackClick = {},
-                isPhoneSize = false
-            )
-        }
+    Row(
+        modifier = Modifier.fillMaxSize()
+    ) {
 
-        // The "Second" pane (Right side)
-        second(minSize = 200.dp) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
 
-            val bottomSheetState = rememberModalBottomSheetState(
-                skipPartiallyExpanded = false
-            )
-
-            NotesEditorUI(
-                notes = note,
-                state = state,
-                toolsPaneItems = Tools(emptyList()),
-                onTextChanged = {},
-                bottomSheetState = bottomSheetState,
-                showFolderButton = false,
-            )
-        }
-
-        // The "Splitter" (The draggable handle)
-        splitter {
-            visiblePart {
-                Box(
-                    Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.colorScheme.outline)
+            if (note != Notes.AbsentNote()) {
+                DesktopToolsBar(
+                    state = state,
+                    tools = tools,
+                    notes = note,
                 )
             }
-            handle {
-                Box(
-                    Modifier
-                        .markAsHandle() // This makes it draggable
-                        .cursorForHorizontalResize() // Sets the mouse icon automatically
-                        .width(8.dp)
-                        .fillMaxHeight()
-                )
+
+            HorizontalSplitPane(splitPaneState = splitterState) {
+                // The Notes List UI
+                first(minSize = 150.dp) {
+                    NotesListUI(
+                        notes = noteList,
+                        onSelected = { selectedNote ->
+                            // Open Note Editor Screen
+                            coroutineScope.launch {
+                                onSelectAction(selectedNote)
+                            }
+                        },
+                        addAction = {
+                            // Open Note Editor Screen
+                            coroutineScope.launch {
+                                onAddAction()
+                            }
+                        },
+                        isPhoneSize = false,
+                        topBar = {
+                            SearchBarFieldV2()
+                        }
+                    )
+                }
+
+                // The "Second" pane (Right side)
+                second(minSize = 200.dp) {
+                    val bottomSheetState =
+                        rememberModalBottomSheetState(
+                            skipPartiallyExpanded = false,
+                        )
+
+                    NotesEditorUI(
+                        notes = note,
+                        state = state,
+                        tools = tools,
+                        bottomSheetState = bottomSheetState,
+                        showFolderButton = false,
+                        showTopBar = false,
+                        withAnimation = true,
+                    )
+                }
+
+                // The Editor UI
+                splitter {
+                    visiblePart {
+                        Box(
+                            Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colorScheme.outline),
+                        )
+                    }
+                    handle {
+                        Box(
+                            Modifier
+                                .background(MaterialTheme.colorScheme.background)
+                                .markAsHandle() // This makes it draggable
+                                .cursorForHorizontalResize() // Sets the mouse icon automatically
+                                .width(8.dp)
+                                .fillMaxHeight(),
+                        )
+                    }
+                }
             }
+
         }
+
     }
-
 }
+
+private fun Modifier.cursorForHorizontalResize(): Modifier =
+    pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+

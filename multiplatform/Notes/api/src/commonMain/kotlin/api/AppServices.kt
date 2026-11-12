@@ -4,6 +4,7 @@ import api.AppService.Companion.DEFAULT_AUTH
 import api.auth.AbstractAuthService
 import api.data.AbstractStorageService
 import api.data.EncryptedStore
+import java.util.Collections
 
 /**
  * Generic app service definition.
@@ -11,7 +12,6 @@ import api.data.EncryptedStore
  * which usually relies on some external APIs or even cloud service.
  */
 interface AppService {
-
     companion object {
         const val FIREBASE_AUTH = "firebaseauth"
         const val GOOGLE_AUTH = "googlesignin"
@@ -24,6 +24,7 @@ interface AppService {
     val key: Any // Unique app service key
 
     fun onCreate() {}
+
     suspend fun onDestroy() {}
 }
 
@@ -31,20 +32,24 @@ interface AppService {
  * Application's services holder
  */
 object AppServices {
-
     var serverClientId = ""
 
-    private val appServices = mutableListOf<AppService>()
+    private val appServices = Collections.synchronizedList(ArrayList<AppService>())
 
-    fun addService(
-        appService: AppService,
-    ) {
+    fun addService(appService: AppService) {
         appService.onCreate()
         if (appService is AbstractStorageService) {
             appServices.add(EncryptedStore(appService))
         } else {
             appServices.add(appService)
         }
+    }
+
+    suspend fun clear() {
+        for (service in appServices) {
+            service.onDestroy()
+        }
+        appServices.clear()
     }
 
     fun getDefaultAuthService(): AbstractAuthService {
@@ -56,13 +61,13 @@ object AppServices {
         throw IllegalStateException("No installed auth default service")
     }
 
-    fun getServiceByKey(key: Any): AppService {
+    fun getServiceByKey(key: Any): AppService? {
         for (service in appServices) {
             if (service.key == key) {
                 return service
             }
         }
-        throw IllegalStateException("No installed service")
+        return null
     }
 
     fun getAuthServiceByKey(key: Any): AbstractAuthService {
@@ -74,9 +79,7 @@ object AppServices {
         throw IllegalStateException("No installed auth service")
     }
 
-    fun getStoreServices(): List<AbstractStorageService> {
-        return appServices.filterIsInstance<AbstractStorageService>()
-    }
+    fun getStoreServices(): List<AbstractStorageService> = appServices.filterIsInstance<AbstractStorageService>()
 
     fun getStoreServicesByKey(key: Any): AbstractStorageService {
         for (service in appServices) {
@@ -102,5 +105,4 @@ object AppServices {
         }
         throw IllegalStateException("No installed store service")
     }
-
 }

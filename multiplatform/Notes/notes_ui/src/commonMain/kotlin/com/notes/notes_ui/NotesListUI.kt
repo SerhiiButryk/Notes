@@ -1,5 +1,6 @@
 package com.notes.notes_ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,17 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
@@ -28,54 +28,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import api.Platform
+import api.data.AppSettings
 import api.data.Notes
 import api.data.NotesCollection
-import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
-import com.notes.ui.SearchBarField
+import com.notes.notes_ui.editor.rememberRichEditorState
 import com.notes.ui.StyledChip
+import com.notes.ui.theme.backgroundColor
+import dev.mkeeda.arranger.richtext.editor.RichTextState
 
 @Composable
 fun NotesListUI(
     modifier: Modifier = Modifier,
     addAction: () -> Unit,
-    onSettingsClick: () -> Unit = {},
     onSelected: (Notes) -> Unit,
     notes: NotesCollection,
-    onBackClick: () -> Unit = {},
-    isPhoneSize: Boolean
+    isPhoneSize: Boolean,
+    topBar: @Composable () -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            SearchBarField(
-                trailingIcon = {
-                    // Show settings conditionally for phone devices
-                    if (isPhoneSize) {
-                        IconButton(
-                            onClick = { onSettingsClick() },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                },
-                onBackClick = onBackClick,
-            )
-        },
+        topBar =  { topBar() },
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.imePadding(),
@@ -86,12 +65,13 @@ fun NotesListUI(
         },
     ) { innerPadding ->
         NotesList(
-            modifier = Modifier
-                .padding(innerPadding)
-                .testTag("notes_list"),
+            modifier =
+                Modifier
+                    .padding(top = innerPadding.calculateTopPadding())
+                    .testTag("notes_list"),
             notes = notes,
             onSelected = onSelected,
-            isPhoneSize = isPhoneSize
+            isPhoneSize = isPhoneSize,
         )
     }
 }
@@ -101,20 +81,28 @@ fun NotesList(
     modifier: Modifier = Modifier,
     notes: NotesCollection,
     onSelected: (Notes) -> Unit,
-    isPhoneSize: Boolean
+    isPhoneSize: Boolean,
 ) {
-    if (notes.collection.isEmpty()) {
+    if (notes.isEmpty() || notes.isLoading()) {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            SuggestionChip(
-                onClick = {},
-                label = {
-                    Text("Create your first note by tapping '+' button")
-                }
-            )
+            if (notes.isLoading()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(40.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    strokeWidth = 4.dp
+                )
+            } else {
+                SuggestionChip(
+                    onClick = {},
+                    label = {
+                        Text("Create your first note by tapping '+' button")
+                    },
+                )
+            }
         }
     } else {
         if (isPhoneSize) {
@@ -123,10 +111,9 @@ fun NotesList(
             ) {
                 for (note in notes.collection) {
                     item(key = note.id) {
-                        EditorPreviewStateful(
-                            content = note.content,
-                            id = note.id,
-                        ) { onSelected(note) }
+                        EditorPreviewStateful(note = note) {
+                            onSelected(note)
+                        }
                     }
                 }
             }
@@ -137,10 +124,9 @@ fun NotesList(
             ) {
                 for (note in notes.collection) {
                     item(key = note.id) {
-                        EditorPreviewStateful(
-                            content = note.content,
-                            id = note.id,
-                        ) { onSelected(note) }
+                        EditorPreviewStateful(note = note) {
+                            onSelected(note)
+                        }
                     }
                 }
             }
@@ -150,37 +136,33 @@ fun NotesList(
 
 @Composable
 private fun EditorPreviewStateful(
-    content: String,
-    id: Long,
-    onClicked: () -> Unit,
+    note: Notes,
+    onClick: () -> Unit,
 ) {
-
     var title by rememberSaveable {
         mutableStateOf("")
     }
 
-    // Do not use rememberRichTextState as it dramatically slows down the list
-    val state = remember {
-        RichTextState()
-    }
+    val state by rememberRichEditorState(note)
 
-    LaunchedEffect(content) {
-        state.clear()
-        state.setHtml(content)
+    LaunchedEffect(note.content) {
         // Get first line as a title
-        val textContent = state.toText()
-        val firstLine = textContent.substringBefore('\n')
-        title = if (Platform().logger.isDebug) "[id=${id}] $firstLine"
-        else firstLine
+        val textContent = state.richString.text
+        var firstLine = textContent.substringBefore('\n')
+        if (firstLine.isEmpty()) firstLine = "No title"
+        title =
+            if (AppSettings.isDebugEnabled) {
+                "[id=${note.id}] $firstLine"
+            } else {
+                firstLine
+            }
     }
 
     EditorPreview(state = state, title = title) {
-        onClicked()
+        onClick()
     }
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorPreview(
     state: RichTextState,
@@ -191,25 +173,26 @@ private fun EditorPreview(
         Modifier
             .fillMaxWidth()
             .heightIn(max = 250.dp)
+            .padding(all = 6.dp)
+
+    val shape = RoundedCornerShape(10)
 
     Box(
-        modifier = contentModifier,
+        modifier =
+            contentModifier.background(
+                shape = shape,
+                color = backgroundColor(),
+            ).shadow(
+                elevation = 0.dp,
+                shape = shape,
+                clip = true,
+            ),
     ) {
-
-        val padding = Modifier.padding(4.dp)
-
         // Readonly field doesn't react on click events
-        RichTextEditor(
+        EditorLayout(
             state = state,
-            shape = RoundedCornerShape(10),
             readOnly = true,
-            colors =
-                richTextEditorColors(
-                    // Remove bottom thin line
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-            modifier = contentModifier.then(padding),
+            modifier = Modifier.padding(all = 6.dp)
         )
 
         StyledChip(title)

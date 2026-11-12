@@ -7,12 +7,14 @@ kotlin {
 
     android {
         namespace = "com.notes.repo"
-        compileSdk = libs.versions.android.targetSdk
-            .get()
-            .toInt()
-        minSdk = libs.versions.android.minSdk
-            .get()
-            .toInt()
+        compileSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         withHostTestBuilder {
         }
@@ -27,19 +29,13 @@ kotlin {
     jvm()
 
     sourceSets {
-        commonMain {
-            dependencies {
-                implementation(projects.api)
-                implementation(projects.ui)
-                // Kotlin coroutines
-                implementation(libs.kotlinx.coroutines.core)
-            }
-        }
-        androidMain {
-            dependencies {
-                implementation(projects.localDb)
-            }
+        commonMain.dependencies {
+            implementation(projects.api)
+            implementation(projects.ui)
+            implementation(projects.localDb)
+
+            // Kotlin coroutines
+            implementation(libs.kotlinx.coroutines.core)
         }
     }
-
 }

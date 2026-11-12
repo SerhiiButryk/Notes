@@ -16,18 +16,19 @@ internal fun RegisterUI(
     title: String,
     subTitle: String,
 ) {
-
     RegisterUIImpl(
-        modifier = Modifier.semantics {
-            testTagsAsResourceId = true
-        },
+        modifier =
+            Modifier.semantics {
+                testTagsAsResourceId = true
+            },
         onRegister = onRegister,
     ) {
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues ->
+        innerPadding: PaddingValues,
+        ->
 
         AuthUIAdaptive(
             title = title,
@@ -39,8 +40,7 @@ internal fun RegisterUI(
             innerPadding = innerPadding,
             hasProgress = false,
             onEnter = onEnter,
-            onLogin = onLogin
+            onLogin = onLogin,
         )
-
     }
 }

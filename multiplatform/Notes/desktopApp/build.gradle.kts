@@ -7,6 +7,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Force protobuf-java down to 3.25.3 to match gRPC and Firestore
+        // and fix runtime version errors
+        force("com.google.protobuf:protobuf-java:3.25.3")
+        force("com.google.protobuf:protobuf-javalite:3.25.3")
+    }
+}
+
 dependencies {
 
     implementation(projects.api)
@@ -32,7 +41,11 @@ dependencies {
     implementation(libs.serializationJson)
 
     // Navigation 3
-    implementation(libs.jetbrains.navigation3.ui)
+    implementation(libs.navigation3.ui)
+
+    // Testing modules
+    testImplementation(projects.localDb)
+    testImplementation(projects.repo)
 
     // Tests
     testImplementation(libs.kotlin.test)
@@ -46,9 +59,32 @@ compose.desktop {
         mainClass = "com.notes.app.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Deb)
-            packageName = "com.notes.app"
+            targetFormats(TargetFormat.Dmg)
+            packageName = "NotesApp"
             packageVersion = "1.0.0"
+
+            macOS {
+                bundleID = "com.notes.app"
+                dockName = "NotesApp"
+                iconFile.set(project.file("../../../images/AppIcon.icns"))
+            }
+
+            // Explicitly add the missing sun/misc/Unsafe module
+            modules("jdk.unsupported")
+            // Explicitly add the missing sql module
+            modules("java.sql")
+        }
+
+        // Configure ProGuard for the release build type
+        buildTypes.release.proguard {
+            isEnabled.set(true)   // Enables ProGuard processing (shrinking and minification)
+            obfuscate.set(true)   // Enables code obfuscation (renaming classes/methods)
+            optimize.set(false)   // Enables bytecode optimization
+
+            // Proguard version
+            version.set("7.5.0")
+
+            configurationFiles.from(project.file("compose-desktop.pro"))
         }
     }
 }

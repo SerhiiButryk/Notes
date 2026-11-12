@@ -1,0 +1,156 @@
+package com.notes.db.impl
+
+import api.AppService
+import api.Platform
+import api.data.AbstractStorageService
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+
+/**
+ * TODO: Improve in future. Can be replaced with a wrapper or proxy class.
+ */
+
+fun String.isPendingDeletionOnRemote(): Boolean {
+    try {
+        val jsonElement = parseJson(this) ?: return false
+        val pendingFirebase =
+            jsonElement.jsonObject["pending_delete_on_firebase"]?.jsonPrimitive?.content ?: ""
+        val pendingGoogle =
+            jsonElement.jsonObject["pending_delete_on_googledrive"]?.jsonPrimitive?.content ?: ""
+        return pendingFirebase.toBoolean() || pendingGoogle.toBoolean()
+    } catch (e: IllegalArgumentException) {
+        Platform().logger.loge("String.isPendingDeletionOnRemote(): error = $e")
+        return false
+    }
+}
+
+fun String.isPendingUpdateOnRemote(): Boolean {
+    try {
+        val jsonElement = parseJson(this) ?: return false
+        val pendingFirebase =
+            jsonElement.jsonObject["pending_update_on_firebase"]?.jsonPrimitive?.content ?: ""
+        val pendingGoogle =
+            jsonElement.jsonObject["pending_update_on_googledrive"]?.jsonPrimitive?.content ?: ""
+        return pendingFirebase.toBoolean() || pendingGoogle.toBoolean()
+    } catch (e: IllegalArgumentException) {
+        Platform().logger.loge("NotesMetadataEntity.isPendingUpdateOnRemote(): error = $e")
+        return false
+    }
+}
+
+fun String.updateForDatastore(
+    dataStore: AbstractStorageService,
+    pendingDelete: Boolean? = null,
+    pendingUpdate: Boolean? = null,
+): String {
+    if (dataStore.key == AppService.FIREBASE_STORAGE) {
+        return update(
+            pendingDeleteFirebase = pendingDelete,
+            pendingUpdateFirebase = pendingUpdate,
+        )
+    }
+    if (dataStore.key == AppService.GOOGLE_STORAGE) {
+        return update(
+            pendingDeleteGoogle = pendingDelete,
+            pendingUpdateGoogle = pendingUpdate,
+        )
+    }
+    throw IllegalArgumentException("Unknown service")
+}
+
+fun String.update(
+    pendingDelete: Boolean? = null,
+    pendingUpdate: Boolean? = null,
+): String =
+    update(
+        pendingDeleteFirebase = pendingDelete,
+        pendingDeleteGoogle = pendingDelete,
+        pendingUpdateFirebase = pendingUpdate,
+        pendingUpdateGoogle = pendingUpdate,
+    )
+
+fun String.update(
+    pendingDeleteFirebase: Boolean? = null,
+    pendingDeleteGoogle: Boolean? = null,
+    pendingUpdateFirebase: Boolean? = null,
+    pendingUpdateGoogle: Boolean? = null,
+): String {
+    val jsonElement = parseJson(this)
+
+    var pendingDeleteFirebaseValue: Boolean? = pendingDeleteFirebase
+    var pendingDeleteGoogleValue: Boolean? = pendingDeleteGoogle
+    var pendingUpdateFirebaseValue: Boolean? = pendingUpdateFirebase
+    var pendingUpdateGoogleValue: Boolean? = pendingUpdateGoogle
+
+    try {
+        if (pendingDeleteFirebaseValue == null) {
+            val str =
+                jsonElement?.jsonObject["pending_delete_on_firebase"]?.jsonPrimitive?.content
+                    ?: "false"
+            pendingDeleteFirebaseValue = str.toBoolean()
+        }
+
+        if (pendingDeleteGoogleValue == null) {
+            val str =
+                jsonElement?.jsonObject["pending_delete_on_googledrive"]?.jsonPrimitive?.content
+                    ?: "false"
+            pendingDeleteGoogleValue = str.toBoolean()
+        }
+
+        if (pendingUpdateFirebaseValue == null) {
+            val str =
+                jsonElement?.jsonObject["pending_update_on_firebase"]?.jsonPrimitive?.content
+                    ?: "false"
+            pendingUpdateFirebaseValue = str.toBoolean()
+        }
+
+        if (pendingUpdateGoogleValue == null) {
+            val str =
+                jsonElement?.jsonObject["pending_update_on_googledrive"]?.jsonPrimitive?.content
+                    ?: "false"
+            pendingUpdateGoogleValue = str.toBoolean()
+        }
+    } catch (e: Exception) {
+        Platform().logger.loge("NotesMetadataEntity.update(): error = $e")
+    }
+
+    return toJson(
+        pendingDeleteFirebase = pendingDeleteFirebaseValue!!,
+        pendingDeleteGoogle = pendingDeleteGoogleValue!!,
+        pendingUpdateFirebase = pendingUpdateFirebaseValue!!,
+        pendingUpdateGoogle = pendingUpdateGoogleValue!!,
+    )
+}
+
+fun toJson(
+    pendingDeleteFirebase: Boolean,
+    pendingDeleteGoogle: Boolean,
+    pendingUpdateFirebase: Boolean,
+    pendingUpdateGoogle: Boolean,
+): String {
+    val json =
+        buildJsonObject {
+            put("pending_delete_on_firebase", JsonPrimitive(pendingDeleteFirebase))
+            put("pending_delete_on_googledrive", JsonPrimitive(pendingDeleteGoogle))
+            put("pending_update_on_firebase", JsonPrimitive(pendingUpdateFirebase))
+            put("pending_update_on_googledrive", JsonPrimitive(pendingUpdateGoogle))
+        }
+    return json.toString()
+}
+
+private fun parseJson(metadata: String): JsonElement? {
+    if (metadata.isEmpty()) return null
+    val json = Json { ignoreUnknownKeys = true }
+    val deserializedElement: JsonElement =
+        try {
+            json.parseToJsonElement(metadata)
+        } catch (e: Exception) {
+            Platform().logger.loge("NotesMetadataEntity.parseJson(): error = $e")
+            return null
+        }
+    return deserializedElement
+}

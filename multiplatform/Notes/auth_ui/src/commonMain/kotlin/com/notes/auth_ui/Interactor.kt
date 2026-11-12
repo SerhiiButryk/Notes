@@ -1,14 +1,15 @@
 package com.notes.auth_ui
 
+import api.AppService.Companion.GOOGLE_AUTH
 import api.AppServices
 import api.Platform
 import api.auth.AbstractAuthService
 import api.auth.AuthResult
-import api.data.getRegisteredUser
-import api.data.setRegisteredUser
-import api.data.userDataState
+import api.auth.AuthService
+import api.data.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
@@ -19,7 +20,11 @@ class Interactor(
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
     private val scope = CoroutineScope(coroutineContext)
 
-    suspend fun login(password: String, email: String, context: Any?): AuthResult {
+    suspend fun login(
+        password: String,
+        email: String,
+        context: Any?,
+    ): AuthResult {
         if (password.isEmpty() || email.isEmpty()) {
             return AuthResult.emailOrPassEmpty(email)
         }
@@ -27,13 +32,36 @@ class Interactor(
         val job =
             scope.async {
                 Platform().crypto.addAuthCallbackFor(authService)
+
+                // This is first user login attempt
+                // At this moment User must be able to chose Google Account!
+                val googleService = AppServices.getServiceByKey(GOOGLE_AUTH) as? AuthService
+                if (googleService != null) {
+                    val emailStored = AppSettings.getUserEmail()
+                    if (emailStored.isEmpty()) {
+                        Platform().logger.logi("login(): login for the first time")
+                        googleService.setAccountAutoselect(false)
+                    } else {
+                        googleService.setAccountAutoselect(true)
+                    }
+                }
+
                 val result = authService.login(password, email, context)
-                // Save user email if it's not saved
-                // It's the case if user didn't register and did sing in with
-                // an existed account
-                val emailStored = getRegisteredUser()
+
+                if (result.status == AuthResult.accountHasChanged) {
+                    // Clear old user data cause it will be updated
+                    Platform().appRepo.clearAccountOnlyData()
+                }
+
+                // Call completion listeners
+                if (result.isSuccess()) {
+                    Platform().crypto.onAuthCompleted(password, authService.getUserEmail())
+                }
+
+                // Save the login email if it's not been saved, yet
+                val emailStored = AppSettings.getUserEmail()
                 if (emailStored.isEmpty() && result.isSuccess()) {
-                    setRegisteredUser(email = result.email)
+                    AppSettings.setUserEmail(authService.getUserEmail())
                 }
                 result
             }
@@ -41,8 +69,11 @@ class Interactor(
         return job.await()
     }
 
-    suspend fun register(confirmPassword: String, password: String, email: String): AuthResult {
-
+    suspend fun register(
+        confirmPassword: String,
+        password: String,
+        email: String,
+    ): AuthResult {
         if (email.isEmpty() || password.isEmpty() || password != confirmPassword) {
             return AuthResult.Companion.passwordEmptyOrNotMatching(email)
         }
@@ -66,8 +97,9 @@ class Interactor(
     }
 
     suspend fun verifyCode() {
-        if (userDataState.value.code.isNotEmpty()) {
-            verifyCode(userDataState.value.code)
+        val code = AppSettings.getCode()
+        if (code.isNotEmpty()) {
+            verifyCode(code)
         }
     }
 
@@ -75,7 +107,7 @@ class Interactor(
         val job =
             scope.async {
                 if (authService.isEmailVerified()) {
-                    setRegisteredUser(email = authService.getUserEmail())
+                    AppSettings.setUserEmail(authService.getUserEmail())
                     Platform().logger.logi("isEmailVerified(): email is verified")
                     true
                 } else {
@@ -87,44 +119,44 @@ class Interactor(
     }
 
     suspend fun getEmail(): String {
-        val email = getRegisteredUser()
+        val email = AppSettings.getUserEmail()
         return email.ifEmpty { authService.getUserEmail() }
     }
 
-    suspend fun hasRegisteredUser() = getRegisteredUser().isNotEmpty()
+    suspend fun hasRegisteredUser() =
+        AppSettings.getUserEmail().isNotEmpty()
 
     suspend fun changePassword(newPass: String): Boolean {
-        val job = scope.async {
+        val job =
+            scope.async {
+                // When user changes the password we must update derived key.
+                // Derived key we use to encrypt user data before they are sent to datastore.
+                // This will update derived key. However, there are coner case which can corrupt user data:
 
-            // When user changes the password we must update derived key.
-            // Derived key we use to encrypt user data before they are sent to datastore.
-            // This will update derived key. However, there are coner case which can corrupt user data:
+                // 1. What happens if local data are not up-to-date with remote datastore services ?
+                // 2. What happens if local data are up-to-date with one datastore, but out of sync with others ?
 
-            // 1. What happens if local data are not up-to-date with remote datastore services ?
-            // 2. What happens if local data are up-to-date with one datastore, but out of sync with others ?
+                // We should create a backup file before changing a password to mitigate user data corruption
 
-            // We should create a backup file before changing a password to mitigate user data corruption
+                if (!Platform().appRepo.canChangePassword()) {
+                    return@async false
+                }
 
-            if (!Platform().appRepo.canChangePassword())
-                return@async false
+                val result = authService.changePassword(newPass)
 
-            val result = authService.changePassword(newPass)
+                if (result) {
+                    // Update derived key
+                    Platform().crypto.onAuthCompleted(newPass, getEmail(), true)
 
-            if (result) {
+                    Platform().appRepo.onPasswordChanged()
+                }
 
-                // Update derived key
-                Platform().crypto.onAuthCompleted(newPass, getEmail(), true)
-
-                Platform().appRepo.onPasswordChanged()
+                result
             }
-
-            result
-        }
         return job.await()
     }
 
     fun onClear() {
         scope.cancel()
     }
-
 }

@@ -45,24 +45,22 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class BenchmarksAdvance {
-
     @get:Rule
     val rule = MacrobenchmarkRule()
 
     private val iterations = 1
 
-    private val metrics = listOf(
-        StartupTimingMetric(),
-        FrameTimingMetric(),
-    )
+    private val metrics =
+        listOf(
+            StartupTimingMetric(),
+            FrameTimingMetric(),
+        )
 
     @Test
-    fun startupCompilationNone() =
-        runTestBenchmark(CompilationMode.None())
+    fun startupCompilationNone() = runTestBenchmark(CompilationMode.None())
 
     @Test
-    fun startupCompilationBaselineProfiles() =
-        runTestBenchmark(CompilationMode.Partial(BaselineProfileMode.Require))
+    fun startupCompilationBaselineProfiles() = runTestBenchmark(CompilationMode.Partial(BaselineProfileMode.Require))
 
     private fun runTestBenchmark(compilationMode: CompilationMode) {
         rule.measureRepeated(
@@ -76,7 +74,7 @@ class BenchmarksAdvance {
             },
             measureBlock = {
                 testLogin()
-            }
+            },
         )
     }
 }

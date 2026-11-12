@@ -41,15 +41,13 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.components.resources)
     // Preview support
-    //debugImplementation(libs.jetbrains.ui.tooling.preview)
+    // debugImplementation(libs.jetbrains.ui.tooling.preview)
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
 
     // Serialization
     implementation(libs.serializationJson)
 
-    // Navigation 3
-    implementation(libs.jetbrains.navigation3.ui)
     implementation(libs.androidx.profileinstaller)
 
     // The consumer app ('androidApp') knows where to get the generated profile from.
@@ -59,6 +57,7 @@ dependencies {
     implementation(libs.androidx.runtime.tracing)
 
     implementation(libs.material)
+    implementation(libs.androidx.core.splashscreen)
 
     // Test modules
     androidTestImplementation(projects.localDb)
@@ -96,6 +95,24 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        // TODO: Don't forget to update hashes on Firebase console if you change keys
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
+        create("release") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -103,7 +120,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
         create("benchmark") {

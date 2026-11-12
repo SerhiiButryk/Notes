@@ -6,21 +6,25 @@ plugins {
 android {
     namespace = "com.notes.app.benchmark"
     compileSdk {
-        val targetSdk = libs.versions.android.targetSdk
-            .get()
-            .toInt()
-        version = release(targetSdk) {
-            minorApiLevel = 1
-        }
+        val targetSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
+        version =
+            release(targetSdk) {
+                minorApiLevel = 1
+            }
     }
 
     defaultConfig {
-        minSdk = libs.versions.android.minSdk
-            .get()
-            .toInt()
-        targetSdk = libs.versions.android.targetSdk
-            .get()
-            .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -66,9 +70,10 @@ baselineProfile {
 
 androidComponents {
 
-    val shouldGenNewProfile = project.properties["baseline.profile.tests.generator"]
-        .toString()
-        .toBoolean()
+    val shouldGenNewProfile =
+        project.properties["baseline.profile.tests.generator"]
+            .toString()
+            .toBoolean()
 
     if (shouldGenNewProfile) {
         beforeVariants(selector().all()) {
@@ -79,7 +84,7 @@ androidComponents {
             val artifactsLoader = v.artifacts.getBuiltArtifactsLoader()
             v.instrumentationRunnerArguments.put(
                 "targetAppId",
-                v.testedApks.map { artifactsLoader.load(it)?.applicationId }
+                v.testedApks.map { artifactsLoader.load(it)?.applicationId },
             )
         }
     }

@@ -1,39 +1,34 @@
 package com.notes.notes_ui
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
-import androidx.activity.result.IntentSenderRequest
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import api.Platform
+import api.data.AppSettings
 import api.repo.Repository
-import com.notes.notes_ui.data.AccountInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     appRepository: Repository = Platform().appRepo,
     // For test support
-    scopeOverride: CoroutineScope? = null
-) : ViewModel() {
-
-    private val _accountInfo = MutableStateFlow(AccountInfo())
-    val accountInfo = _accountInfo.asStateFlow()
-
-    private val scope: CoroutineScope = scopeOverride ?: viewModelScope
-
-    private val interactor = SettingsInteractor(appRepository)
+    scopeOverride: CoroutineScope? = null,
+) : SettingsVMBase(
+    scopeOverride = scopeOverride,
+    interactor = SettingsInteractor(appRepository)
+) {
 
     init {
         updateAccountInfo()
     }
 
     // Request permissions for Google Drive
-    fun requestPermissions(context: Any?, onSuccess: (IntentSenderRequest) -> Unit) {
+    fun requestPermissions(
+        context: Any?,
+        onSuccess: (Any?) -> Unit,
+    ) {
         scope.launch {
             updateAccountInfo(pending = true)
             interactor.requestPermissions(context, onSuccess) {
@@ -42,38 +37,63 @@ class SettingsViewModel(
         }
     }
 
-    // Will sign out from Google and Firebase
-    fun singOut(onSuccess: () -> Unit) {
-        scope.launch(Dispatchers.Default) {
-            interactor.singOut { result ->
-                if (result) {
-                    launch(Dispatchers.Main) {
-                        onSuccess()
-                    }
-                }
-                updateAccountInfo()
-            }
-        }
-    }
-
-    fun onExport(uri: Uri?, context: Context) {
-
-        Platform().logger.logi("onExport() uri = ${uri != null}")
-
+    fun onExport(
+        uri: Uri?,
+        context: Context,
+    ) {
+        Platform().logger.logi("onExport()")
         if (uri == null) {
-            Platform().logger.loge("onExport() error: uri is empty")
+            Platform().logger.loge("onExport() error: uri is null")
             return
         }
-
         scope.launch(Dispatchers.Default) {
             interactor.onExport(uri, context)
         }
     }
 
-    fun updateAccountInfo(pending: Boolean = false) {
+    override fun onDebugChanged(isDebug: Boolean, openDocTree: () -> Unit) {
+        super.onDebugChanged(isDebug, openDocTree)
         scope.launch {
-            val accountInfo = interactor.getAccountInfo(pending)
-            _accountInfo.update { accountInfo }
+            if (isDebug && !Platform().logger.hasLogFile()) {
+                openDocTree()
+            }
         }
     }
+
+    @SuppressLint("WrongConstant")
+    fun onSelectFolder(uri: Uri?, context: Context) {
+        Platform().logger.logi("onSelectFolder()")
+
+        if (uri == null) {
+            Platform().logger.loge("onSelectFolder() error: uri is null")
+            return
+        }
+
+        try {
+            // Persist the permission so it survives app restarts
+            context.contentResolver.takePersistableUriPermission(uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        } catch (e: SecurityException) {
+            Platform().logger.loge("onSelectFolder() error: $e")
+            return
+        }
+
+        val uri = (interactor as SettingsInteractor).createNewFileInTree(
+            context = context,
+            treeUri = uri,
+            mimeType = "text/plain",
+            displayName = Platform().logger.getLogFileName(),
+        )
+
+        if (uri != null) {
+            scope.launch(Dispatchers.Default) {
+                AppSettings.setLogFilePath(uri.toString())
+                Platform().logger.logi("onSelectFolder() saved uri")
+            }
+        }
+
+    }
+
 }

@@ -22,10 +22,9 @@ fun LoginUIImpl(
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues
-    ) -> Unit
+        innerPadding: PaddingValues,
+    ) -> Unit,
 ) {
-
     val finalModifier = Modifier.fillMaxSize().then(modifier)
 
     Scaffold(
@@ -33,14 +32,12 @@ fun LoginUIImpl(
     ) { innerPadding ->
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
-
             NetworkStateMessage()
 
             AnimatedBackground {
-
-                val email = rememberSaveable { mutableStateOf(state.email) }
+                val email = rememberSaveable(state.email) { mutableStateOf(state.email) }
                 val password = rememberSaveable { mutableStateOf("") }
 
                 content(
@@ -56,9 +53,7 @@ fun LoginUIImpl(
                     },
                     innerPadding,
                 )
-
             }
         }
-
     }
 }

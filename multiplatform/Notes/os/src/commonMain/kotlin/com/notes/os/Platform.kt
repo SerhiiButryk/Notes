@@ -11,28 +11,46 @@ import api.utils.Log
 
 internal expect class PlatformFactory {
     fun provideBase64Operations(): Base64Operations
+
     fun provideCryptoOperations(): CryptoOperations
+
     fun provideStorageOperations(): StorageOperations
+
     fun provideLogger(): Log
+
     fun provideNetStateManager(): NetStateManager
+
     fun provideAppRepository(): BaseRepo
+
     fun provideHttpClient(): HttpClient
+
+    fun provideCacheDirPath(): String
+
+    fun provideRootFilesDir(): String
+
+    fun provideDownloadFilesDir(): String
 }
 
-internal class Platform(factory: PlatformFactory) : OSPlatform {
+internal class Platform(
+    private val factory: PlatformFactory,
+) : OSPlatform {
+    override val base64: Base64Operations by lazy { factory.provideBase64Operations() }
 
-    override val base64: Base64Operations = factory.provideBase64Operations()
+    override val storage: StorageOperations by lazy { factory.provideStorageOperations() }
 
-    override val storage: StorageOperations = factory.provideStorageOperations()
+    override val logger: Log by lazy { factory.provideLogger() }
 
-    override val logger: Log = factory.provideLogger()
+    override val crypto: CryptoOperations by lazy { factory.provideCryptoOperations() }
 
-    override val crypto: CryptoOperations = factory.provideCryptoOperations()
+    override val netStateManager: NetStateManager by lazy { factory.provideNetStateManager() }
 
-    override val netStateManager: NetStateManager = factory.provideNetStateManager()
+    override val appRepo: BaseRepo by lazy { factory.provideAppRepository() }
 
-    override val appRepo: BaseRepo = factory.provideAppRepository()
+    override val httpClient: HttpClient by lazy { factory.provideHttpClient() }
 
-    override val httpClient: HttpClient = factory.provideHttpClient()
+    override fun getCacheDir() = factory.provideCacheDirPath()
+
+    override fun getRootFilesDir() = factory.provideRootFilesDir()
+
+    override fun getDownloadFilesDir() = factory.provideDownloadFilesDir()
 }
-

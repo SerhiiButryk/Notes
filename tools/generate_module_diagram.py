@@ -30,7 +30,7 @@ COLOR_LEGEND = [
     ("feature", "Feature UI modules"),
     ("core", "Core contracts / platform glue"),
     ("data", "Data and domain modules"),
-    ("external", "3rd party modules"),
+    # ("external", "3rd party modules"),
 ]
 DOT_COLOR_LEGEND_POS = (-1.4, 1.1)
 EXCALIDRAW_COLOR_LEGEND_POS = (1100, 500)
@@ -59,6 +59,19 @@ EDGE_STYLE = {
     "baselineProfile": "dotted",
     "target": "dotted",
 }
+
+EDGE_COLORS = [
+    "#1f77b4",
+    "#000000",
+    "#2ca02c",
+    "#d4aa00",
+    "#d62728",
+    "#9467bd",
+    "#ff7f0e",
+    "#17becf",
+    "#8c564b",
+    "#e377c2",
+]
 
 ACCESSOR_OVERRIDES = {
     "authUi": ":auth_ui",
@@ -230,9 +243,10 @@ def write_dot(modules: list[str], edges: list[tuple[str, str, str]]) -> None:
     color_table += "\n  </TABLE>\n>"
     legend_x, legend_y = DOT_COLOR_LEGEND_POS
     lines.append(f'  color_legend [shape=plain, fixedsize=false, margin=0, label={color_table}, pos="{legend_x},{legend_y}!"];')
-    for src, dst, kind in edges:
+    for index, (src, dst, kind) in enumerate(edges):
         attrs = []
         style = EDGE_STYLE.get(kind, "solid")
+        attrs.append(f'color="{EDGE_COLORS[index % len(EDGE_COLORS)]}"')
         if style != "solid":
             attrs += [f'style="{style}"']
         suffix = " [" + ", ".join(attrs) + "]" if attrs else ""
@@ -319,7 +333,7 @@ def rect_element(element_id: str, x: float, y: float, w: float, h: float, fill: 
     }
 
 
-def arrow_element(element_id: str, src: str, dst: str, kind: str) -> dict:
+def arrow_element(element_id: str, src: str, dst: str, kind: str, color: str) -> dict:
     sx, sy = MODULE_POS[src]
     dx, dy = MODULE_POS[dst]
     w, h = 220, 86
@@ -343,7 +357,7 @@ def arrow_element(element_id: str, src: str, dst: str, kind: str) -> dict:
         "width": end[0] - start[0],
         "height": end[1] - start[1],
         "angle": 0,
-        "strokeColor": "#495057",
+        "strokeColor": color,
         "backgroundColor": "transparent",
         "fillStyle": "solid",
         "strokeWidth": 1,
@@ -381,7 +395,8 @@ def write_excalidraw(modules: list[str], edges: list[tuple[str, str, str]]) -> N
         elements.append(rect_element("rect_" + dot_id(module), x, y, w, h, COLOR[CATEGORY.get(module, "core")]))
         elements.append(text_element("txt_" + dot_id(module), x + 14, y + 14, f"{label}\n{module}\n{desc}", 14))
     for idx, (src, dst, kind) in enumerate(edges):
-        elements.append(arrow_element(f"edge_{idx}", src, dst, kind))
+        color = EDGE_COLORS[idx % len(EDGE_COLORS)]
+        elements.append(arrow_element(f"edge_{idx}", src, dst, kind, color))
 
     legend_x, legend_y = EXCALIDRAW_COLOR_LEGEND_POS
     elements.append(rect_element("color_legend_box", legend_x, legend_y, 285, 190, "#ffffff"))

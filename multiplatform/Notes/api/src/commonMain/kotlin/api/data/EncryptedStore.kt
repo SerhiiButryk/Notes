@@ -5,8 +5,9 @@ import api.Platform
 /**
  * Service which adds a layer of encryption on storage service
  */
-class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageService() {
-
+class EncryptedStore(
+    val delegate: AbstractStorageService,
+) : AbstractStorageService() {
     override val key = delegate.key
 
     override var canUse: Boolean = delegate.canUse
@@ -30,9 +31,7 @@ class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageServ
         return null
     }
 
-    override suspend fun delete(document: Document): Boolean {
-        return delegate.delete(document)
-    }
+    override suspend fun delete(document: Document): Boolean = delegate.delete(document)
 
     override suspend fun fetchAll(): List<Document> {
         val documents = delegate.fetchAll()
@@ -41,4 +40,7 @@ class EncryptedStore(val delegate: AbstractStorageService) : AbstractStorageServ
             Document(name = doc.name, data = decrypted)
         }
     }
+
+    override suspend fun selectDocName(initial: Long): Long? = delegate.selectDocName(initial)
+
 }

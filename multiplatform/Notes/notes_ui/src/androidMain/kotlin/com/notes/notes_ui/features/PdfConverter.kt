@@ -13,9 +13,12 @@ import androidx.documentfile.provider.DocumentFile
 import api.Platform
 
 class PdfConverter {
-
-    fun convertHtmlToPdf(context: Context, htmlString: String, fileName: String, folderUri: Uri) {
-
+    fun convertHtmlToPdf(
+        context: Context,
+        htmlString: String,
+        fileName: String,
+        folderUri: Uri,
+    ) {
         val rootFolder = DocumentFile.fromTreeUri(context, folderUri)
         val newFile = rootFolder?.createFile("application/pdf", fileName)
 
@@ -28,15 +31,19 @@ class PdfConverter {
         // Also we could try to make it a member variable.
         val webView = WebView(context)
 
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                if (view != null) {
-                    genPdf(view, newFile.uri, fileName, context)
-                } else {
-                    Platform().logger.loge("PdfConverter::convertHtmlToPdf webview is null")
+        webView.webViewClient =
+            object : WebViewClient() {
+                override fun onPageFinished(
+                    view: WebView?,
+                    url: String?,
+                ) {
+                    if (view != null) {
+                        genPdf(view, newFile.uri, fileName, context)
+                    } else {
+                        Platform().logger.loge("PdfConverter::convertHtmlToPdf webview is null")
+                    }
                 }
             }
-        }
 
         webView.settings.javaScriptEnabled = false
         webView.settings.blockNetworkImage = true
@@ -46,56 +53,64 @@ class PdfConverter {
         webView.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null)
     }
 
-    private fun genPdf(webView: WebView, outputFile: Uri, fileName: String, context: Context) {
-
+    private fun genPdf(
+        webView: WebView,
+        outputFile: Uri,
+        fileName: String,
+        context: Context,
+    ) {
         Platform().logger.logi("PdfConverter::genPdf started")
 
         val printAdapter = webView.createPrintDocumentAdapter(fileName)
 
-        val printAttributes = PrintAttributes.Builder()
-            .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
-            .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
-            .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
-            .build()
+        val printAttributes =
+            PrintAttributes
+                .Builder()
+                .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                .build()
 
         val cancelSignal = CancellationSignal()
 
         val fileDescriptor = context.contentResolver.openFileDescriptor(outputFile, "rwt")
 
-        val writeResultCallback = createWriteCallback(
-            onFinished = {
-                Platform().logger.logi("PdfConverter::genPdf onWrite success")
-                fileDescriptor?.close()
-            },
-            onFailed = { error ->
-                Platform().logger.logi("PdfConverter::genPdf onWrite failed - $error")
-                fileDescriptor?.close()
-            }
-        )
+        val writeResultCallback =
+            createWriteCallback(
+                onFinished = {
+                    Platform().logger.logi("PdfConverter::genPdf onWrite success")
+                    fileDescriptor?.close()
+                },
+                onFailed = { error ->
+                    Platform().logger.logi("PdfConverter::genPdf onWrite failed - $error")
+                    fileDescriptor?.close()
+                },
+            )
 
-        val layoutCallback = createLayoutCallback(
-            onFinished = { _, _ ->
-                Platform().logger.logi("PdfConverter::genPdf onLayout success")
+        val layoutCallback =
+            createLayoutCallback(
+                onFinished = { _, _ ->
+                    Platform().logger.logi("PdfConverter::genPdf onLayout success")
 
-                printAdapter.onWrite(
-                    arrayOf(PageRange.ALL_PAGES),
-                    fileDescriptor,
-                    cancelSignal,
-                    writeResultCallback)
-            },
-            onFailed = {
-                Platform().logger.logi("PdfConverter::genPdf onLayout failed")
-                fileDescriptor?.close()
-            }
-        )
+                    printAdapter.onWrite(
+                        arrayOf(PageRange.ALL_PAGES),
+                        fileDescriptor,
+                        cancelSignal,
+                        writeResultCallback,
+                    )
+                },
+                onFailed = {
+                    Platform().logger.logi("PdfConverter::genPdf onLayout failed")
+                    fileDescriptor?.close()
+                },
+            )
 
         printAdapter.onLayout(
             null,
             printAttributes,
             null,
             layoutCallback,
-            null
+            null,
         )
-
     }
 }

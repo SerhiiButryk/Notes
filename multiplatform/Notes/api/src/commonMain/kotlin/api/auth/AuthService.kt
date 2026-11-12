@@ -4,7 +4,6 @@ import api.AppService
 import java.lang.ref.WeakReference
 
 interface AuthService : AppService {
-
     suspend fun createUser(
         pass: String,
         email: String,
@@ -13,17 +12,20 @@ interface AuthService : AppService {
     suspend fun login(
         pass: String,
         email: String,
-        activityContext: Any?
+        activityContext: Any?,
     ): AuthResult = AuthResult.loginFailed()
 
     suspend fun login(
         tokenId: String,
-        activityContext: Any?
+        activityContext: Any?,
     ): AuthResult = AuthResult.loginFailed()
 
     suspend fun sendEmailVerify(): AuthResult = AuthResult.verificationSentFailed("")
+
     suspend fun verifyCode(code: String): Boolean = false
+
     suspend fun changePassword(newPass: String): Boolean = false
+
     suspend fun isEmailVerified(): Boolean = false
 
     fun getUserEmail(): String = ""
@@ -38,11 +40,10 @@ interface AuthService : AppService {
 
     suspend fun signOut(): Boolean
 
-    fun resetSettings() {}
+    fun setAccountAutoselect(enable: Boolean) {}
 }
 
 abstract class AbstractAuthService : AuthService {
-
     private var _callback: WeakReference<AuthCallback>? = null
 
     protected val callback: AuthCallback?

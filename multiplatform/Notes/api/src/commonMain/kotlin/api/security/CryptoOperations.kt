@@ -11,9 +11,9 @@ import javax.crypto.spec.SecretKeySpec
 
 private const val tag = "CryptoOperations"
 
-abstract class CryptoOperations : AuthCallback {
+const val DERIVED_PASS_KEY = "derived_key_pass"
 
-    private val DERIVED_PASS_KEY = "derived_key_pass"
+abstract class CryptoOperations : AuthCallback {
 
     private val SECRET_KEY_ALGORITHM = "AES/GCM/NoPadding"
 
@@ -22,7 +22,6 @@ abstract class CryptoOperations : AuthCallback {
     abstract suspend fun decrypt(message: String): String
 
     suspend fun encryptWithDerivedKey(message: String): String {
-
         val key = getKey()
 
         if (message.isEmpty()) return ""
@@ -42,14 +41,12 @@ abstract class CryptoOperations : AuthCallback {
     }
 
     suspend fun decryptWithDerivedKey(message: String): String {
-
         val key = getKey()
 
         if (message.isEmpty()) return ""
         if (key.isEmpty()) return ""
 
         try {
-
             val decoded = Platform().base64.decode(message)
 
             val secretKey = SecretKeySpec(key, "AES")
@@ -62,7 +59,6 @@ abstract class CryptoOperations : AuthCallback {
 
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
             return String(cipher.doFinal(messageBytes.toByteArray()))
-
         } catch (e: Exception) {
             Platform().logger.loge("$tag: failed to decrypt: " + e.message)
             e.printStackTrace()
@@ -70,13 +66,16 @@ abstract class CryptoOperations : AuthCallback {
         }
     }
 
-
     open fun onDestroy() {}
 
-    override suspend fun onAuthCompleted(password: String, uid: String, force: Boolean) {
+    override suspend fun onAuthCompleted(
+        password: String,
+        uid: String,
+        force: Boolean,
+    ) {
         val key = Platform().storage.get(DERIVED_PASS_KEY)
         if (key.isEmpty() || force) {
-            genDerivedKey(password, uid)
+            genDerivedKeyAndSave(password, uid)
             Platform().logger.logd("$tag:onAuthCompleted() derived key is created")
         } else {
             Platform().logger.logd("$tag:onAuthCompleted() derived key is present")
@@ -94,7 +93,6 @@ abstract class CryptoOperations : AuthCallback {
     }
 
     protected suspend fun getKey(): ByteArray {
-
         val key = Platform().storage.get(DERIVED_PASS_KEY)
 
         if (key.isEmpty()) {
@@ -108,7 +106,10 @@ abstract class CryptoOperations : AuthCallback {
         return realKey
     }
 
-    protected fun genDerivedKeyInter(password: String, uid: String): ByteArray {
+    protected fun genDerivedKeyInter(
+        password: String,
+        uid: String,
+    ): ByteArray {
         // Gen derived key which we will use as user personal key
         val input = password + uid
         val secretKeySpec = SecretKeySpec(uid.toByteArray(), "HmacSHA256")
@@ -119,15 +120,16 @@ abstract class CryptoOperations : AuthCallback {
         return mac.doFinal(input.toByteArray())
     }
 
-    protected suspend fun genDerivedKey(password: String, uid: String) {
-
+    protected suspend fun genDerivedKeyAndSave(
+        password: String,
+        uid: String,
+    ) {
         val key = Platform().base64.encode(genDerivedKeyInter(password, uid))
 
         val encKey = Platform().crypto.encrypt(String(key))
         val key2 = Platform().base64.encode(encKey.toByteArray())
 
         val result = Platform().storage.save(String(key2), DERIVED_PASS_KEY)
-        Platform().logger.logd("$tag:genDerivedKey() saved = $result")
+        Platform().logger.logd("$tag:genDerivedKeyAndSave() saved = $result")
     }
-
 }

@@ -48,7 +48,7 @@ fun PreviewScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = ""
+                            contentDescription = "",
                         )
                     }
                 },
@@ -57,9 +57,10 @@ fun PreviewScreen(
     ) { padding ->
         ZoomableImage(
             uri = uri,
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
         )
     }
 }
@@ -67,7 +68,7 @@ fun PreviewScreen(
 @Composable
 private fun ZoomableImage(
     uri: Uri,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -78,58 +79,63 @@ private fun ZoomableImage(
     val configuration = LocalWindowInfo.current
     val density = LocalDensity.current
 
-    val screenWidthPx = with(density) {
-        configuration.containerSize.width.dp.toPx()
-    }
+    val screenWidthPx =
+        with(density) {
+            configuration.containerSize.width.dp
+                .toPx()
+        }
 
-    val screenHeightPx = with(density) {
-        configuration.containerSize.height.dp.toPx()
-    }
+    val screenHeightPx =
+        with(density) {
+            configuration.containerSize.height.dp
+                .toPx()
+        }
 
     Box(
-        modifier = modifier
-            .safeDrawingPadding()
-            .pointerInput(Unit) {
-                detectTransformGestures { _, pan, zoom, _ ->
+        modifier =
+            modifier
+                .safeDrawingPadding()
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
 
-                    val newScale = (scale * zoom).coerceIn(minScale, maxScale)
+                        val newScale = (scale * zoom).coerceIn(minScale, maxScale)
 
-                    val extraWidth = (newScale - 1) * screenWidthPx
-                    val extraHeight = (newScale - 1) * screenHeightPx
+                        val extraWidth = (newScale - 1) * screenWidthPx
+                        val extraHeight = (newScale - 1) * screenHeightPx
 
-                    val maxX = extraWidth / 2
-                    val maxY = extraHeight / 2
+                        val maxX = extraWidth / 2
+                        val maxY = extraHeight / 2
 
-                    scale = newScale
+                        scale = newScale
 
-                    offset = Offset(
-                        x = (offset.x + pan.x).coerceIn(-maxX, maxX),
-                        y = (offset.y + pan.y).coerceIn(-maxY, maxY)
-                    )
+                        offset =
+                            Offset(
+                                x = (offset.x + pan.x).coerceIn(-maxX, maxX),
+                                y = (offset.y + pan.y).coerceIn(-maxY, maxY),
+                            )
 
-                    // Reset position when zoomed out
-                    if (scale <= 1f) {
-                        offset = Offset.Zero
+                        // Reset position when zoomed out
+                        if (scale <= 1f) {
+                            offset = Offset.Zero
+                        }
                     }
-                }
-            },
-        contentAlignment = Alignment.Center
+                },
+        contentAlignment = Alignment.Center,
     ) {
-
         AsyncImage(
             model = uri,
             contentDescription = "",
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
 
-                    translationX = offset.x
-                    translationY = offset.y
-                },
-            contentScale = ContentScale.Fit
+                        translationX = offset.x
+                        translationY = offset.y
+                    },
+            contentScale = ContentScale.Fit,
         )
-
     }
 }

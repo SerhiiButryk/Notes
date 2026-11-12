@@ -3,41 +3,49 @@ package com.notes.repo.feature
 import api.Platform
 import api.data.isEqualTo
 import com.notes.repo.AppRepository
-import com.notes.repo.FilesManager
 import com.notes.repo.RemoteRepository
+import com.notes.repo.FilesManager
 import kotlinx.coroutines.coroutineScope
 
 internal class ChangePasswordUseCase {
-
     private val filesManager = FilesManager()
 
-    suspend fun canChangePassword(repo: AppRepository, remoteRepo: RemoteRepository): Boolean {
-
+    suspend fun canChangePassword(
+        repo: AppRepository,
+        remoteRepo: RemoteRepository,
+    ): Boolean {
         if (!Platform().netStateManager.isNetworkAvailable()) {
             Platform().logger.loge("PasswordHelper::canChangePassword() no network")
             return false
         }
 
         if (!repo.isDataInSync()) {
-            Platform().logger.loge("PasswordHelper::canChangePassword() " +
-                    "local data is not up-to-date with remote")
+            Platform().logger.loge(
+                "PasswordHelper::canChangePassword() " +
+                    "local data is not up-to-date with remote",
+            )
             return false
         }
 
         val remoteNotes = remoteRepo.fetchCopy()
         if (!remoteNotes.isEqualTo(repo.cachedLocalNotes)) {
-            Platform().logger.loge("PasswordHelper::canChangePassword() " +
-                    "remote data is not up-to-date with local data")
+            Platform().logger.loge(
+                "PasswordHelper::canChangePassword() " +
+                    "remote data is not up-to-date with local data",
+            )
             return false
         }
 
         // Create backup files
-        val result = filesManager.cacheNotes(remoteNotes)
+        val result = filesManager.writeCache(remoteNotes)
         Platform().logger.logi("PasswordHelper::canChangePassword: $result")
         return result
     }
 
-    suspend fun onPasswordChanged(repo: AppRepository, remoteRepo: RemoteRepository) {
+    suspend fun onPasswordChanged(
+        repo: AppRepository,
+        remoteRepo: RemoteRepository,
+    ) {
         Platform().logger.logi("PasswordHelper::onPasswordChanged()")
 
         coroutineScope {
@@ -47,7 +55,7 @@ internal class ChangePasswordUseCase {
             }
         }
 
-        repo.clearLocalAppStorage()
+        repo.clearAllData()
 
         coroutineScope {
             // This should get our app in sync when password has changed
@@ -56,5 +64,4 @@ internal class ChangePasswordUseCase {
 
         Platform().logger.logi("PasswordHelper::onPasswordChanged() done")
     }
-
 }

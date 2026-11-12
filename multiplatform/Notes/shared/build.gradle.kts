@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -12,8 +13,14 @@ kotlin {
 
     android {
         namespace = "com.notes.app"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         compilerOptions {
             val target = libs.versions.javaversion.get()
@@ -27,13 +34,15 @@ kotlin {
         }
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
+    // Configuration for ios xcframwork
+    // Build using - './gradlew shared:assembleXCFramework'
+    val xcf = XCFramework()
+    val iosTargets = listOf(iosArm64(), iosSimulatorArm64())
+
+    iosTargets.forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "Shared"
-            isStatic = true
+            xcf.add(this)
         }
     }
 

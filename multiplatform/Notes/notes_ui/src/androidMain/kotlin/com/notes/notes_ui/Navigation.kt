@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.notes.notes_ui
 
 import android.app.Activity
@@ -21,11 +23,9 @@ import androidx.navigation.toRoute
 import api.Platform
 import api.data.Notes
 import api.data.UserFile
-import com.notes.notes_ui.data.UiEvent
-import com.notes.notes_ui.editor.EditorCommand
+import com.notes.notes_ui.components.UICommand
 import com.notes.ui.Access
 import com.notes.ui.AlertDialogStateful
-import com.notes.ui.Auth
 import com.notes.ui.LoadingDialogStateful
 import com.notes.ui.MainContent
 import com.notes.ui.MediaPreview
@@ -37,7 +37,6 @@ import com.notes.ui.isTabletOrFoldableExpanded
 import kotlinx.coroutines.flow.Flow
 
 fun NavGraphBuilder.mainContentDestination(navController: NavController) {
-
     val onBackClick: () -> Unit = { navController.popBackStack() }
 
     // Main app content graph
@@ -60,10 +59,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val onNavigatedBack: suspend () -> Unit = { viewModel.onNavigatedBack() }
 
-            val sendEditorCommand: (EditorCommand) -> Unit =
-                { viewModel.sendEditorCommand(it) }
-
-            val getEvents: suspend () -> Flow<UiEvent> = { viewModel.events }
+            val getEvents: suspend () -> Flow<UICommand> = { viewModel.commands }
 
             val onSettingsClicked = { navController.navigate(NotesSettings()) }
 
@@ -75,7 +71,7 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 activity?.moveTaskToBack(true)
             }
 
-            BackHandler(enabled = true) {
+            BackHandler {
                 onBackButtonClicked()
             }
 
@@ -84,19 +80,20 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             val attachments by viewModel.attachments.collectAsStateWithLifecycle()
 
             val onOpenPreview: (UserFile) -> Unit = {
-                val uri = it.location as Uri
-                navController.navigate(MediaPreview(uri.toString(), it.name))
+                val uri = Uri.fromFile(it.file)
+                navController.navigate(MediaPreview(uri.toString(), it.file.name))
             }
 
             val onDelete: (UserFile) -> Unit = {
                 viewModel.onDeleteAttachment(it)
             }
 
-            val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.PickVisualMedia()
-            ) { uri ->
-                viewModel.onAttachments(uri, context)
-            }
+            val launcher =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.PickVisualMedia(),
+                ) { uri ->
+                    viewModel.onAttachments(uri, context)
+                }
 
             val onAttachFile = {
                 viewModel.onShowFilePicker(launcher)
@@ -109,7 +106,6 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
                 note = note,
                 onSelectAction = onSelectAction,
                 onNavigatedBack = onNavigatedBack,
-                onTextChanged = sendEditorCommand,
                 getEvents = getEvents,
                 onSettingsClick = onSettingsClicked,
                 onBackClick = onBackButtonClicked,
@@ -132,29 +128,47 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
+            val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
+
             val onAccountSelected = { navController.navigate(NotesAccount()) }
-            val onExport: (uri: Uri?, context: Context) -> Unit = { uri, context ->
-                viewModel.onExport(uri, context)
-            }
 
             val onPasswordUpdateClick = {
                 navController.navigate(Access(showChangePasswordUI = true))
             }
 
-            val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.OpenDocumentTree()
-            ) { result ->
-                onExport(result, context)
-            }
+            val launcherOnExport =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.OpenDocumentTree(),
+                ) { result ->
+                    viewModel.onExport(result, context)
+                }
+
+            val launcherOnSelectFolder =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.OpenDocumentTree(),
+                ) { result ->
+                    viewModel.onSelectFolder(result, context)
+                }
 
             SettingsUI(
                 onBackClick = onBackClick,
                 onAccountClick = onAccountSelected,
                 onExportClick = {
                     // Ask User to select a folder for notes export
-                    launcher.launch(null)
+                    launcherOnExport.launch(null)
                 },
-                onPasswordUpdateClick = onPasswordUpdateClick
+                onPasswordUpdateClick = onPasswordUpdateClick,
+                onSignOutClick = {
+                    viewModel.onSignOut {
+                        navController.navigate(Access(forceLoginUI = true))
+                    }
+                },
+                isDebugMode = settingsState.isDebug,
+                onDebugModeChanged = {
+                    viewModel.onDebugChanged(it) {
+                        launcherOnSelectFolder.launch(null)
+                    }
+                },
             )
         }
 
@@ -162,27 +176,22 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
 
             val viewModel = backStackEntry.getViewModel<SettingsViewModel>(navController)
 
-            val onSignOut = {
-                viewModel.singOut {
-                    navController.navigate(Auth())
-                }
-            }
-
-            val accountInfo by viewModel.accountInfo.collectAsStateWithLifecycle()
+            val accountInfo by viewModel.accountInfoState.collectAsStateWithLifecycle()
 
             val activity = LocalActivity.current
 
-            val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.StartIntentSenderForResult()
-            ) { result ->
-                val result = result.resultCode == Activity.RESULT_OK
-                Platform().logger.logi("AccountUI::activity result = $result")
-                viewModel.updateAccountInfo()
-            }
+            val launcher =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.StartIntentSenderForResult(),
+                ) { result ->
+                    val result = result.resultCode == Activity.RESULT_OK
+                    Platform().logger.logi("AccountUI::activity result = $result")
+                    viewModel.updateAccountInfo()
+                }
 
             val onSuccess = { sender: IntentSenderRequest ->
                 launcher.launch(sender)
-            }
+            } as (Any?) -> Unit
 
             val onGrantPermissionClick: () -> Unit =
                 { viewModel.requestPermissions(activity, onSuccess) }
@@ -190,10 +199,8 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             AccountUI(
                 onBackClick = onBackClick,
                 onGrantPermissionClick = onGrantPermissionClick,
-                onSignOut = onSignOut,
-                accountInfo = accountInfo
+                accountInfo = accountInfo,
             )
-
         }
 
         composable<MediaPreview> { backStackEntry ->
@@ -209,8 +216,6 @@ fun NavGraphBuilder.mainContentDestination(navController: NavController) {
             BackHandler(enabled = true) {
                 onBackClick()
             }
-
         }
-
     }
 }

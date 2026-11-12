@@ -1,24 +1,36 @@
 package com.notes.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
@@ -27,13 +39,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,16 +58,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -63,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import api.Platform
+import com.notes.ui.theme.iconColor
 import kotlinx.coroutines.delay
 
 /**
@@ -110,20 +127,22 @@ fun InputTextField(
         value = text,
         onValueChange = { onValueChange(it) },
         label = { Text(label) },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            showKeyboardOnFocus = true,
-            autoCorrectEnabled = false,
-            imeAction = imeAction,
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                keyboardType = keyboardType,
+                showKeyboardOnFocus = true,
+                autoCorrectEnabled = false,
+                imeAction = imeAction,
+            ),
         keyboardActions = keyboardActions,
         modifier = localModifier,
         maxLines = 1,
-        visualTransformation = if (passwordShown || keyboardType == KeyboardType.Email) {
-            VisualTransformation.None
-        } else {
-            PasswordVisualTransformation()
-        },
+        visualTransformation =
+            if (passwordShown || keyboardType == KeyboardType.Email) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
         supportingText = {
 // TODO Enable error message for input validation errors
             //            ErrorMessage()
@@ -211,28 +230,29 @@ fun AlertDialogUI(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadingDialog(
-    isLoading: Boolean
-) {
+fun LoadingDialog(isLoading: Boolean) {
     if (isLoading) {
         BasicAlertDialog(
-            onDismissRequest = {  },
-            properties = DialogProperties(
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false
-            )
+            onDismissRequest = { },
+            properties =
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
         ) {
             Surface(
                 modifier = Modifier.size(100.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface
+                shape =
+                    androidx.compose.foundation.shape
+                        .RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 ) {
                     CircularProgressIndicator(
-                        color = Color(0xFF6200EE)
+                        color = Color(0xFF6200EE),
                     )
                 }
             }
@@ -241,66 +261,57 @@ fun LoadingDialog(
 }
 
 /**
- * Search bar component
+ * A variant of search bar component
  */
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBarField(
+fun SearchBarFieldV2(
     modifier: Modifier = Modifier,
+    query: String = "",
+    onQueryChange: (String) -> Unit = {},
     trailingIcon: @Composable (() -> Unit)? = null,
-    onBackClick: () -> Unit = {}
 ) {
-
-    val focusManager = LocalFocusManager.current
-    var shouldClear by remember { mutableStateOf(true) }
-
-    SearchBar(
-        inputField = {
-            SearchBarDefaults.InputField(
-                expanded = false,
-                query = "",
-                onQueryChange = { },
-                onSearch = { }, // Collapse on search submission
-                onExpandedChange = { },
-                placeholder = { Text("Search your notes...") },
-                leadingIcon = {
-//                    if (true) {
-                    IconButton(onClick = {
-                        onBackClick()
-//                            active = false
-//                            query = "" // Clear query when collapsing with back button
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-//                    } else {
-//                        Icon(Icons.Default.Search, contentDescription = "Search icon")
-//                    }
-                },
-                trailingIcon = {
-//                    if (/*active && query.isNotEmpty()*/false) {
-//                        IconButton(onClick = { /*query = ""*/ }) {
-//                            Icon(Icons.Default.Close, contentDescription = "Clear search")
-//                        }
-//                    }
-
-                    trailingIcon?.invoke()
-                },
-            )
-        },
-        expanded = false,
-        onExpandedChange = {},
-        modifier = Modifier
+    BasicTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyMedium.copy(
+            color = MaterialTheme.colorScheme.onSurface
+        ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        modifier = modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
-            .onFocusEvent {
-                // TODO: Can cause crashes
-//                if (it.hasFocus && shouldClear) {
-//                    focusManager.clearFocus()
-//                    shouldClear = false
-//                }
-            },
-    ) {}
+            .padding(4.dp)
+            .height(40.dp) // Direct compact height
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+        decorationBox = { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (query.isEmpty()) {
+                        Text(
+                            text = "Search your notes...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    innerTextField()
+                }
+
+                trailingIcon?.invoke()
+            }
+        }
+    )
 }
 
 /**
@@ -309,45 +320,48 @@ fun SearchBarField(
 
 @Composable
 fun AccentButton(
-    onClick: () -> Unit, label: String, modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    start: Color = Color(0xFF9DCEFF),
+    end: Color = Color(0xFFC58BF2),
 ) {
     val transition = rememberInfiniteTransition(label = "accent-button")
 
-    val colorPhaseState = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "accent-button-color-phase",
-    )
-
-    val startColor = Color(0xFF9DCEFF)
-    val endColor = Color(0xFFC58BF2)
+    val colorPhaseState =
+        transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "accent-button-color-phase",
+        )
 
     Button(
         onClick = { onClick() },
-        modifier = modifier
-            .fillMaxWidth()
-            .drawBehind {
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    val phase = colorPhaseState.value
 
-                val phase = colorPhaseState.value
+                    val currentStart = lerp(start, end, phase)
+                    val currentEnd = lerp(end, start, phase)
 
-                val currentStart = lerp(startColor, endColor, phase)
-                val currentEnd = lerp(endColor, startColor, phase)
+                    // Replicate the 50.dp RoundedCornerShape (50.dp in pixels is height / 2)
+                    val cornerRadius = CornerRadius(size.height / 2f, size.height / 2f)
 
-                // Replicate the 50.dp RoundedCornerShape (50.dp in pixels is height / 2)
-                val cornerRadius = CornerRadius(size.height / 2f, size.height / 2f)
-
-                drawRoundRect(
-                    brush = Brush.horizontalGradient(
-                        listOf(currentStart, currentEnd)
-                    ),
-                    cornerRadius = cornerRadius
-                )
-
-            },
+                    drawRoundRect(
+                        brush =
+                            Brush.horizontalGradient(
+                                listOf(currentStart, currentEnd),
+                            ),
+                        cornerRadius = cornerRadius,
+                    )
+                },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
     ) {
         Text(text = label, color = Color.White)
@@ -360,7 +374,8 @@ fun AccentButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleTopBar(
-    title: String, onBackClick: () -> Unit
+    title: String,
+    onBackClick: () -> Unit,
 ) {
     TopAppBar(
         title = { Text(title) },
@@ -368,7 +383,7 @@ fun SimpleTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-        }
+        },
     )
 }
 
@@ -377,7 +392,6 @@ fun SimpleTopBar(
  */
 @Composable
 fun NetworkStateMessage() {
-
     var networkIsAvailable by rememberSaveable { mutableStateOf(true) }
     var show by rememberSaveable { mutableStateOf(false) }
 
@@ -410,18 +424,152 @@ fun NetworkStateMessage() {
         Surface(
             color = color,
         ) {
-            val message = if (networkIsAvailable) "Network is available"
-            else "Network is not available"
+            val message =
+                if (networkIsAvailable) {
+                    "Network is available"
+                } else {
+                    "Network is not available"
+                }
             Text(
                 text = message,
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .systemBarsPadding(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .systemBarsPadding(),
             )
         }
     }
+}
 
+/**
+ * A button which can be in active or inactive state
+ */
+@Composable
+fun ToggleButton(
+    modifier: Modifier = Modifier,
+    isActive: Boolean,
+    isEnabled: Boolean,
+    onClick: () -> Unit,
+    imageVector: ImageVector?,
+    painter: Painter?,
+) {
+    val unfocusableModifier = Modifier.focusProperties { canFocus = false }
+    val colors =
+        IconButtonDefaults.iconToggleButtonColors(
+            checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    IconToggleButton(
+        checked = isActive,
+        onCheckedChange = { onClick() },
+        enabled = isEnabled,
+        colors = colors,
+        modifier = modifier.then(unfocusableModifier),
+    ) {
+        if (imageVector != null) {
+            Icon(
+                tint = iconColor(isEnabled),
+                imageVector = imageVector,
+                contentDescription = "",
+            )
+        } else {
+            Icon(
+                tint = iconColor(isEnabled),
+                painter = painter!!,
+                contentDescription = "",
+            )
+        }
+    }
+}
+
+/**
+ * Search bar component
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CollapsibleSearchTopBar(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {},
+    trailingIcon: @Composable (() -> Unit)? = null,
+    searchQuery: String = "",
+    onQueryChange: (String) -> Unit = {},
+) {
+
+    var isSearching by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isSearching) {
+        if (isSearching) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    TopAppBar(
+        modifier = modifier,
+        title = {
+
+            AnimatedVisibility(
+                visible = isSearching,
+                enter = fadeIn() + slideInHorizontally { it / 2 },
+                exit = fadeOut() + slideOutHorizontally { it / 2 }
+            ) {
+                TextField(
+                    value = searchQuery,
+                    onValueChange = onQueryChange,
+                    placeholder = { Text("Search notes...") },
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                )
+            }
+
+            AnimatedVisibility(
+                visible = !isSearching,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            }
+        },
+        actions = {
+            if (isSearching) {
+                // Clear query or collapse if already empty
+                IconButton(onClick = {
+                    if (searchQuery.isEmpty()) {
+                        isSearching = false
+                    } else {
+                        onQueryChange("")
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Search"
+                    )
+                }
+            } else {
+
+                // Tap to expand search
+                IconButton(onClick = { isSearching = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Open Search"
+                    )
+                }
+
+                trailingIcon?.invoke()
+            }
+        }
+    )
 }

@@ -27,19 +27,21 @@ fun getErrorTitleAndMessage(authResult: AuthResult): Pair<String, String> {
     return Pair(first = title, second = subtitle)
 }
 
-fun getVerifyTitleAndMessage(emailSent: Boolean, userEmail: String): Pair<String, String> {
-
+fun getVerifyTitleAndMessage(
+    emailSent: Boolean,
+    userEmail: String,
+): Pair<String, String> {
     val title =
         if (emailSent) {
             "Verification email has been sent to you. " +
-                    "Please, check your $userEmail email."
+                "Please, check your $userEmail email."
         } else {
             "We failed to send verification email to you. Please, retry later."
         }
 
     val subtitle =
         "Look for email with 'Verify your email for fancynotesdevtest' title. " +
-                "If you don't see such email check 'Spam' folder."
+            "If you don't see such email check 'Spam' folder."
 
     return Pair(first = title, second = subtitle)
 }
@@ -50,7 +52,6 @@ fun getTitleAndMessage(
     passwordChangeUI: Boolean = false,
     authToConfirm: Boolean = false,
 ): Pair<String, String> {
-
     val title =
         if (authToConfirm) {
             "Reenter your credentials"
@@ -70,7 +71,7 @@ fun getTitleAndMessage(
         } else if (passwordChangeUI) {
             "Please, set a new strong password"
         } else if (registerUI) {
-            "Set your user email and a password to access this application"
+            "Set your email and password to access this application"
         } else if (loginUI) {
             "Sign in using your email and password"
         } else {

@@ -2,10 +2,10 @@ package com.notes.ui.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import kotlinx.coroutines.CoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import api.Platform
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -17,21 +17,17 @@ data class LoadingDialogState(
     val show: Boolean = false,
 )
 
-// This annotation could be redundant as
-// the class is already stable, because all properties are stable.
-// However, keep it for clarity.
-@Stable
+@Immutable
 class DialogState(
     val title: String,
     val subtitle: String,
-    val onConfirm: (() -> Unit)? = null
+    val onConfirm: (() -> Unit)? = null,
 )
 
 open class BaseAppVM(
     // For test support
-    scopeOverride: CoroutineScope? = null
+    scopeOverride: CoroutineScope? = null,
 ) : ViewModel() {
-
     protected val scope: CoroutineScope = scopeOverride ?: viewModelScope
 
     // Dialog ui state
@@ -44,11 +40,11 @@ open class BaseAppVM(
     protected suspend fun showDialog(
         title: String,
         subtitle: String,
-        onConfirm: (() -> Unit)? = null
+        onConfirm: (() -> Unit)? = null,
     ) {
         Platform().logger.logi("$tag::showDialog()")
         _dialogState.emit(
-            DialogState(title = title, subtitle = subtitle, onConfirm = onConfirm)
+            DialogState(title = title, subtitle = subtitle, onConfirm = onConfirm),
         )
     }
 

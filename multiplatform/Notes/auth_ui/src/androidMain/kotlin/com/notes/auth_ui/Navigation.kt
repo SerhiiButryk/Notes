@@ -62,7 +62,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                         viewModel.login(state = it, onSuccess = onSuccess, context = activityContext, args = args)
                     },
                     title = title,
-                    subTitle = subTitle
+                    subTitle = subTitle,
                 )
 
                 val context = LocalContext.current
@@ -76,7 +76,6 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
             if (state.value is RegisterUIState) {
 
-
                 val onLogin = {
                     // Go to login screen
                     navController.navigate(Access(forceLoginUI = true))
@@ -84,7 +83,6 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
                 val onRegister: (RegisterUIState) -> Unit = {
                     if (args.showChangePasswordUI) {
-
                         val onSuccess = {
                             navController.popBackStack()
                             Unit
@@ -92,7 +90,6 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
 
                         viewModel.changePassword(state = it, onSuccess = onSuccess)
                     } else {
-
                         val onSuccess = {
                             navController.navigate(EmailVerification())
                         }
@@ -109,7 +106,7 @@ fun NavGraphBuilder.authDestination(navController: NavController) {
                     onRegister = onRegister,
                     onLogin = if (args.showChangePasswordUI) null else onLogin,
                     title = title,
-                    subTitle = subTitle
+                    subTitle = subTitle,
                 )
             }
 

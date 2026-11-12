@@ -14,18 +14,23 @@ import kotlin.reflect.KClass
 
 @OptIn(InternalSerializationApi::class)
 @Composable
-fun createNavBackStack(default: NavKey, vararg elements: KClass<out NavKey>): NavBackStack<NavKey> {
-    val navConfig = remember {
-        SavedStateConfiguration {
-            serializersModule = SerializersModule {
-                polymorphic(NavKey::class) {
-                    for (element in elements) {
-                        @Suppress("UNCHECKED_CAST")
-                        subclass(element as KClass<NavKey>, element.serializer())
+fun createNavBackStack(
+    default: NavKey,
+    vararg elements: KClass<out NavKey>,
+): NavBackStack<NavKey> {
+    val navConfig =
+        remember {
+            SavedStateConfiguration {
+                serializersModule =
+                    SerializersModule {
+                        polymorphic(NavKey::class) {
+                            for (element in elements) {
+                                @Suppress("UNCHECKED_CAST")
+                                subclass(element as KClass<NavKey>, element.serializer())
+                            }
+                        }
                     }
-                }
             }
         }
-    }
     return rememberNavBackStack(navConfig, default)
 }

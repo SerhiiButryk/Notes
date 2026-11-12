@@ -21,10 +21,9 @@ fun RegisterUIImpl(
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues
-    ) -> Unit
+        innerPadding: PaddingValues,
+    ) -> Unit,
 ) {
-
     val finalModifier = Modifier.fillMaxSize().then(modifier)
 
     Scaffold(
@@ -36,9 +35,8 @@ fun RegisterUIImpl(
         val confirmPassword = rememberSaveable { mutableStateOf("") }
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
-
             NetworkStateMessage()
 
             content(
@@ -56,7 +54,6 @@ fun RegisterUIImpl(
                 },
                 innerPadding,
             )
-
         }
     }
 }

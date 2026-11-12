@@ -65,11 +65,13 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.api)
+
+            // Firebase SDK for KMP
+            implementation(libs.firebase.app )
+            implementation(libs.gitlive.firebase.firestore)
+            implementation(libs.devfirebase.auth)
         }
         jvmMain.dependencies {
-            // The unofficial Firebase Kotlin SDK
-            implementation(libs.firebase.app)
-            implementation(libs.devfirebase.auth)
         }
     }
 }

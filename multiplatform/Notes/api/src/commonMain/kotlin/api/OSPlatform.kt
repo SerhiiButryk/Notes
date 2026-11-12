@@ -9,7 +9,6 @@ import api.security.CryptoOperations
 import api.utils.Log
 
 interface OSPlatform {
-
     val base64: Base64Operations
 
     val storage: StorageOperations
@@ -23,6 +22,12 @@ interface OSPlatform {
     val appRepo: BaseRepo
 
     val httpClient: HttpClient
+
+    fun getCacheDir(): String
+
+    fun getRootFilesDir(): String
+
+    fun getDownloadFilesDir(): String
 }
 
 var platform: OSPlatform? = null

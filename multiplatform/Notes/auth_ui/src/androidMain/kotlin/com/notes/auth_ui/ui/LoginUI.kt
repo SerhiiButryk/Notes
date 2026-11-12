@@ -15,18 +15,19 @@ fun LoginUI(
     title: String,
     subTitle: String,
 ) {
-
     LoginUIImpl(
-        modifier = Modifier.semantics {
-            testTagsAsResourceId = true
-        },
+        modifier =
+            Modifier.semantics {
+                testTagsAsResourceId = true
+            },
         state = state,
         onLogin = onLogin,
     ) {
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        innerPadding: PaddingValues ->
+        innerPadding: PaddingValues,
+        ->
 
         AuthUIAdaptive(
             title = title,
@@ -39,5 +40,4 @@ fun LoginUI(
             onEnter = onEnter,
         )
     }
-
 }

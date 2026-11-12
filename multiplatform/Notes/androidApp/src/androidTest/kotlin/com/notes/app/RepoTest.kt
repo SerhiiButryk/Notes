@@ -4,15 +4,16 @@ import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import api.AppService
-import api.data.AbstractStorageService
 import api.data.Document
 import api.data.Notes
 import com.google.common.truth.Truth.assertThat
-import com.notes.db.LocalNoteDatabase
-import com.notes.repo.AppRepository
+import com.notes.repo.AndroidSyncManager
+import com.notes.repo.FilesManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -24,342 +25,368 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 @OptIn(ExperimentalAtomicApi::class)
 @RunWith(AndroidJUnit4::class)
 class RepoTest : AppTest() {
-
-    private val appContext: Context = InstrumentationRegistry
-        .getInstrumentation().targetContext.applicationContext
+    private val appContext: Context =
+        InstrumentationRegistry
+            .getInstrumentation()
+            .targetContext.applicationContext
 
     private val tag = "RepoTest"
 
-    private var mockedStoreServiceStoreResult = true
-    private var mockedStoreServiceDeleteResult = true
-
-    private val mockedStoreServiceFirebase = object : AbstractStorageService() {
-
-        override val key: Any = AppService.FIREBASE_STORAGE
-
-        init {
-            canUse = true
-        }
-
-        override suspend fun store(document: Document): Boolean {
-            return mockedStoreServiceStoreResult
-        }
-
-        override suspend fun load(document: Document): Document {
-            return Document("", "")
-        }
-
-        override suspend fun delete(document: Document): Boolean {
-            return mockedStoreServiceDeleteResult
-        }
-
-        override suspend fun fetchAll(): List<Document> {
-            return emptyList()
-        }
-
-    }
-
-    private val mockedStoreServiceGoogle = object : AbstractStorageService() {
-
-        override val key: Any = AppService.GOOGLE_STORAGE
-
-        init {
-            canUse = true
-        }
-
-        override suspend fun store(document: Document): Boolean {
-            return mockedStoreServiceStoreResult
-        }
-
-        override suspend fun load(document: Document): Document {
-            return Document("", "")
-        }
-
-        override suspend fun delete(document: Document): Boolean {
-            return mockedStoreServiceDeleteResult
-        }
-
-        override suspend fun fetchAll(): List<Document> {
-            return emptyList()
-        }
-
-    }
-
-    private val appRepo = AppRepository.create(
-        listOf(mockedStoreServiceGoogle, mockedStoreServiceFirebase),
-    )
+    private val syncManager = AndroidSyncManager(appContext)
 
     @Before
     fun onStart() {
-        LocalNoteDatabase.initialize(appContext)
     }
 
     @After
     fun onFinish() {
-        LocalNoteDatabase.close()
     }
 
     @Test
-    fun test01_insert_new_note() = runTest {
+    fun test01_insert_new_note() =
+        runTest {
+            Log.i(tag, "test01_insert_new_note: started")
 
-        preConditionCheck()
+            preConditionCheck()
 
-        val repo = appRepo
+            // Check that no data
+            verifyDBIsEmpty(syncManager, this)
 
-        // Check that no data
-        verifyDBIsEmpty(repo)
+            val note = Notes(id = 1, content = "some content", userId = "userId", time = "time")
 
-        val note = Notes(content = "some content", userId = "userId", time = "time")
+            val callbackCalled = AtomicBoolean(false)
+            var notesSaved: Notes? = null
 
-        val callbackCalled = AtomicBoolean(false)
-        var id = -1L
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
 
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.saveNote(this, note, onNewAdded = {
-                Log.i(tag, "test01_insert_new_note: callback is called id = $it")
-                // Should be called when a record is added
-                callbackCalled.store(true)
-                id = it
-            })
+                val documents = listOf(
+                    Document(name = note.id.toString(), data = note.content),
+                )
+
+                setupServices(
+                    docsList = documents,
+                )
+
+                val localRepo = createAppRepo(
+                    syncManager = syncManager,
+                    scope = this,
+                )
+
+                localRepo.saveNote(note, onAdded = {
+                    // Should be called when a record is added
+                    callbackCalled.store(true)
+                    notesSaved = it
+                })
+
+            }
+
+            // Check that 1 note
+            val actualList = syncManager.notes.first()
+            assertThat(actualList.size == 1).isTrue()
+            assertThat(actualList[0].id).isEqualTo(notesSaved?.id)
+            assertThat(actualList[0].content).isEqualTo(note.content)
+
+            run<Unit> {
+
+                val repo = createAppRepo(syncManager = syncManager)
+                val noteListAfter = repo.getNotes().first()
+
+                assertThat(noteListAfter.isEmpty()).isFalse()
+                assertThat(noteListAfter.size).isEqualTo(1)
+
+                assertThat(callbackCalled.load()).isTrue()
+                assertThat(noteListAfter[0].id).isEqualTo(notesSaved?.id)
+
+            }
+
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+
+                setupServices(docsList = emptyList())
+
+                val repo = createAppRepo(syncManager = syncManager, scope = this)
+
+                repo.deleteNote(Notes(id = notesSaved!!.id), {})
+            }
+
+            assertThat(syncManager.notes.first().isEmpty()).isTrue()
+
+            run {
+                val repo = createAppRepo(syncManager = syncManager)
+                assertThat(repo.getNotes().first().isEmpty()).isTrue()
+            }
+
+            postConditionCheck()
+
+            Log.i(tag, "test01_insert_new_note: done")
         }
-
-        // Check that 1 note
-        val noteListAfter = repo.getNotes().first()
-
-        assertThat(noteListAfter.isEmpty()).isFalse()
-        assertThat(noteListAfter.size).isEqualTo(1)
-
-        assertThat(callbackCalled.load()).isTrue()
-        assertThat(noteListAfter[0].id).isEqualTo(id)
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.deleteNote(scope = this, Notes(id = id), {})
-        }
-
-        // Check that no data
-        verifyDBIsEmpty(repo)
-
-        repo.clear()
-
-        postConditionCheck()
-
-        Log.i(tag, "test01_insert_new_note: done")
-    }
 
     @Test
-    fun test02_update_existed_note() = runTest {
+    fun test02_update_existed_note() =
+        runTest {
+            Log.i(tag, "test02_update_existed_note: started")
 
-        preConditionCheck()
+            preConditionCheck()
 
-        val repo = appRepo
+            val repo = createAppRepo(syncManager = syncManager)
 
-        // Check that no data
-        verifyDBIsEmpty(repo)
+            // Check that no data
+            verifyDBIsEmpty(syncManager, this)
 
-        val note = Notes(content = "some content", userId = "userId", time = "time")
+            val note = Notes(content = "some content", userId = "userId", time = "time")
 
-        var id = -1L
+            var notesSaved: Notes? = null
 
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.saveNote(scope = this, note) {
-                Log.i(tag, "test02_update_existed_note: callback is called")
-                // Should be called when a record is added
-                id = it
+            val channel = Channel<List<Notes>>(capacity = Channel.CONFLATED)
+            backgroundScope.launch {
+                repo.getNotes().collect {
+                    channel.send(it)
+                }
             }
-        }
 
-        // Check that 1 note
-        val noteListAfter = repo.getNotes().first()
-
-        assertThat(noteListAfter.isEmpty()).isFalse()
-        assertThat(noteListAfter.size).isEqualTo(1)
-
-        assertThat(noteListAfter[0].id).isEqualTo(id)
-
-        val callbackCalled = AtomicBoolean(false)
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.saveNote(scope = this, note.copy(id = id, content = "new content")) {
-                callbackCalled.store(true)
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                val documents = listOf(
+                    Document(name = note.id.toString(), data = note.content),
+                )
+                setupServices(
+                    docsList = documents,
+                )
+                val localRepo = createAppRepo(
+                    syncManager = syncManager,
+                    scope = this,
+                )
+                localRepo.saveNote(note) {
+                    Log.i(tag, "test02_update_existed_note: callback is called")
+                    // Should be called when a record is added
+                    notesSaved = it
+                }
             }
+
+            // Check that 1 note
+            val noteListAfter = channel.receive()
+
+            assertThat(noteListAfter.isEmpty()).isFalse()
+            assertThat(noteListAfter.size).isEqualTo(1)
+
+            assertThat(noteListAfter[0].id).isEqualTo(notesSaved?.id)
+
+            val callbackCalled = AtomicBoolean(false)
+
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                val copy = note.copy(id = notesSaved!!.id, content = "new content")
+                val documents = listOf(
+                    Document(name = copy.id.toString(), data = copy.content),
+                )
+                setupServices(
+                    docsList = documents,
+                )
+                val localRepo = createAppRepo(
+                    syncManager = syncManager,
+                    scope = this,
+                )
+                localRepo.saveNote(copy) {
+                    callbackCalled.store(true)
+                }
+            }
+
+            assertThat(callbackCalled.load()).isTrue()
+
+            // Check that still one note not more
+            val noteListAfterUpdate = channel.receive()
+
+            assertThat(noteListAfterUpdate.isEmpty()).isFalse()
+            assertThat(noteListAfterUpdate.size).isEqualTo(1)
+
+            with(noteListAfterUpdate[0]) {
+                assertThat(this.content).isEqualTo("new content")
+                assertThat(this.id).isEqualTo(id)
+            }
+
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                setupServices(docsList = emptyList())
+                val localRepo = createAppRepo(syncManager = syncManager, scope = this)
+                localRepo.deleteNote(Notes(id = notesSaved!!.id), {})
+            }
+
+            val afterDeletion = channel.receive()
+            assertThat(afterDeletion.isEmpty()).isTrue()
+
+            // Check that no data
+            verifyDBIsEmpty(syncManager, this)
+
+            postConditionCheck()
+
+            Log.i(tag, "test02_update_existed_note: done")
         }
-
-        assertThat(callbackCalled.load()).isFalse()
-
-        // Check that still one note not more
-        val noteListAfterUpdate = repo.getNotes().first()
-
-        assertThat(noteListAfterUpdate.isEmpty()).isFalse()
-        assertThat(noteListAfterUpdate.size).isEqualTo(1)
-
-        val updatedNote = repo.getNotes(id = id).first()!!
-
-        with(updatedNote) {
-            assertThat(this.content).isEqualTo("new content")
-            assertThat(this.id).isEqualTo(id)
-            assertThat(this.userId).isEqualTo("userId")
-        }
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.deleteNote(scope = this, Notes(id = id), {})
-        }
-
-        // Check that no data
-        verifyDBIsEmpty(repo)
-
-        repo.clear()
-
-        postConditionCheck()
-
-        Log.i(tag, "test02_update_existed_note: done")
-    }
 
     @Test
-    fun test03_failed_to_save_note_to_remote() = runTest {
+    fun test03_failed_to_save_note_to_remote() =
+        runTest {
+            Log.i(tag, "test03_failed_to_save_note_to_remote: started")
 
-        preConditionCheck()
+            preConditionCheck()
 
-        val repo = appRepo
+            val repo = createAppRepo(syncManager = syncManager)
 
-        // Check that no data
-        verifyDBIsEmpty(repo)
+            // Check that no data
+            verifyDBIsEmpty(syncManager, this)
 
-        mockedStoreServiceStoreResult = false
+            val note = Notes(id = 1, content = "some content", userId = "userId", time = "time")
 
-        val note = Notes(content = "some content", userId = "userId", time = "time")
-
-        var id = -1L
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.saveNote(scope = this, note) {
-                Log.i(tag, "test03_failed_to_save_note_to_remote: callback is called")
-                id = it
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                setupServices(setStore = false)
+                val localRepo = createAppRepo(
+                    syncManager = syncManager,
+                    scope = this,
+                )
+                localRepo.saveNote(note) {}
             }
+
+            // Note metadata must have pendingUpdate set to true
+
+            val metadataList = syncManager.__getMetadata_FOR_TEST()
+
+            assertThat(metadataList.size).isEqualTo(1)
+
+            val metadata = metadataList.first()
+
+            assertThat(metadata.pendingDelete).isFalse()
+            assertThat(metadata.id > 0).isTrue()
+
+            // Should be false
+            assertThat(syncManager.isAllInSync()).isFalse()
+
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                val localRepo = createAppRepo(syncManager = syncManager, scope = this)
+                localRepo.deleteNote(Notes(id = note.id), {})
+            }
+
+            // Metadata and notes should be deleted
+
+            val metadataListAfterDeletion = syncManager.__getMetadata_FOR_TEST()
+
+            assertThat(metadataListAfterDeletion).isEmpty()
+
+            verifyDBIsEmpty(syncManager, this)
+
+            postConditionCheck()
+
+            Log.i(tag, "test03_failed_to_save_note_to_remote: done")
         }
-
-        // Note metadata must have pendingUpdate set to true
-
-        val metaDb = LocalNoteDatabase.accessNoteMetadata()
-        val metadataList = metaDb.getAllMetadata().first()
-
-        assertThat(metadataList.size).isEqualTo(1)
-
-        val metadata = metadataList.first()
-
-        assertThat(metadata.pendingDelete).isFalse()
-        assertThat(metadata.uid > 0).isTrue()
-        assertThat(metadata.original == id).isTrue()
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.deleteNote(scope = this, Notes(id = id), {})
-        }
-
-        // Metadata and notes should be deleted
-
-        val metadataListAfterDeletion = metaDb.getAllMetadata().first()
-
-        assertThat(metadataListAfterDeletion).isEmpty()
-
-        verifyDBIsEmpty(repo)
-        repo.clear()
-
-        postConditionCheck()
-
-        Log.i(tag, "test03_failed_to_save_note_to_remote: done")
-    }
 
     @Test
-    fun test04_failed_to_delete_note_in_remote() = runTest {
+    fun test04_failed_to_delete_note_in_remote() =
+        runTest {
+            Log.i(tag, "test04_failed_to_delete_note_in_remote: started")
 
-        preConditionCheck()
+            preConditionCheck()
 
-        val repo = appRepo
+            val repo = createAppRepo(syncManager = syncManager)
 
-        // Check that no data
-        verifyDBIsEmpty(repo)
+            // Check that no data
+            verifyDBIsEmpty(syncManager, this)
 
-        mockedStoreServiceDeleteResult = false
+            val note = Notes(id = 1, content = "some content", userId = "userId", time = "time")
 
-        val note = Notes(content = "some content", userId = "userId", time = "time")
+            var notesSaved: Notes? = null
 
-        var id = -1L
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.saveNote(scope = this, note) {
-                Log.i(tag, "test04_failed_to_delete_note_in_remote: callback is called")
-                id = it
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                setupServices(docsList = listOf(Document(name = note.id.toString(), data = note.content)))
+                val repo = createAppRepo(syncManager = syncManager, scope = this)
+                repo.saveNote(note) {
+                    Log.i(tag, "test04_failed_to_delete_note_in_remote: callback is called")
+                    notesSaved = it
+                }
             }
+
+            assertThat(repo.getNotes().first()).isNotEmpty()
+            assertThat(repo.getNotes().first().size == 1).isTrue()
+
+            // Will not return unless the child coroutines have been completed
+            coroutineScope {
+                setupServices(
+                    docsList = listOf(Document(name = note.id.toString(), data = note.content)),
+                    setDelete = false
+                )
+                val repo = createAppRepo(
+                    syncManager = syncManager,
+                    scope = this,
+                )
+                repo.deleteNote(Notes(id = notesSaved!!.id), {})
+            }
+
+            // Note metadata must have pendingDelete set to true
+
+            val metadataList = syncManager.__getMetadata_FOR_TEST()
+
+            assertThat(metadataList.size).isEqualTo(1)
+
+            val metadata = metadataList.first()
+
+            assertThat(metadata.pendingDelete).isTrue()
+            assertThat(metadata.id > 0).isTrue()
+            assertThat(metadata.noteId == notesSaved!!.id).isTrue()
+
+            // Try retriggering delete from remote
+            coroutineScope {
+                repo.syncData(this)
+            }
+
+            // Still should have pendingDelete set to true
+
+            val metadataListAfterRetrigger = syncManager.__getMetadata_FOR_TEST()
+
+            assertThat(metadataListAfterRetrigger.size).isEqualTo(1)
+
+            val metadataAfterRetrigger = metadataListAfterRetrigger.first()
+
+            assertThat(metadataAfterRetrigger.pendingDelete).isTrue()
+            assertThat(metadataAfterRetrigger.id > 0).isTrue()
+            assertThat(metadataAfterRetrigger.noteId == notesSaved?.id).isTrue()
+
+            setupServices(
+                docsList = emptyList(),
+            )
+
+            run {
+                val repo = createAppRepo(syncManager = syncManager, scope = backgroundScope)
+                repo.syncData()
+            }
+
+            val list = repo.getNotes().first()
+            if (list.isNotEmpty()) {
+                // Wait some time, we might not receive new value at this moment
+                for (i in 0..5) {
+                    Thread.sleep(1000)
+                    if (repo.getNotes().first().isEmpty()) break
+                }
+            }
+
+            // Metadata and notes should be deleted
+
+            val metadataListAfterDeletion = syncManager.__getMetadata_FOR_TEST()
+
+            assertThat(metadataListAfterDeletion).isEmpty()
+
+            verifyDBIsEmpty(syncManager, this)
+
+            postConditionCheck()
+
+            Log.i(tag, "test04_failed_to_delete_note_in_remote: done")
         }
 
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.deleteNote(scope = this, Notes(id = id), {})
-        }
-
-        // Note metadata must have pendingDelete set to true
-
-        val metaDb = LocalNoteDatabase.accessNoteMetadata()
-        val metadataList = metaDb.getAllMetadata().first()
-
-        assertThat(metadataList.size).isEqualTo(1)
-
-        val metadata = metadataList.first()
-
-        assertThat(metadata.pendingDelete).isTrue()
-        assertThat(metadata.uid > 0).isTrue()
-        assertThat(metadata.original == id).isTrue()
-
-        // Try retriggering delete from remote
-        coroutineScope {
-            appRepo.syncData(this)
-        }
-
-        // Still should have pendingDelete set to true
-
-        val metadataListAfterRetrigger = metaDb.getAllMetadata().first()
-
-        assertThat(metadataListAfterRetrigger.size).isEqualTo(1)
-
-        val metadataAfterRetrigger = metadataListAfterRetrigger.first()
-
-        assertThat(metadataAfterRetrigger.pendingDelete).isTrue()
-        assertThat(metadataAfterRetrigger.uid > 0).isTrue()
-        assertThat(metadataAfterRetrigger.original == id).isTrue()
-
-        // Now we should be able to delete all
-
-        mockedStoreServiceDeleteResult = true
-
-        // Will not return unless the task is completed
-        coroutineScope {
-            repo.deleteNote(scope = this, Notes(id = id), {})
-        }
-
-        // Metadata and notes should be deleted
-
-        val metadataListAfterDeletion = metaDb.getAllMetadata().first()
-
-        assertThat(metadataListAfterDeletion).isEmpty()
-
-        verifyDBIsEmpty(repo)
-        repo.clear()
-
-        postConditionCheck()
-
-        Log.i(tag, "test04_failed_to_delete_note_in_remote: done")
+    suspend fun verifyDBIsEmpty(syncManager: AndroidSyncManager, scope: CoroutineScope) {
+        val fileManager = FilesManager()
+        assertThat(fileManager.readCache(fileManager.secondCacheDir).isEmpty()).isTrue()
+        val repo = createAppRepo(syncManager, scope)
+        assertThat(repo.getNotes().first().isEmpty()).isTrue()
+        assertThat(syncManager.notes.first().isEmpty()).isTrue()
     }
-
-    private suspend fun verifyDBIsEmpty(repo: AppRepository) {
-        val list = repo.getNotes().first()
-        assertThat(list.isEmpty()).isTrue()
-    }
-
 }

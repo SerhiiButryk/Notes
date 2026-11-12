@@ -1,6 +1,5 @@
 package com.notes.auth_ui.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,12 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notes.ui.AccentButton
 import com.notes.ui.InputTextField
-import com.notes.ui.theme.SurfaceColor
+import com.notes.ui.theme.surfaceColor
 
 @Composable
 fun AuthHeader(
@@ -39,7 +39,6 @@ fun AuthHeader(
     bottomPadding: Dp = 0.dp,
     title: String,
     subTitle: String,
-    onLogin: (() -> Unit)?
 ) {
     Column(
         modifier = modifier,
@@ -63,17 +62,6 @@ fun AuthHeader(
                     .fillMaxWidth(),
             textAlign = textAlign,
         )
-
-        if (onLogin != null) {
-            Text(
-                text = "Have you already got your account ? Go ahead and sign in !",
-                fontSize = 18.sp,
-                style = TextStyle(fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
-                modifier = Modifier.padding(top = 10.dp).clickable { onLogin() },
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
     }
 }
 
@@ -87,6 +75,7 @@ fun AuthBody(
     confirmPasswordState: MutableState<String>? = null,
     onEnter: (String, String, String) -> Unit,
     hasProgress: Boolean,
+    onLogin: (() -> Unit)? = null,
 ) {
     var password by passwordState
     var email by emailState
@@ -103,9 +92,10 @@ fun AuthBody(
             focusRequester = emailFieldFocusRequester,
             onValueChange = { email = it },
             keyboardType = KeyboardType.Email,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("input_auth_1"),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("input_auth_1"),
             imeAction = ImeAction.Next,
         )
 
@@ -128,9 +118,10 @@ fun AuthBody(
             focusRequester = passwordFieldFocusRequester,
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("input_auth_2"),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("input_auth_2"),
             imeAction = if (confirmPassword == null) ImeAction.Done else ImeAction.Next,
             keyboardActions = if (confirmPassword == null) keyboardActions else KeyboardActions.Default,
         )
@@ -142,9 +133,10 @@ fun AuthBody(
                 label = "Confirm password",
                 onValueChange = { confirmPassword.value = it },
                 keyboardType = KeyboardType.Password,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("input_auth_3"),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag("input_auth_3"),
                 imeAction = ImeAction.Done,
                 keyboardActions =
                     KeyboardActions(
@@ -158,12 +150,35 @@ fun AuthBody(
         if (hasProgress) {
             CircularProgressIndicator()
         } else {
-            // Login button
             AccentButton(
                 onClick = { onEnter(password, confirmPassword?.value ?: "", email) },
-                label = "Continue"
+                label = if (onLogin != null) "Create user" else "Continue",
             )
         }
+
+        // Adding login option
+        if (onLogin != null) {
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Do you already have your account ? Then Sign in !",
+                fontSize = 18.sp,
+                style = TextStyle(fontWeight = FontWeight.Light, textAlign = TextAlign.Center),
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline,
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            AccentButton(
+                onClick = onLogin,
+                label = "Sign in",
+                start = MaterialTheme.colorScheme.primary,
+                end = MaterialTheme.colorScheme.tertiary,
+            )
+        }
+
     }
 }
 
@@ -179,7 +194,7 @@ fun SurfaceContainer(
             Modifier
                 .padding(all = 10.dp)
                 .then(modifier),
-        color = SurfaceColor(),
+        color = surfaceColor(),
     ) {
         content()
     }
@@ -209,7 +224,8 @@ fun SubHeader(
     Text(
         text = text,
         fontSize = 18.sp,
-        style = TextStyle(fontWeight = FontWeight.Bold, textAlign = textAlign),
+        style = TextStyle(fontWeight = FontWeight.Light, textAlign = textAlign),
         modifier = modifier,
+        color = MaterialTheme.colorScheme.primary,
     )
 }

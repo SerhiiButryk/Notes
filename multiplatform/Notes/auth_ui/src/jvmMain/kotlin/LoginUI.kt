@@ -5,27 +5,31 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import com.notes.auth_ui.data.LoginUIState
 import com.notes.auth_ui.ui.AuthLayoutWideScreen
 import com.notes.auth_ui.ui.LoginUIImpl
-import com.notes.auth_ui.data.LoginUIState
 import kotlin.String
 
 @Composable
 fun LoginScreenImpl(
     state: LoginUIState,
     onLogin: (LoginUIState) -> Unit,
-    title: String,
-    subTitle: String,
+    onOpen: () -> Unit,
 ) {
+
+    LaunchedEffect(false) {
+        onOpen()
+    }
 
     LoginUIImpl(
         state = state,
-        onLogin = onLogin
+        onLogin = onLogin,
     ) {
         emailState: MutableState<String>,
         passwordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        _ ->
+        _,
+        ->
 
         val emailFieldFocusRequester = remember { FocusRequester() }
         val passFieldFocusRequester = remember { FocusRequester() }
@@ -42,8 +46,8 @@ fun LoginScreenImpl(
 
         AuthLayoutWideScreen(
             modifier = Modifier.fillMaxSize(),
-            title = title,
-            subTitle = subTitle,
+            title = state.title,
+            subTitle = state.subtitle,
             emailState = emailState,
             passwordState = passwordState,
             emailFieldFocusRequester = emailFieldFocusRequester,
@@ -51,7 +55,5 @@ fun LoginScreenImpl(
             hasProgress = state.showProgress,
             onEnter = onEnter,
         )
-
     }
-
 }

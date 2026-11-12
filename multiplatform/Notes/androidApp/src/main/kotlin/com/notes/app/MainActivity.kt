@@ -7,16 +7,17 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import api.Platform
+import api.data.AppSettings
 import com.notes.app.ui.EntryScreen
-import api.data.loadUserData
-import api.data.cacheCode
 import com.notes.ui.AppTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -26,37 +27,49 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_SECURE
         )
 
-        // Load User data and then show UI
-        // Ideally should show some progress here
-        // TODO: Revisit to improve
         lifecycleScope.launch {
-            loadUserData()
-            // Handle intent if any
+            // First handle any intent
             handleIntent(intent)
+            val firstLaunch = AppSettings.getUserEmail().isEmpty()
             setContent {
                 AppTheme {
-                    EntryScreen()
+                    EntryScreen(firstLaunch = firstLaunch)
                 }
             }
         }
 
-        Platform().logger.logi("MainActivity::onCreate() created")
+        Platform().logger.logd("MainActivity::onCreate()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Platform().logger.logd("MainActivity::onResume()")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Platform().logger.logd("MainActivity::onStop()")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Platform().logger.logd("MainActivity::onDestroy()")
     }
 
     private fun handleIntent(intent: Intent?) {
-
         val appLinkAction: String? = intent?.action
         val appLinkData: Uri? = intent?.data
 
         if (Intent.ACTION_VIEW == appLinkAction && appLinkData != null) {
-
-            Platform().logger.logi("MainActivity::handleIntent() intent received")
+            Platform().logger.logd("MainActivity::handleIntent() intent received")
 
             val oobCode = appLinkData.getQueryParameter("oobCode")
             if (oobCode != null) {
-                Platform().logger.logi("MainActivity::handleIntent() " +
-                        "looks like we got email verification response")
-                cacheCode(oobCode)
+                Platform().logger.logd(
+                    "MainActivity::handleIntent() " +
+                        "looks like we got email verification response",
+                )
+                AppSettings.cacheCode(oobCode)
             }
         }
     }

@@ -40,6 +40,8 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
 
+            implementation(projects.localDb)
+
             implementation(libs.bundles.android.core)
             // For style attributes like attr/colorControlNormal
             implementation(libs.androidx.appcompat)
@@ -69,10 +71,27 @@ kotlin {
 
             implementation(projects.api)
             implementation(projects.ui)
-            implementation(projects.composeRichEditor)
+            implementation(projects.repo)
+
+            // Type-safe Rich Text Editor Engine for Compose Multiplatform
+            // Github: https://github.com/mkeeda/arranger
+            implementation(libs.arranger.richtext.editor)
+            implementation(libs.arranger.richtext.editor.material3)
+            implementation(libs.arranger.richtext.html)
+            // Html parsing
+            implementation(libs.ksoup)
 
             // Kotlin coroutines
             implementation(libs.kotlinx.coroutines.core)
+
+            // Image loading
+            implementation(libs.coil.compose)
+
+            // Serialization
+            implementation(libs.serializationJson)
+
+            // Navigation 3
+            implementation(libs.navigation3.ui)
 
             // Compose
             implementation(libs.runtime)
@@ -85,16 +104,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.jetbrains.material.icons.extended)
             implementation(libs.components.splitpane)
-
-            // Image loading
-            implementation(libs.coil.compose)
-
-            // Serialization
-            implementation(libs.serializationJson)
-            // Navigation 3
-            implementation(libs.jetbrains.navigation3.ui)
-            // View Model
-            implementation(libs.androidx.lifecycle.viewmodel)
+        }
+        jvmMain.dependencies {
         }
     }
 }

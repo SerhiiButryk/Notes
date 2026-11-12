@@ -5,40 +5,44 @@ import androidx.compose.runtime.InternalComposeTracingApi
 import androidx.tracing.DelicateTracingApi
 import androidx.tracing.wire.TraceDriver
 import androidx.tracing.wire.TraceSink
+import api.Platform
+import api.data.AppSettings
+import api.utils.Log
 import java.io.File
-import java.nio.file.Paths
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-class AppLogger : PlatformLog() {
+class AppLogger : Log() {
 
-    private val tracesFilePath: String
+    private val logsDir: String = "${Platform().getCacheDir()}/logs"
+    private val logFile: File = File("$logsDir/${getLogFileName()}")
+
     private val driver: TraceDriver
-    private val logFile: File
 
     init {
-        val currDir = Paths.get("").toAbsolutePath()
-        tracesFilePath = "$currDir/logs"
-        logFile = File("$currDir/logs/logs.txt")
         driver = createTraceDriver()
-        logi("Trace file: $tracesFilePath")
-        logi("Log file: ${logFile.path}")
     }
 
-    override fun logi(message: String) {
-        val message = "NOTES [INFO] $message"
-        println(message)
-        logFile.appendText("$message\n")
+    override fun getPID(): Long {
+        return ProcessHandle.current().pid()
     }
 
-    override fun loge(message: String) {
-        val message = "NOTES [ERROR] $message"
-        println(message)
-        logFile.appendText("$message\n")
+    override fun logi(message: String): String {
+        println(super.logi(message))
+        return ""
     }
 
-    override fun logd(message: String) {
-        val message = "NOTES [DEBUG] $message"
-        println(message)
+    override fun loge(message: String): String {
+        println(super.loge(message))
+        return ""
+    }
+
+    override fun logd(message: String): String {
+        if (AppSettings.isDebugEnabled) {
+            println(super.logd(message))
+        }
+        return ""
+    }
+
+    override fun logToFile(message: String) {
         logFile.appendText("$message\n")
     }
 
@@ -49,21 +53,24 @@ class AppLogger : PlatformLog() {
     @OptIn(
         InternalComposeTracingApi::class,
         DelicateTracingApi::class,
-        ExperimentalAtomicApi::class
     )
     override fun createCustomComposeTracer(): Any {
         return object : CompositionTracer {
 
             override fun isTraceInProgress(): Boolean {
-                // Always enabled
-                return isDebug
+                // TODO Uncomment if debugging UI
+                return false
             }
 
             override fun traceEventEnd() {
                 // This is a fast then just saving a closable and then close it here
                 val process = driver.context.process
                 val thread = Thread.currentThread()
-                val threadTrack = process.getOrCreateThreadTrack(thread.id, thread.name)
+                val threadTrack = process.getOrCreateThreadTrack(
+                    thread.threadId(),
+                    ProcessHandle.current().pid(),
+                    thread.name,
+                )
                 threadTrack.endSection()
             }
 
@@ -71,10 +78,15 @@ class AppLogger : PlatformLog() {
                 key: Int,
                 dirty1: Int,
                 dirty2: Int,
-                info: String
+                info: String,
             ) {
-                val closable = driver.tracer.beginSectionWithMetadata(category = "RecompositionTrace", name = info,
-                    token = null, isRoot = false)
+                val closable =
+                    driver.tracer.beginSectionWithMetadata(
+                        category = "RecompositionTrace",
+                        name = info,
+                        token = null,
+                        isRoot = false,
+                    )
                 // We can decide whether we wanna dispatch a trace here
                 closable.metadata.dispatchToTraceSink()
             }
@@ -88,20 +100,20 @@ class AppLogger : PlatformLog() {
 
     private fun createSink(): TraceSink {
         val outputDirectory =
-        try {
-            val file = File(tracesFilePath)
-            if (!file.exists()) {
-                file.mkdirs()
+            try {
+                val file = File(logsDir)
+                if (!file.exists()) {
+                    file.mkdirs()
+                }
+                file
+            } catch (e: Exception) {
+                println("Exception: $e")
+                e.printStackTrace()
+                throw e
             }
-            file
-        } catch (e: Exception) {
-            println("Exception: $e")
-            e.printStackTrace()
-            throw e
-        }
         return TraceSink(
             sequenceId = 1,
-            directory = outputDirectory
+            directory = outputDirectory,
         )
     }
 }

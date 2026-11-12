@@ -5,9 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import com.notes.auth_ui.data.RegisterUIState
 import com.notes.auth_ui.ui.AuthLayoutWideScreen
 import com.notes.auth_ui.ui.RegisterUIImpl
-import com.notes.auth_ui.data.RegisterUIState
 import kotlin.String
 
 @Composable
@@ -18,7 +18,6 @@ fun RegisterScreenImpl(
     title: String,
     subTitle: String,
 ) {
-
     RegisterUIImpl(
         onRegister = { onRegister(it) },
     ) {
@@ -26,7 +25,8 @@ fun RegisterScreenImpl(
         passwordState: MutableState<String>,
         confirmPasswordState: MutableState<String>,
         onEnter: (String, String, String) -> Unit,
-        _ ->
+        _,
+        ->
 
         val emailFieldFocusRequester = remember { FocusRequester() }
         val passFieldFocusRequester = remember { FocusRequester() }
@@ -54,6 +54,5 @@ fun RegisterScreenImpl(
             onLogin = onLogin,
             onEnter = onEnter,
         )
-
     }
 }

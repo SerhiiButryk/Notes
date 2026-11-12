@@ -19,11 +19,12 @@ import java.io.File
 class MediaStoreUseCase(
     private val scope: CoroutineScope,
 ) {
-
     private val filesManager = FilesManager()
 
     fun onAttachments(
-        attachment: Any, noteId: Long, info: Any?
+        attachment: Any,
+        noteId: Long,
+        info: Any?,
     ): File? {
         val context = info as Context
         val uri = attachment as Uri
@@ -33,7 +34,7 @@ class MediaStoreUseCase(
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 return filesManager.saveImage(
                     inputStream = inputStream,
-                    fileName = fileName
+                    fileName = fileName,
                 )
             }
         } catch (e: Exception) {
@@ -55,8 +56,10 @@ class MediaStoreUseCase(
         filesManager.deleteAllFor(noteId)
     }
 
-    private fun getImageNameFromUri(context: Context, uri: Uri): String? {
-
+    private fun getImageNameFromUri(
+        context: Context,
+        uri: Uri,
+    ): String? {
         var fileName: String? = null
 
         if (uri.scheme == "content") {
@@ -80,39 +83,47 @@ class MediaStoreUseCase(
         return fileName
     }
 
-    private fun File.observeAsFlow(): Flow<Attachments> = callbackFlow {
+    // Watch cache directory
+    private fun File.observeAsFlow(): Flow<Attachments> =
+        callbackFlow {
+            val mask: Int =
+                FileObserver.CREATE or FileObserver.DELETE or
+                    FileObserver.MODIFY or FileObserver.MOVED_TO
 
-        val mask: Int = FileObserver.CREATE or FileObserver.DELETE or
-                FileObserver.MODIFY or FileObserver.MOVED_TO
+            val observer =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    object : FileObserver(this@observeAsFlow, mask) {
+                        override fun onEvent(
+                            event: Int,
+                            path: String?,
+                        ) {
+                            val attachments = filesManager.scanFolder(this@observeAsFlow.path)
+                            trySend(attachments)
+                        }
+                    }
+                } else {
+                    @Suppress("DEPRECATION")
+                    object : FileObserver(this@observeAsFlow.absolutePath, mask) {
+                        override fun onEvent(
+                            event: Int,
+                            path: String?,
+                        ) {
+                            val attachments = filesManager.scanFolder(this@observeAsFlow.path)
+                            trySend(attachments)
+                        }
+                    }
+                }
 
-        val observer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            object : FileObserver(this@observeAsFlow, mask) {
-                override fun onEvent(event: Int, path: String?) {
-                    val attachments = filesManager.scanFolder(this@observeAsFlow.path)
-                    trySend(attachments)
-                }
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            object : FileObserver(this@observeAsFlow.absolutePath, mask) {
-                override fun onEvent(event: Int, path: String?) {
-                    val attachments = filesManager.scanFolder(this@observeAsFlow.path)
-                    trySend(attachments)
-                }
+            // Start watching the file system folder
+            observer.startWatching()
+
+            val attachments = filesManager.scanFolder(path)
+            trySend(attachments)
+
+            // Keep the Flow active. When the collector cancels or its lifecycle scope ends,
+            // this block executes to clean up resources and prevent memory leaks.
+            awaitClose {
+                observer.stopWatching()
             }
         }
-
-        // Start watching the file system folder
-        observer.startWatching()
-
-        val attachments = filesManager.scanFolder(path)
-        trySend(attachments)
-
-        // Keep the Flow active. When the collector cancels or its lifecycle scope ends,
-        // this block executes to clean up resources and prevent memory leaks.
-        awaitClose {
-            observer.stopWatching()
-        }
-    }
-
 }

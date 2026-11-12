@@ -8,7 +8,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class NetHttpClient : HttpClient {
-
     private val tag = "HttpClient"
 
     private val client = OkHttpClient()
@@ -16,8 +15,8 @@ class NetHttpClient : HttpClient {
     override suspend fun post(
         url: String,
         formArgs: Map<String, String>,
-    ): String? {
-        return suspendCancellableCoroutine { continuation ->
+    ): String? =
+        suspendCancellableCoroutine { continuation ->
             postInternal(url = url, formArgs = formArgs, callback = { body, result ->
                 if (result) {
                     continuation.resume(body) { _, _, _ ->
@@ -30,28 +29,31 @@ class NetHttpClient : HttpClient {
                 }
             })
         }
-    }
 
     override fun postSync(
         url: String,
-        formArgs: Map<String, String>
+        formArgs: Map<String, String>,
     ): String? = postInternal(url = url, formArgs = formArgs, sync = true)
 
     private fun postInternal(
         url: String,
         formArgs: Map<String, String>,
         callback: ((String?, Boolean) -> Unit)? = null,
-        sync: Boolean = false
+        sync: Boolean = false,
     ): String? {
         try {
-
             val builder = FormBody.Builder()
             for ((key, value) in formArgs) {
                 builder.add(key, value)
             }
             val body = builder.build()
 
-            val request = Request.Builder().url(url).post(body).build()
+            val request =
+                Request
+                    .Builder()
+                    .url(url)
+                    .post(body)
+                    .build()
 
             if (sync) {
                 Platform().logger.logi("$tag: postInternal: sync sending...")
@@ -65,7 +67,6 @@ class NetHttpClient : HttpClient {
                     callback?.invoke(response.body.string(), true)
                 }
             }
-
         } catch (e: Exception) {
             // TODO: Improve error handling
             Platform().logger.loge("$tag: postInternal: error: '$e'")

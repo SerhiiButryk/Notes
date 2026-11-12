@@ -4,6 +4,17 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
+}
+
+// TODO: Uncomment when migarting to Room3
+// Required by Room 3
+//extensions.configure<androidx.room3.gradle.RoomExtension>("room3") {
+//    schemaDirectory("$projectDir/schemas")
+//}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {
@@ -31,19 +42,33 @@ kotlin {
         }
     }
 
+    jvm()
+
     sourceSets {
         androidMain.dependencies {
             // Room
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.serializationJson)
+            implementation(libs.androidx.sqlite.bundled)
         }
         commonMain.dependencies {
             implementation(projects.api)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.serializationJson)
+            // Room
+            implementation(libs.androidx.sqlite)
+            implementation(libs.androidx.room.common)
+            implementation(libs.androidx.room.runtime)
+        }
+        jvmMain.dependencies {
+            // Room3 drops support for mac x64 in the latest releases,
+            // so we must use old Room2 library for now.
+            // However, if we don't build mac x64, then we can switch to Room3
+            implementation(libs.androidx.sqlite.bundled.jvm)
         }
     }
 }
 
 dependencies {
-    // Apply to an Android-specific source set if needed
+    // Applying Room compiler
     add("kspAndroid", libs.androidx.room.compiler)
+    add("kspJvm", libs.androidx.room.compiler)
 }

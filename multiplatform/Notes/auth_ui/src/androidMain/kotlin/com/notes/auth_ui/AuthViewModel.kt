@@ -7,7 +7,6 @@ import com.notes.auth_ui.data.LoginUIState
 import com.notes.auth_ui.data.RegisterUIState
 import com.notes.auth_ui.data.UIState
 import com.notes.auth_ui.data.VerificationUIState
-import com.notes.auth_ui.data.copyLoginUIState
 import com.notes.ui.Access
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,7 @@ private const val tag = "AuthViewModel"
 
 class AuthViewModel(
     // For test support
-    scopeOverride: CoroutineScope? = null
+    scopeOverride: CoroutineScope? = null,
 ) : AuthVMBase(scopeOverride) {
 
     private val _uiState = MutableStateFlow(UIState())
@@ -28,13 +27,12 @@ class AuthViewModel(
         state: LoginUIState,
         onSuccess: () -> Unit,
         context: Any?,
-        args: Access
+        args: Access,
     ) {
         Platform().logger.logi("$tag::login()")
         scope.launch {
-            // Show progress
-            val newState = _uiState.copyLoginUIState(showProgress = true)
-            _uiState.emit(newState!!)
+
+            _uiState.showProgressSafe(show = true)
 
             val result = interactor.login(state.password, state.email, context)
             if (result.isSuccess()) {
@@ -47,22 +45,18 @@ class AuthViewModel(
                     onSuccess()
                 }
             } else {
+                _uiState.showProgressSafe(show = false)
                 if (state.authToConfirm) {
                     Platform().logger.loge("$tag::login() reauth failed")
                 }
                 handleResult(result)
-            }
-
-            val updateProgress = _uiState.copyLoginUIState(showProgress = result.isSuccess())
-            if (updateProgress != null) {
-                _uiState.emit(updateProgress)
             }
         }
     }
 
     fun register(
         state: RegisterUIState,
-        onSuccess: suspend () -> Unit
+        onSuccess: suspend () -> Unit,
     ) {
         Platform().logger.logi("$tag::register()")
         scope.launch {
@@ -80,11 +74,10 @@ class AuthViewModel(
 
     fun changePassword(
         state: RegisterUIState,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
     ) {
         Platform().logger.logi("$tag::changePassword()")
         scope.launch {
-
             if (state.email != interactor.getEmail()) {
                 // Show error
                 showDialog(
@@ -92,7 +85,7 @@ class AuthViewModel(
                     subtitle = "Entered email is not correct",
                     onConfirm = {
                         dismissDialog()
-                    }
+                    },
                 )
                 return@launch
             }
@@ -104,7 +97,7 @@ class AuthViewModel(
                     subtitle = "Passwords do not match",
                     onConfirm = {
                         dismissDialog()
-                    }
+                    },
                 )
                 return@launch
             }
@@ -117,7 +110,7 @@ class AuthViewModel(
                     subtitle = "Password has changed successfully!",
                     onConfirm = {
                         onSuccess()
-                    }
+                    },
                 )
             } else {
                 showDialog(
@@ -125,10 +118,9 @@ class AuthViewModel(
                     subtitle = "Failed to change password. Please, try later.",
                     onConfirm = {
                         dismissDialog()
-                    }
+                    },
                 )
             }
-
         }
     }
 
@@ -160,7 +152,8 @@ class AuthViewModel(
             // Special case to handle if user don't want to register
             // and to allow he/she to go strait to login ui
             // also in some cases we should auth user again
-            val loginUIForced = args.forceLoginUI ||
+            val loginUIForced =
+                args.forceLoginUI ||
                     (_uiState.value is LoginUIState && (_uiState.value as LoginUIState).uiForced) ||
                     args.showChangePasswordUI
 
@@ -180,10 +173,11 @@ class AuthViewModel(
     }
 
     private suspend fun onShowLoginUI(args: Access) {
-        val newState = createLoginUIState(
-            showChangePasswordUI = args.showChangePasswordUI,
-            uiForced = args.forceLoginUI
-        )
+        val newState =
+            createLoginUIState(
+                showChangePasswordUI = args.showChangePasswordUI,
+                uiForced = args.forceLoginUI,
+            )
         _uiState.emit(newState)
     }
 
@@ -198,14 +192,14 @@ class AuthViewModel(
     private suspend fun updateVerificationUIState(
         emailVerificationSent: Boolean? = null,
         email: String? = null,
-        force: Boolean = false
+        force: Boolean = false,
     ) {
         val copy = if (force) VerificationUIState() else _uiState.value as? VerificationUIState ?: return
         _uiState.emit(
             VerificationUIState(
                 emailVerificationSent = emailVerificationSent ?: copy.emailVerificationSent,
                 email = email ?: copy.email,
-            )
+            ),
         )
     }
 
@@ -225,5 +219,4 @@ class AuthViewModel(
         // Handle other errors
         super.handleResult(result)
     }
-
 }

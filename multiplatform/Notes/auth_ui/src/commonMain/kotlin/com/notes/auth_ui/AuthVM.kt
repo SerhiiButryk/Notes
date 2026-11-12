@@ -1,14 +1,16 @@
 package com.notes.auth_ui
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.navigation3.runtime.NavKey
 import api.Platform
-import api.data.isFirstLaunch
 import com.notes.auth_ui.data.LoginUIState
 import com.notes.auth_ui.data.RegisterUIState
+import com.notes.ui.LoadingNoteScreen
 import com.notes.ui.LoginScreen
 import com.notes.ui.OnBoardingNoteScreen
-import com.notes.ui.RegistrationScreen
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -17,7 +19,7 @@ private const val tag = "AuthVM"
 
 class AuthVM(
     // For test support
-    scopeOverride: CoroutineScope? = null
+    scopeOverride: CoroutineScope? = null,
 ) : AuthVMBase(scopeOverride) {
 
     private val _uiStateRegister = MutableStateFlow(RegisterUIState())
@@ -26,20 +28,29 @@ class AuthVM(
     private val _uiStateLogin = MutableStateFlow(LoginUIState())
     val loginUIState = _uiStateLogin.asStateFlow()
 
-    var startDestination: NavKey? = null
+    val startDestination = mutableStateOf<NavKey>(LoadingNoteScreen)
 
     init {
+        val firstLaunch = scope.async (Dispatchers.IO) {
+            !interactor.hasRegisteredUser()
+        }
         scope.launch {
-            startDestination = if (isFirstLaunch())
+            startDestination.value = if (firstLaunch.await()) {
                 OnBoardingNoteScreen
-            else if (interactor.hasRegisteredUser()) {
+            } else {
                 onShowLoginScreen()
                 LoginScreen
-            } else {
-                onShowRegisterScreen()
-                RegistrationScreen
             }
-            Platform().logger.logi("AuthVM() init completed")
+            Platform().logger.logi("AuthVM() init done")
+        }
+    }
+
+    fun onOpen() {
+        // Reset state when UI gets open
+        scope.launch {
+            _uiStateLogin.showProgress(show = false)
+            dismissDialog()
+            dismissLoadingDialog()
         }
     }
 
@@ -47,18 +58,23 @@ class AuthVM(
         state: LoginUIState,
         onSuccess: () -> Unit,
     ) {
-
         Platform().logger.logi("$tag::login()")
 
         scope.launch {
+
+            _uiStateLogin.showProgress(show = true)
+
             val result = interactor.login(password = state.password, email = state.email, null)
+
             if (result.isSuccess()) {
                 Platform().logger.logi("$tag::login() success")
                 onSuccess()
             } else {
-                Platform().logger.logi("$tag::register() failed")
+                Platform().logger.logi("$tag::login() failed")
+                _uiStateLogin.showProgress(show = false)
                 handleResult(result)
             }
+
         }
     }
 
@@ -66,15 +82,15 @@ class AuthVM(
         state: RegisterUIState,
         onSuccess: () -> Unit,
     ) {
-
         Platform().logger.logi("$tag::register()")
 
         scope.launch {
-            val result = interactor.register(
-                password = state.password,
-                email = state.email,
-                confirmPassword = state.confirmPassword
-            )
+            val result =
+                interactor.register(
+                    password = state.password,
+                    email = state.email,
+                    confirmPassword = state.confirmPassword,
+                )
             if (result.isSuccess()) {
                 Platform().logger.logi("$tag::register() success")
                 onSuccess()
@@ -99,5 +115,4 @@ class AuthVM(
         // Showing Register UI
         onShowRegisterScreen()
     }
-
 }

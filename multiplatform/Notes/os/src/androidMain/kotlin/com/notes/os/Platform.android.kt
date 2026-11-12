@@ -3,6 +3,7 @@ package com.notes.os
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
+import android.os.Environment
 import api.data.StorageOperations
 import api.net.HttpClient
 import api.net.NetStateManager
@@ -15,20 +16,18 @@ import com.notes.os.impl.AppLogger
 import com.notes.os.impl.Base64Provider
 import com.notes.os.impl.CryptoProvider
 import com.notes.os.impl.StorageProvider
+import com.notes.repo.AndroidSyncManager
 import com.notes.repo.AppRepository
 import java.lang.ref.WeakReference
 
-internal actual class PlatformFactory(context: Context) {
-
+internal actual class PlatformFactory(
+    context: Context,
+) {
     private val weakContextRef = WeakReference(context)
 
-    actual fun provideBase64Operations(): Base64Operations {
-        return Base64Provider()
-    }
+    actual fun provideBase64Operations(): Base64Operations = Base64Provider()
 
-    actual fun provideCryptoOperations(): CryptoOperations {
-        return CryptoProvider()
-    }
+    actual fun provideCryptoOperations(): CryptoOperations = CryptoProvider()
 
     actual fun provideStorageOperations(): StorageOperations {
         val context = weakContextRef.get()
@@ -36,9 +35,7 @@ internal actual class PlatformFactory(context: Context) {
         return StorageProvider(context)
     }
 
-    actual fun provideLogger(): Log {
-        return AppLogger()
-    }
+    actual fun provideLogger(): Log = AppLogger()
 
     actual fun provideNetStateManager(): NetStateManager {
         val context = weakContextRef.get()
@@ -48,12 +45,27 @@ internal actual class PlatformFactory(context: Context) {
     }
 
     actual fun provideAppRepository(): BaseRepo {
-        return AppRepository.create()
+        val context = weakContextRef.get()
+        requireNotNull(context) { "Null context" }
+        return AppRepository.create(AndroidSyncManager(context))
     }
 
-    actual fun provideHttpClient(): HttpClient {
-        return NetHttpClient()
+    actual fun provideHttpClient(): HttpClient = NetHttpClient()
+
+    actual fun provideCacheDirPath(): String {
+        val context = weakContextRef.get()
+        requireNotNull(context) { "Null context" }
+        return context.externalCacheDir?.absolutePath ?: context.cacheDir.absolutePath
     }
 
+    actual fun provideRootFilesDir(): String {
+        val context = weakContextRef.get()
+        requireNotNull(context) { "Null context" }
+        return context.filesDir.absolutePath
+    }
+
+    actual fun provideDownloadFilesDir(): String {
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        return downloadDir.absolutePath
+    }
 }
-

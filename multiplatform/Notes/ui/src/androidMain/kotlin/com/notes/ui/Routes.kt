@@ -14,7 +14,7 @@ class Auth : Screen()
 @Serializable
 class Access(
     val showChangePasswordUI: Boolean = false,
-    val forceLoginUI: Boolean = false
+    val forceLoginUI: Boolean = false,
 ) : Screen()
 
 @Serializable
@@ -36,4 +36,7 @@ class NotesSettings : Screen()
 class NotesAccount : Screen()
 
 @Serializable
-class MediaPreview(val uri: String, val name: String) : Screen()
+class MediaPreview(
+    val uri: String,
+    val name: String,
+) : Screen()

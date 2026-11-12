@@ -1,22 +1,55 @@
 package com.notes.os
 
 import api.AppServices
+import api.Platform
+import api.data.AppSettings
 import api.platform
-import com.notes.services.FirebaseAuthService
-import com.notes.services.FirebaseService
+import com.notes.os.impl.crypto.TinkCrypto
+import com.notes.services.Firebase
 import com.notes.ui.initResources
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 object JVMInitProvider {
 
-    fun create() {
+    @OptIn(DelicateCoroutinesApi::class)
+    fun onCreate() {
+
         // Perform initialization during the app launch
         val factory = PlatformFactory()
         val osPlatform = Platform(factory)
         platform = osPlatform
+
+        // This is fast and should not cause any issues
+        GlobalScope.launch {
+            AppSettings.loadAppSettings()
+        }
+
         initResources()
+
         // Set services
-        AppServices.addService(FirebaseService())
-        AppServices.addService(FirebaseAuthService())
+        val firebase = Firebase()
+        AppServices.addService(firebase)
+        AppServices.addService(firebase.createAuthService())
+        AppServices.addService(firebase.createFirestoreService())
+
+        // Init crypto lib
+        TinkCrypto.getCryptoHandle()
+
+        // Other app configs
+        AppSettings.editorBackEnabled = false
+        AppSettings.attachmentsEnabled = false
+
+        Platform().logger.logi("App launched >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun onDestroy() {
+        GlobalScope.launch {
+            AppServices.clear()
+            Platform().logger.close()
+        }
     }
 
 }

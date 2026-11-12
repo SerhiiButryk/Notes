@@ -12,63 +12,58 @@ import com.notes.os.impl.AppLogger
 import com.notes.os.impl.Base64Provider
 import com.notes.os.impl.CryptoProvider
 import com.notes.os.impl.StorageProvider
-import com.notes.repo.AppRepoCommon
+import com.notes.repo.AppRepoBase
+import com.notes.repo.JvmSyncManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import java.io.File
 
 internal actual class PlatformFactory {
+    actual fun provideBase64Operations(): Base64Operations = Base64Provider()
 
-    actual fun provideBase64Operations(): Base64Operations {
-        return Base64Provider()
-    }
+    actual fun provideCryptoOperations(): CryptoOperations = CryptoProvider()
 
-    actual fun provideCryptoOperations(): CryptoOperations {
-        return CryptoProvider()
-    }
+    actual fun provideStorageOperations(): StorageOperations = StorageProvider()
 
-    actual fun provideStorageOperations(): StorageOperations {
-        return StorageProvider()
-    }
+    actual fun provideLogger(): Log = AppLogger()
 
-    actual fun provideLogger(): Log {
-        return AppLogger()
-    }
+    actual fun provideNetStateManager(): NetStateManager =
+        object : NetStateManager {
+            override suspend fun isNetworkAvailable(): Boolean = true
 
-    actual fun provideNetStateManager(): NetStateManager {
-        return object : NetStateManager {
-            override suspend fun isNetworkAvailable(): Boolean {
-                return true
-            }
-
-            override fun observerChanges(): Flow<NetStateInfo> {
-                return emptyFlow()
-            }
+            override fun observerChanges(): Flow<NetStateInfo> = emptyFlow()
 
             override fun startObserver() {
-
             }
         }
-    }
 
-    actual fun provideAppRepository(): BaseRepo {
-        return AppRepoCommon()
-    }
+    actual fun provideAppRepository(): BaseRepo =
+        AppRepoBase(syncManager = JvmSyncManager())
 
-    actual fun provideHttpClient(): HttpClient {
-        return object : HttpClient {
+    actual fun provideHttpClient(): HttpClient =
+        object : HttpClient {
             override suspend fun post(
                 url: String,
-                formArgs: Map<String, String>
-            ): String? {
-                return null
-            }
+                formArgs: Map<String, String>,
+            ): String? = null
 
             override fun postSync(
                 url: String,
-                formArgs: Map<String, String>
-            ): String? {
-                return null
-            }
+                formArgs: Map<String, String>,
+            ): String? = null
         }
+
+    actual fun provideCacheDirPath(): String {
+        val userHome = System.getProperty("user.home")
+        val appDir = File(userHome, ".notes")
+            .apply {
+                if (!exists())
+                    mkdirs()
+            }
+        return appDir.absolutePath
     }
+
+    actual fun provideRootFilesDir(): String = ""
+    actual fun provideDownloadFilesDir(): String = ""
+
 }

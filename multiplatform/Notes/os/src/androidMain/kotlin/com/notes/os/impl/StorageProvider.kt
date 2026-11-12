@@ -10,18 +10,14 @@ import api.Platform
 import api.data.StorageOperations
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import java.io.File
 import java.lang.ref.WeakReference
 
 class StorageProvider(
     context: Context,
 ) : StorageOperations {
-
     // Keep context as weak ref for safety
     private val contextRef = WeakReference(context)
     private val fileName = "AppSettings"
-    private val cacheDir: File = context.externalCacheDir ?: context.cacheDir
-    private val rootDir: File = context.filesDir
 
     // This should be a single instance across whole app !
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(fileName)
@@ -41,11 +37,12 @@ class StorageProvider(
     override suspend fun get(key: String): String {
         val ref = contextRef.get() ?: return ""
         val result =
-            ref.applicationContext.datastore.data.map { prefs: Preferences ->
-                val valueEnc = prefs[stringPreferencesKey(key)] ?: return@map ""
-                val valueDec = Platform().crypto.decrypt(valueEnc)
-                valueDec
-            }.first()
+            ref.applicationContext.datastore.data
+                .map { prefs: Preferences ->
+                    val valueEnc = prefs[stringPreferencesKey(key)] ?: return@map ""
+                    val valueDec = Platform().crypto.decrypt(valueEnc)
+                    valueDec
+                }.first()
         return result
     }
 
@@ -55,13 +52,4 @@ class StorageProvider(
             preferences.clear()
         }
     }
-
-    override fun getCacheDir(): String {
-        return cacheDir.absolutePath
-    }
-
-    override fun getRootFilesDir(): String {
-        return rootDir.absolutePath
-    }
-
 }

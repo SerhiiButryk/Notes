@@ -8,6 +8,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.notes.ui.isPhoneLandScape
 import com.notes.ui.isTabletOrFoldableExpanded
 import com.notes.ui.previewIcon
 import com.notes.ui.toPainter
@@ -21,6 +22,9 @@ fun OnboardingScreen(onContinue: () -> Unit) {
         if (isTabletOrFoldableExpanded(sc)) {
             // Add max width bound
             Modifier.widthIn(max = 800.dp)
+        } else if (isPhoneLandScape(sc)) {
+            // Add mid width bound
+            Modifier.widthIn(max = 500.dp)
         } else {
             // Full size
             Modifier
@@ -32,14 +36,13 @@ fun OnboardingScreen(onContinue: () -> Unit) {
         modifier = sizeModifier,
         onContinue = onContinue,
         preview = {
-
             Image(
                 modifier = Modifier.padding(10.dp, 10.dp, bottom = 30.dp),
                 painter = toPainter(previewIcon),
                 contentDescription = null,
             )
 
-            // TODO: Can have a video preview if I got a good animation
+            // TODO: Can have a video preview if I get a good animation
             // Generated using https://www.vidnoz.com/image-to-video-ai.html
             // From image https://undraw.co/search/notes
 //            val url = "asset:///preview_video.mp4"
@@ -61,7 +64,6 @@ fun OnboardingScreen(onContinue: () -> Unit) {
 //                            .padding(bottom = 32.dp),
 //                )
 //            }
-        }
+        },
     )
-
 }

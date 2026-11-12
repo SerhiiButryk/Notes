@@ -1,3 +1,10 @@
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType.HTML
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -14,72 +21,75 @@ plugins {
     alias(libs.plugins.ktlint) apply false // Static analysis
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.android.test) apply false
-    alias(libs.plugins.baselineprofile) apply false // Static analysis
+    alias(libs.plugins.baselineprofile) apply false
+    alias(libs.plugins.androidx.room) apply false
 }
 
 subprojects {
 
-    // Enable compose compiler reports
+    // Apply static analysis tools to all subprojects
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    // Configure compose compiler reports dynamically
     // Run this task to see a report:
     // '$ ./gradlew clean'
     // '$ ./gradlew :composeApp:compileDebugKotlinAndroid --rerun-tasks'
     plugins.withId("org.jetbrains.kotlin.plugin.compose") {
 
-        if (project.name == "compose-rich-editor") { // Separate git submodule , do not enable
-            println("Compose compiler reports are disabled for ${project.name} module")
-        } else {
+        extensions.configure<ComposeCompilerGradlePluginExtension>(
+            "composeCompiler"
+        ) {
 
-            extensions.configure<org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension>(
-                "composeCompiler"
-            ) {
+            reportsDestination.set(
+                rootProject.layout.buildDirectory.dir("compose_reports/${project.name}")
+            )
 
-                reportsDestination.set(
-                    rootProject.layout.buildDirectory.dir("compose_reports/${project.name}")
-                )
+            metricsDestination.set(
+                rootProject.layout.buildDirectory.dir("compose_compiler/${project.name}/")
+            )
 
-                metricsDestination.set(
-                    rootProject.layout.buildDirectory.dir("compose_compiler/${project.name}/")
-                )
-
-                // TODO Add stability configuration if needed
+            // TODO Add stability configuration if needed
 //            stabilityConfigurationFiles.add(
 //                rootProject.layout.projectDirectory.file(
 //                    "compose_compiler/stability.conf"
 //                )
 //            )
-            }
         }
     }
 
-    // Setup static analysis
-    if (project.name == "compose-rich-editor") { // Separate git submodule , do not enable
-        println("Ktlint & Detekt are disabled for ${project.name} module")
-    } else {
+    // Configure Kotlin lint dynamically
+    // Run this task to see a report:
+    // '$ ./gradlew ktlintchec'
+    // '$ ./gradlew ktlintFormat' - to fix
+    plugins.withId("org.jlleitschuh.gradle.ktlint") {
 
-        apply(plugin = "org.jlleitschuh.gradle.ktlint")
-        apply(plugin = "io.gitlab.arturbosch.detekt")
-
-        configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        extensions.configure<KtlintExtension> {
             // Enable or disable specific settings
             debug.set(true)
             android.set(false)
             outputToConsole.set(false)
             verbose.set(true)
             ignoreFailures.set(true)
-
             reporters {
-                reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.HTML)
+                reporter(HTML)
             }
-
         }
 
-        tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask> {
+        tasks.withType<GenerateReportsTask> {
             val projectName = project.name
             // Custom output locations
-            reportsOutputDirectory = rootProject.layout.buildDirectory.dir("reports/ktlint/${projectName}")
+            reportsOutputDirectory =
+                rootProject.layout.buildDirectory.dir("reports/ktlint/${projectName}")
         }
+    }
 
-        configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
+    // Configure detekt dynamically
+    // Run this task to see a report:
+    // '$ ./gradlew detekt'
+    plugins.withId("io.gitlab.arturbosch.detekt") {
+
+        configure<DetektExtension> {
             // Enable or disable specific settings
             buildUponDefaultConfig = true
             allRules = false
@@ -92,7 +102,7 @@ subprojects {
             basePath = projectDir.path
         }
 
-        tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        tasks.withType<Detekt>().configureEach {
             reports {
                 // Enable or disable specific formats
                 html.required.set(true)
@@ -109,6 +119,6 @@ subprojects {
                 html.outputLocation.set(outputFile)
             }
         }
-
     }
+
 }

@@ -32,22 +32,24 @@ class BenchmarksBasic {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
-    private val metrics = listOf(
-        StartupTimingMetric()
-    )
+    private val metrics =
+        listOf(
+            StartupTimingMetric(),
+        )
 
     private val iterations = 1
 
     @Test
-    fun startup() = benchmarkRule.measureRepeated(
-        packageName = "com.notes.app",
-        metrics = metrics,
-        iterations = iterations,
-        startupMode = StartupMode.COLD,
-        setupBlock = {
-            pressHome()
-        },
-    ) {
-        testLogin()
-    }
+    fun startup() =
+        benchmarkRule.measureRepeated(
+            packageName = "com.notes.app",
+            metrics = metrics,
+            iterations = iterations,
+            startupMode = StartupMode.COLD,
+            setupBlock = {
+                pressHome()
+            },
+        ) {
+            testLogin()
+        }
 }

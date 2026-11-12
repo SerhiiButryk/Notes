@@ -30,11 +30,12 @@ inline fun <reified T : ViewModel> NavBackStackEntry.getViewModel(
     }
 
     val parentEntry = remember(this) { navController.getBackStackEntry(route) }
-    val vm = if (factory != null) {
-        viewModel<T>(parentEntry, factory = factory)
-    } else {
-        viewModel<T>(parentEntry)
-    }
+    val vm =
+        if (factory != null) {
+            viewModel<T>(parentEntry, factory = factory)
+        } else {
+            viewModel<T>(parentEntry)
+        }
 
     Platform().logger.logd("$TAG::getViewModel: created = $vm")
     return vm

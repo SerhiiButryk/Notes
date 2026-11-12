@@ -7,27 +7,29 @@ data class Notes(
     val content: String = "",
     val id: Long = 0,
     val userId: String = "",
-    val time: String = ""
+    val time: String = "",
 ) {
+    // UI state representing this note
+    var richState: Any? = null
+
     companion object {
         fun NewNote() = Notes(id = -1)
-
         fun AbsentNote() = Notes(id = -2)
+        fun LoadingNote() = Notes(id = -3)
     }
 }
 
 @Immutable // To mark it stable for compose
 data class NotesCollection(
-    val collection: List<Notes> = emptyList()
-)
-
-fun Notes.getStringRep(): String {
-    return content
+    val collection: List<Notes> = emptyList(),
+) {
+    fun isEmpty() = collection.isEmpty()
+    fun isLoading() = if (isEmpty()) false else collection.first().id == Notes.LoadingNote().id
 }
 
-fun String.toNote(id: Long): Notes {
-    return Notes(content = this, id = id, userId = "", time = "")
-}
+fun Notes.getStringRep(): String = content
+
+fun String.getNoteRep(id: Long): Notes = Notes(content = this, id = id, userId = "", time = "")
 
 fun List<Notes>.isEqualTo(list: List<Notes>): Boolean {
     if (size != list.size) {
@@ -37,13 +39,15 @@ fun List<Notes>.isEqualTo(list: List<Notes>): Boolean {
 
         val found = list.find { it.id == item.id }
 
-        if (found == null)
+        if (found == null) {
             return false
+        }
 
         val identical = found.content == item.content && found.userId == item.userId
 
-        if (!identical)
+        if (!identical) {
             return false
+        }
     }
     return true
 }

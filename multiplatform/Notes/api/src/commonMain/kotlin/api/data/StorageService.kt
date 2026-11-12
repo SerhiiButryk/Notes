@@ -7,18 +7,19 @@ import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 interface StorageService : AppService {
-
     suspend fun store(document: Document): Boolean
 
     suspend fun load(document: Document): Document?
 
     suspend fun delete(document: Document): Boolean
 
+    // TODO: Revisit this looks wrong, maybe there is a better way?
+    suspend fun selectDocName(initial: Long = 1): Long? = null
+
     suspend fun fetchAll(): List<Document>
 }
 
 abstract class AbstractStorageService : StorageService {
-
     private val tag = "AbstractStorageService"
 
     @OptIn(ExperimentalAtomicApi::class)
@@ -29,12 +30,11 @@ abstract class AbstractStorageService : StorageService {
         get() {
             return _canUse.load()
         }
-    set(value) {
-        _canUse.store(value)
-    }
+        set(value) {
+            _canUse.store(value)
+        }
 
     protected fun paramsCheck(name: String): Boolean {
-
         if (!isAuthenticated()) return false
 
         if (name.isEmpty()) {
@@ -44,7 +44,7 @@ abstract class AbstractStorageService : StorageService {
 
         try {
             val nameCheck = name.toInt()
-            if (nameCheck < 0) {
+            if (nameCheck <= 0) {
                 Platform().logger.loge("$tag::paramsCheck() stop cos not valid name")
                 return false
             }
@@ -72,5 +72,4 @@ abstract class AbstractStorageService : StorageService {
 
         return true
     }
-
 }

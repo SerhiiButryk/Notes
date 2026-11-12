@@ -2,8 +2,8 @@ package api.repo
 
 import api.Platform
 import api.data.Attachments
-import api.data.UserFile
 import api.data.Notes
+import api.data.UserFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -11,9 +11,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 
 interface RepoCallback {
-    fun onNoteAdded(id: Long)
-    fun onNoteDeleted(id: Long)
-    fun onNoteNavigateBack()
+    fun onNoteAdded(note: Notes?)
+    fun onEditorNavBack()
 }
 
 interface Repository {
@@ -23,7 +22,7 @@ interface Repository {
 
     fun saveNote(
         note: Notes,
-        onNewAdded: suspend (Long) -> Unit,
+        onAdded: suspend (Notes?) -> Unit,
     )
 
     fun deleteNote(
@@ -35,27 +34,31 @@ interface Repository {
 
     suspend fun canChangePassword(): Boolean
 
-    suspend fun clearLocalAppStorage()
+    suspend fun clearAllData()
+    suspend fun clearAccountOnlyData()
 
     suspend fun isDataInSync(): Boolean
 
     fun clear()
 
-    suspend fun onAttachments(attachment: Any, noteId: Long, info: Any? = null): Boolean = false
+    suspend fun onAttachments(
+        attachment: Any,
+        noteId: Long,
+        info: Any? = null,
+    ): Boolean = false
 
-    fun getAttachments() : Flow<Attachments>
+    fun getAttachments(): Flow<Attachments>
 
     suspend fun onDeleteAttachment(file: UserFile): Boolean = false
 }
 
-abstract class BaseRepo : Repository {
+abstract class BaseRepo(scopeOverride: CoroutineScope? = null) : Repository {
 
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
-    protected val scope = CoroutineScope(coroutineContext)
+    val scope = scopeOverride ?: CoroutineScope(coroutineContext)
 
     override fun clear() {
         Platform().logger.logi("BaseRepo::clear()")
         scope.cancel()
     }
-
 }

@@ -1,9 +1,9 @@
 package com.notes.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import api.data.AppSettings
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
@@ -16,7 +16,23 @@ val Pink40 = Color(0xFF7D5260)
 val SurfaceDarkModeColor = Color(0xFF1e1e1e)
 
 @Composable
-fun SurfaceColor(): Color {
-    val darkMode = isSystemInDarkTheme()
+fun surfaceColor(): Color {
+    val darkMode = AppSettings.isDarkThemeEnabled
     return if (darkMode) SurfaceDarkModeColor else MaterialTheme.colorScheme.surface
+}
+
+@Composable
+fun backgroundColor(): Color {
+    val darkMode = AppSettings.isDarkThemeEnabled
+    return if (darkMode) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerHigh
+}
+
+@Composable
+fun iconColor(isEnabled: Boolean): Color {
+    val darkMode = AppSettings.isDarkThemeEnabled
+    return if (darkMode) {
+        if (isEnabled) Color.White else Color(0xFF616161)
+    } else {
+        if (isEnabled) Color.Black else Color(0xFFBDBDBD)
+    }
 }

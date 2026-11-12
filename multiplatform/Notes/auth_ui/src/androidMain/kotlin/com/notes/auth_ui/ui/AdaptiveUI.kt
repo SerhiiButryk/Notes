@@ -28,7 +28,7 @@ fun AuthUIAdaptive(
     innerPadding: PaddingValues,
     hasFocus: Boolean,
     hasProgress: Boolean,
-    onLogin: (() -> Unit)? = null
+    onLogin: (() -> Unit)? = null,
 ) {
     val emailFieldFocusRequester = remember { FocusRequester() }
     val passFieldFocusRequester = remember { FocusRequester() }
@@ -65,10 +65,12 @@ fun AuthUIAdaptive(
             .imePadding()
 
     when {
-
         isTabletOrFoldableExpanded(sc) -> {
-            val modifier = containerModifier
-                .then(keyboardPadding)
+
+            val modifier =
+                containerModifier
+                    .then(keyboardPadding)
+
             AuthLayoutWideScreen(
                 modifier = modifier,
                 title = title,
@@ -86,7 +88,7 @@ fun AuthUIAdaptive(
 
         isPhoneLandScape(sc) -> {
             AuthLayoutLandscapeSmallScreen(
-                containerModifier = containerModifier,
+                modifier = containerModifier,
                 mainContentModifier = mainContentModifier,
                 title = title,
                 subTitle = subTitle,
@@ -105,7 +107,7 @@ fun AuthUIAdaptive(
         else -> {
             val modifier = containerModifier.then(keyboardPadding)
             AuthLayoutCommonScreen(
-                containerModifier = modifier,
+                modifier = modifier,
                 mainContentModifier = mainContentModifier,
                 title = title,
                 subTitle = subTitle,
@@ -119,6 +121,5 @@ fun AuthUIAdaptive(
                 onEnter = onEnter,
             )
         }
-
     }
 }

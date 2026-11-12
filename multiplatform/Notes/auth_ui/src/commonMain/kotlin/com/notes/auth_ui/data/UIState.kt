@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 open class UIState(
     val title: String = "",
-    val subtitle: String = ""
+    val subtitle: String = "",
 )
 
 // This annotation could be redundant as
@@ -22,9 +22,9 @@ class LoginUIState(
     val uiForced: Boolean = true,
     val authToConfirm: Boolean = false,
 ) : UIState(
-    title = getTitleAndMessage(loginUI = true, authToConfirm = authToConfirm).first,
-    subtitle = getTitleAndMessage(loginUI = true, authToConfirm = authToConfirm).second
-)
+        title = getTitleAndMessage(loginUI = true, authToConfirm = authToConfirm).first,
+        subtitle = getTitleAndMessage(loginUI = true, authToConfirm = authToConfirm).second,
+    )
 
 fun <T> MutableStateFlow<T>.copyLoginUIState(showProgress: Boolean): UIState? {
     val old = (value as? LoginUIState)
@@ -35,7 +35,7 @@ fun <T> MutableStateFlow<T>.copyLoginUIState(showProgress: Boolean): UIState? {
             hasFocus = old.hasFocus,
             showProgress = showProgress,
             uiForced = old.uiForced,
-            authToConfirm = old.authToConfirm
+            authToConfirm = old.authToConfirm,
         )
     }
     return null
@@ -52,9 +52,9 @@ class RegisterUIState(
     val hasFocus: Boolean = false,
     val showChangePassword: Boolean = true,
 ) : UIState(
-    title = getTitleAndMessage(registerUI = true, passwordChangeUI =  showChangePassword).first,
-    subtitle = getTitleAndMessage(registerUI = true, passwordChangeUI =  showChangePassword).second
-)
+        title = getTitleAndMessage(registerUI = true, passwordChangeUI = showChangePassword).first,
+        subtitle = getTitleAndMessage(registerUI = true, passwordChangeUI = showChangePassword).second,
+    )
 
 // This annotation could be redundant as
 // the class is already stable, because all properties are stable.
@@ -64,6 +64,6 @@ class VerificationUIState(
     val emailVerificationSent: Boolean = false,
     val email: String = "",
 ) : UIState(
-    title = getVerifyTitleAndMessage(emailVerificationSent, email).first,
-    subtitle = getVerifyTitleAndMessage(emailVerificationSent, email).second
-)
+        title = getVerifyTitleAndMessage(emailVerificationSent, email).first,
+        subtitle = getVerifyTitleAndMessage(emailVerificationSent, email).second,
+    )

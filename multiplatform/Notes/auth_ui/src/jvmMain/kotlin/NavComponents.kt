@@ -22,11 +22,9 @@ fun EntryProviderScope<NavKey>.authDestination(
     onNavOnBoarding: () -> Unit,
     viewModel: AuthVM,
 ) {
-
     val scope = rememberCoroutineScope()
 
     entry(LoginScreen) {
-
         val uiState by viewModel.loginUIState.collectAsState()
 
         LoginScreenImpl(
@@ -34,13 +32,11 @@ fun EntryProviderScope<NavKey>.authDestination(
                 viewModel.login(state = it, onSuccess = onNavLogin)
             },
             state = uiState,
-            title = uiState.title,
-            subTitle = uiState.subtitle,
+            onOpen = viewModel::onOpen,
         )
     }
 
     entry(RegistrationScreen) {
-
         val uiState by viewModel.registerUIState.collectAsState()
 
         RegisterScreenImpl(
@@ -72,7 +68,6 @@ fun EntryProviderScope<NavKey>.authDestination(
     }
 
     Dialog(viewModel)
-
 }
 
 @Composable

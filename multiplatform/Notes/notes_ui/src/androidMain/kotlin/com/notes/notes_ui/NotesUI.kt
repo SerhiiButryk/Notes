@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
@@ -24,8 +26,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -34,17 +38,20 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import api.data.Attachments
 import api.data.Document.Companion.isUserFile
-import api.data.UserFile
 import api.data.Notes
 import api.data.NotesCollection
+import api.data.UserFile
 import coil3.compose.AsyncImage
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.notes.notes_ui.components.NotesNavRail
-import com.notes.notes_ui.data.Tools
-import com.notes.notes_ui.data.UiEvent
-import com.notes.notes_ui.editor.EditorCommand
+import com.notes.notes_ui.models.Tools
+import com.notes.notes_ui.components.UICommand
+import com.notes.notes_ui.editor.rememberRichEditorState
+import com.notes.ui.CollapsibleSearchTopBar
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NotesUI(
@@ -55,8 +62,7 @@ fun NotesUI(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<UiEvent>,
+    getEvents: suspend () -> Flow<UICommand>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
@@ -73,7 +79,6 @@ fun NotesUI(
         note = note,
         onSelectAction = onSelectAction,
         onNavigatedBack = onNavigatedBack,
-        onTextChanged = onTextChanged,
         getEvents = getEvents,
         onSettingsClick = onSettingsClick,
         onBackClick = onBackClick,
@@ -94,8 +99,7 @@ private fun NotesUIImpl(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<UiEvent>,
+    getEvents: suspend () -> Flow<UICommand>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showNavRail: Boolean,
@@ -106,7 +110,6 @@ private fun NotesUIImpl(
     onAttachFile: () -> Unit,
 ) {
     Row {
-
         // Show nav rail for large screens
         if (showNavRail) {
             NotesNavRail(onSettingsClick = onSettingsClick)
@@ -119,7 +122,6 @@ private fun NotesUIImpl(
             note = note,
             onSelectAction = onSelectAction,
             onNavigatedBack = onNavigatedBack,
-            onTextChanged = onTextChanged,
             getEvents = getEvents,
             onSettingsClick = onSettingsClick,
             onBackClick = onBackClick,
@@ -132,7 +134,7 @@ private fun NotesUIImpl(
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
 private fun ListDetailUI(
     notes: NotesCollection,
@@ -141,8 +143,7 @@ private fun ListDetailUI(
     onAddAction: suspend () -> Unit,
     onSelectAction: suspend (Notes) -> Unit,
     onNavigatedBack: suspend () -> Unit,
-    onTextChanged: (EditorCommand) -> Unit,
-    getEvents: suspend () -> Flow<UiEvent>,
+    getEvents: suspend () -> Flow<UICommand>,
     onSettingsClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     isPhoneSize: Boolean,
@@ -175,13 +176,7 @@ private fun ListDetailUI(
 
     val coroutineScope = rememberCoroutineScope()
 
-    val state = rememberRichTextState()
-
-    LaunchedEffect(false) {
-        // Set text when the editor is open
-        state.clear()
-        state.setHtml(note.content)
-    }
+    var state by rememberRichEditorState(note)
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,
@@ -189,49 +184,65 @@ private fun ListDetailUI(
             AnimatedPane {
                 // Note List screen
                 NotesListUI(
-                    modifier = Modifier.semantics {
-                        testTagsAsResourceId = true
-                    },
+                    modifier =
+                        Modifier.semantics {
+                            testTagsAsResourceId = true
+                        },
                     notes = notes,
                     onSelected = { selectedNote ->
                         // Open Note Editor Screen
                         coroutineScope.launch {
-                            state.clear() // Clear editor before opening
-                            state.setHtml(selectedNote.content) // Set content
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onSelectAction(selectedNote)
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                         }
                     },
                     addAction = {
                         // Open Note Editor Screen
                         coroutineScope.launch {
-                            state.clear() // Clear editor before opening
-                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                             onAddAction()
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, null)
                         }
                     },
-                    onSettingsClick = onSettingsClick,
-                    onBackClick = onBackClick,
-                    isPhoneSize = isPhoneSize
+                    isPhoneSize = isPhoneSize,
+                    topBar = {
+                        CollapsibleSearchTopBar(
+                            trailingIcon = {
+                                // Show settings conditionally for phone devices
+                                if (isPhoneSize) {
+                                    IconButton(
+                                        onClick = { onSettingsClick() },
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Settings,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                }
+                            },
+                            onBackClick = onBackClick,
+                        )
+                    }
                 )
             }
         },
         detailPane = {
             AnimatedPane {
-
                 LaunchedEffect(note) {
-                    getEvents().collect { event ->
-                        when (event) {
-                            // Close editor
-                            is UiEvent.NavigateToListPane -> {
-                                try {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.List, null)
-                                } finally {
-                                    onNavigatedBack()
+                    getEvents()
+                        .debounce(400L.milliseconds)
+                        .collect { event ->
+                            when (event) {
+                                // Close editor
+                                is UICommand.NavigateToListPane -> {
+                                    try {
+                                        navigator.navigateTo(ListDetailPaneScaffoldRole.List, null)
+                                    } finally {
+                                        onNavigatedBack()
+                                    }
                                 }
                             }
                         }
-                    }
                 }
 
                 BackHandler(enabled = true) {
@@ -247,22 +258,22 @@ private fun ListDetailUI(
 
                 val scope = rememberCoroutineScope()
 
-                val bottomSheetState = rememberModalBottomSheetState(
-                    skipPartiallyExpanded = false
-                )
+                val bottomSheetState =
+                    rememberModalBottomSheetState(
+                        skipPartiallyExpanded = false,
+                    )
 
                 val showFolderButton = attachments.hasAttachmentsFor(note.id)
                 SideEffect {
                     if (bottomSheetState.isVisible && !showFolderButton) {
-                        scope.launch {  bottomSheetState.hide() }
+                        scope.launch { bottomSheetState.hide() }
                     }
                 }
 
                 NotesEditorUI(
                     notes = note,
                     state = state,
-                    toolsPaneItems = toolsPaneItems,
-                    onTextChanged = onTextChanged,
+                    tools = toolsPaneItems,
                     onAttacheFile = onAttachFile,
                     showFolderButton = showFolderButton,
                     bottomSheetState = bottomSheetState,
@@ -276,10 +287,9 @@ private fun ListDetailUI(
                                 onOpenPreview(it)
                             }
                         },
-                        onDelete
+                        onDelete,
                     )
                 }
-
             }
         },
     )
@@ -295,34 +305,33 @@ fun MediaPreview(
     if (attachments.files.isNotEmpty()) {
         LazyRow {
             for (file in attachments.files) {
-                if (isUserFile(file.name, notes.id)) {
-                    item(file.location) {
+                if (isUserFile(file.file.name, notes.id)) {
+                    item(file.file) {
                         Box(
-                            modifier = Modifier
-                                .width(250.dp)
-                                .height(250.dp)
-                                .clickable {
-                                    onClick(file)
-                                },
+                            modifier =
+                                Modifier
+                                    .width(250.dp)
+                                    .height(250.dp)
+                                    .clickable {
+                                        onClick(file)
+                                    },
                         ) {
-
                             AsyncImage(
-                                model = file.location as Uri,
+                                model = Uri.fromFile(file.file),
                                 contentDescription = "",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Inside
+                                contentScale = ContentScale.Inside,
                             )
 
                             IconButton(
                                 onClick = { onDelete(file) },
-                                modifier = Modifier.align(Alignment.TopEnd)
+                                modifier = Modifier.align(Alignment.TopEnd),
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = ""
+                                    contentDescription = "",
                                 )
                             }
-
                         }
                     }
                 }

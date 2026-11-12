@@ -35,7 +35,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class BaselineProfileGenerator {
-
     @get:Rule
     val rule = BaselineProfileRule()
 
@@ -45,7 +44,7 @@ class BaselineProfileGenerator {
         rule.collect(
             packageName = packageName,
             // See: https://d.android.com/topic/performance/baselineprofiles/dex-layout-optimizations
-            includeInStartupProfile = true
+            includeInStartupProfile = true,
         ) {
             pressHome()
             testLogin()

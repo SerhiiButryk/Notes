@@ -2,29 +2,29 @@
 
 # Notes application 💜💜💜
 
-<img src="images/icons/Dark/Kotlin Multiplatform Logo.png">
+<img src="images/Banner.png">
 
 # What is it ? ✨
 
-Cross-platform, secure, fluent and rich editor for your notes, which is built with KMP.
+Cross-platform, secure, fluent and simple rich editor for your notes, which is built with KMP.
 
 # Current state
 
-Under active development.
+| Platform | Support Status | Target |
+| :--- | :---: | :--- |
+| **Android** | ✅ Supported | API Level 26+ |
+| **Desktop (JVM)** | ✅ Supported | macOS |
+| **iOS** | ⚠️ Supported | Early development |
 
 # Design
 
 <img src="images/package_structure.png">
 
-**Cloning the repo with submodules**
+# High level app architecture
 
-```
-$ git clone git@github.com:SerhiiButryk/Notes.git
-$ git submodule init
-$ git submodule update
-```
+<img src="images/App.png">
 
-**The ongoing improvements/features**
+**The ongoing tasks**
 
 1. Investigate memory issues during runtime
 
@@ -32,4 +32,4 @@ $ git submodule update
 
 3. Implement UI improvements (Search, Labels ...)
 
-4. Can add PlayIntgrity check using Firebase. However, it needs Google Play console configuration which is not possible now.
+4. Can add the PlayIntgrity checks throught Firebase SDK. However, it needs Google Play console configuration which is not possible now.
